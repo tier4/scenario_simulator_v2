@@ -50,7 +50,8 @@ auto quietNaNLaneletPose() -> LaneletPose
     .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>()
            .x(std::numeric_limits<double>::quiet_NaN())
            .y(std::numeric_limits<double>::quiet_NaN())
-           .z(std::numeric_limits<double>::quiet_NaN()));
+           .z(std::numeric_limits<double>::quiet_NaN()))
+    .lanelet_pose_valid(false);
 }
 
 /// @note Conversions
@@ -101,68 +102,72 @@ auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<La
   return lanelet_wrapper::pose::alternativeLaneletPoses(lanelet_pose);
 }
 
-auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
-  -> std::optional<CanonicalizedLaneletPose>
+auto toCanonicalizedLaneletPoses(const std::vector<LaneletPose> & lanelet_poses)
+  -> std::vector<CanonicalizedLaneletPose>
 {
-  if (lanelet_pose == LaneletPose()) {
-    return std::nullopt;
+  if (lanelet_poses.empty()) {
+    return {};
   } else {
     try {
-      return CanonicalizedLaneletPose(lanelet_pose);
+      std::vector<CanonicalizedLaneletPose> canonicalized_poses;
+      for (const auto & lanelet_pose : lanelet_poses) {
+        canonicalized_poses.push_back(CanonicalizedLaneletPose(lanelet_pose));
+      }
+      return canonicalized_poses;
     } catch (const common::SemanticError &) {
-      return std::nullopt;
+      return {};
     }
   }
 }
 
-auto toCanonicalizedLaneletPose(
+auto toCanonicalizedLaneletPoses(
   const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk)
-  -> std::optional<CanonicalizedLaneletPose>
+  -> std::vector<CanonicalizedLaneletPose>
 {
   /// @todo here matching_distance should be passed
   constexpr double matching_distance{1.0};
-  if (
-    const auto pose =
-      lanelet_wrapper::pose::toLaneletPose(map_pose, include_crosswalk, matching_distance)) {
-    return toCanonicalizedLaneletPose(pose.value());
+  if (const auto poses =
+        lanelet_wrapper::pose::toLaneletPoses(map_pose, include_crosswalk, matching_distance);
+      !poses.empty()) {
+    return toCanonicalizedLaneletPoses(poses);
   } else {
-    return std::nullopt;
+    return {};
   }
 }
 
-auto toCanonicalizedLaneletPose(
+auto toCanonicalizedLaneletPoses(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
+  const double matching_distance) -> std::vector<CanonicalizedLaneletPose>
 {
-  if (
-    const auto pose = lanelet_wrapper::pose::toLaneletPose(
-      map_pose, bounding_box, include_crosswalk, matching_distance)) {
-    return toCanonicalizedLaneletPose(pose.value());
+  if (const auto poses = lanelet_wrapper::pose::toLaneletPoses(
+        map_pose, bounding_box, include_crosswalk, matching_distance);
+      !poses.empty()) {
+    return toCanonicalizedLaneletPoses(poses);
   } else {
-    return std::nullopt;
+    return {};
   }
 }
 
-auto toCanonicalizedLaneletPose(
+auto toCanonicalizedLaneletPoses(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
-  const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
+  const double matching_distance) -> std::vector<CanonicalizedLaneletPose>
 {
-  std::optional<LaneletPose> lanelet_pose;
+  std::vector<LaneletPose> lanelet_poses;
   if (!unique_route_lanelets.empty()) {
-    lanelet_pose =
-      lanelet_wrapper::pose::toLaneletPose(map_pose, unique_route_lanelets, matching_distance);
+    lanelet_poses =
+      lanelet_wrapper::pose::toLaneletPoses(map_pose, unique_route_lanelets, matching_distance);
   }
-  if (!lanelet_pose) {
-    lanelet_pose = lanelet_wrapper::pose::toLaneletPose(
+  if (lanelet_poses.empty()) {
+    lanelet_poses = lanelet_wrapper::pose::toLaneletPoses(
       map_pose, bounding_box, include_crosswalk, matching_distance);
   }
-  if (lanelet_pose) {
-    return toCanonicalizedLaneletPose(lanelet_pose.value());
+  if (!lanelet_poses.empty()) {
+    return toCanonicalizedLaneletPoses(lanelet_poses);
   } else {
-    return std::nullopt;
+    return {};
   }
 }
 
@@ -422,9 +427,13 @@ auto findRoutableAlternativeLaneletPoseFrom(
                    search_distance);
                  !lanelet_pose) {
         continue;
-      } else if (auto canonicalized = toCanonicalizedLaneletPose(lanelet_pose.value());
-                 canonicalized) {
-        routes.emplace_back(std::move(canonicalized.value()), std::move(route));
+      } else if (auto canonicalized = toCanonicalizedLaneletPoses({lanelet_pose.value()});
+                 canonicalized.size() == 1) {
+        routes.emplace_back(std::move(canonicalized[0]), std::move(route));
+      } else {
+        // WIP need to choose the best lanelet pose
+        THROW_SEMANTIC_ERROR(
+          "Failed to convert lanelet pose to single canonicalized lanelet pose. ");
       }
     }
     if (!routes.empty()) {
@@ -440,6 +449,33 @@ auto findRoutableAlternativeLaneletPoseFrom(
   return std::nullopt;
 }
 
+auto getShortestOffsetLaneletPose(
+  const std::vector<CanonicalizedLaneletPose> & canonicalized_lanelet_poses)
+  -> std::optional<CanonicalizedLaneletPose>
+{
+  if (canonicalized_lanelet_poses.empty()) {
+    return std::nullopt;
+  } else if (canonicalized_lanelet_poses.size() == 1) {
+    return canonicalized_lanelet_poses.front();
+  } else {
+    /// @note Find the laneletID with the shortest offset
+    std::vector<double> distances;
+    for (const auto & canonicalized_lanelet_pose : canonicalized_lanelet_poses) {
+      distances.push_back(canonicalized_lanelet_pose.getLaneletPose().offset);
+    }
+    const auto min_distance_it = std::min_element(distances.cbegin(), distances.cend());
+    if (min_distance_it != distances.cend()) {
+      std::distance(distances.cbegin(), min_distance_it);
+      const auto index = std::distance(distances.cbegin(), min_distance_it);
+      return canonicalized_lanelet_poses.at(index);
+    } else {
+      THROW_SEMANTIC_ERROR(
+        "Failed to find the lanelet pose with the shortest offset, please check the input poses.");
+      return std::nullopt;
+    }
+  }
+}
+
 namespace pedestrian
 {
 /*
@@ -453,10 +489,11 @@ auto transformToCanonicalizedLaneletPose(
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
 {
-  if (
-    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
-      map_pose, bounding_box, unique_route_lanelets, include_crosswalk, matching_distance)) {
-    return canonicalized_lanelet_pose;
+  if (const auto canonicalized_lanelet_poses = toCanonicalizedLaneletPoses(
+        map_pose, bounding_box, unique_route_lanelets, include_crosswalk, matching_distance);
+      !canonicalized_lanelet_poses.empty()) {
+    // WIP just return the first one
+    return canonicalized_lanelet_poses.front();
   }
   /// @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
   /// In this branch, the algorithm only consider entity pose.
@@ -468,25 +505,28 @@ auto transformToCanonicalizedLaneletPose(
     if (
       const auto canonicalized_lanelet_pose =
         std::get<std::optional<LaneletPose>>(canonicalized_tuple)) {
-      return toCanonicalizedLaneletPose(lanelet_pose.value());
+      return toCanonicalizedLaneletPoses({lanelet_pose.value()}).front();
     } else {
       /// @note If canonicalize failed, set end of road lanelet pose.
       if (
         const auto end_of_road_lanelet_id =
           std::get<std::optional<lanelet::Id>>(canonicalized_tuple)) {
         if (lanelet_pose.value().s < 0) {
-          return CanonicalizedLaneletPose(traffic_simulator_msgs::build<LaneletPose>()
-                                            .lanelet_id(end_of_road_lanelet_id.value())
-                                            .s(0.0)
-                                            .offset(lanelet_pose.value().offset)
-                                            .rpy(lanelet_pose.value().rpy));
+          return CanonicalizedLaneletPose(
+            traffic_simulator_msgs::build<LaneletPose>()
+              .lanelet_id(end_of_road_lanelet_id.value())
+              .s(0.0)
+              .offset(lanelet_pose.value().offset)
+              .rpy(lanelet_pose.value().rpy)
+              .lanelet_pose_valid(false));
         } else {
           return CanonicalizedLaneletPose(
             traffic_simulator_msgs::build<LaneletPose>()
               .lanelet_id(end_of_road_lanelet_id.value())
               .s(lanelet_wrapper::lanelet_map::laneletLength(end_of_road_lanelet_id.value()))
               .offset(lanelet_pose.value().offset)
-              .rpy(lanelet_pose.value().rpy));
+              .rpy(lanelet_pose.value().rpy)
+              .lanelet_pose_valid(true));
         }
       } else {
         THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id for LaneletPose estimation.");

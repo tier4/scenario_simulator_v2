@@ -128,8 +128,8 @@ auto makeEntityStatus(
     .bounding_box(bbox)
     .action_status(traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0))
     .pose(traffic_simulator::pose::toMapPose(pose))
-    .lanelet_pose(static_cast<traffic_simulator::LaneletPose>(pose))
-    .lanelet_pose_valid(true);
+    .lanelet_poses(std::vector<traffic_simulator_msgs::msg::LaneletPose>{
+      static_cast<traffic_simulator::LaneletPose>(pose)});
 }
 
 auto makeEntityStatus(
@@ -147,8 +147,7 @@ auto makeEntityStatus(
     .bounding_box(bbox)
     .action_status(traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0))
     .pose(pose)
-    .lanelet_pose(traffic_simulator_msgs::msg::LaneletPose{})
-    .lanelet_pose_valid(false);
+    .lanelet_poses(std::vector<traffic_simulator_msgs::msg::LaneletPose>{});
 }
 
 auto makeCanonicalizedEntityStatus(
@@ -173,10 +172,11 @@ auto makeCanonicalizedEntityStatus(
   const auto include_crosswalk =
     (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == type ||
      traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == type);
-  const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
+  const auto canonicalized_lanelet_poses = traffic_simulator::pose::toCanonicalizedLaneletPoses(
     pose, bbox, include_crosswalk, matching_distance);
   return traffic_simulator::entity_status::CanonicalizedEntityStatus(
-    makeEntityStatus(pose, bbox, speed, name, type), canonicalized_lanelet_pose);
+    // WIP just use the first canonicalized lanelet pose for now
+    makeEntityStatus(pose, bbox, speed, name, type), canonicalized_lanelet_poses.front());
 }
 
 #endif  // TRAFFIC_SIMULATOR__TEST__ENTITY_HELPER_FUNCTIONS_HPP_

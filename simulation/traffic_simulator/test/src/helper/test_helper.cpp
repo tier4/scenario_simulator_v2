@@ -51,7 +51,8 @@ TEST(helper, constructLaneletPose)
       .lanelet_id(11LL)
       .s(13.0)
       .offset(17.0)
-      .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(19.0).y(23.0).z(29.0));
+      .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(19.0).y(23.0).z(29.0))
+      .lanelet_pose_valid(true);
 
   const auto result_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(11LL, 13.0, 17.0, 19.0, 23.0, 29.0);
@@ -126,7 +127,7 @@ TEST(helper, constructLidarConfiguration)
 }
 
 /**
- * @note Test basic functionality. Test construction correctness of 
+ * @note Test basic functionality. Test construction correctness of
  * a detection sensor with a given configuration.
  */
 TEST(helper, constructDetectionSensorConfiguration)

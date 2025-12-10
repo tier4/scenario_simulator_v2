@@ -78,10 +78,10 @@ public:
       RCLCPP_INFO_STREAM(logger_, message);
       scenario_completed_ = false;
 
-      if (const auto ego_start_canonicalized_lanelet_pose =
-            traffic_simulator::pose::toCanonicalizedLaneletPose(
-              test_description_.ego_start_position);
-          !ego_start_canonicalized_lanelet_pose) {
+      if (const auto ego_start_canonicalized_lanelet_poses =
+            traffic_simulator::pose::toCanonicalizedLaneletPoses(
+              {test_description_.ego_start_position});
+          ego_start_canonicalized_lanelet_poses.empty()) {
         throw std::runtime_error(
           "Can not canonicalize ego start lanelet pose: id: " +
           std::to_string(test_description_.ego_start_position.lanelet_id) +
@@ -90,13 +90,15 @@ public:
       } else {
         api_->updateFrame();
         api_->spawn(
-          ego_name_, ego_start_canonicalized_lanelet_pose.value(), getVehicleParameters(),
+          // WIP just use first lanelet pose, should be changed in the future
+          ego_name_, ego_start_canonicalized_lanelet_poses.front(), getVehicleParameters(),
           traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
 
         auto & ego_entity = api_->getEgoEntity(ego_name_);
 
         ego_entity.setStatus(
-          ego_start_canonicalized_lanelet_pose.value(),
+          // WIP just use first lanelet pose, should be changed in the future
+          ego_start_canonicalized_lanelet_poses.front(),
           traffic_simulator::helper::constructActionStatus());
 
         if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
@@ -149,9 +151,9 @@ public:
         goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
 
         for (const auto & npc_descr : test_description_.npcs_descriptions) {
-          if (const auto npc_start_canonicalized_lanelet_pose =
-                traffic_simulator::pose::toCanonicalizedLaneletPose(npc_descr.start_position);
-              not npc_start_canonicalized_lanelet_pose.has_value()) {
+          if (const auto npc_start_canonicalized_lanelet_poses =
+                traffic_simulator::pose::toCanonicalizedLaneletPoses({npc_descr.start_position});
+              npc_start_canonicalized_lanelet_poses.empty()) {
             throw std::runtime_error(
               "Can not canonicalize npc start lanelet pose: id: " +
               std::to_string(npc_descr.start_position.lanelet_id) +
@@ -159,13 +161,15 @@ public:
               " offset: " + std::to_string(npc_descr.start_position.offset));
           } else {
             api_->spawn(
-              npc_descr.name, npc_start_canonicalized_lanelet_pose.value(), getVehicleParameters(),
+              // WIP just use first lanelet pose, should be changed in the future
+              npc_descr.name, npc_start_canonicalized_lanelet_poses.front(), getVehicleParameters(),
               traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
 
             auto & entity = api_->getEntity(npc_descr.name);
 
             entity.setStatus(
-              npc_start_canonicalized_lanelet_pose.value(),
+              // WIP just use first lanelet pose, should be changed in the future
+              npc_start_canonicalized_lanelet_poses.front(),
               traffic_simulator::helper::constructActionStatus(npc_descr.speed));
 
             entity.requestSpeedChange(npc_descr.speed, true);

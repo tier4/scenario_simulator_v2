@@ -48,8 +48,10 @@ private:
     const auto & to_entity = api_.getEntity(to_entity_name);
     if (from_entity.isInLanelet() && to_entity.isInLanelet()) {
       return traffic_simulator::distance::lateralDistance(
-        from_entity.getCanonicalizedLaneletPose().value(),
-        to_entity.getCanonicalizedLaneletPose().value(), traffic_simulator::RoutingConfiguration());
+        // WIP just use first lanelet pose, should be changed in the future
+        from_entity.getCanonicalizedLaneletPoses().front(),
+        to_entity.getCanonicalizedLaneletPoses().front(),
+        traffic_simulator::RoutingConfiguration());
     }
     return std::nullopt;
   };
@@ -58,13 +60,14 @@ private:
     const std::string & from_entity_name, const std::string & to_entity_name,
     const double matching_distance) -> std::optional<double>
   {
-    const auto from_entity_lanelet_pose =
-      api_.getEntity(from_entity_name).getCanonicalizedLaneletPose(matching_distance);
-    const auto to_entity_lanelet_pose =
-      api_.getEntity(to_entity_name).getCanonicalizedLaneletPose(matching_distance);
-    if (from_entity_lanelet_pose && to_entity_lanelet_pose) {
+    const auto from_entity_lanelet_poses =
+      api_.getEntity(from_entity_name).getCanonicalizedLaneletPoses(matching_distance);
+    const auto to_entity_lanelet_poses =
+      api_.getEntity(to_entity_name).getCanonicalizedLaneletPoses(matching_distance);
+    if (!from_entity_lanelet_poses.empty() && !to_entity_lanelet_poses.empty()) {
       return traffic_simulator::distance::lateralDistance(
-        from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(),
+        // WIP just use first lanelet pose, should be changed in the future
+        from_entity_lanelet_poses.front(), to_entity_lanelet_poses.front(),
         traffic_simulator::RoutingConfiguration());
     }
     return std::nullopt;
@@ -78,8 +81,9 @@ private:
     const auto & to_entity = api_.getEntity(to_entity_name);
     if (from_entity.isInLanelet() && to_entity.isInLanelet()) {
       return traffic_simulator::distance::longitudinalDistance(
-        from_entity.getCanonicalizedLaneletPose().value(),
-        to_entity.getCanonicalizedLaneletPose().value(), false, false,
+        // WIP just use first lanelet pose, should be changed in the future
+        from_entity.getCanonicalizedLaneletPoses().front(),
+        to_entity.getCanonicalizedLaneletPoses().front(), false, false,
         traffic_simulator::RoutingConfiguration());
     }
     return std::nullopt;

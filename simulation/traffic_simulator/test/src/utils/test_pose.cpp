@@ -79,10 +79,10 @@ TEST(pose, quietNaNLaneletPose)
  */
 TEST_F(PoseTest, canonicalize_default)
 {
-  const auto pose =
-    traffic_simulator::pose::toCanonicalizedLaneletPose(traffic_simulator_msgs::msg::LaneletPose());
+  const auto poses = traffic_simulator::pose::toCanonicalizedLaneletPoses(
+    {traffic_simulator_msgs::msg::LaneletPose()});
 
-  EXPECT_FALSE(pose.has_value());
+  EXPECT_FALSE(!poses.empty());
 }
 
 /**
@@ -91,11 +91,12 @@ TEST_F(PoseTest, canonicalize_default)
 TEST_F(PoseTest, canonicalize_invalid)
 {
   EXPECT_THROW(
-    traffic_simulator::pose::toCanonicalizedLaneletPose(
-      traffic_simulator::pose::quietNaNLaneletPose()),
+    traffic_simulator::pose::toCanonicalizedLaneletPoses(
+      {traffic_simulator::pose::quietNaNLaneletPose()}),
     std::runtime_error);
-  EXPECT_FALSE(traffic_simulator::pose::toCanonicalizedLaneletPose(
-    traffic_simulator::helper::constructLaneletPose(203, 1000.0, 0.0)));
+  EXPECT_FALSE(traffic_simulator::pose::toCanonicalizedLaneletPoses(
+                 {traffic_simulator::helper::constructLaneletPose(203, 1000.0, 0.0)})
+                 .empty());
 }
 
 /**
@@ -104,12 +105,14 @@ TEST_F(PoseTest, canonicalize_invalid)
 TEST_F(PoseTest, canonicalize_valid)
 {
   const auto pose = traffic_simulator::helper::constructLaneletPose(195, 0.0, 0.0);
-  std::optional<traffic_simulator::CanonicalizedLaneletPose> canonicalized_pose;
+  std::vector<traffic_simulator::CanonicalizedLaneletPose> canonicalized_poses;
 
-  EXPECT_NO_THROW(canonicalized_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(pose));
-  ASSERT_TRUE(canonicalized_pose.has_value());
+  EXPECT_NO_THROW(
+    canonicalized_poses = traffic_simulator::pose::toCanonicalizedLaneletPoses({pose}));
+  ASSERT_TRUE(!canonicalized_poses.empty());
   EXPECT_LANELET_POSE_EQ(
-    static_cast<traffic_simulator::LaneletPose>(canonicalized_pose.value()), pose);
+    // WIP just use the first canonicalized lanelet pose for now
+    static_cast<traffic_simulator::LaneletPose>(canonicalized_poses.front()), pose);
 }
 
 /**
@@ -151,12 +154,14 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_noBoundingBox_noRoute_valid)
 
   const geometry_msgs::msg::Pose pose = static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 
-  const auto canonicalized_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(pose, true);
+  const auto canonicalized_poses = traffic_simulator::pose::toCanonicalizedLaneletPoses(pose, true);
 
-  ASSERT_TRUE(canonicalized_pose.has_value());
-  EXPECT_POSE_NEAR(pose, static_cast<geometry_msgs::msg::Pose>(canonicalized_pose.value()), 0.01);
+  ASSERT_TRUE(!canonicalized_poses.empty());
+  // WIP just use the first canonicalized lanelet pose for now
+  EXPECT_POSE_NEAR(pose, static_cast<geometry_msgs::msg::Pose>(canonicalized_poses.front()), 0.01);
   EXPECT_LANELET_POSE_NEAR(
-    static_cast<traffic_simulator::LaneletPose>(canonicalized_pose.value()),
+    // WIP just use the first canonicalized lanelet pose for now
+    static_cast<traffic_simulator::LaneletPose>(canonicalized_poses.front()),
     static_cast<traffic_simulator::LaneletPose>(lanelet_pose), 0.01);
 }
 
@@ -167,7 +172,7 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_noBoundingBox_noRoute_invalid)
 {
   const geometry_msgs::msg::Pose pose = makePose(makePoint(0.0, 0.0, 0.0));
 
-  EXPECT_EQ(traffic_simulator::pose::toCanonicalizedLaneletPose(pose, true), std::nullopt);
+  EXPECT_EQ(traffic_simulator::pose::toCanonicalizedLaneletPoses(pose, true).empty(), true);
 }
 
 /**
@@ -180,13 +185,15 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_noRoute_valid)
 
   const geometry_msgs::msg::Pose pose = static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 
-  const auto canonicalized_pose =
-    traffic_simulator::pose::toCanonicalizedLaneletPose(pose, makeBoundingBox(), true, 1.0);
+  const auto canonicalized_poses =
+    traffic_simulator::pose::toCanonicalizedLaneletPoses(pose, makeBoundingBox(), true, 1.0);
 
-  ASSERT_TRUE(canonicalized_pose.has_value());
-  EXPECT_POSE_NEAR(pose, static_cast<geometry_msgs::msg::Pose>(canonicalized_pose.value()), 0.01);
+  ASSERT_TRUE(!canonicalized_poses.empty());
+  // WIP just use the first canonicalized lanelet pose for now
+  EXPECT_POSE_NEAR(pose, static_cast<geometry_msgs::msg::Pose>(canonicalized_poses.front()), 0.01);
   EXPECT_LANELET_POSE_NEAR(
-    static_cast<traffic_simulator::LaneletPose>(canonicalized_pose.value()),
+    // WIP just use the first canonicalized lanelet pose for now
+    static_cast<traffic_simulator::LaneletPose>(canonicalized_poses.front()),
     static_cast<traffic_simulator::LaneletPose>(lanelet_pose), 0.01);
 }
 
@@ -201,8 +208,9 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_noRoute_invalid)
   const geometry_msgs::msg::Pose pose = static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 
   EXPECT_EQ(
-    traffic_simulator::pose::toCanonicalizedLaneletPose(pose, makeSmallBoundingBox(), true, 0.0),
-    std::nullopt);
+    traffic_simulator::pose::toCanonicalizedLaneletPoses(pose, makeSmallBoundingBox(), true, 0.0)
+      .empty(),
+    true);
 }
 
 /**
@@ -213,9 +221,10 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_emptyInvalid)
   const geometry_msgs::msg::Pose pose = makePose(makePoint(0.0, 0.0, 0.0));
 
   EXPECT_EQ(
-    traffic_simulator::pose::toCanonicalizedLaneletPose(
-      pose, makeBoundingBox(), lanelet::Ids{}, true, 1.0),
-    std::nullopt);
+    traffic_simulator::pose::toCanonicalizedLaneletPoses(
+      pose, makeBoundingBox(), lanelet::Ids{}, true, 1.0)
+      .empty(),
+    true);
 }
 
 /**
@@ -228,13 +237,15 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_emptyValid)
 
   const geometry_msgs::msg::Pose pose = static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 
-  const auto canonicalized_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
+  const auto canonicalized_poses = traffic_simulator::pose::toCanonicalizedLaneletPoses(
     pose, makeBoundingBox(), lanelet::Ids{}, true, 1.0);
 
-  ASSERT_TRUE(canonicalized_pose.has_value());
-  EXPECT_POSE_NEAR(pose, static_cast<geometry_msgs::msg::Pose>(canonicalized_pose.value()), 0.01);
+  ASSERT_TRUE(!canonicalized_poses.empty());
+  // WIP just use the first canonicalized lanelet pose for now
+  EXPECT_POSE_NEAR(pose, static_cast<geometry_msgs::msg::Pose>(canonicalized_poses.front()), 0.01);
   EXPECT_LANELET_POSE_NEAR(
-    static_cast<traffic_simulator::LaneletPose>(canonicalized_pose.value()),
+    // WIP just use the first canonicalized lanelet pose for now
+    static_cast<traffic_simulator::LaneletPose>(canonicalized_poses.front()),
     static_cast<traffic_simulator::LaneletPose>(lanelet_pose), 0.01);
 }
 
@@ -246,8 +257,9 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_nonEmptyInvalid)
   const geometry_msgs::msg::Pose pose = makePose(makePoint(0.0, 0.0, 0.0));
 
   EXPECT_EQ(
-    traffic_simulator::pose::toCanonicalizedLaneletPose(pose, makeBoundingBox(), {195}, true, 1.0),
-    std::nullopt);
+    traffic_simulator::pose::toCanonicalizedLaneletPoses(pose, makeBoundingBox(), {195}, true, 1.0)
+      .empty(),
+    true);
 }
 
 /**
@@ -260,13 +272,15 @@ TEST_F(PoseTest, toCanonicalizedLaneletPose_BoundingBox_route_nonEmptyValid)
 
   const geometry_msgs::msg::Pose pose = static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 
-  const auto canonicalized_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
+  const auto canonicalized_poses = traffic_simulator::pose::toCanonicalizedLaneletPoses(
     pose, makeBoundingBox(), lanelet::Ids{195}, true, 1.0);
 
-  ASSERT_TRUE(canonicalized_pose.has_value());
-  EXPECT_POSE_NEAR(pose, static_cast<geometry_msgs::msg::Pose>(canonicalized_pose.value()), 0.01);
+  ASSERT_TRUE(!canonicalized_poses.empty());
+  // WIP just use the first canonicalized lanelet pose for now
+  EXPECT_POSE_NEAR(pose, static_cast<geometry_msgs::msg::Pose>(canonicalized_poses.front()), 0.01);
   EXPECT_LANELET_POSE_NEAR(
-    static_cast<traffic_simulator::LaneletPose>(canonicalized_pose.value()),
+    // WIP just use the first canonicalized lanelet pose for now
+    static_cast<traffic_simulator::LaneletPose>(canonicalized_poses.front()),
     static_cast<traffic_simulator::LaneletPose>(lanelet_pose), 0.01);
 }
 

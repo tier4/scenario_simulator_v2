@@ -36,7 +36,7 @@ EgoEntitySimulation::EgoEntitySimulation(
   wheel_base_(common::getParameter(
     "wheel_base", parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x)),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
-  status_(initial_status, std::nullopt),
+  status_(initial_status, {}),
   initial_pose_(status_.getMapPose()),
   initial_rotation_matrix_(math::geometry::getRotationMatrix(initial_pose_.orientation)),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
@@ -453,9 +453,9 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// @note Ego uses the unique_route_lanelets get from Autoware, instead of the current lanelet_id
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus
-  const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
+  const auto canonicalized_lanelet_poses = traffic_simulator::pose::toCanonicalizedLaneletPoses(
     status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance);
-  status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
+  status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_poses));
   setAutowareStatus();
 }
 

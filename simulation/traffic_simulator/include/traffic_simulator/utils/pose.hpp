@@ -38,23 +38,23 @@ auto toMapPose(const LaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose;
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
 
-auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
-  -> std::optional<CanonicalizedLaneletPose>;
+auto toCanonicalizedLaneletPoses(const std::vector<LaneletPose> & lanelet_poses)
+  -> std::vector<CanonicalizedLaneletPose>;
 
-auto toCanonicalizedLaneletPose(
+auto toCanonicalizedLaneletPoses(
   const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk)
-  -> std::optional<CanonicalizedLaneletPose>;
+  -> std::vector<CanonicalizedLaneletPose>;
 
-auto toCanonicalizedLaneletPose(
+auto toCanonicalizedLaneletPoses(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance) -> std::optional<CanonicalizedLaneletPose>;
+  const double matching_distance) -> std::vector<CanonicalizedLaneletPose>;
 
-auto toCanonicalizedLaneletPose(
+auto toCanonicalizedLaneletPoses(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
-  const double matching_distance) -> std::optional<CanonicalizedLaneletPose>;
+  const double matching_distance) -> std::vector<CanonicalizedLaneletPose>;
 
 auto transformRelativePoseToGlobal(
   const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
@@ -113,6 +113,10 @@ auto findRoutableAlternativeLaneletPoseFrom(
   const lanelet::Id from_lanelet_id, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box)
   -> std::optional<traffic_simulator::CanonicalizedLaneletPose>;
+
+auto getShortestOffsetLaneletPose(
+  const std::vector<CanonicalizedLaneletPose> & canonicalized_lanelet_poses)
+  -> std::optional<CanonicalizedLaneletPose>;
 
 namespace pedestrian
 {

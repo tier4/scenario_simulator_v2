@@ -87,8 +87,8 @@ auto interpolateEntityStatusFromPolylineTrajectory(
       const traffic_simulator_msgs::msg::Vertex & v1) -> traffic_simulator_msgs::msg::EntityStatus {
     auto interpolated_entity_status =
       static_cast<traffic_simulator_msgs::msg::EntityStatus>(*entity_status);
-    interpolated_entity_status.lanelet_pose_valid = false;
-    interpolated_entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    interpolated_entity_status.lanelet_poses =
+      std::vector<traffic_simulator_msgs::msg::LaneletPose>();
     interpolated_entity_status.pose =
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(

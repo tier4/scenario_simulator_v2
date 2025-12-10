@@ -331,16 +331,14 @@ TEST(Conversion, EntityStatus)
   lanelet_pose.rpy.x = 3.4;
   lanelet_pose.rpy.y = 5.1;
   lanelet_pose.rpy.z = 1.3;
-  status.lanelet_pose = lanelet_pose;
-  status.lanelet_pose_valid = false;
+  lanelet_pose.lanelet_pose_valid = false;
+  status.lanelet_poses.emplace_back(lanelet_pose);
   simulation_interface::toProto(status, proto);
   EXPECT_ENTITY_STATUS_EQ(status, proto);
   status = traffic_simulator_msgs::msg::EntityStatus();
-  EXPECT_TRUE(status.lanelet_pose_valid);
   EXPECT_FALSE(proto.lanelet_pose_valid());
   simulation_interface::toMsg(proto, status);
   EXPECT_ENTITY_STATUS_EQ(status, proto);
-  EXPECT_FALSE(status.lanelet_pose_valid);
 }
 
 TEST(Conversion, SentEntityStatus)

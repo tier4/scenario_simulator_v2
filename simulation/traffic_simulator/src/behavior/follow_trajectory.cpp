@@ -87,15 +87,16 @@ auto makeUpdatedStatus(
     const auto quaternion = convertDirectionToQuaternion(
       geometry_msgs::build<Vector3>().x(to.x - from.x).y(to.y - from.y).z(to.z - from.z));
     const auto from_pose = geometry_msgs::build<Pose>().position(from).orientation(quaternion);
-    if (
-      const auto from_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        from_pose, entity_status.bounding_box, include_crosswalk, matching_distance)) {
+    if (const auto from_canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+          from_pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+        !from_canonicalized_lanelet_poses.empty()) {
       const auto to_pose = geometry_msgs::build<Pose>().position(to).orientation(quaternion);
-      if (
-        const auto to_canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-          to_pose, entity_status.bounding_box, include_crosswalk, matching_distance)) {
+      if (const auto to_canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+            to_pose, entity_status.bounding_box, include_crosswalk, matching_distance);
+          !to_canonicalized_lanelet_poses.empty()) {
         if (const auto longitudinal_distance = distance::longitudinalDistance(
-              from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
+              // WIP only taking the first pose
+              from_canonicalized_lanelet_poses.front(), to_canonicalized_lanelet_poses.front(),
               include_adjacent_lanelet, include_opposite_direction, routing_configuration);
             longitudinal_distance.has_value()
             /**
@@ -108,7 +109,8 @@ auto makeUpdatedStatus(
             and longitudinal_distance.value() >= 0.0) {
           if (
             const auto lateral_distance = distance::lateralDistance(
-              from_canonicalized_lanelet_pose.value(), to_canonicalized_lanelet_pose.value(),
+              // WIP only taking the first pose
+              from_canonicalized_lanelet_poses.front(), to_canonicalized_lanelet_poses.front(),
               routing_configuration)) {
             return std::hypot(longitudinal_distance.value(), lateral_distance.value());
           }
@@ -392,12 +394,18 @@ auto makeUpdatedStatus(
                    const auto dx = target_position.x - position.x;
                    const auto dy = target_position.y - position.y;
                    /// @note if entity is on lane use pitch from lanelet, otherwise use pitch on target
+                   //  const auto pitch =
+                   //    entity_status.lanelet_pose_valid
+                   //      ? -math::geometry::convertQuaternionToEulerAngle(
+                   //           entity_status.pose.orientation)
+                   //           .y
+                   //      : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+                   // #############################################
+                   // WIP
+                   // #############################################
                    const auto pitch =
-                     entity_status.lanelet_pose_valid
-                       ? -math::geometry::convertQuaternionToEulerAngle(
-                            entity_status.pose.orientation)
-                            .y
-                       : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+                     std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+                   // #############################################
                    const auto yaw = std::atan2(dy, dx);  // Use yaw on target
                    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
                      .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
@@ -592,24 +600,25 @@ auto makeUpdatedStatus(
       }
     }();
 
+    // WIP: this part is to heavy to refactor, so just return the first one
     /// @note If it is the transition between lanelets: overwrite position to improve precision
-    if (entity_status.lanelet_pose_valid) {
-      constexpr bool desired_velocity_is_global{true};
-      const auto canonicalized_lanelet_pose =
-        traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
-      const auto estimated_next_canonicalized_lanelet_pose =
-        traffic_simulator::pose::toCanonicalizedLaneletPose(updated_status.pose, include_crosswalk);
-      if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
-        const auto next_lanelet_id =
-          static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
-        if (  /// @note Handle lanelet transition
-          const auto updated_position = pose::updatePositionForLaneletTransition(
-            canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
-            desired_velocity_is_global, step_time)) {
-          updated_status.pose.position = updated_position.value();
-        }
-      }
-    }
+    // if (entity_status.lanelet_pose_valid) {
+    //   constexpr bool desired_velocity_is_global{true};
+    //   const auto canonicalized_lanelet_pose =
+    //     traffic_simulator::pose::toCanonicalizedLaneletPose(entity_status.lanelet_pose);
+    //   const auto estimated_next_canonicalized_lanelet_pose =
+    //     traffic_simulator::pose::toCanonicalizedLaneletPose(updated_status.pose, include_crosswalk);
+    //   if (canonicalized_lanelet_pose && estimated_next_canonicalized_lanelet_pose) {
+    //     const auto next_lanelet_id =
+    //       static_cast<LaneletPose>(estimated_next_canonicalized_lanelet_pose.value()).lanelet_id;
+    //     if (  /// @note Handle lanelet transition
+    //       const auto updated_position = pose::updatePositionForLaneletTransition(
+    //         canonicalized_lanelet_pose.value(), next_lanelet_id, desired_velocity,
+    //         desired_velocity_is_global, step_time)) {
+    //       updated_status.pose.position = updated_position.value();
+    //     }
+    //   }
+    // }
 
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
 
@@ -632,7 +641,9 @@ auto makeUpdatedStatus(
 
     updated_status.time = entity_status.time + step_time;
 
-    updated_status.lanelet_pose_valid = false;
+    for (auto & lanelet_pose : updated_status.lanelet_poses) {
+      lanelet_pose.lanelet_pose_valid = false;
+    }
 
     return updated_status;
   }

@@ -204,15 +204,16 @@ TEST_F(distanceTest_FourTrackHighwayMap, lateralDistance_possible_matching)
 TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOpposite_noChange_false)
 {
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81595.44, 50006.09, 35.0, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81584.48, 50084.76, 35.0, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, traffic_simulator::RoutingConfiguration());
+      pose_from.front(), pose_to.front(), false, false, traffic_simulator::RoutingConfiguration());
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -226,14 +227,15 @@ TEST_F(distanceTest_StandardMap, longitudinalDistance_noAdjacent_noOpposite_noCh
 {
   {
     const auto pose_from =
-      traffic_simulator::toCanonicalizedLaneletPose(makePose(3800.05, 73715.77, 0.5, 30.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to =
-      traffic_simulator::toCanonicalizedLaneletPose(makePose(3841.26, 73748.80, 0.5, 110.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+      traffic_simulator::toCanonicalizedLaneletPoses(makePose(3800.05, 73715.77, 0.5, 30.0), false);
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
+      makePose(3841.26, 73748.80, 0.5, 110.0), false);
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, traffic_simulator::RoutingConfiguration());
+      pose_from.front(), pose_to.front(), false, false, traffic_simulator::RoutingConfiguration());
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 60.0, 1.0);
   }
@@ -247,15 +249,17 @@ TEST_F(distanceTest_StandardMap, longitudinalDistance_noAdjacent_noOpposite_noCh
 TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_adjacent_noOpposite_noChange_false)
 {
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81585.79, 50042.62, 35.0, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81588.34, 50083.23, 35.0, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, traffic_simulator::RoutingConfiguration());
+      pose_from.front(), pose_to.front(), true, false, traffic_simulator::RoutingConfiguration());
+
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -268,15 +272,16 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_adjacent_noOpposit
 TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_adjacent_noOpposite_noChange)
 {
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81599.02, 50065.76, 35.0, 280.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81599.61, 50045.16, 35.0, 280.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, traffic_simulator::RoutingConfiguration());
+      pose_from.front(), pose_to.front(), true, false, traffic_simulator::RoutingConfiguration());
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 20.0, 1.0);
   }
@@ -290,31 +295,33 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_adjacent_noOpposit
 TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOpposite_change_false)
 {
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81595.47, 49982.80, 36.0, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81599.34, 50022.34, 35.0, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), false, false, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81612.35, 50015.63, 35.0, 280.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81612.95, 49991.30, 35.5, 280.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), false, false, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -327,32 +334,34 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOppos
 TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOpposite_change_case0)
 {
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81592.96, 49997.94, 35.0, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81570.56, 50141.75, 35.0, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), false, false, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 145.0, 1.0);
   }
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81587.31, 50165.57, 35.0, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(81610.25, 49988.59, 35.5, 100.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), false, false, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 178.0, 1.0);
   }
@@ -364,59 +373,63 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOppos
 TEST_F(distanceTest_IntersectionMap, longitudinalDistance_noAdjacent_noOpposite_change_case1)
 {
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86627.71, 44972.06, 3.0, 340.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86647.23, 44882.51, 3.0, 240.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), false, false, lane_changeable_routing_configuration);
     EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 118.0, 1.0));
   }
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86555.38, 45000.88, 3.0, 340.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86647.23, 44882.51, 3.0, 240.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), false, false, lane_changeable_routing_configuration);
     EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 195.0, 1.0));
   }
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86788.82, 44993.77, 3.0, 210.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86553.48, 44990.56, 3.0, 150.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), false, false, lane_changeable_routing_configuration);
     EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 257.0, 1.0));
   }
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86788.82, 44993.77, 3.0, 210.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86579.91, 44979.00, 3.0, 150.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), false, false, lane_changeable_routing_configuration);
     EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 228.0, 1.0));
   }
 }
@@ -429,31 +442,33 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_noAdjacent_noOpposite_
 TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_change_false)
 {
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86736.13, 44969.63, 3.0, 210.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86642.95, 44958.78, 3.0, 340.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), true, false, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86732.06, 44976.58, 3.0, 210.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86704.59, 44927.32, 3.0, 340.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), true, false, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -466,30 +481,32 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_ch
 TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_change)
 {
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86637.19, 44967.35, 3.0, 340.0), false);
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86648.82, 44886.19, 3.0, 240.0), false);
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), true, false, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_DOUBLE_EQ(result.value(), 97.648110014340688);
   }
   {
-    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPose(
+    const auto pose_from = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86719.94, 44957.20, 3.0, 210.0), false);
-    ASSERT_TRUE(pose_from.has_value());
-    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPose(
+    ASSERT_TRUE(!pose_from.empty());
+    const auto pose_to = traffic_simulator::toCanonicalizedLaneletPoses(
       makePose(86599.32, 44975.01, 3.0, 180.0), false);
-    ASSERT_TRUE(pose_from.has_value());
+    ASSERT_TRUE(!pose_to.empty());
 
+    // WIP just use the first canonicalized lanelet pose for now
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration);
+      pose_from.front(), pose_to.front(), true, false, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_DOUBLE_EQ(result.value(), 127.99532311325152);
   }

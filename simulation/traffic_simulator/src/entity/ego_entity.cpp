@@ -271,8 +271,10 @@ void EgoEntity::requestAssignRoute(
     std::vector<RouteSegment> route_segments;
     traffic_simulator::RoutingConfiguration routing_configuration;
     routing_configuration.allow_lane_change = true;
-    if (auto current_lanelet_pose = getCanonicalizedLaneletPose()) {
-      route_segments.push_back(make_segment(current_lanelet_pose->getLaneletId()));
+    if (auto current_lanelet_poses = getCanonicalizedLaneletPoses();
+        !current_lanelet_poses.empty()) {
+      // WIP only taking the first pose
+      route_segments.push_back(make_segment(current_lanelet_poses.front().getLaneletId()));
     } else {
       throw common::Error(
         "Failed to get current lanelet of ego entity. (", __FILE__, ":", __LINE__, ")");
@@ -320,13 +322,19 @@ void EgoEntity::requestAssignRoute(
   const traffic_simulator::RouteOption & option)
 {
   if (option.use_lane_ids_for_routing) {
-    std::vector<CanonicalizedLaneletPose> lanelet_poses;
+    std::vector<CanonicalizedLaneletPose> route_lanelet_poses;
     for (const auto & pose : route) {
-      if (auto lanelet_pose = pose::toCanonicalizedLaneletPose(pose, false)) {
-        lanelet_poses.push_back(*lanelet_pose);
+      if (auto lanelet_poses = pose::toCanonicalizedLaneletPoses(pose, false);
+          lanelet_poses.empty()) {
+        THROW_SYNTAX_ERROR(
+          "Failed to convert geometry_msgs::msg::Pose to CanonicalizedLaneletPose. "
+          "Please check the input poses.");
+      } else {
+        // WIP only taking the first pose
+        route_lanelet_poses.push_back(lanelet_poses.front());
       }
     }
-    requestAssignRoute(lanelet_poses, option);
+    requestAssignRoute(route_lanelet_poses, option);
   } else {
     requestClearRoute();
 
@@ -461,7 +469,9 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
   auto entity_status = static_cast<EntityStatus>(*status_);
   entity_status.pose = map_pose;
-  entity_status.lanelet_pose_valid = false;
+  for (auto & lanelet_pose : entity_status.lanelet_poses) {
+    lanelet_pose.lanelet_pose_valid = false;  // invalidate lanelet poses
+  }
   // prefer current lanelet on Autoware side
   status_->set(
     entity_status, helper::getUniqueValues(getRouteLanelets()),

@@ -187,14 +187,15 @@ auto TrafficSource::isPoseValid(
     return {true, std::nullopt};
   }
 
-  if (
-    auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      pose, std::holds_alternative<PedestrianParameter>(parameter))) {
+  if (auto canonicalized_lanelet_poses = pose::toCanonicalizedLaneletPoses(
+        pose, std::holds_alternative<PedestrianParameter>(parameter));
+      !canonicalized_lanelet_poses.empty()) {
     /// @note reset orientation - to align the entity with lane
-    canonicalized_lanelet_pose->alignOrientationToLanelet();
+    canonicalized_lanelet_poses.front().alignOrientationToLanelet();
     /// @note Step 3: check whether the bounding box can be outside lanelet
     if (not configuration_.require_footprint_fitting) {
-      return std::make_pair(true, canonicalized_lanelet_pose.value());
+      // WIP just return the first one
+      return std::make_pair(true, canonicalized_lanelet_poses.front());
     }
 
     /// @note Step 4: check whether the bounding box fits inside the lanelet
@@ -202,18 +203,20 @@ auto TrafficSource::isPoseValid(
       return std::make_pair(
         not configuration_.require_footprint_fitting or
           validate_considering_crosswalk(
+            // WIP just return the first one
             math::geometry::transformPoints(
-              pose::toMapPose(canonicalized_lanelet_pose.value()), bbox_corners),
-            canonicalized_lanelet_pose->getLaneletId()),
-        canonicalized_lanelet_pose.value());
+              pose::toMapPose(canonicalized_lanelet_poses.front()), bbox_corners),
+            canonicalized_lanelet_poses.front().getLaneletId()),
+        canonicalized_lanelet_poses.front());
     } else {
       return std::make_pair(
         not configuration_.require_footprint_fitting or
           validate(
             math::geometry::transformPoints(
-              pose::toMapPose(canonicalized_lanelet_pose.value()), bbox_corners),
-            canonicalized_lanelet_pose->getLaneletId()),
-        canonicalized_lanelet_pose.value());
+              // WIP just return the first one
+              pose::toMapPose(canonicalized_lanelet_poses.front()), bbox_corners),
+            canonicalized_lanelet_poses.front().getLaneletId()),
+        canonicalized_lanelet_poses.front());
     }
   } else {
     return {false, std::nullopt};

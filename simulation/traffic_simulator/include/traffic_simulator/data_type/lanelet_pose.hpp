@@ -45,6 +45,7 @@ public:
     LaneletPose from,
     const RoutingConfiguration & routing_configuration = RoutingConfiguration()) const
     -> std::optional<LaneletPose>;
+  auto setLaneletPoseValid(bool valid) -> void { lanelet_pose_.lanelet_pose_valid = valid; }
 
   static auto setConsiderPoseByRoadSlope(bool consider_pose_by_road_slope) -> void
   {
