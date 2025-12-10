@@ -388,7 +388,7 @@ auto conflictingLaneIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType
     const auto & conflicting_lanelets = lanelet::utils::getConflictingLanelets(
       LaneletWrapper::routingGraph(type), LaneletWrapper::map()->laneletLayer.get(lanelet_id));
     for (const auto & conflicting_lanelet : conflicting_lanelets) {
-      conflicting_lanes_ids.emplace_back(conflicting_lanelet.id());
+      conflicting_lanes_ids.push_back(conflicting_lanelet.id());
     }
   }
   return conflicting_lanes_ids;

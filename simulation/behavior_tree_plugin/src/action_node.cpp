@@ -226,7 +226,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
                             canonicalized_entity_status_->getMapPose().orientation)
                             .z;
     // Iterate by increasing euclidean distance and compute the
-    // actual spline-based distance using getDistanceToTargetEntity.
+    // actual spline-based distance using traffic_simulator::distance::splineDistanceToBoundingBox.
     // Select the entity that yields the minimal valid distance.
     std::optional<std::string> best_name;
     double best_distance = std::numeric_limits<double>::infinity();
@@ -408,7 +408,7 @@ auto ActionNode::getFrontEntityNameAndDistanceByTrajectory(
 }
 
 auto ActionNode::calculateUpdatedEntityStatus(
-  const double local_target_speed_,
+  const double local_target_speed,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
@@ -416,7 +416,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time_, canonicalized_entity_status_->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    local_target_speed_, constraints, canonicalized_entity_status_->getTwist(),
+    local_target_speed, constraints, canonicalized_entity_status_->getTwist(),
     canonicalized_entity_status_->getAccel());
 
   const double linear_jerk_new = std::get<2>(dynamics);
@@ -447,7 +447,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
 }
 
 auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
-  const double local_target_speed_,
+  const double local_target_speed,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
@@ -512,7 +512,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time_, canonicalized_entity_status_->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    local_target_speed_, constraints, canonicalized_entity_status_->getTwist(),
+    local_target_speed, constraints, canonicalized_entity_status_->getTwist(),
     canonicalized_entity_status_->getAccel());
   const auto linear_jerk_new = std::get<2>(dynamics);
   const auto & accel_new = std::get<1>(dynamics);
