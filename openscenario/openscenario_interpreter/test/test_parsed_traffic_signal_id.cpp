@@ -19,64 +19,75 @@
 using openscenario_interpreter::syntax::TrafficSignalState;
 using TrafficSignalType = TrafficSignalState::TrafficSignalType;
 
-TEST(ParseTrafficSignalID, ValidId)
+struct ValidParseTestCase
 {
-  const auto result = TrafficSignalState::parseTrafficSignalId("34802");
-  EXPECT_EQ(result.id, 34802);
-  EXPECT_EQ(result.type.value, TrafficSignalType::conventional);
-  EXPECT_FALSE(result.detected);
+  std::string input;
+  lanelet::Id expected_id;
+  TrafficSignalType::value_type expected_type;
+  bool expected_detected;
+};
+
+class ParseTrafficSignalIdValidTest : public ::testing::TestWithParam<ValidParseTestCase>
+{
+};
+
+TEST_P(ParseTrafficSignalIdValidTest, Parse)
+{
+  const auto & parameter = GetParam();
+  const auto [id, type, detected] = TrafficSignalState::parseTrafficSignalId(parameter.input);
+  EXPECT_EQ(id, parameter.expected_id);
+  EXPECT_EQ(type.value, parameter.expected_type);
+  EXPECT_EQ(detected, parameter.expected_detected);
 }
 
-TEST(ParseTrafficSignalID, ValidIdWithV2IType)
-{
-  const auto result = TrafficSignalState::parseTrafficSignalId("34802 v2i");
-  EXPECT_EQ(result.id, 34802);
-  EXPECT_EQ(result.type.value, TrafficSignalType::v2i);
-  EXPECT_FALSE(result.detected);
-}
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(
+  ValidCases, ParseTrafficSignalIdValidTest,
+  ::testing::Values(
+    ValidParseTestCase{"34802",        34802, TrafficSignalType::conventional, false},
+    ValidParseTestCase{"34802 v2i",    34802, TrafficSignalType::v2i,          false},
+    ValidParseTestCase{"34802    v2i", 34802, TrafficSignalType::v2i,          false}));
+// clang-format on
 
-TEST(ParseTrafficSignalID, ValidIdWithMultipleSpaces)
+class ParseTrafficSignalIdInvalidTest : public ::testing::TestWithParam<std::string>
 {
-  const auto result = TrafficSignalState::parseTrafficSignalId("34802    v2i");
-  EXPECT_EQ(result.id, 34802);
-  EXPECT_EQ(result.type.value, TrafficSignalType::v2i);
-  EXPECT_FALSE(result.detected);
-}
+};
 
-TEST(ParseTrafficSignalID, EmptyString)
-{
-  EXPECT_THROW(TrafficSignalState::parseTrafficSignalId(""), openscenario_interpreter::Error);
-}
-
-TEST(ParseTrafficSignalID, InvalidId)
+TEST_P(ParseTrafficSignalIdInvalidTest, ThrowsError)
 {
   EXPECT_THROW(
-    TrafficSignalState::parseTrafficSignalId("invalid"), openscenario_interpreter::Error);
+    TrafficSignalState::parseTrafficSignalId(GetParam()), openscenario_interpreter::Error);
 }
 
-TEST(ParseTrafficSignalID, InvalidType)
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(
+  InvalidCases, ParseTrafficSignalIdInvalidTest,
+  ::testing::Values(
+    "",
+    "invalid",
+    "34802 invalid",
+    "34802 v2i extra",
+    " 34802",
+    "34802 v2i "));
+// clang-format on
+
+class TrafficSignalTypeValidTest
+: public ::testing::TestWithParam<std::pair<std::string, TrafficSignalType::value_type>>
 {
-  EXPECT_THROW(
-    TrafficSignalState::parseTrafficSignalId("34802 invalid"), openscenario_interpreter::Error);
+};
+
+TEST_P(TrafficSignalTypeValidTest, FromString)
+{
+  const auto & [input, expected] = GetParam();
+  TrafficSignalType type(input);
+  EXPECT_EQ(type.value, expected);
 }
 
-TEST(ParseTrafficSignalID, TooManyParts)
-{
-  EXPECT_THROW(
-    TrafficSignalState::parseTrafficSignalId("34802 v2i extra"), openscenario_interpreter::Error);
-}
-
-TEST(TrafficSignalType, FromStringConventional)
-{
-  TrafficSignalType type("conventional");
-  EXPECT_EQ(type.value, TrafficSignalType::conventional);
-}
-
-TEST(TrafficSignalType, FromStringV2I)
-{
-  TrafficSignalType type("v2i");
-  EXPECT_EQ(type.value, TrafficSignalType::v2i);
-}
+INSTANTIATE_TEST_SUITE_P(
+  ValidCases, TrafficSignalTypeValidTest,
+  ::testing::Values(
+    std::make_pair("conventional", TrafficSignalType::conventional),
+    std::make_pair("v2i", TrafficSignalType::v2i)));
 
 TEST(TrafficSignalType, FromStringInvalid)
 {
@@ -86,6 +97,5 @@ TEST(TrafficSignalType, FromStringInvalid)
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-
   return RUN_ALL_TESTS();
 }
