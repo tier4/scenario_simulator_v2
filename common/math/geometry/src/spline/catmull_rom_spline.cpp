@@ -650,6 +650,9 @@ auto CatmullRomSpline::getPoint(const double s, const double offset) const
   return point;
 }
 
+/**
+ * @brief Get approximation of min and max altitude - from the control points
+ */
 auto CatmullRomSpline::getAltitudeRange() const -> std::pair<double, double>
 {
   if (control_points.empty()) {
