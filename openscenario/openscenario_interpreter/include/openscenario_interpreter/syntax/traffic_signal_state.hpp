@@ -71,15 +71,23 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
     constexpr operator value_type() const noexcept { return value; }
   };
 
-  static auto parseTrafficSignalId(const std::string & traffic_signal_id)
-    -> std::pair<lanelet::Id, TrafficSignalType>;
+  struct ParsedTrafficSignalId
+  {
+    lanelet::Id id;
+    TrafficSignalType type;
+    bool detected;
+  };
 
-  auto id() const -> lanelet::Id { return parsed_traffic_signal_id.first; }
+  static auto parseTrafficSignalId(const std::string & traffic_signal_id) -> ParsedTrafficSignalId;
 
-  auto trafficSignalType() const -> TrafficSignalType { return parsed_traffic_signal_id.second; }
+  auto id() const -> lanelet::Id { return parsed_traffic_signal_id.id; }
+
+  auto trafficSignalType() const -> TrafficSignalType { return parsed_traffic_signal_id.type; }
+
+  auto isDetected() const -> bool { return parsed_traffic_signal_id.detected; }
 
 private:
-  const std::pair<lanelet::Id, TrafficSignalType> parsed_traffic_signal_id;
+  const ParsedTrafficSignalId parsed_traffic_signal_id;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

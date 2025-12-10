@@ -21,23 +21,26 @@ using TrafficSignalType = TrafficSignalState::TrafficSignalType;
 
 TEST(ParseTrafficSignalID, ValidId)
 {
-  const auto [id, type] = TrafficSignalState::parseTrafficSignalId("34802");
-  EXPECT_EQ(id, 34802);
-  EXPECT_EQ(type.value, TrafficSignalType::conventional);
+  const auto result = TrafficSignalState::parseTrafficSignalId("34802");
+  EXPECT_EQ(result.id, 34802);
+  EXPECT_EQ(result.type.value, TrafficSignalType::conventional);
+  EXPECT_FALSE(result.detected);
 }
 
 TEST(ParseTrafficSignalID, ValidIdWithV2IType)
 {
-  const auto [id, type] = TrafficSignalState::parseTrafficSignalId("34802 v2i");
-  EXPECT_EQ(id, 34802);
-  EXPECT_EQ(type.value, TrafficSignalType::v2i);
+  const auto result = TrafficSignalState::parseTrafficSignalId("34802 v2i");
+  EXPECT_EQ(result.id, 34802);
+  EXPECT_EQ(result.type.value, TrafficSignalType::v2i);
+  EXPECT_FALSE(result.detected);
 }
 
 TEST(ParseTrafficSignalID, ValidIdWithMultipleSpaces)
 {
-  const auto [id, type] = TrafficSignalState::parseTrafficSignalId("34802    v2i");
-  EXPECT_EQ(id, 34802);
-  EXPECT_EQ(type.value, TrafficSignalType::v2i);
+  const auto result = TrafficSignalState::parseTrafficSignalId("34802    v2i");
+  EXPECT_EQ(result.id, 34802);
+  EXPECT_EQ(result.type.value, TrafficSignalType::v2i);
+  EXPECT_FALSE(result.detected);
 }
 
 TEST(ParseTrafficSignalID, EmptyString)

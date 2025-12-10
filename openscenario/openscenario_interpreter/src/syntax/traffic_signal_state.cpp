@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
+#include <regex>
 
 namespace openscenario_interpreter
 {
@@ -41,7 +42,7 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
   state(readAttribute<String>("state", node, scope)),
   parsed_traffic_signal_id(parseTrafficSignalId(traffic_signal_id))
 {
-  if (state.find("unknown") != std::string::npos) {
+  if (not isDetected() and state.find("unknown") != std::string::npos) {
     throw Error(
       "TrafficSignalState: The state '", state,
       "' contains 'unknown' which is not allowed for ground truth traffic lights. "
@@ -53,10 +54,18 @@ auto TrafficSignalState::evaluate() const -> Object
 {
   switch (trafficSignalType()) {
     case TrafficSignalType::conventional:
-      addConventionalTrafficLightsState(id(), state);
+      if (isDetected()) {
+        // addConventionalDetectedTrafficLightsState(id(), state);
+      } else {
+        addConventionalTrafficLightsState(id(), state);
+      }
       break;
     case TrafficSignalType::v2i:
-      addV2ITrafficLightsState(id(), state);
+      if (isDetected()) {
+        // addV2IDetectedTrafficLightsState(id(), state);
+      } else {
+        addV2ITrafficLightsState(id(), state);
+      }
       break;
     default:
       throw Error("Unknown traffic signal type has set to TrafficSignalState");
@@ -65,7 +74,7 @@ auto TrafficSignalState::evaluate() const -> Object
 }
 
 auto TrafficSignalState::parseTrafficSignalId(const std::string & traffic_signal_id)
-  -> std::pair<lanelet::Id, TrafficSignalType>
+  -> ParsedTrafficSignalId
 {
   std::vector<std::string> parts;
   boost::split(parts, traffic_signal_id, boost::is_space(), boost::token_compress_on);
@@ -79,12 +88,23 @@ auto TrafficSignalState::parseTrafficSignalId(const std::string & traffic_signal
       "'. Expected a numeric lanelet ID.");
   }
 
-  TrafficSignalType type = [&]() {
+  auto [type, detected] = [&]() -> std::pair<TrafficSignalType, bool> {
     switch (parts.size()) {
       case 1:
-        return TrafficSignalType(TrafficSignalType::conventional);
-      case 2:
-        return TrafficSignalType(parts[1]);
+        return {TrafficSignalType(TrafficSignalType::conventional), false};
+      case 2: {
+        const std::string & type_str = parts[1];
+        static const std::regex pattern(R"(^(conventional|v2i)(_detected)?$)");
+        std::smatch match;
+        if (std::regex_match(type_str, match, pattern)) {
+          bool detected = match[2].matched;
+          return {TrafficSignalType(match[1].str()), detected};
+        } else {
+          throw Error(
+            "TrafficSignalState: Invalid traffic signal type '", type_str,
+            "'. Expected 'conventional', 'conventional_detected', 'v2i', or 'v2i_detected'.");
+        }
+      }
       default:
         throw Error(
           "TrafficSignalState: trafficSignalId '", traffic_signal_id,
@@ -92,7 +112,7 @@ auto TrafficSignalState::parseTrafficSignalId(const std::string & traffic_signal
     }
   }();
 
-  return {id, type};
+  return {id, type, detected};
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
