@@ -36,24 +36,26 @@ inline namespace syntax
 */
 struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 {
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  ID of the referenced signal in a road network. The signal ID must be
-   *  listed in TrafficSignal list of the RoadNetwork.
-   *
-   *  In the TIER IV OpenSCENARIO implementation, it is the Lanelet ID (positive
-   *  integer) of the traffic light, optionally followed by a space and the
-   *  signal type ("v2i"). For example: "34802" or "34802 v2i".
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     NOTE:
+       ID of the referenced signal in a road network. The signal ID must be
+       listed in TrafficSignal list of the RoadNetwork.
+
+       In the TIER IV OpenSCENARIO implementation, it is the Lanelet ID (positive
+       integer) of the traffic light, optionally followed by:
+         - Signal type: "v2i" (default is "conventional" if omitted)
+         - Detected suffix: "_detected" to indicate detected traffic light
+
+       Format: "<lanelet_id> [<type>]" or "<lanelet_id> [<type>_detected]"
+       Examples: "34802", "34802 v2i", "34802 conventional_detected", "34802 v2i_detected"
+   */
   const String traffic_signal_id;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  State of the signal. The available states are listed in the TrafficSignal
-   *  list of the RoadNetwork.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     NOTE:
+       State of the signal. The available states are listed in the TrafficSignal
+       list of the RoadNetwork.
+   */
   const String state;
 
   explicit TrafficSignalState(const pugi::xml_node &, Scope &);
