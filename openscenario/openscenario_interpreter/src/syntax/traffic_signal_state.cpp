@@ -44,7 +44,7 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
   if (state.find("unknown") != std::string::npos) {
     throw Error(
       "TrafficSignalState: The state '", state,
-      "' contains 'unknown' which is not allowed for c. "
+      "' contains 'unknown' which is not allowed for ground truth traffic lights. "
       "'unknown' is reserved for traffic light perception simulation.");
   }
 }
