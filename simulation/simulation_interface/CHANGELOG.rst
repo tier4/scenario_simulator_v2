@@ -2,6 +2,12 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+21.1.1 (2025-12-10)
+-------------------
+* Merge branch 'master' into update-sonarqube-settings
+* Merge branch 'master' into update-sonarqube-settings
+* Contributors: Kotaro Yoshimoto
+
 21.1.0 (2025-12-10)
 -------------------
 * Merge pull request `#1757 <https://github.com/tier4/scenario_simulator_v2/issues/1757>`_ from tier4/feature/unknown

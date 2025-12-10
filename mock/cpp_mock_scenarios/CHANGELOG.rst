@@ -2,6 +2,12 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+21.1.1 (2025-12-10)
+-------------------
+* Merge branch 'master' into update-sonarqube-settings
+* Merge branch 'master' into update-sonarqube-settings
+* Contributors: Kotaro Yoshimoto
+
 21.1.0 (2025-12-10)
 -------------------
 * Merge branch 'master' into feature/unknown
