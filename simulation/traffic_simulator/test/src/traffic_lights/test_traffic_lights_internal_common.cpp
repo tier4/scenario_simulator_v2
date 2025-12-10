@@ -57,6 +57,10 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsColor)
   this->lights->setTrafficLightsColor(this->id, Color::white);
   EXPECT_FALSE(
     this->lights->getTrafficLightsComposedState(this->id).find("white") == std::string::npos);
+
+  this->lights->setTrafficLightsColor(this->id, Color::unknown);
+  EXPECT_FALSE(
+    this->lights->getTrafficLightsComposedState(this->id).find("unknown") == std::string::npos);
 }
 
 TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_color)
@@ -84,6 +88,9 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_color)
 
   this->lights->setTrafficLightsState(this->id, stateFromColor("white"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("white"));
+
+  this->lights->setTrafficLightsState(this->id, stateFromColor("unknown"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("unknown"));
 }
 
 TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_status)
@@ -141,6 +148,9 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_shape)
 
   this->lights->setTrafficLightsState(this->id, stateFromShape("straight"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("up"));
+
+  this->lights->setTrafficLightsState(this->id, stateFromShape("unknown"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("unknown"));
 }
 
 TYPED_TEST(TrafficLightsInternalTest, isAnyTrafficLightChanged)

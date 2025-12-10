@@ -202,6 +202,8 @@ auto toMsg(
         return TrafficLightBulbMessageType::GREEN;
       case TrafficLight_Color_WHITE:
         return TrafficLightBulbMessageType::WHITE;
+      case TrafficLight_Color_UNKNOWN_COLOR:
+        return TrafficLightBulbMessageType::UNKNOWN;
       default:
         return TrafficLightBulbMessageType::UNKNOWN;
     }
@@ -231,6 +233,8 @@ auto toMsg(
         return TrafficLightBulbMessageType::DOWN_RIGHT_ARROW;
       case TrafficLight_Shape_CROSS:
         return TrafficLightBulbMessageType::CROSS;
+      case TrafficLight_Shape_UNKNOWN_SHAPE:
+        return TrafficLightBulbMessageType::UNKNOWN;
       default:
         return TrafficLightBulbMessageType::UNKNOWN;
     }
@@ -245,6 +249,8 @@ auto toMsg(
         return TrafficLightBulbMessageType::SOLID_ON;
       case TrafficLight_Status_FLASHING:
         return TrafficLightBulbMessageType::FLASHING;
+      case TrafficLight_Status_UNKNOWN_STATUS:
+        return TrafficLightBulbMessageType::UNKNOWN;
       default:
         return TrafficLightBulbMessageType::UNKNOWN;
     }
