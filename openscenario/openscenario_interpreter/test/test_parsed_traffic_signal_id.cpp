@@ -44,9 +44,15 @@ TEST_P(ParseTrafficSignalIdValidTest, Parse)
 INSTANTIATE_TEST_SUITE_P(
   ValidCases, ParseTrafficSignalIdValidTest,
   ::testing::Values(
-    ValidParseTestCase{"34802",        34802, TrafficSignalType::conventional, false},
-    ValidParseTestCase{"34802 v2i",    34802, TrafficSignalType::v2i,          false},
-    ValidParseTestCase{"34802    v2i", 34802, TrafficSignalType::v2i,          false}));
+    ValidParseTestCase{"34802",                       34802,      TrafficSignalType::conventional, false },
+    ValidParseTestCase{"34802 v2i",                   34802,      TrafficSignalType::v2i,          false },
+    ValidParseTestCase{"34802    v2i",                34802,      TrafficSignalType::v2i,          false },
+    ValidParseTestCase{"34802 conventional",          34802,      TrafficSignalType::conventional, false },
+    ValidParseTestCase{"34802 conventional_detected", 34802,      TrafficSignalType::conventional, true  },
+    ValidParseTestCase{"34802 v2i_detected",          34802,      TrafficSignalType::v2i,          true  },
+    ValidParseTestCase{"1",                           1,          TrafficSignalType::conventional, false },
+    ValidParseTestCase{"9999999999",                  9999999999, TrafficSignalType::conventional, false },
+    ValidParseTestCase{"-1",                          -1,         TrafficSignalType::conventional, false }));
 // clang-format on
 
 class ParseTrafficSignalIdInvalidTest : public ::testing::TestWithParam<std::string>
@@ -66,6 +72,7 @@ INSTANTIATE_TEST_SUITE_P(
     "",
     "invalid",
     "34802 invalid",
+    "34802 invalid_detected",
     "34802 v2i extra",
     " 34802",
     "34802 v2i "));
