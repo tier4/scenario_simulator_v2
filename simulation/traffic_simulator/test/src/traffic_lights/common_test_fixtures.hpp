@@ -31,9 +31,9 @@ public:
   explicit TrafficLightsInternalTestArchitectureDependent()
   : lights([this] {
       if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>) {
-        return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr);
+        return std::make_unique<TrafficLightsT>(node_ptr);
       } else if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>) {
-        return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr, Architecture);
+        return std::make_unique<TrafficLightsT>(node_ptr, Architecture);
       }
     }())
   {
@@ -56,16 +56,6 @@ public:
   const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsInternalTest");
 
   rclcpp::executors::SingleThreadedExecutor executor;
-
-  const std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
-                           "/map/standard_map/lanelet2_map.osm";
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr =
-    std::make_shared<hdmap_utils::HdMapUtils>(
-      path, geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-              .latitude(35.61836750154)
-              .longitude(139.78066608243)
-              .altitude(0.0));
 
   std::unique_ptr<TrafficLightsT> lights;
 };
