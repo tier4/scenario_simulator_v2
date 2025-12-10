@@ -204,7 +204,7 @@ requires-dist = [
     { name = "plantuml", specifier = ">=0.3.0,<0.4" },
     { name = "plantuml-markdown", specifier = ">=3.9.2,<4" },
     { name = "pymdown-extensions", specifier = "~=10.1" },
-    { name = "python-markdown-math", specifier = ">=0.8,<0.9" },
+    { name = "python-markdown-math", specifier = ">=0.8,<0.10" },
     { name = "requests", specifier = ">=2.32.4,<3" },
 ]
 
@@ -635,14 +635,14 @@ wheels = [
 
 [[package]]
 name = "python-markdown-math"
-version = "0.8"
+version = "0.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ec/17/e7e3f3fce951b8adec10987834f4b2fa721ebd9bd6651ce2a4f39c4c544d/python-markdown-math-0.8.tar.gz", hash = "sha256:8564212af679fc18d53f38681f16080fcd3d186073f23825c7ce86fadd3e3635", size = 8509, upload-time = "2020-11-03T17:33:05.462Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4c/68/fbea05ec6fb318bdcf56ea47596605614554f51d77bfd14f6fb481139ad8/python_markdown_math-0.9.tar.gz", hash = "sha256:567395553dc4941e79b3789a1096dcabb3fda9539d150d558ef3507948b264a3", size = 8680, upload-time = "2025-04-10T10:10:31.84Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/36/d16118345ff5f503d4d1c708e8427ed2213f2af7aaffac9d59010e665b5c/python_markdown_math-0.8-py3-none-any.whl", hash = "sha256:c685249d84b5b697e9114d7beb352bd8ca2e07fd268fd4057ffca888c14641e5", size = 5858, upload-time = "2020-11-03T17:33:02.998Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/68/ecf3535c40845de2efd8ac2d092dd5fca0868219fa3684d9e58ef7abeece/python_markdown_math-0.9-py3-none-any.whl", hash = "sha256:ac9932df517a5c0f6d01c56e7a44d065eca4a420893ac45f7a6937c67cb41e86", size = 6046, upload-time = "2025-04-10T10:10:30.318Z" },
 ]
 
 [[package]]
