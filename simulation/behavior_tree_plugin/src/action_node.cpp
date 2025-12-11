@@ -31,6 +31,7 @@
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <unordered_map>
@@ -116,6 +117,29 @@ auto ActionNode::getBlackBoardValues() -> void
   }
 }
 
+auto ActionNode::getOtherEntitiesCanonicalizedLaneletPoses() const
+  -> std::vector<traffic_simulator::CanonicalizedLaneletPose>
+{
+  std::vector<traffic_simulator::CanonicalizedLaneletPose> other_canonicalized_lanelet_poses;
+  for (const auto & [name, status] : other_entity_status_) {
+    if (auto const & canonicalized_lanelet_pose = status.getCanonicalizedLaneletPose()) {
+      other_canonicalized_lanelet_poses.push_back(canonicalized_lanelet_pose.value());
+    }
+  }
+  return other_canonicalized_lanelet_poses;
+}
+
+auto ActionNode::getOtherEntitiesCanonicalizedEntityStatuses() const
+  -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
+{
+  std::vector<traffic_simulator::CanonicalizedEntityStatus> other_status;
+  other_status.reserve(other_entity_status_.size());
+  for (const auto & [entity_name, entity_status] : other_entity_status_) {
+    other_status.push_back(entity_status);
+  }
+  return other_status;
+}
+
 auto ActionNode::getHorizon() const -> double
 {
   return std::clamp(canonicalized_entity_status_->getTwist().linear.x * 5.0, 20.0, 50.0);
@@ -135,43 +159,16 @@ auto ActionNode::setCanonicalizedEntityStatus(const traffic_simulator::EntitySta
     entity_status, default_matching_distance_for_lanelet_pose_calculation_);
 }
 
-auto ActionNode::getOtherEntityStatus(lanelet::Id lanelet_id) const
-  -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
-{
-  std::vector<traffic_simulator::CanonicalizedEntityStatus> ret;
-  for (const auto & [name, status] : other_entity_status_) {
-    if (status.isInLanelet() && traffic_simulator::isSameLaneletId(status, lanelet_id)) {
-      ret.emplace_back(status);
-    }
-  }
-  return ret;
-}
-
 auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) const
   -> std::optional<double>
 {
-  std::set<double> distances;
-  for (const auto & lanelet : following_lanelets) {
-    const auto right_of_way_ids = hdmap_utils_->getRightOfWayLaneletIds(lanelet);
-    for (const auto right_of_way_id : right_of_way_ids) {
-      const auto other_status = getOtherEntityStatus(right_of_way_id);
-      if (!other_status.empty() && canonicalized_entity_status_->isInLanelet()) {
-        const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
-        const auto distance_forward =
-          traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-            lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
-        const auto distance_backward =
-          traffic_simulator::lanelet_wrapper::distance::longitudinalDistance(
-            traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
-        if (distance_forward) {
-          distances.insert(distance_forward.value());
-        } else if (distance_backward) {
-          distances.insert(-distance_backward.value());
-        }
-      }
-    }
-    if (distances.size() != 0) {
-      return *distances.begin();
+  if (
+    const auto canonicalized_lanelet_pose =
+      canonicalized_entity_status_->getCanonicalizedLaneletPose()) {
+    if (const auto other_canonicalized_lanelet_poses = getOtherEntitiesCanonicalizedLaneletPoses();
+        !other_canonicalized_lanelet_poses.empty()) {
+      return traffic_simulator::distance::distanceToYieldStop(
+        canonicalized_lanelet_pose.value(), following_lanelets, other_canonicalized_lanelet_poses);
     }
   }
   return std::nullopt;
@@ -227,17 +224,17 @@ auto ActionNode::getRightOfWayEntities() const
 }
 
 auto ActionNode::getDistanceToTrafficLightStopLine(
-  const lanelet::Ids & route_lanelets_,
+  const lanelet::Ids & route_lanelets,
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
-  if (const auto traffic_light_ids = hdmap_utils_->getTrafficLightIdsOnPath(route_lanelets_);
+  if (const auto traffic_light_ids = hdmap_utils_->getTrafficLightIdsOnPath(route_lanelets);
       !traffic_light_ids.empty()) {
     std::set<double> collision_points = {};
     for (const auto traffic_light_id : traffic_light_ids) {
       if (traffic_lights_->isRequiredStopTrafficLightState(traffic_light_id)) {
         if (
           const auto collision_point =
-            hdmap_utils_->getDistanceToTrafficLightStopLine(spline, traffic_light_id)) {
+            traffic_simulator::distance::distanceToTrafficLightStopLine(spline, traffic_light_id)) {
           collision_points.insert(collision_point.value());
         }
       }
@@ -252,18 +249,38 @@ auto ActionNode::getDistanceToTrafficLightStopLine(
 auto ActionNode::getDistanceToFrontEntity(
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
-  if (const auto entity_name = getFrontEntityName(spline)) {
-    return getDistanceToTargetEntity(spline, getEntityStatus(entity_name.value()));
-  } else {
+  if (not canonicalized_entity_status_->isInLanelet()) {
     return std::nullopt;
   }
+  if (const auto front_entity_name = getFrontEntityName(spline)) {
+    const auto & front_entity_status = getEntityStatus(front_entity_name.value());
+    if (
+      const auto & front_entity_canonicalized_lanelet_pose =
+        front_entity_status.getCanonicalizedLaneletPose()) {
+      return traffic_simulator::distance::splineDistanceToBoundingBox(
+        spline, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
+        canonicalized_entity_status_->getBoundingBox(),
+        front_entity_canonicalized_lanelet_pose.value(), front_entity_status.getBoundingBox(),
+        lateral_collision_threshold_.value_or(-1.0));
+    }
+  }
+  return std::nullopt;
 }
 
 auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
   -> std::optional<std::string>
 {
+  if (not canonicalized_entity_status_->isInLanelet()) {
+    return std::nullopt;
+  }
+  /**
+   * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a
+   * candidate of front entity.
+   */
+  constexpr double front_entity_angle_threshold{boost::math::constants::half_pi<double>()};
+
   if (euclidean_distances_map_ != nullptr) {
-    std::map<double, std::string> local_euclidean_distances_map_;
+    std::map<double, std::string> local_euclidean_distances_map;
     const double stop_distance = calculateStopDistance(behavior_parameter_.dynamic_constraints);
     const double horizon = spline.getLength() > stop_distance ? spline.getLength() : stop_distance;
     for (const auto & [name_pair, euclidean_distance] : *euclidean_distances_map_) {
@@ -272,9 +289,9 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
        */
       if (euclidean_distance < horizon) {
         if (name_pair.first == canonicalized_entity_status_->getName()) {
-          local_euclidean_distances_map_.emplace(euclidean_distance, name_pair.second);
+          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.second);
         } else if (name_pair.second == canonicalized_entity_status_->getName()) {
-          local_euclidean_distances_map_.emplace(euclidean_distance, name_pair.first);
+          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.first);
         }
       }
     }
@@ -284,23 +301,32 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
                             canonicalized_entity_status_->getMapPose().orientation)
                             .z;
     // Iterate by increasing euclidean distance and compute the
-    // actual spline-based distance using getDistanceToTargetEntity.
+    // actual spline-based distance using traffic_simulator::distance::splineDistanceToBoundingBox.
     // Select the entity that yields the minimal valid distance.
     std::optional<std::string> best_name;
     double best_distance = std::numeric_limits<double>::infinity();
-    for (const auto & [euclidean_distance, name] : local_euclidean_distances_map_) {
-      const auto other_pos = other_entity_status_.at(name).getMapPose().position;
-      const auto dx = other_pos.x - self_pos.x;
-      const auto dy = other_pos.y - self_pos.y;
-      const auto vec_yaw = std::atan2(dy, dx);
-      const auto yaw_diff = std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
-      if (std::fabs(yaw_diff) <= boost::math::constants::half_pi<double>()) {
-        if (const auto distance_opt = getDistanceToTargetEntity(spline, getEntityStatus(name));
-            distance_opt.has_value()) {
-          const auto dist = distance_opt.value();
-          if (dist < best_distance) {
-            best_distance = dist;
-            best_name = name;
+    for (const auto & [euclidean_distance, name] : local_euclidean_distances_map) {
+      const auto & other_status = other_entity_status_.at(name);
+      if (
+        const auto & other_canonicalized_lanelet_pose =
+          other_status.getCanonicalizedLaneletPose()) {
+        const auto other_pos = other_status.getMapPose().position;
+        const auto dx = other_pos.x - self_pos.x;
+        const auto dy = other_pos.y - self_pos.y;
+        const auto vec_yaw = std::atan2(dy, dx);
+        const auto yaw_diff =
+          std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
+        if (std::fabs(yaw_diff) <= front_entity_angle_threshold) {
+          if (const auto distance_opt = traffic_simulator::distance::splineDistanceToBoundingBox(
+                spline, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
+                canonicalized_entity_status_->getBoundingBox(),
+                other_canonicalized_lanelet_pose.value(), other_status.getBoundingBox());
+              distance_opt.has_value()) {
+            const auto dist = distance_opt.value();
+            if (dist < best_distance) {
+              best_distance = dist;
+              best_name = name;
+            }
           }
         }
       }
@@ -467,95 +493,6 @@ auto ActionNode::getFrontEntityNameAndDistanceByTrajectory(
   return std::nullopt;
 }
 
-/**
- * @note getDistanceToTargetEntity working schematics
- * 
- * 1. Check if route to target entity from reference entity exists, if not try to transform pose to other 
- *    routable lanelet, within matching distance (findRoutableAlternativeLaneletPoseFrom).
- * 2. Calculate longitudinal distance between entities bounding boxes -> bounding_box_distance.
- * 3. Calculate longitudinal distance between entities poses -> longitudinal_distance.
- * 4. Calculate target entity bounding box distance to reference entity spline (minimal distance from all corners) 
- *    -> target_to_spline_distance.
- * 5. If target_to_spline_distance is less than half width of reference entity target entity is conflicting.
- * 6. Check corner case where target entity width is bigger than width of entity and target entity
- *    is exactly on the spline -> spline.getCollisionPointIn2D
- * 7. If target entity is conflicting return bounding_box_distance enlarged by half of the entity 
- *    length.
- */
-auto ActionNode::getDistanceToTargetEntity(
-  const math::geometry::CatmullRomSplineInterface & spline,
-  const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>
-{
-  if (
-    !status.isInLanelet() || !canonicalized_entity_status_->isInLanelet() ||
-    !isOtherEntityAtConsideredAltitude(status)) {
-    return std::nullopt;
-  }
-  /** 
-      * boundingBoxLaneLongitudinalDistance requires routing_configuration, 
-      * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets 
-      */
-  traffic_simulator::RoutingConfiguration routing_configuration;
-  routing_configuration.allow_lane_change = true;
-  constexpr bool include_adjacent_lanelet{false};
-  constexpr bool include_opposite_direction{true};
-  constexpr bool search_backward{false};
-
-  const auto & target_bounding_box = status.getBoundingBox();
-
-  if (const auto & target_lanelet_pose =
-        traffic_simulator::pose::findRoutableAlternativeLaneletPoseFrom(
-          canonicalized_entity_status_->getLaneletId(),
-          status.getCanonicalizedLaneletPose().value(), target_bounding_box);
-      target_lanelet_pose) {
-    const auto & from_lanelet_pose = canonicalized_entity_status_->getCanonicalizedLaneletPose();
-    const auto & from_bounding_box = canonicalized_entity_status_->getBoundingBox();
-    const auto bounding_box_map_points = math::geometry::transformPoints(
-      static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose),
-      math::geometry::getPointsFromBbox(target_bounding_box));
-    const auto bounding_box_diagonal_length =
-      math::geometry::getDistance(bounding_box_map_points[0], bounding_box_map_points[2]);
-    if (const auto longitudinal_distance = traffic_simulator::distance::longitudinalDistance(
-          *from_lanelet_pose, *target_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, routing_configuration);
-        !longitudinal_distance) {
-      return std::nullopt;
-    } else if (const auto bounding_box_distance =
-                 traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
-                   longitudinal_distance, from_bounding_box, target_bounding_box);
-               !bounding_box_distance || bounding_box_distance.value() < 0.0) {
-      return std::nullopt;
-    } else {
-      /// @todo rotation of NPC is not taken into account, same as in boundingBoxLaneLongitudinalDistance
-      /// this should be considered to be changed in separate task in the future
-      const auto target_bounding_box_distance =
-        bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
-
-      const auto lateral_distance_to_spline = traffic_simulator::distance::distanceToSpline(
-        static_cast<geometry_msgs::msg::Pose>(*target_lanelet_pose), target_bounding_box, spline,
-        longitudinal_distance.value());
-
-      const double threshold =
-        lateral_collision_threshold_.value_or(from_bounding_box.dimensions.y * 0.5);
-
-      if (lateral_distance_to_spline <= threshold) {
-        return target_bounding_box_distance;
-      }
-      /// @note if the distance of the target entity to the spline cannot be calculated because a collision occurs
-      else if (const auto target_polygon = math::geometry::transformPoints(
-                 status.getMapPose(), math::geometry::getPointsFromBbox(target_bounding_box));
-               spline.getCollisionPointIn2D(
-                 target_polygon, search_backward,
-                 std::make_pair(
-                   bounding_box_distance.value(),
-                   target_bounding_box_distance + bounding_box_diagonal_length))) {
-        return target_bounding_box_distance;
-      }
-    }
-  }
-  return std::nullopt;
-}
-
 auto ActionNode::isOtherEntityAtConsideredAltitude(
   const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool
 {
@@ -569,11 +506,14 @@ auto ActionNode::isOtherEntityAtConsideredAltitude(
 }
 
 auto ActionNode::getDistanceToConflictingEntity(
-  const lanelet::Ids & route_lanelets_,
+  const lanelet::Ids & route_lanelets,
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
-  auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets_);
-  auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets_);
+  if (not canonicalized_entity_status_->isInLanelet()) {
+    return std::nullopt;
+  }
+  auto crosswalk_entity_status = getConflictingEntityStatusOnCrossWalk(route_lanelets);
+  auto lane_entity_status = getConflictingEntityStatusOnLane(route_lanelets);
   std::set<double> distances;
   for (const auto & status : crosswalk_entity_status) {
     const auto s = getDistanceToTargetEntityOnCrosswalk(spline, status);
@@ -582,8 +522,14 @@ auto ActionNode::getDistanceToConflictingEntity(
     }
   }
   for (const auto & status : lane_entity_status) {
-    if (const auto distance_to_entity = getDistanceToTargetEntity(spline, status)) {
-      distances.insert(distance_to_entity.value());
+    if (const auto conflicting_pose = status.getCanonicalizedLaneletPose()) {
+      if (
+        const auto distance_to_entity = traffic_simulator::distance::splineDistanceToBoundingBox(
+          spline, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
+          canonicalized_entity_status_->getBoundingBox(), conflicting_pose.value(),
+          status.getBoundingBox())) {
+        distances.insert(distance_to_entity.value());
+      }
     }
   }
   if (distances.empty()) {
@@ -644,7 +590,7 @@ auto ActionNode::foundConflictingEntity(const lanelet::Ids & following_lanelets)
 }
 
 auto ActionNode::calculateUpdatedEntityStatus(
-  const double local_target_speed_,
+  const double local_target_speed,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
@@ -652,7 +598,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time_, canonicalized_entity_status_->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    local_target_speed_, constraints, canonicalized_entity_status_->getTwist(),
+    local_target_speed, constraints, canonicalized_entity_status_->getTwist(),
     canonicalized_entity_status_->getAccel());
 
   const double linear_jerk_new = std::get<2>(dynamics);
@@ -685,7 +631,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
 }
 
 auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
-  const double local_target_speed_,
+  const double local_target_speed,
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::EntityStatus
 {
@@ -750,7 +696,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time_, canonicalized_entity_status_->getName());
   const auto dynamics = speed_planner.getDynamicStates(
-    local_target_speed_, constraints, canonicalized_entity_status_->getTwist(),
+    local_target_speed, constraints, canonicalized_entity_status_->getTwist(),
     canonicalized_entity_status_->getAccel());
   const auto linear_jerk_new = std::get<2>(dynamics);
   const auto & accel_new = std::get<1>(dynamics);

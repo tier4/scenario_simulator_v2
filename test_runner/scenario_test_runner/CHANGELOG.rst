@@ -2,47 +2,245 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.15.0 (2024-04-18)
+21.1.1 (2025-12-10)
 -------------------
-* Merge pull request `#1223 <https://github.com/tier4/scenario_simulator_v2/issues/1223>`_ from tier4/refactor/drop_workflow
-  Delete workflow feature and add alternative bash script
-* chore: delete unnecessary diff
-* Merge branch 'master' into refactor/drop_workflow
-* fix: add dropped scenario to workflow.txt
-* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+* Merge branch 'master' into update-sonarqube-settings
+* Merge branch 'master' into update-sonarqube-settings
+* Contributors: Kotaro Yoshimoto
+
+21.1.0 (2025-12-10)
+-------------------
+* Merge branch 'master' into feature/unknown
+* Merge branch 'master' into feature/unknown
+* Contributors: Kotaro Yoshimoto
+
+21.0.0 (2025-12-10)
+-------------------
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Contributors: Mateusz Palczuk
+
+20.0.4 (2025-12-09)
+-------------------
+* Merge pull request `#1764 <https://github.com/tier4/scenario_simulator_v2/issues/1764>`_ from tier4/sort-changelog
+* Sort CHANGELOG.rst
+* Contributors: Kotaro Yoshimoto
+
+20.0.3 (2025-12-03)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-6
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-6
+* Contributors: Kotaro Yoshimoto
+
+20.0.2 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/autoware-documentation-link
+* Contributors: Kotaro Yoshimoto
+
+20.0.1 (2025-12-03)
+-------------------
+* Merge branch 'master' into use-maximal-munch
+* Contributors: Kotaro Yoshimoto
+
+20.0.0 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/double-INF
+* Merge remote-tracking branch 'origin/fix/double-INF' into fix/double-INF
+* Merge branch 'master' into fix/double-INF
+* Contributors: Kotaro Yoshimoto
+
+19.0.3 (2025-11-27)
+-------------------
+
+19.0.2 (2025-11-27)
+-------------------
+* Merge branch 'master' into fix/dependabot-uv
+* Merge branch 'master' into fix/dependabot-uv
+* Contributors: Kotaro Yoshimoto
+
+19.0.1 (2025-11-27)
+-------------------
+* Merge branch 'master' into skip-sonarqube-scan-for-dependabots
+* Contributors: Kotaro Yoshimoto
+
+19.0.0 (2025-11-27)
+-------------------
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge tag '12.0.2' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-pose' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Michał Ciasnocha, Tatsuya Yamasaki, robomic
+
+18.5.0 (2025-11-26)
+-------------------
+* Merge pull request `#1742 <https://github.com/tier4/scenario_simulator_v2/issues/1742>`_ from tier4/feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Rollback meaningless velocity status parameters movement
+* Merge branch 'master' into feature/publisher-noise-imu
+* Merge branch 'master' into feature/publisher-noise-imu
+* Set imu data standard_deviation to zero
+* Add covariance diagonal elements errors for Imu
+* Add default IMU noise in new configuration to be the same as default in legacy configuration
+  This was done so that covariance matrices are calculated to be non-zero (their diagonal). Otherwise the Autoware gets confused and Ego starts shaking in RViz.
+* Fix parameter comments
+* Fix minor issue
+* Add /sensing/imu/imu_data parameters to parameters file
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk
+
+18.4.5 (2025-11-25)
+-------------------
+
+18.4.4 (2025-11-21)
+-------------------
+
+18.4.3 (2025-11-21)
+-------------------
+* Merge remote-tracking branch 'origin/master' into fix/poetry-to-uv
   # Conflicts:
-  #	test_runner/scenario_test_runner/config/workflow_example.yaml
-* refactor: rename workflow.csv to workflow.txt
-* Merge branch 'master' into refactor/drop_workflow
-* Merge branch 'master' into refactor/drop_workflow
-* chore: use remote workflow file(test)
-* Merge branch 'master' into refactor/drop_workflow
-* chore: revert scenario failure
-* chore: test for scenario failure
-* chore: update way to run workflow
-* refactor: delete workflow.Workflow and rename workflow.py to scenario.py
+  #	poetry.lock
+  #	pyproject.toml
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Merge branch 'master' into fix/poetry-to-uv
+* Contributors: Kotaro Yoshimoto, Taiga, ぐるぐる
+
+18.4.2 (2025-11-20)
+-------------------
+* Merge branch 'master' into fix/deprecation_error
+* Contributors: Kotaro Yoshimoto
+
+18.4.1 (2025-11-20)
+-------------------
+
+18.4.0 (2025-11-20)
+-------------------
+* Merge pull request `#1727 <https://github.com/tier4/scenario_simulator_v2/issues/1727>`_ from tier4/feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Merge branch 'master' into feature/publisher-noise-pose
+* Add covariance diagonal elements errors for PoseWithCovarianceStamped
+* Add covariance diagonal elements errors for PoseWithCovarianceStamped
+* Add /localization/pose_estimator/pose_with_covariance parameters to parameters file
+* Contributors: Kotaro Yoshimoto, Mateusz Palczuk
+
+18.3.9 (2025-11-18)
+-------------------
+
+18.3.8 (2025-11-18)
+-------------------
+
+18.3.7 (2025-11-14)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/8BitJonny/gh-get-current-pr-4.0.0
+* Contributors: Kotaro Yoshimoto
+
+18.3.6 (2025-11-13)
+-------------------
+* Merge branch 'master' into fix/multiple_states_on_phase
+* Merge branch 'master' into fix/multiple_states_on_phase
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
-2.5.0 (2024-07-08)
-------------------
-* Merge pull request `#1305 <https://github.com/tier4/scenario_simulator_v2/issues/1305>`_ from tier4/feature/publish_empty_context
-  Feature/publish empty context
-* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
-* Merge branch 'master' into feature/publish_empty_context
-* Merge branch 'master' into feature/publish_empty_context
-* add GET_PARAMETER line
-* update launch file
-* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
-* Contributors: Masaya Kataoka
-
-16.4.2 (2025-05-23)
+18.3.5 (2025-11-13)
 -------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-6
+* Contributors: Taiga
 
-18.3.2 (2025-11-06)
+18.3.4 (2025-11-13)
 -------------------
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Contributors: Kotaro Yoshimoto, Taiga
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-5
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-5
+* Contributors: Taiga
 
 18.3.3 (2025-11-07)
 -------------------
@@ -51,6 +249,12 @@ Changelog for package scenario_test_runner
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
@@ -540,6 +744,9 @@ Changelog for package scenario_test_runner
 * Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
 * Merge branch 'master' into refactor/behavior-tree-2
 * Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.2 (2025-05-23)
+-------------------
 
 16.4.1 (2025-05-23)
 -------------------
@@ -2255,6 +2462,18 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka, Release Bot
 
+2.5.0 (2024-07-08)
+------------------
+* Merge pull request `#1305 <https://github.com/tier4/scenario_simulator_v2/issues/1305>`_ from tier4/feature/publish_empty_context
+  Feature/publish empty context
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* add GET_PARAMETER line
+* update launch file
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Contributors: Masaya Kataoka
+
 2.4.2 (2024-07-08)
 ------------------
 
@@ -2581,6 +2800,27 @@ Changelog for package scenario_test_runner
 * chore: update way to run workflow
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, hakuturu583, ぐるぐる
+
+1.15.0 (2024-04-18)
+-------------------
+* Merge pull request `#1223 <https://github.com/tier4/scenario_simulator_v2/issues/1223>`_ from tier4/refactor/drop_workflow
+  Delete workflow feature and add alternative bash script
+* chore: delete unnecessary diff
+* Merge branch 'master' into refactor/drop_workflow
+* fix: add dropped scenario to workflow.txt
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* refactor: rename workflow.csv to workflow.txt
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* chore: use remote workflow file(test)
+* Merge branch 'master' into refactor/drop_workflow
+* chore: revert scenario failure
+* chore: test for scenario failure
+* chore: update way to run workflow
+* refactor: delete workflow.Workflow and rename workflow.py to scenario.py
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
 1.14.1 (2024-04-12)
 -------------------
