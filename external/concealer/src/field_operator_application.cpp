@@ -205,7 +205,7 @@ FieldOperatorApplication::~FieldOperatorApplication()
       return timeout;
     }();
 
-    if (::kill(process_id, SIGTERM); sigtimedwait(&sigset, nullptr, &timeout) < 0) {
+    if (::kill(process_id, SIGINT); sigtimedwait(&sigset, nullptr, &timeout) < 0) {
       switch (errno) {
         case EINTR:
           /*
@@ -225,7 +225,7 @@ FieldOperatorApplication::~FieldOperatorApplication()
              timeout period.
           */
           RCLCPP_ERROR_STREAM(get_logger(), "Autoware launch process does not respond. Kill it.");
-          ::kill(process_id, SIGKILL);
+          ::kill(process_id, SIGTERM);
           break;
 
         default:
