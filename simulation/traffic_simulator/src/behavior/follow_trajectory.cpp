@@ -136,11 +136,13 @@ auto makeUpdatedStatus(
   //                 WAYPOINT QUERIES
   //  ==============================================
 
-  const auto previous_waypoint = [&polyline_trajectory]() -> const auto & {
+  const auto previous_waypoint = [&polyline_trajectory]() -> const auto &
+  {
     return polyline_trajectory.shape.vertices[0];
   };
 
-  const auto target_waypoint = [&polyline_trajectory]() -> const auto & {
+  const auto target_waypoint = [&polyline_trajectory]() -> const auto &
+  {
     return polyline_trajectory.shape.vertices[1];
   };
 
@@ -197,14 +199,9 @@ auto makeUpdatedStatus(
        * When lanelet matching errors are fixed, this dirty hack can be removed.
        */
       const auto longitudinal_distance = distance::longitudinalDistance(
-        from_canonicalized.value(),
-        to_canonicalized.value(),
-        include_adjacent_lanelet,
-        include_opposite_direction,
-        routing_configuration);
-      if (
-        not longitudinal_distance.has_value() or
-        longitudinal_distance.value() < 0.0) {
+        from_canonicalized.value(), to_canonicalized.value(), include_adjacent_lanelet,
+        include_opposite_direction, routing_configuration);
+      if (not longitudinal_distance.has_value() or longitudinal_distance.value() < 0.0) {
         return hypot(from, to);
       }
 
