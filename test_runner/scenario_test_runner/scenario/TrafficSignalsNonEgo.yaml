@@ -1,0 +1,135 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: "2021-02-01T08:31:04.600Z"
+    description: ""
+    author: ""
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController:
+        - name: controller-1
+          Phase:
+            - name: phase-1
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "red solidOn circle" }
+                - { trafficSignalId: "34802", state: "green solidOn right" }
+                - { trafficSignalId: "34802 v2i", state: "red solidOn circle" }
+            - name: phase-2
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "yellow solidOn circle" }
+            - name: dummy-phase (for debugging corner case)
+              duration: 0
+              TrafficSignalState: []
+            - name: phase-3
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "green solidOn circle" }
+                - { trafficSignalId: "34802", state: "green solidOff right" }
+                - {
+                    trafficSignalId: "34802 v2i",
+                    state: "green solidOn circle",
+                  }
+                - {
+                    trafficSignalId: "34802 v2i",
+                    state: "green solidOff right",
+                  }
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: "34513"
+                      s: 0
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ""
+                        laneId: "34630"
+                        s: 20
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+    Story:
+      - name: ""
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 30
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup:
+        - Condition:
+            - name: ""
+              delay: 0
+              conditionEdge: none
+              ByValueCondition:
+                SimulationTimeCondition:
+                  value: 300
+                  rule: greaterThan
