@@ -2,21 +2,38 @@
 Changelog for package simple_cross_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-2.5.0 (2024-07-08)
-------------------
-* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
-* Merge branch 'master' into feature/publish_empty_context
-* Merge branch 'master' into feature/publish_empty_context
-* Contributors: Masaya Kataoka
-
-16.4.2 (2025-05-23)
+21.1.1 (2025-12-10)
 -------------------
+* Merge branch 'master' into update-sonarqube-settings
+* Merge branch 'master' into update-sonarqube-settings
+* Contributors: Kotaro Yoshimoto
 
-18.3.2 (2025-11-06)
+21.1.0 (2025-12-10)
 -------------------
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Contributors: Kotaro Yoshimoto, Taiga
+* Merge branch 'master' into feature/unknown
+* Merge branch 'master' into feature/unknown
+* Contributors: Kotaro Yoshimoto
+
+21.0.0 (2025-12-10)
+-------------------
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Contributors: Mateusz Palczuk
+
+20.0.4 (2025-12-09)
+-------------------
+* Merge pull request `#1764 <https://github.com/tier4/scenario_simulator_v2/issues/1764>`_ from tier4/sort-changelog
+* Sort CHANGELOG.rst
+* Contributors: Kotaro Yoshimoto
 
 20.0.3 (2025-12-03)
 -------------------
@@ -219,6 +236,12 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
@@ -658,6 +681,9 @@ Changelog for package simple_cross_map
 * Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
 * Merge branch 'master' into refactor/behavior-tree-2
 * Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.2 (2025-05-23)
+-------------------
 
 16.4.1 (2025-05-23)
 -------------------
@@ -2099,6 +2125,13 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka, Release Bot
+
+2.5.0 (2024-07-08)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Contributors: Masaya Kataoka
 
 2.4.2 (2024-07-08)
 ------------------
