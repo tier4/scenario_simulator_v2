@@ -272,8 +272,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
 
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
         if (
-          getLocalizationState().state !=
-          autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
+          getLocalizationState().state >=
+          autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZING) {
           return;
         }
 #endif
