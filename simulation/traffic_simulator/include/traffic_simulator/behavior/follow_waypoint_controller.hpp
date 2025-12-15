@@ -285,15 +285,6 @@ public:
   */
   static constexpr double local_epsilon = 1e-12;
 
-  /*
-     Maximum allowable distance the vehicle may travel past the
-     final waypoint.
-
-     There is no technical basis for this value, it was determined based on
-     Dawid Moszynski experiments.
-  */
-  static constexpr double acceptable_overshoot_distance = 1e-1;
-
   explicit constexpr FollowWaypointController(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const double step_time, const bool with_breaking,

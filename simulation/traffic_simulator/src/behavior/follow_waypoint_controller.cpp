@@ -267,19 +267,19 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
     return true;
   };
 
-  /// @todo rename state -> predicted_status
-  PredictedEntityStatus state(entity_status);
+  PredictedEntityStatus predicted_status(entity_status);
   if (remaining_time < step_time) {
-    return state;
+    return predicted_status;
   } else {
     // First step with acceleration equal to step_acceleration.
-    state.step(
-      clampAcceleration(step_acceleration, state.getAcceleration(), state.getSpeed()), step_time,
-      update_entity_status, distance_along_lanelet);
+    predicted_status.step(
+      clampAcceleration(
+        step_acceleration, predicted_status.getAcceleration(), predicted_status.getSpeed()),
+      step_time, update_entity_status, distance_along_lanelet);
 
     if (with_breaking) {
       // Predict the current (before acceleration zeroing) braking time required for stopping.
-      PredictedEntityStatus breaking_check = state;
+      PredictedEntityStatus breaking_check = predicted_status;
       if (!brakeUntilImmobility(breaking_check)) {
         // If complete immobility is not possible - ignore this candidate.
         return std::nullopt;
@@ -290,41 +290,42 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
     }
 
     // If it is not braking time, more time left for driving with constant speed.
-    while (std::abs(state.getAcceleration()) > 0.0) {
-      if (state.travel_time >= remaining_time) {
+    while (std::abs(predicted_status.getAcceleration()) > 0.0) {
+      if (predicted_status.travel_time >= remaining_time) {
         throw ControllerError(
           "It is not the braking time, but there is no time to achieve acceleration equal "
           "to 0.0 - the trajectory does not meet the constraint of having an acceleration "
           "equal to 0.0 on arrival at the followed waypoint, speed: ",
-          state.getSpeed(), ", acceleration: ", state.getAcceleration(),
+          predicted_status.getSpeed(), ", acceleration: ", predicted_status.getAcceleration(),
           ", remaining_time: ", remaining_time, ", remaining_distance: ", remaining_distance,
           " step_acceleration: ", step_acceleration, ". ", *this);
       } else {
-        state.step(
-          clampAcceleration(0.0, state.getAcceleration(), state.getSpeed()), step_time,
-          update_entity_status, distance_along_lanelet);
+        predicted_status.step(
+          clampAcceleration(0.0, predicted_status.getAcceleration(), predicted_status.getSpeed()),
+          step_time, update_entity_status, distance_along_lanelet);
       }
     }
 
-    if (std::abs(state.getSpeed()) <= local_epsilon) {
+    if (std::abs(predicted_status.getSpeed()) <= local_epsilon) {
       // If the previous steps caused the constant speed to be extremely low - ignore this.
       return std::nullopt;
     } else {
-      const double const_speed_value = state.getSpeed();
+      const double const_speed_value = predicted_status.getSpeed();
 
       if (with_breaking) {
         // Predict the current (after acceleration zeroing) braking time required for stopping.
-        if (!brakeUntilImmobility(state)) {
+        if (!brakeUntilImmobility(predicted_status)) {
           // If complete immobility is not possible - ignore this candidate.
           return std::nullopt;
-        } else if (std::abs(state.travel_time - remaining_time) <= step_time) {
+        } else if (std::abs(predicted_status.travel_time - remaining_time) <= step_time) {
           // If it is breaking time - consider this candidate.
-          return state;
+          return predicted_status;
         }
       }
 
       // Count the distance and time of movement with constant speed, use this to prediction.
-      if (const double const_speed_distance = remaining_distance - state.traveled_distance;
+      if (const double const_speed_distance =
+            remaining_distance - predicted_status.traveled_distance;
           const_speed_distance >= std::numeric_limits<double>::max() * const_speed_value) {
         throw ControllerError(
           "Exceeded the range of the variable type <double> (", const_speed_distance, "/",
@@ -338,8 +339,9 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
           roundTimeToFullStepsWithTolerance(const_speed_time, step_time_tolerance);
         const double rounded_const_speed_distance = rounded_const_speed_time * const_speed_value;
         return PredictedEntityStatus{
-          state.getEntityStatus(), rounded_const_speed_distance + state.traveled_distance,
-          rounded_const_speed_time + state.travel_time};
+          predicted_status.getEntityStatus(),
+          rounded_const_speed_distance + predicted_status.traveled_distance,
+          rounded_const_speed_time + predicted_status.travel_time};
       }
     }
   }
