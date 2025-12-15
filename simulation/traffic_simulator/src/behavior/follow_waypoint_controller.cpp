@@ -228,7 +228,8 @@ auto FollowWaypointController::getPredictedStopEntityStatusWithoutConsideringTim
     } else {
       auto [local_min_acceleration, local_max_acceleration] =
         getAccelerationLimits(acceleration, speed);
-      predicted_status.step(local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
+      predicted_status.step(
+        local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
     }
   }
   return predicted_status;
@@ -259,7 +260,8 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
       } else {
         auto [local_min_acceleration, local_max_acceleration] =
           getAccelerationLimits(acceleration, speed);
-        predicted_status.step(local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
+        predicted_status.step(
+          local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
       }
     }
     return true;

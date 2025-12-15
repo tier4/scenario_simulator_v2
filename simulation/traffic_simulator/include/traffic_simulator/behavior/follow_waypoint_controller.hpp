@@ -89,7 +89,8 @@ struct PredictedEntityStatus
 
     if constexpr (use_distance_along_lanelet) {
       const auto desired_velocity = [&]() {
-        const auto euler = math::geometry::convertQuaternionToEulerAngle(entity_status_.pose.orientation);
+        const auto euler =
+          math::geometry::convertQuaternionToEulerAngle(entity_status_.pose.orientation);
         /// @note pitch is negated to match the convention: positive pitch = upward motion
         return geometry_msgs::build<geometry_msgs::msg::Vector3>()
           .x(std::cos(-euler.y) * std::cos(euler.z) * desired_speed)
@@ -98,7 +99,8 @@ struct PredictedEntityStatus
       }();
       const auto position_before_update = entity_status_.pose.position;
       entity_status_ = update_entity_status(entity_status_, desired_velocity);
-      traveled_distance += distance_along_lanelet(position_before_update, entity_status_.pose.position);
+      traveled_distance +=
+        distance_along_lanelet(position_before_update, entity_status_.pose.position);
     } else {
       entity_status_.action_status.twist.linear.x = desired_speed;
       entity_status_.action_status.accel.linear.x = (desired_speed - current_speed) / step_time;
