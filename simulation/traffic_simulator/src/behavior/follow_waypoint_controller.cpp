@@ -52,7 +52,7 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
   const double speed) const -> double
 {
   if (remaining_time <= step_time * 2.0) {
-    if (!with_breaking || (std::abs(speed) < local_epsilon)) {
+    if (!with_braking || (std::abs(speed) < local_epsilon)) {
       // Step in which the acceleration is set to 0.0.
       return clampAcceleration(0.0, acceleration, speed);
     } else {
@@ -63,7 +63,7 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
         ", remaining_distance: ", remaining_distance, ". ", *this);
     }
   } else if (remaining_time <= step_time * 3.0) {
-    if (with_breaking) {
+    if (with_braking) {
       // Step in which the speed is set to 0.0.
       return clampAcceleration(-speed / step_time, acceleration, speed);
     } else {
@@ -75,7 +75,7 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
       return clampAcceleration(numerator / std::pow(step_time, 2), acceleration, speed);
     }
   } else if (remaining_time <= step_time * 4.0) {
-    if (with_breaking) {
+    if (with_braking) {
       /*
          Step in which acceleration is set to ensure that the remaining
          distance is traveled in next step.
@@ -228,8 +228,7 @@ auto FollowWaypointController::getPredictedStopEntityStatusWithoutConsideringTim
     } else {
       auto [local_min_acceleration, local_max_acceleration] =
         getAccelerationLimits(acceleration, speed);
-      predicted_status.step(
-        local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
+      predicted_status.step(local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
     }
   }
   return predicted_status;
@@ -260,8 +259,7 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
       } else {
         auto [local_min_acceleration, local_max_acceleration] =
           getAccelerationLimits(acceleration, speed);
-        predicted_status.step(
-          local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
+        predicted_status.step(local_min_acceleration, step_time, update_entity_status, distance_along_lanelet);
       }
     }
     return true;
@@ -277,15 +275,15 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
         step_acceleration, predicted_status.getAcceleration(), predicted_status.getSpeed()),
       step_time, update_entity_status, distance_along_lanelet);
 
-    if (with_breaking) {
+    if (with_braking) {
       // Predict the current (before acceleration zeroing) braking time required for stopping.
-      PredictedEntityStatus breaking_check = predicted_status;
-      if (!brakeUntilImmobility(breaking_check)) {
+      PredictedEntityStatus braking_check = predicted_status;
+      if (!brakeUntilImmobility(braking_check)) {
         // If complete immobility is not possible - ignore this candidate.
         return std::nullopt;
-      } else if (std::abs(breaking_check.travel_time - remaining_time) <= step_time) {
-        // If it is breaking time - consider this candidate.
-        return breaking_check;
+      } else if (std::abs(braking_check.travel_time - remaining_time) <= step_time) {
+        // If it is braking time - consider this candidate.
+        return braking_check;
       }
     }
 
@@ -312,13 +310,13 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
     } else {
       const double const_speed_value = predicted_status.getSpeed();
 
-      if (with_breaking) {
+      if (with_braking) {
         // Predict the current (after acceleration zeroing) braking time required for stopping.
         if (!brakeUntilImmobility(predicted_status)) {
           // If complete immobility is not possible - ignore this candidate.
           return std::nullopt;
         } else if (std::abs(predicted_status.travel_time - remaining_time) <= step_time) {
-          // If it is breaking time - consider this candidate.
+          // If it is braking time - consider this candidate.
           return predicted_status;
         }
       }
@@ -466,7 +464,7 @@ auto FollowWaypointController::getAcceleration(
     /*
        If last steps, increase accuracy by using analytical calculations.
     */
-    if (with_breaking && remaining_time <= step_time * 4) {
+    if (with_braking && remaining_time <= step_time * 4) {
       return getAnalyticalAccelerationForLastSteps(
         remaining_time, remaining_distance, acceleration, speed);
     } else if (remaining_time <= step_time * 3) {

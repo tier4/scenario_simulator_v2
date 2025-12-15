@@ -45,6 +45,8 @@ struct ControllerError : public common::Error
 
 struct PredictedEntityStatus
 {
+  /// @note compile-time flag to switch between 1D kinematics (false) and lanelet-aware distance (true)
+  /// set to true for high-accuracy validation/debugging, default false for production performance
   static constexpr bool use_distance_along_lanelet = false;
 
   double traveled_distance;
@@ -62,6 +64,20 @@ struct PredictedEntityStatus
   {
   }
 
+  /**
+   * @brief Advance simulation by one time step with given acceleration.
+   *
+   * If use_distance_along_lanelet=false (default): Uses 1D kinematic model with trapezoidal integration.
+   * Speed and acceleration updated directly. Distance integrated using average speed (exact for constant acceleration).
+   *
+   * If use_distance_along_lanelet=true: Uses lanelet-aware distance calculation for high accuracy.
+   * Requires update_entity_status and distance_along_lanelet functions.
+   *
+   * @param step_acceleration Acceleration to apply [m/s²]
+   * @param step_time Time step duration [s]
+   * @param update_entity_status Function to update entity status (used when use_distance_along_lanelet=true)
+   * @param distance_along_lanelet Function to compute distance along lanelet (used when use_distance_along_lanelet=true)
+   */
   template <typename UpdateEntityStatusFunc, typename DistanceAlongLaneletFunc>
   auto step(
     const double step_acceleration, const double step_time,
@@ -69,27 +85,21 @@ struct PredictedEntityStatus
     const DistanceAlongLaneletFunc & distance_along_lanelet) -> void
   {
     const auto current_speed = entity_status_.action_status.twist.linear.x;
-    const auto current_position = entity_status_.pose.position;
-
     const auto desired_speed = current_speed + step_acceleration * step_time;
 
-    if (use_distance_along_lanelet) {
+    if constexpr (use_distance_along_lanelet) {
       const auto desired_velocity = [&]() {
-        const auto pitch =
-          -math::geometry::convertQuaternionToEulerAngle(entity_status_.pose.orientation).y;
-        const auto yaw =
-          math::geometry::convertQuaternionToEulerAngle(entity_status_.pose.orientation).z;
+        const auto euler = math::geometry::convertQuaternionToEulerAngle(entity_status_.pose.orientation);
+        /// @note pitch is negated to match the convention: positive pitch = upward motion
         return geometry_msgs::build<geometry_msgs::msg::Vector3>()
-          .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
-          .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
-          .z(std::sin(pitch) * desired_speed);
+          .x(std::cos(-euler.y) * std::cos(euler.z) * desired_speed)
+          .y(std::cos(-euler.y) * std::sin(euler.z) * desired_speed)
+          .z(std::sin(-euler.y) * desired_speed);
       }();
-
+      const auto position_before_update = entity_status_.pose.position;
       entity_status_ = update_entity_status(entity_status_, desired_velocity);
-      traveled_distance += distance_along_lanelet(current_position, entity_status_.pose.position);
+      traveled_distance += distance_along_lanelet(position_before_update, entity_status_.pose.position);
     } else {
-      /// @note 1D kinematic update: set speed and acceleration directly,
-      /// integrate distance using trapezoidal method assuming constant acceleration
       entity_status_.action_status.twist.linear.x = desired_speed;
       entity_status_.action_status.accel.linear.x = (desired_speed - current_speed) / step_time;
       traveled_distance += (current_speed + desired_speed) * 0.5 * step_time;
@@ -117,7 +127,7 @@ private:
 class FollowWaypointController
 {
   const double step_time;
-  const bool with_breaking;
+  const bool with_braking;
 
   const double max_speed;
   const double max_acceleration;
@@ -163,7 +173,7 @@ class FollowWaypointController
   {
     stream << std::setprecision(16) << std::fixed;
     stream << "FollowWaypointController: step_time: " << c.step_time
-           << ", with_breaking: " << c.with_breaking << ", max_speed: " << c.max_speed
+           << ", with_braking: " << c.with_braking << ", max_speed: " << c.max_speed
            << ", max_acceleration: " << c.max_acceleration
            << ", max_deceleration: " << c.max_deceleration
            << ", max_acceleration_rate: " << c.max_acceleration_rate
@@ -287,10 +297,10 @@ public:
 
   explicit constexpr FollowWaypointController(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-    const double step_time, const bool with_breaking,
+    const double step_time, const bool with_braking,
     const std::optional<double> & target_speed = std::nullopt)
   : step_time{step_time},
-    with_breaking{with_breaking},
+    with_braking{with_braking},
     max_speed{behavior_parameter.dynamic_constraints.max_speed},
     max_acceleration{behavior_parameter.dynamic_constraints.max_acceleration},
     max_acceleration_rate{behavior_parameter.dynamic_constraints.max_acceleration_rate},
@@ -471,7 +481,7 @@ public:
   auto areConditionsOfArrivalMet(
     const double acceleration, const double speed, const double distance) const -> double
   {
-    return (!with_breaking || std::abs(speed) < local_epsilon) &&
+    return (!with_braking || std::abs(speed) < local_epsilon) &&
            std::abs(acceleration) < local_epsilon && distance < remaining_distance_tolerance;
   }
 };

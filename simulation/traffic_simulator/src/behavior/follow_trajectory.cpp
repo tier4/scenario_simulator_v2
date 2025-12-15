@@ -567,12 +567,12 @@ auto makeUpdatedStatus(
 
   const auto constrained_brake_velocity = [&behavior_parameter, step_time](
                                             const double speed, const auto & orientation) {
-    constexpr double target_breaking_speed = 0.0;
+    constexpr double target_braking_speed = 0.0;
     const auto controller =
-      FollowWaypointController(behavior_parameter, step_time, true, target_breaking_speed);
+      FollowWaypointController(behavior_parameter, step_time, true, target_braking_speed);
     const auto deceleration = std::max(
       controller.accelerationWithJerkConstraint(
-        speed, target_breaking_speed, behavior_parameter.dynamic_constraints.max_deceleration_rate),
+        speed, target_braking_speed, behavior_parameter.dynamic_constraints.max_deceleration_rate),
       -behavior_parameter.dynamic_constraints.max_deceleration);
     return scalarToDirectionVector(speed + deceleration * step_time, orientation);
   };
