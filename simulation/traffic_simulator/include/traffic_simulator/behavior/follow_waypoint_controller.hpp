@@ -86,15 +86,6 @@ class FollowWaypointController
   const double target_speed;
 
   /*
-     Achieving official epsilon (1e-16) accuracy when using doubles is
-     difficult for this reason the controller uses less accuracy.
-
-     There is no technical basis for this value, it was determined based on
-     Dawid Moszynski experiments.
-  */
-  static constexpr double local_epsilon = 1e-12;
-
-  /*
      Acceptable time step inaccuracy, allowing the time to be rounded up to the
      full number of steps.
 
@@ -102,15 +93,6 @@ class FollowWaypointController
      Dawid Moszynski experiments.
   */
   static constexpr double step_time_tolerance = 1e-6;
-
-  /*
-     Accuracy of the final arrival distance at a waypoint with a specified
-     time.
-
-     There is no technical basis for this value, it was determined based on
-     Dawid Moszynski experiments.
-  */
-  static constexpr double finish_distance_tolerance = 1e-2;
 
   /*
      Accuracy of the predicted arrival distance at the waypoint with the
@@ -220,6 +202,24 @@ class FollowWaypointController
     const double speed) const -> std::optional<PredictedState>;
 
 public:
+  /*
+     Accuracy of the remaining distance to the waypoint at the moment
+     of arrival with a specified time.
+
+     There is no technical basis for this value, it was determined based on
+     Dawid Moszynski experiments.
+  */
+  static constexpr double remaining_distance_tolerance = 0.1;
+
+  /*
+     Achieving official epsilon (1e-16) accuracy when using doubles is
+     difficult for this reason the controller uses less accuracy.
+
+     There is no technical basis for this value, it was determined based on
+     Dawid Moszynski experiments.
+  */
+  static constexpr double local_epsilon = 1e-12;
+
   explicit constexpr FollowWaypointController(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const double step_time, const bool with_breaking,
@@ -291,7 +291,7 @@ public:
     const double acceleration, const double speed, const double distance) const -> double
   {
     return (!with_breaking || std::abs(speed) < local_epsilon) &&
-           std::abs(acceleration) < local_epsilon && distance < finish_distance_tolerance;
+           std::abs(acceleration) < local_epsilon && distance < remaining_distance_tolerance;
   }
 };
 }  // namespace follow_trajectory
