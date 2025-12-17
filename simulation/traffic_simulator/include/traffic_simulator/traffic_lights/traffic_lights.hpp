@@ -25,6 +25,7 @@
 #endif
 
 #include <algorithm>
+#include <set>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
@@ -177,6 +178,40 @@ private:
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
 };
+
+template <typename GroundTruthType>
+class TrafficLightsChannel
+{
+public:
+  template <typename NodeTypePointer, typename... Args>
+  explicit TrafficLightsChannel(
+    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+    Args &&... args)
+  : ground_truth_(
+      std::make_shared<GroundTruthType>(node_ptr, hdmap_utils, std::forward<Args>(args)...)),
+    detected_(std::make_shared<DetectedTrafficLights>(hdmap_utils))
+  {
+  }
+
+  auto getGroundTruth() const -> std::shared_ptr<GroundTruthType> { return ground_truth_; }
+
+  auto getDetected() const -> std::shared_ptr<DetectedTrafficLights> { return detected_; }
+
+  auto hasDetectedChanges() const -> bool { return not detected_->empty(); }
+
+  auto generateUpdateRequest() const -> simulation_api_schema::UpdateTrafficLightsRequest
+  {
+    auto request = ground_truth_->generateUpdateTrafficLightsRequest();
+    detected_->apply(request);
+    return request;
+  }
+
+private:
+  std::shared_ptr<GroundTruthType> ground_truth_;
+
+  std::shared_ptr<DetectedTrafficLights> detected_;
+};
+
 class TrafficLights
 {
 public:
