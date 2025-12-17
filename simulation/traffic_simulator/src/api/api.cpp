@@ -384,6 +384,11 @@ auto API::getConventionalDetectedTrafficLights() const -> std::shared_ptr<Detect
   return traffic_lights_ptr_->getConventionalDetectedTrafficLights();
 }
 
+auto API::setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled) -> void
+{
+  traffic_lights_ptr_->setV2IFeature(lanelet_id, enabled);
+}
+
 auto API::addTrafficSource(
   const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
   const traffic::TrafficSource::Distribution & distribution, const bool allow_spawn_outside_lane,

@@ -243,6 +243,25 @@ public:
       });
   }
 
+  auto setV2IFeature(const lanelet::Id lanelet_id, const bool enabled) -> void
+  {
+    if (hdmap_utils_->isTrafficLightRegulatoryElement(lanelet_id)) {
+      // relation ID -> convert to way IDs
+      const auto regulatory_element = hdmap_utils_->getTrafficLightRegulatoryElement(lanelet_id);
+      for (const auto & ref_member :
+           regulatory_element->getParameters<lanelet::ConstLineString3d>("refers")) {
+        setV2IFeature(ref_member.id(), enabled);
+      }
+    } else if (hdmap_utils_->isTrafficLight(lanelet_id)) {
+      // way ID -> use directly
+      if (enabled) {
+        v2i_enabled_traffic_lights_.insert(lanelet_id);
+      } else {
+        v2i_enabled_traffic_lights_.erase(lanelet_id);
+      }
+    }
+  }
+
   auto isAnyTrafficLightChanged() -> bool;
 
   auto startTrafficLightsUpdate(

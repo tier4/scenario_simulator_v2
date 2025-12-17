@@ -177,6 +177,42 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
   }
 };
 
+struct EnableTrafficSignalV2IFeatureAction : public CustomCommand,
+                                             public SimulatorCore::NonStandardOperation
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope &) -> void override
+  {
+    if (parameters.empty()) {
+      throw Error(
+        "EnableTrafficSignalV2IFeature requires at least 1 argument (traffic signal IDs). "
+        "Usage: EnableTrafficSignalV2IFeatureAction(id1, id2, ...)");
+    }
+    for (const auto & param : parameters) {
+      setTrafficSignalV2IFeature(std::stoll(param), true);
+    }
+  }
+};
+
+struct DisableTrafficSignalV2IFeatureAction : public CustomCommand,
+                                              public SimulatorCore::NonStandardOperation
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope &) -> void override
+  {
+    if (parameters.empty()) {
+      throw Error(
+        "DisableTrafficSignalV2IFeatureAction requires at least 1 argument (traffic signal IDs). "
+        "Usage: DisableTrafficSignalV2IFeatureAction(id1, id2, ...)");
+    }
+    for (const auto & param : parameters) {
+      setTrafficSignalV2IFeature(std::stoll(param), false);
+    }
+  }
+};
+
 struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::ActionApplication
 {
   using CustomCommand::CustomCommand;
@@ -314,6 +350,8 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("PseudoTrafficSignalDetectorConfidenceSetAction@v1", ApplyPseudoTrafficSignalDetectorConfidenceSetAction<1>),
       ELEMENT("RequestToCooperateCommandAction@v1", ApplyRequestToCorporateCommandAction<1>),
       ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
+      ELEMENT("EnableTrafficSignalV2IFeatureAction@v1", EnableTrafficSignalV2IFeatureAction),
+      ELEMENT("DisableTrafficSignalV2IFeatureAction@v1", DisableTrafficSignalV2IFeatureAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
       ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED

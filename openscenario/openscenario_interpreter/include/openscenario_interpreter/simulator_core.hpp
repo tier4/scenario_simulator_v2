@@ -741,6 +741,12 @@ public:
       return core->getEgoEntity(ego_ref).getTurnIndicatorsCommandName();
     }
 
+    static auto setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled)
+      -> decltype(auto)
+    {
+      return core->setTrafficSignalV2IFeature(lanelet_id, enabled);
+    }
+
     // TrafficLights - Conventional and V2I
     template <typename... Ts>
     static auto setConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
