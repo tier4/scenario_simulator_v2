@@ -116,8 +116,7 @@ auto API::updateEntitiesStatusInSim() -> bool
 auto API::updateTrafficLightsInSim() -> bool
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
-    const auto request =
-      traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
+    const auto request = traffic_lights_ptr_->generateConventionalUpdateRequest();
     return zeromq_client_.call(request).result().success();
   }
   /// @todo handle response
@@ -373,6 +372,16 @@ auto API::getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
 auto API::getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>
 {
   return traffic_lights_ptr_->getConventionalTrafficLights();
+}
+
+auto API::getV2IDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>
+{
+  return traffic_lights_ptr_->getV2IDetectedTrafficLights();
+}
+
+auto API::getConventionalDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>
+{
+  return traffic_lights_ptr_->getConventionalDetectedTrafficLights();
 }
 
 auto API::addTrafficSource(

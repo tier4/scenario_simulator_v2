@@ -764,6 +764,20 @@ public:
     }
 
     template <typename... Ts>
+    static auto clearConventionalDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalDetectedTrafficLights()->clearState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addConventionalDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalDetectedTrafficLights()->addState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
     static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
     {
       return core->getConventionalTrafficLights()->setTrafficLightsConfidence(
@@ -807,6 +821,18 @@ public:
     static auto addV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
     {
       return core->getV2ITrafficLights()->addTrafficLightsState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearV2IDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2IDetectedTrafficLights()->clearState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addV2IDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2IDetectedTrafficLights()->addState(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>

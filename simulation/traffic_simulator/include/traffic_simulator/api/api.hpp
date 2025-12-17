@@ -256,6 +256,10 @@ public:
   auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>;
 
   auto getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>;
+
+  auto getV2IDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>;
+
+  auto getConventionalDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>;
   /**
    * @brief Add a traffic source to the simulation
    * @param radius The radius defining the area on which entities will be spawned
