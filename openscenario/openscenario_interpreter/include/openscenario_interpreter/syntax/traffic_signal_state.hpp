@@ -60,6 +60,8 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 
   explicit TrafficSignalState(const pugi::xml_node &, Scope &);
 
+  auto clear() const -> void;
+
   auto evaluate() const -> Object;
 
   struct TrafficSignalType

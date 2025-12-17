@@ -50,6 +50,28 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
   }
 }
 
+auto TrafficSignalState::clear() const -> void
+{
+  switch (trafficSignalType()) {
+    case TrafficSignalType::conventional:
+      if (isDetected()) {
+        clearConventionalDetectedTrafficLightsState(id());
+      } else {
+        clearConventionalTrafficLightsState(id());
+      }
+      break;
+    case TrafficSignalType::v2i:
+      if (isDetected()) {
+        clearV2IDetectedTrafficLightsState(id());
+      } else {
+        clearV2ITrafficLightsState(id());
+      }
+      break;
+    default:
+      throw Error("Unknown traffic signal type has set to TrafficSignalState");
+  }
+}
+
 auto TrafficSignalState::evaluate() const -> Object
 {
   switch (trafficSignalType()) {
