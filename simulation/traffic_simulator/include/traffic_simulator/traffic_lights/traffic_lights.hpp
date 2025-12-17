@@ -219,10 +219,9 @@ public:
   explicit TrafficLights(
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
     const std::string & architecture_type)
-  : conventional_traffic_lights_(
-      std::make_shared<ConventionalTrafficLights>(node_ptr, hdmap_utils)),
-    v2i_traffic_lights_(
-      std::make_shared<V2ITrafficLights>(node_ptr, hdmap_utils, architecture_type))
+  : conventional_channel_(node_ptr, hdmap_utils),
+    v2i_channel_(node_ptr, hdmap_utils, architecture_type),
+    hdmap_utils_(hdmap_utils)
   {
   }
 
@@ -236,9 +235,17 @@ public:
 
   auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>;
 
+  auto getConventionalDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>;
+
+  auto getV2IDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>;
+
+  auto generateConventionalUpdateRequest() const
+    -> simulation_api_schema::UpdateTrafficLightsRequest;
+
 private:
-  const std::shared_ptr<ConventionalTrafficLights> conventional_traffic_lights_;
-  const std::shared_ptr<V2ITrafficLights> v2i_traffic_lights_;
+  TrafficLightsChannel<ConventionalTrafficLights> conventional_channel_;
+
+  TrafficLightsChannel<V2ITrafficLights> v2i_channel_;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_HPP_
