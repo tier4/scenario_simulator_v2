@@ -77,14 +77,14 @@ auto TrafficSignalState::evaluate() const -> Object
   switch (trafficSignalType()) {
     case TrafficSignalType::conventional:
       if (isDetected()) {
-        // addConventionalDetectedTrafficLightsState(id(), state);
+        addConventionalDetectedTrafficLightsState(id(), state);
       } else {
         addConventionalTrafficLightsState(id(), state);
       }
       break;
     case TrafficSignalType::v2i:
       if (isDetected()) {
-        // addV2IDetectedTrafficLightsState(id(), state);
+        addV2IDetectedTrafficLightsState(id(), state);
       } else {
         addV2ITrafficLightsState(id(), state);
       }
