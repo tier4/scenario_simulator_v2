@@ -24,6 +24,7 @@
 #include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
 #endif
 
+#include <algorithm>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
@@ -128,6 +129,54 @@ private:
   const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
 };
 
+class DetectedTrafficLights
+{
+public:
+  explicit DetectedTrafficLights(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
+  : hdmap_utils_(hdmap_utils)
+  {
+  }
+
+  auto setState(const lanelet::Id lanelet_id, const std::string & state) -> void
+  {
+    clearState(lanelet_id);
+    addState(lanelet_id, state);
+  }
+
+  auto addState(const lanelet::Id lanelet_id, const std::string & state) -> void
+  {
+    auto [iter, inserted] =
+      detected_traffic_lights_.try_emplace(lanelet_id, lanelet_id, *hdmap_utils_);
+    iter->second.set(state);
+  }
+
+  auto clearState(const lanelet::Id lanelet_id) -> bool
+  {
+    return detected_traffic_lights_.erase(lanelet_id) > 0;
+  }
+
+  auto empty() const -> bool { return detected_traffic_lights_.empty(); }
+
+  auto apply(simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
+  {
+    for (const auto & [lanelet_id, detected_light] : detected_traffic_lights_) {
+      if (auto matched_state = std::find_if(
+            request.mutable_states()->begin(), request.mutable_states()->end(),
+            [lanelet_id](const auto & state) { return state.id() == lanelet_id; });
+          matched_state != request.mutable_states()->end()) {
+        *matched_state = static_cast<simulation_api_schema::TrafficSignal>(detected_light);
+      } else {
+        // add ground-truth-less detected traffic light
+        *request.add_states() = static_cast<simulation_api_schema::TrafficSignal>(detected_light);
+      }
+    }
+  }
+
+private:
+  std::map<lanelet::Id, TrafficLight> detected_traffic_lights_;
+
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+};
 class TrafficLights
 {
 public:
