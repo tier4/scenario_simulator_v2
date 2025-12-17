@@ -223,6 +223,24 @@ public:
     v2i_channel_(node_ptr, hdmap_utils, architecture_type),
     hdmap_utils_(hdmap_utils)
   {
+    conventional_channel_.getGroundTruth()->registerStateChangeCallback(
+      [this, v2i = v2i_channel_.getGroundTruth()](
+        lanelet::Id lanelet_id, const std::string & state,
+        TrafficLightsBase::StateChangeType change_type) {
+        if (v2i_enabled_traffic_lights_.count(lanelet_id) > 0) {
+          switch (change_type) {
+            case TrafficLightsBase::StateChangeType::SET:
+              v2i->setTrafficLightsState(lanelet_id, state);
+              break;
+            case TrafficLightsBase::StateChangeType::CLEAR:
+              v2i->clearTrafficLightsState(lanelet_id);
+              break;
+            case TrafficLightsBase::StateChangeType::ADD:
+              v2i->addTrafficLightsState(lanelet_id, state);
+              break;
+          }
+        }
+      });
   }
 
   auto isAnyTrafficLightChanged() -> bool;
@@ -246,6 +264,10 @@ private:
   TrafficLightsChannel<ConventionalTrafficLights> conventional_channel_;
 
   TrafficLightsChannel<V2ITrafficLights> v2i_channel_;
+
+  std::set<lanelet::Id> v2i_enabled_traffic_lights_;
+
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_HPP_
