@@ -15,14 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PHASE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__PHASE_HPP_
 
-#include <map>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 #include <pugixml.hpp>
-#include <vector>
 
 namespace openscenario_interpreter
 {
@@ -58,15 +56,11 @@ struct Phase : private SimulatorCore::NonStandardOperation
    * ------------------------------------------------------------------------ */
   const std::list<TrafficSignalState> traffic_signal_states;
 
-  // Grouped traffic signal states by their ID and type
-  const std::map<
-    std::pair<lanelet::Id, TrafficSignalState::TrafficSignalType>,
-    std::vector<const TrafficSignalState *>>
-    grouped_states;
-
   explicit Phase(const pugi::xml_node &, Scope &);
 
   auto evaluate() const -> Object;
+
+  auto clearStates() const -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
