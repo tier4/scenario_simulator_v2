@@ -2,9 +2,6 @@
 Changelog for package embree_vendor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-22.0.0 (2025-12-18)
--------------------
-
 21.2.0 (2025-12-16)
 -------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1921-simplify-follow-trajectory
