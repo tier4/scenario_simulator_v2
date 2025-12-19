@@ -2,6 +2,9 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+21.2.2 (2025-12-19)
+-------------------
+
 21.2.1 (2025-12-18)
 -------------------
 * Revert "Bump version of scenario_simulator_v2 from version 21.2.0 to version 22.0.0"
