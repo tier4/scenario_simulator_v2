@@ -59,7 +59,7 @@ jobs:
 
       - name: Cache apt and rosdep
         id: cache-apt-rosdep
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             /var/cache/apt/archives
