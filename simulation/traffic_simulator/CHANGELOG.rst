@@ -2,6 +2,48 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.0.0 (2025-12-22)
+-------------------
+
+21.3.0 (2025-12-22)
+-------------------
+* Merge pull request `#1761 <https://github.com/tier4/scenario_simulator_v2/issues/1761>`_ from tier4/fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Apply clang format
+* Change auto&& to const auto& in find_if lambda
+* Fix braking typos and improve PredictedEntityStatus code clarity
+* Rename state to predicted_status in getPredictedWaypointArrivalState
+* Merge branch 'ref/RJD-1921-simplify-follow-trajectory' into fix/RJD-1921-fix-follow-waypoint-controller
+* Refactor FollowWaypointController: integrate full entity state and improve acceleration computation
+  - replace PredictedState (scalar speed/accel) with PredictedEntityStatus (full EntityStatus wrapper)
+  - add PredictedEntityStatus::step() with support for 3D motion simulation and distance_along_lanelet calculation
+  - add accelerationWithJerkConstraint() method implementing discrete-time jerk-constrained acceleration with detailed documentation
+  - refactor getAccelerationLimits() with improved preconditions documentation and simplified logic using accelerationWithJerkConstraint
+  - improve clampAcceleration() edge case handling (backward motion, overspeed) before applying jerk constraints
+  - update controller methods (getPredictedWaypointArrivalState, getPredictedStopEntityStatusWithoutConsideringTime, getAcceleration) to accept entity_status and update_entity_status/distance_along_lanelet callbacks
+  - implement constrained_brake_velocity lambda in follow_trajectory.cpp using accelerationWithJerkConstraint for smooth final waypoint braking
+  - complete final waypoint braking implementation (resolve @todo) with constrained deceleration
+  - change remaining_time_to_nearest_timed_waypoint() to return quiet_NaN instead of infinity for consistency
+  - add acceptable_overshoot_distance (0.1m) constant and improve error messages in getAccelerationLimits
+  - replace isnan checks with isfinite for unified validation
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto
+
+21.2.3 (2025-12-22)
+-------------------
+
+21.2.2 (2025-12-19)
+-------------------
+
+21.2.1 (2025-12-18)
+-------------------
+* Revert "Bump version of scenario_simulator_v2 from version 21.2.0 to version 22.0.0"
+  This reverts commit 95b2ebee5ed7df8b52a058e92f05e121e2bf75b4.
+* Bump version of scenario_simulator_v2 from version 21.2.0 to version 22.0.0
+* Contributors: Kotaro Yoshimoto, Release Bot
+
 21.2.0 (2025-12-16)
 -------------------
 * Merge pull request `#1760 <https://github.com/tier4/scenario_simulator_v2/issues/1760>`_ from tier4/ref/RJD-1921-simplify-follow-trajectory
