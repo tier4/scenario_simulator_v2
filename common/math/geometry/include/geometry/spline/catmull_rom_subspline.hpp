@@ -42,6 +42,8 @@ public:
 
   double getLength() const override;
 
+  std::pair<double, double> getAltitudeRange() const override;
+
   std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward = false,
     const std::optional<std::pair<double, double>> & s_range = std::nullopt) const override;

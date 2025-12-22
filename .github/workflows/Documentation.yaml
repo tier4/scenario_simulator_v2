@@ -14,7 +14,7 @@ jobs:
     name: Generate documentation
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -47,7 +47,7 @@ jobs:
         if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
         uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
+          personal_token: ${{ secrets.STRONG_GITHUB_TOKEN }}
           publish_dir: site
           keep_files: false
           external_repository: tier4/scenario_simulator_v2-docs
@@ -56,7 +56,7 @@ jobs:
     name: Generate API documentation
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install doxygen
         run: sudo apt-get install -y doxygen
@@ -75,7 +75,7 @@ jobs:
         if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
         uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
+          personal_token: ${{ secrets.STRONG_GITHUB_TOKEN }}
           publish_dir: html
           keep_files: false
           external_repository: tier4/scenario_simulator_v2-api-docs
