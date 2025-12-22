@@ -2,6 +2,15 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+21.3.0 (2025-12-22)
+-------------------
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'ref/RJD-1921-simplify-follow-trajectory' into fix/RJD-1921-fix-follow-waypoint-controller
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto
+
 21.2.3 (2025-12-22)
 -------------------
 
