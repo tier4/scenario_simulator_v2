@@ -41,16 +41,22 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
   state(readAttribute<String>("state", node, scope)),
   parsed_traffic_signal_id(parseTrafficSignalId(traffic_signal_id))
 {
+  if (state.find("unknown") != std::string::npos) {
+    throw Error(
+      "TrafficSignalState: The state '", state,
+      "' contains 'unknown' which is not allowed for ground truth traffic lights. "
+      "'unknown' is reserved for traffic light perception simulation.");
+  }
 }
 
 auto TrafficSignalState::evaluate() const -> Object
 {
   switch (trafficSignalType()) {
     case TrafficSignalType::conventional:
-      setConventionalTrafficLightsState(id(), state);
+      addConventionalTrafficLightsState(id(), state);
       break;
     case TrafficSignalType::v2i:
-      setV2ITrafficLightsState(id(), state);
+      addV2ITrafficLightsState(id(), state);
       break;
     default:
       throw Error("Unknown traffic signal type has set to TrafficSignalState");

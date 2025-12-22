@@ -493,9 +493,16 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyFollowTrajectoryAction(const std::string & entity_ref, Ts &&... xs)
+    static auto applyFollowTrajectoryAction(
+      const std::string & entity_ref,
+      const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter)
     {
-      return core->getEntity(entity_ref).requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
+      /// @note add current entity pose as the first waypoint in the trajectory
+      traffic_simulator_msgs::msg::Vertex initial_vertex;
+      initial_vertex.time = std::numeric_limits<double>::quiet_NaN();
+      initial_vertex.position = core->getEntity(entity_ref).getMapPose();
+      parameter->shape.vertices.insert(parameter->shape.vertices.begin(), initial_vertex);
+      return core->getEntity(entity_ref).requestFollowTrajectory(parameter);
     }
 
     template <typename... Ts>
@@ -750,6 +757,20 @@ public:
     }
 
     template <typename... Ts>
+    static auto clearConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->clearTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->addTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
     static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
     {
       return core->getConventionalTrafficLights()->setTrafficLightsConfidence(
@@ -780,6 +801,19 @@ public:
     static auto setV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
     {
       return core->getV2ITrafficLights()->setTrafficLightsState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->clearTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->addTrafficLightsState(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
