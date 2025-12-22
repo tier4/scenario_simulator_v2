@@ -119,7 +119,11 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
     front_entity_name = getFrontEntityName(*trajectory);
     if (front_entity_name) {
       const auto & front_entity_status = getEntityStatus(front_entity_name.value());
-      distance_to_front_entity_ = getDistanceToTargetEntity(*trajectory, front_entity_status);
+      distance_to_front_entity_ = traffic_simulator::distance::splineDistanceToBoundingBox(
+        *trajectory, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
+        canonicalized_entity_status_->getBoundingBox(),
+        front_entity_status.getCanonicalizedLaneletPose().value(),
+        front_entity_status.getBoundingBox());
     }
   }
   if (!front_entity_name) {
