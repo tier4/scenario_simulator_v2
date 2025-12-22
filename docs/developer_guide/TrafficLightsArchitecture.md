@@ -11,7 +11,7 @@ A physical traffic light can be observed through different methods:
 
 A single traffic light has two channels: conventional and v2i.
 
-```
+```text
 Physical Traffic Light
 ├── conventional channel (optical observation)
 │   ├── GroundTruth
@@ -142,7 +142,7 @@ Only the C++ → Proto → ROS direction is implemented. Reverse conversions are
 
 ### Traffic Signal ID Format
 
-```
+```text
 <lanelet_id> [<type>][_detected]
 ```
 
