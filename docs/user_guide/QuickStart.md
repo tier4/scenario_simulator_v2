@@ -54,7 +54,7 @@ This guide provides step-by-step instructions for building and running **Scenari
     ```
 
 !!! note
-    For detailed guidance on build issues and troubleshooting, please refer to the [Autoware Troubleshooting Guide](https://autowarefoundation.github.io/autoware-documentation/main/support/troubleshooting/#build-issues).
+    For detailed guidance on build issues and troubleshooting, please refer to the [Autoware Troubleshooting Guide](https://autowarefoundation.github.io/autoware-documentation/main/community/support/troubleshooting/#build-issues).
 
     ![Build success](../image/ss2_autoware_build_result.png)
     *As a result of running the `colcon build` command, all packages should be built successfully.*

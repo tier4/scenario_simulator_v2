@@ -2,47 +2,83 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1.15.0 (2024-04-18)
--------------------
-* Merge pull request `#1223 <https://github.com/tier4/scenario_simulator_v2/issues/1223>`_ from tier4/refactor/drop_workflow
-  Delete workflow feature and add alternative bash script
-* chore: delete unnecessary diff
-* Merge branch 'master' into refactor/drop_workflow
-* fix: add dropped scenario to workflow.txt
-* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
-  # Conflicts:
-  #	test_runner/scenario_test_runner/config/workflow_example.yaml
-* refactor: rename workflow.csv to workflow.txt
-* Merge branch 'master' into refactor/drop_workflow
-* Merge branch 'master' into refactor/drop_workflow
-* chore: use remote workflow file(test)
-* Merge branch 'master' into refactor/drop_workflow
-* chore: revert scenario failure
-* chore: test for scenario failure
-* chore: update way to run workflow
-* refactor: delete workflow.Workflow and rename workflow.py to scenario.py
-* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
-
-2.5.0 (2024-07-08)
-------------------
-* Merge pull request `#1305 <https://github.com/tier4/scenario_simulator_v2/issues/1305>`_ from tier4/feature/publish_empty_context
-  Feature/publish empty context
-* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
-* Merge branch 'master' into feature/publish_empty_context
-* Merge branch 'master' into feature/publish_empty_context
-* add GET_PARAMETER line
-* update launch file
-* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
-* Contributors: Masaya Kataoka
-
-16.4.2 (2025-05-23)
+21.2.3 (2025-12-22)
 -------------------
 
-18.3.2 (2025-11-06)
+21.2.2 (2025-12-19)
 -------------------
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
-* Contributors: Kotaro Yoshimoto, Taiga
+
+21.2.1 (2025-12-18)
+-------------------
+* Revert "Bump version of scenario_simulator_v2 from version 21.2.0 to version 22.0.0"
+  This reverts commit 95b2ebee5ed7df8b52a058e92f05e121e2bf75b4.
+* Bump version of scenario_simulator_v2 from version 21.2.0 to version 22.0.0
+* Contributors: Kotaro Yoshimoto, Release Bot
+
+21.2.0 (2025-12-16)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1921-simplify-follow-trajectory
+* Merge branch 'master' into ref/RJD-1921-simplify-follow-trajectory
+* Contributors: Dawid Moszynski, Dawid Moszyński
+
+21.1.1 (2025-12-10)
+-------------------
+* Merge branch 'master' into update-sonarqube-settings
+* Merge branch 'master' into update-sonarqube-settings
+* Contributors: Kotaro Yoshimoto
+
+21.1.0 (2025-12-10)
+-------------------
+* Merge branch 'master' into feature/unknown
+* Merge branch 'master' into feature/unknown
+* Contributors: Kotaro Yoshimoto
+
+21.0.0 (2025-12-10)
+-------------------
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge remote-tracking branch 'tier4/master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part1
+* Contributors: Mateusz Palczuk
+
+20.0.4 (2025-12-09)
+-------------------
+* Merge pull request `#1764 <https://github.com/tier4/scenario_simulator_v2/issues/1764>`_ from tier4/sort-changelog
+* Sort CHANGELOG.rst
+* Contributors: Kotaro Yoshimoto
+
+20.0.3 (2025-12-03)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-6
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-6
+* Contributors: Kotaro Yoshimoto
+
+20.0.2 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/autoware-documentation-link
+* Contributors: Kotaro Yoshimoto
+
+20.0.1 (2025-12-03)
+-------------------
+* Merge branch 'master' into use-maximal-munch
+* Contributors: Kotaro Yoshimoto
+
+20.0.0 (2025-12-03)
+-------------------
+* Merge branch 'master' into fix/double-INF
+* Merge remote-tracking branch 'origin/fix/double-INF' into fix/double-INF
+* Merge branch 'master' into fix/double-INF
+* Contributors: Kotaro Yoshimoto
+
+19.0.3 (2025-11-27)
+-------------------
 
 19.0.2 (2025-11-27)
 -------------------
@@ -232,6 +268,12 @@ Changelog for package scenario_test_runner
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/github-script-8
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
+* Contributors: Kotaro Yoshimoto, Taiga
+
+18.3.2 (2025-11-06)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Merge branch 'master' into dependabot/github_actions/actions/checkout-5
 * Contributors: Kotaro Yoshimoto, Taiga
 
@@ -721,6 +763,9 @@ Changelog for package scenario_test_runner
 * Bump version of scenario_simulator_v2 from version version 16.4.1 to version 16.4.2
 * Merge branch 'master' into refactor/behavior-tree-2
 * Contributors: Kotaro Yoshimoto, Taiga
+
+16.4.2 (2025-05-23)
+-------------------
 
 16.4.1 (2025-05-23)
 -------------------
@@ -2436,6 +2481,18 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka, Release Bot
 
+2.5.0 (2024-07-08)
+------------------
+* Merge pull request `#1305 <https://github.com/tier4/scenario_simulator_v2/issues/1305>`_ from tier4/feature/publish_empty_context
+  Feature/publish empty context
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* add GET_PARAMETER line
+* update launch file
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Contributors: Masaya Kataoka
+
 2.4.2 (2024-07-08)
 ------------------
 
@@ -2762,6 +2819,27 @@ Changelog for package scenario_test_runner
 * chore: update way to run workflow
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, hakuturu583, ぐるぐる
+
+1.15.0 (2024-04-18)
+-------------------
+* Merge pull request `#1223 <https://github.com/tier4/scenario_simulator_v2/issues/1223>`_ from tier4/refactor/drop_workflow
+  Delete workflow feature and add alternative bash script
+* chore: delete unnecessary diff
+* Merge branch 'master' into refactor/drop_workflow
+* fix: add dropped scenario to workflow.txt
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* refactor: rename workflow.csv to workflow.txt
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* chore: use remote workflow file(test)
+* Merge branch 'master' into refactor/drop_workflow
+* chore: revert scenario failure
+* chore: test for scenario failure
+* chore: update way to run workflow
+* refactor: delete workflow.Workflow and rename workflow.py to scenario.py
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
 1.14.1 (2024-04-12)
 -------------------
