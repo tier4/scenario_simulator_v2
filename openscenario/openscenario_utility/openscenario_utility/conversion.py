@@ -100,7 +100,9 @@ class MacroExpander:
         for index, bindings in enumerate(product(*self.specs)):
             target = deepcopy(xosc)
 
-            for binding in bindings:
+            # Use "maximal munch" technique to avoid replace a part of a longer macro with a shorter macro
+            sorted_bindings = sorted(bindings, key=lambda x: len(str(x[0])), reverse=True)
+            for binding in sorted_bindings:
                 target = sub(str(binding[0]), str(binding[1]), target)
 
             if self.specs:
