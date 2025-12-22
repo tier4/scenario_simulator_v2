@@ -58,7 +58,7 @@ jobs:
           repository: ${{ github.event.pull_request.base.repo.full_name }}
           fetch-depth: 0
           fetch-tags: true
-          token: ${{ secrets.BLOOM_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.STRONG_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup git
         run: |
@@ -108,7 +108,7 @@ jobs:
         if: github.event_name == 'push' && steps.old_version.outputs.old_version != steps.new_version.outputs.new_version
         uses: CasperWA/push-protected@v2
         with:
-          token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
+          token: ${{ secrets.STRONG_GITHUB_TOKEN }}
           branch: master
           force: true
 
