@@ -2,6 +2,9 @@
 Changelog for package openscenario_preprocessor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.0.0 (2025-12-22)
+-------------------
+
 21.3.0 (2025-12-22)
 -------------------
 * Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
