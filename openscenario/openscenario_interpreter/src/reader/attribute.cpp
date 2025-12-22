@@ -24,6 +24,7 @@ auto substitute(const std::string & attribute, const Scope & scope) -> String
 {
   auto dirname = [](auto &&, auto && scope) { return scope.dirname(); };
 
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
   auto find_pkg_share = [](auto && package_name, const auto &) {
     return ament_index_cpp::get_package_share_directory(package_name);
   };
@@ -47,6 +48,7 @@ auto substitute(const std::string & attribute, const Scope & scope) -> String
       return result;
     }
   };
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
   auto var = [](auto && name, const auto & scope) {
     // TODO: Return the value of the launch configuration variable instead of the OpenSCENARIO parameter.
@@ -62,14 +64,16 @@ auto substitute(const std::string & attribute, const Scope & scope) -> String
     std::string, std::function<std::string(const std::string &, const Scope &)> >
     substitutions{
       {"dirname", dirname},
-      // TODO {"env", env},
-      // TODO {"eval", eval},
-      // TODO {"exec-in-package", exec_in_package},
-      // TODO {"find-exec", find_exec},
-      // TODO {"find-pkg-prefix", find_pkg_prefix},
+  // TODO {"env", env},
+  // TODO {"eval", eval},
+  // TODO {"exec-in-package", exec_in_package},
+  // TODO {"find-exec", find_exec},
+  // TODO {"find-pkg-prefix", find_pkg_prefix},
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
       {"find-pkg-share", find_pkg_share},
       {"ros2",
        ros2},  // NOTE: TIER IV extension (Not included in the ROS 2 Launch XML Substitution)
+#endif         // PARAMETER_VALUE_DISTRIBUTION_ONLY
       {"var", var},
     };
 

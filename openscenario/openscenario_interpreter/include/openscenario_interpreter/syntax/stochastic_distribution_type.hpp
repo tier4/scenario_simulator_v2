@@ -22,7 +22,6 @@
 #include <openscenario_interpreter/syntax/poisson_distribution.hpp>
 #include <openscenario_interpreter/syntax/probability_distribution_set.hpp>
 #include <openscenario_interpreter/syntax/uniform_distribution.hpp>
-#include <openscenario_interpreter/syntax/user_defined_distribution.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter

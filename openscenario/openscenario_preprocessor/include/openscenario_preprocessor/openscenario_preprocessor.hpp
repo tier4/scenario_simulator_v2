@@ -15,9 +15,12 @@
 #ifndef OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 #define OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 
-#include <memory>
+#include <yaml-cpp/yaml.h>
+
+#include <fstream>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_validator/validator.hpp>
+#include <openscenario_preprocessor/deriver.hpp>
+#include <openscenario_preprocessor/schema.hpp>
 #include <queue>
 
 namespace openscenario_preprocessor
@@ -33,28 +36,56 @@ struct Scenario
 
   boost::filesystem::path path;
 
-  float frame_rate;
+  double frame_rate;
 };
+
+enum class ScenarioFormat {
+  t4v2,
+  xosc,
+};
+
+std::istream & operator>>(std::istream & is, ScenarioFormat & format);
 
 class Preprocessor
 {
 public:
   explicit Preprocessor(const boost::filesystem::path & output_directory)
-  : validate(), output_directory(output_directory)
+  : output_directory(output_directory), derive([&]() {
+      auto work_directory = output_directory / "work";
+      if (not boost::filesystem::exists(work_directory)) {
+        boost::filesystem::create_directories(work_directory);
+      }
+
+      auto xsd_path = work_directory / "schema.xsd";
+      auto file = std::ofstream(xsd_path, std::ios::trunc);
+      file << openscenario_preprocessor::schema;
+      file.close();
+      return xsd_path;
+    }())
   {
-    if (not boost::filesystem::exists(output_directory)) {
-      boost::filesystem::create_directories(output_directory);
-    }
+  }
+
+  void preprocessScenario(
+    const boost::filesystem::path & scenario_path,
+    ScenarioFormat output_format = ScenarioFormat::xosc);
+
+  void generateDerivedScenarioFromDistribution(
+    openscenario_interpreter::ParameterDistribution & distribution,
+    const boost::filesystem::path & path, ScenarioFormat output_format);
+
+  void convertXMLtoYAML(const pugi::xml_node & xml, YAML::Emitter & emitter);
+
+  const std::queue<boost::filesystem::path> & getPreprocessedScenarios() const
+  {
+    return preprocessed_scenarios;
   }
 
 protected:
-  void preprocessScenario(const Scenario &);
-
-  std::queue<Scenario> preprocessed_scenarios;
+  std::queue<boost::filesystem::path> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
 
-  openscenario_validator::OpenSCENARIOValidator validate;
+  Deriver derive;
 
   boost::filesystem::path output_directory;
 };

@@ -99,10 +99,13 @@ auto readElement(const std::string & name, const pugi::xml_node & parent, Scope 
   }
 }
 
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
   -> syntax::Orientation;
 extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
   -> syntax::Position;
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+
 extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
   -> syntax::Properties;
 extern template auto readElement(const std::string &, const pugi::xml_node &, Scope &)

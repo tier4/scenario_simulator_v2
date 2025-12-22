@@ -12,23 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 #include <openscenario_interpreter/syntax/catalog_definition.hpp>
+#include <openscenario_interpreter/syntax/scenario_definition.hpp>
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
-#include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
 OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & scope)
-// clang-format off
-: Group(
-    choice(tree, {
-      { "Storyboard",                [&](auto &&) { return make<ScenarioDefinition                  >(tree, scope); } },  // DIRTY HACK!!!
-      { "Catalog",                   [&](auto &&) { return make<CatalogDefinition                   >(tree, scope); } },
-      { "ParameterValueDistribution",[&](auto &&) { return make<ParameterValueDistributionDefinition>(tree, scope); } }
-    }))
+: Group(choice(
+    tree, {
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
+            {"Storyboard",
+             [&](auto &&) { return make<ScenarioDefinition>(tree, scope); }},  // DIRTY HACK!!!
+            {"Catalog", [&](auto &&) { return make<CatalogDefinition>(tree, scope); }},
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+            {"ParameterValueDistribution",
+             [&](auto &&) { return make<ParameterValueDistributionDefinition>(tree, scope); }}}))
 // clang-format on
 {
 }
