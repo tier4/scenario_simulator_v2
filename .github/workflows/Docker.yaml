@@ -10,6 +10,7 @@ on:
       - ".github/workflows/Docker.yaml"
       - "!mkdocs.yml"
       - "!pyproject.toml"
+      - "!sonar-project.properties"
       - "!uv.lock"
   push:
     branches:
@@ -43,7 +44,7 @@ jobs:
       - name: Install docker for ubuntu runner
         uses: docker/setup-buildx-action@v3
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Get version
         id: version
@@ -111,7 +112,7 @@ jobs:
       - name: Install QEMU
         uses: docker/setup-qemu-action@v3
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Get version
         id: version

@@ -650,6 +650,23 @@ auto CatmullRomSpline::getPoint(const double s, const double offset) const
   return point;
 }
 
+/**
+ * @brief Get approximation of min and max altitude - from the control points
+ */
+auto CatmullRomSpline::getAltitudeRange() const -> std::pair<double, double>
+{
+  if (control_points.empty()) {
+    THROW_SIMULATION_ERROR("Control points are missing.");
+  } else if (const auto [min_z_it, max_z_it] = std::minmax_element(
+               control_points.begin(), control_points.end(),
+               [](const auto & lhs, const auto & rhs) { return lhs.z < rhs.z; });
+             min_z_it == control_points.end() || max_z_it == control_points.end()) {
+    THROW_SIMULATION_ERROR("Control points are invalid.");
+  } else {
+    return {min_z_it->z, max_z_it->z};
+  }
+}
+
 auto CatmullRomSpline::getMaximum2DCurvature() const -> double
 {
   if (curves_.empty()) {

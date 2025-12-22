@@ -14,6 +14,7 @@ on:
       - ".github/workflows/BuildAndRun.yaml"
       - "!mkdocs.yml"
       - "!pyproject.toml"
+      - "!sonar-project.properties"
       - "!uv.lock"
   push:
     branches:
@@ -46,12 +47,12 @@ jobs:
       - name: Setup workspace
         run: mkdir -p src/scenario_simulator_v2
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           path: src/scenario_simulator_v2
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           repository: RobotecAI/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
