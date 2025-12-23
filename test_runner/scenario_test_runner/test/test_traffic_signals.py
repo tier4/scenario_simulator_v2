@@ -98,4 +98,3 @@ class AnalyzeBasicReplay:
         assert changes[34802][2][1].color == TrafficLightBulbV1.GREEN
         assert changes[34802][2][1].shape == TrafficLightBulbV1.RIGHT_ARROW
         assert changes[34802][2][1].status == TrafficLightBulbV1.SOLID_OFF
-        print(changes)
