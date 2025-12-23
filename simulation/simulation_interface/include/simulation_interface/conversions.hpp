@@ -50,26 +50,27 @@
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
-#include <zmqpp/zmqpp.hpp>
+#include <zmq.hpp>
+#include <cstring>
 
 namespace zeromq
 {
 template <typename Proto>
-zmqpp::message toZMQ(const Proto & proto)
+zmq::message_t toZMQ(const Proto & proto)
 {
-  zmqpp::message msg;
-  std::string serialized_str = "";
+  std::string serialized_str;
   proto.SerializeToString(&serialized_str);
-  msg << serialized_str;
+
+  zmq::message_t msg(serialized_str.size());
+  std::memcpy(msg.data(), serialized_str.data(), serialized_str.size());
   return msg;
 }
 
 template <typename Proto>
-Proto toProto(const zmqpp::message & msg)
+Proto toProto(const zmq::message_t & msg)
 {
-  std::string serialized_str = msg.get(0);
   Proto proto;
-  proto.ParseFromString(serialized_str);
+  proto.ParseFromArray(msg.data(), static_cast<int>(msg.size()));
   return proto;
 }
 }  // namespace zeromq
