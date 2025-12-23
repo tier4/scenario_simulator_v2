@@ -2,6 +2,18 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.0.1 (2025-12-23)
+-------------------
+* Merge pull request `#1743 <https://github.com/tier4/scenario_simulator_v2/issues/1743>`_ from tier4/experiment/signal-testing
+* remove debug output
+* Merge branch 'master' into experiment/signal-testing
+* Use default vehicle
+* Merge branch 'master' into experiment/signal-testing
+* Fix linelint
+* Add replay testing based TrafficSignal test
+* Add testing scenario
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
 22.0.0 (2025-12-22)
 -------------------
 
