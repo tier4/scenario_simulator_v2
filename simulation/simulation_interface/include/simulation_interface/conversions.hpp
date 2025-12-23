@@ -26,6 +26,7 @@
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
+#include <cstring>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -51,7 +52,6 @@
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 #include <zmq.hpp>
-#include <cstring>
 
 namespace zeromq
 {
