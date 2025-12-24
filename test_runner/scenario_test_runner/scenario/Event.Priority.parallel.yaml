@@ -15,7 +15,7 @@ OpenSCENARIO:
       filepath: $(find-pkg-share kashiwanoha_map)/map
   Entities:
     ScenarioObject:
-      - name: npc
+      - name: car
         CatalogReference:
           catalogName: sample_vehicle
           entryName: sample_vehicle
@@ -37,7 +37,7 @@ OpenSCENARIO:
         Act:
           - name: act
             ManeuverGroup:
-              - name: mg
+              - name: ''
                 maximumExecutionCount: 1
                 Actors:
                   selectTriggeringEntities: false
