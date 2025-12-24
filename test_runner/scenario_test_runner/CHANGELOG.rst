@@ -2,6 +2,35 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.0.2 (2025-12-24)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-7
+* Contributors: Kotaro Yoshimoto
+
+22.0.1 (2025-12-23)
+-------------------
+* Merge pull request `#1743 <https://github.com/tier4/scenario_simulator_v2/issues/1743>`_ from tier4/experiment/signal-testing
+* remove debug output
+* Merge branch 'master' into experiment/signal-testing
+* Use default vehicle
+* Merge branch 'master' into experiment/signal-testing
+* Fix linelint
+* Add replay testing based TrafficSignal test
+* Add testing scenario
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
+22.0.0 (2025-12-22)
+-------------------
+
+21.3.0 (2025-12-22)
+-------------------
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'master' into fix/RJD-1921-fix-follow-waypoint-controller
+* Merge branch 'ref/RJD-1921-simplify-follow-trajectory' into fix/RJD-1921-fix-follow-waypoint-controller
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto
+
 21.2.3 (2025-12-22)
 -------------------
 

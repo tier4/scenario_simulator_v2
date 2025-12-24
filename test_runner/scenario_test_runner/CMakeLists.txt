@@ -20,4 +20,9 @@ install(
             ${CMAKE_CURRENT_SOURCE_DIR}/scenario
   DESTINATION share/${PROJECT_NAME})
 
+if(BUILD_TESTING)
+  find_package(replay_testing REQUIRED)
+  add_replay_test(test/test_traffic_signals.py)
+endif()
+
 ament_package()
