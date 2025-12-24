@@ -2,6 +2,13 @@
 Changelog for package kashiwanoha_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.0.3 (2025-12-24)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/cache-5
+* Merge branch 'master' into dependabot/github_actions/actions/cache-5
+* Merge branch 'master' into dependabot/github_actions/actions/cache-5
+* Contributors: Kotaro Yoshimoto
+
 22.0.2 (2025-12-24)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/download-artifact-7
