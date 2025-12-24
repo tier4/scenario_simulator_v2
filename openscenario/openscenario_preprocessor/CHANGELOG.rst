@@ -2,6 +2,11 @@
 Changelog for package openscenario_preprocessor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.0.2 (2025-12-24)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-7
+* Contributors: Kotaro Yoshimoto
+
 22.0.1 (2025-12-23)
 -------------------
 * Merge branch 'master' into experiment/signal-testing
