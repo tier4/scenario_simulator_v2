@@ -85,6 +85,7 @@ def launch_setup(context, *args, **kwargs):
     launch_autoware                             = LaunchConfiguration("launch_autoware",                             default=True)
     launch_rviz                                 = LaunchConfiguration("launch_rviz",                                 default=False)
     launch_simple_sensor_simulator              = LaunchConfiguration("launch_simple_sensor_simulator",              default=True)
+    launch_system_monitor                       = LaunchConfiguration("launch_system_monitor",                       default=False)
     launch_visualization                        = LaunchConfiguration("launch_visualization",                        default=True)
     output_directory                            = LaunchConfiguration("output_directory",                            default=Path("/tmp"))
     override_parameters                         = LaunchConfiguration("override_parameters",                         default="")
@@ -122,6 +123,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"initialize_localization                     := {initialize_localization.perform(context)}")
     print(f"launch_autoware                             := {launch_autoware.perform(context)}")
     print(f"launch_rviz                                 := {launch_rviz.perform(context)}")
+    print(f"launch_system_monitor                       := {launch_system_monitor.perform(context)}")
     print(f"launch_visualization                        := {launch_visualization.perform(context)}")
     print(f"output_directory                            := {output_directory.perform(context)}")
     print(f"override_parameters                         := {override_parameters.perform(context)}")
@@ -161,6 +163,7 @@ def launch_setup(context, *args, **kwargs):
             {"initialize_duration": initialize_duration},
             {"initialize_localization": initialize_localization},
             {"launch_autoware": launch_autoware},
+            {"launch_system_monitor": launch_system_monitor},
             {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
@@ -233,6 +236,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("initialize_localization",                     default_value=initialize_localization                    ),
         DeclareLaunchArgument("launch_autoware",                             default_value=launch_autoware                            ),
         DeclareLaunchArgument("launch_rviz",                                 default_value=launch_rviz                                ),
+        DeclareLaunchArgument("launch_system_monitor",                       default_value=launch_system_monitor                      ),
         DeclareLaunchArgument("output_directory",                            default_value=output_directory                           ),
         DeclareLaunchArgument("parameter_file_path",                         default_value=parameter_file_path                        ),
         DeclareLaunchArgument("pedestrian_ignore_see_around",                default_value=pedestrian_ignore_see_around               ),
