@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <scenario_simulator_exception/exception.hpp>
 #include <sstream>
 
 #include "openscenario_interpreter/syntax/priority.hpp"
@@ -35,7 +36,9 @@ TEST_P(PriorityOperatorTest, ParseAndOutput)
   EXPECT_EQ(input_parsed.value, input_value);
 
   std::stringstream output_stream;
-  output_stream << input_value;
+  Priority output_priority;
+  output_priority.value = input_value;
+  output_stream << output_priority;
   EXPECT_EQ(output_stream.str(), input_string);
 }
 
@@ -56,7 +59,9 @@ class PriorityInvalidTest : public ::testing::TestWithParam<std::string>
 TEST_P(PriorityInvalidTest, ThrowOnInvalidValue)
 {
   auto input = GetParam();
-  EXPECT_THROW(parsePriority(input), std::exception);
+  std::stringstream input_stream(input);
+  Priority priority;
+  EXPECT_THROW(input_stream >> priority, common::SyntaxError);
 }
 
 // clang-format off
