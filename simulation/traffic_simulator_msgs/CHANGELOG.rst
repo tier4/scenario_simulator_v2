@@ -2,6 +2,26 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.2.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into priority
+* Merge branch 'master' into priority
+* Merge branch 'master' into priority
+* Contributors: Kotaro Yoshimoto
+
+22.1.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into migrate-cppzmq
+* Merge branch 'master' into migrate-cppzmq
+* Contributors: Daisuke Nishimatsu, Kotaro Yoshimoto
+
+22.0.4 (2025-12-24)
+-------------------
+* Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
+* Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
+* Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
+* Contributors: Kotaro Yoshimoto
+
 22.0.3 (2025-12-24)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/cache-5
