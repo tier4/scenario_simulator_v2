@@ -2,6 +2,12 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.2.1 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/markdown-3.10
+* Merge branch 'master' into dependabot/uv/markdown-3.10
+* Contributors: Kotaro Yoshimoto
+
 22.2.0 (2025-12-25)
 -------------------
 * Merge pull request `#1779 <https://github.com/tier4/scenario_simulator_v2/issues/1779>`_ from tier4/priority
