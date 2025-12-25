@@ -2,6 +2,12 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.1.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into migrate-cppzmq
+* Merge branch 'master' into migrate-cppzmq
+* Contributors: Daisuke Nishimatsu, Kotaro Yoshimoto
+
 22.0.4 (2025-12-24)
 -------------------
 * Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
