@@ -76,10 +76,8 @@ struct Priority
       If a starting event has priority Override, all events in running state,
       within the same scope (maneuver) as the starting event,
       should be issued a stop command (stop transition).
-
-      NOTE: Named `override_` because `override` is a C++ keyword.
     */
-    override_,
+    override,
   } value;
 
   Priority() = default;

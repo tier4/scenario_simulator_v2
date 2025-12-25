@@ -46,7 +46,7 @@ TEST_P(PriorityOperatorTest, ParseAndOutput)
 INSTANTIATE_TEST_SUITE_P(
   ValidValues, PriorityOperatorTest,
   ::testing::Values(
-    std::make_pair("override", Priority::override_),
+    std::make_pair("override", Priority::override),
     std::make_pair("overwrite", Priority::overwrite),
     std::make_pair("skip", Priority::skip),
     std::make_pair("parallel", Priority::parallel)));

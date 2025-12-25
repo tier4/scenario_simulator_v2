@@ -39,14 +39,9 @@ auto operator>>(std::istream & is, Priority & priority) -> std::istream &
   BOILERPLATE(overwrite);
   BOILERPLATE(parallel);
   BOILERPLATE(skip);
+  BOILERPLATE(override);
 
 #undef BOILERPLATE
-
-  // "override" maps to Priority::override_ due to "override" is a C++ keyword
-  if (buffer == "override") {
-    priority.value = Priority::override_;
-    return is;
-  }
 
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Priority, buffer);
 }
@@ -58,12 +53,10 @@ auto operator<<(std::ostream & os, const Priority & datum) -> std::ostream &
     return os << #NAME;
 
   switch (datum) {
-    // NOTE: Cannot use BOILERPLATE macro because "override" is a C++ keyword
-    case Priority::override_:
-      return os << "override";
-      BOILERPLATE(overwrite);
-      BOILERPLATE(skip);
-      BOILERPLATE(parallel);
+    BOILERPLATE(overwrite);
+    BOILERPLATE(skip);
+    BOILERPLATE(parallel);
+    BOILERPLATE(override);
 
     default:
       throw UNEXPECTED_ENUMERATION_VALUE_ASSIGNED(Priority, datum);
