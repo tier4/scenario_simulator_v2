@@ -35,13 +35,17 @@ auto operator>>(std::istream & is, Priority & priority) -> std::istream &
     return is;                             \
   }                                        \
   static_assert(true, "")
-
-  BOILERPLATE(overwrite);
   BOILERPLATE(parallel);
   BOILERPLATE(skip);
   BOILERPLATE(override);
 
 #undef BOILERPLATE
+
+  // deprecated `overwrite` is deleted internally and `overwrite` is forwarded to Priority::override
+  if (buffer == "overwrite") {
+    priority.value = Priority::override;
+    return is;
+  }
 
   throw UNEXPECTED_ENUMERATION_VALUE_SPECIFIED(Priority, buffer);
 }
@@ -53,7 +57,6 @@ auto operator<<(std::ostream & os, const Priority & datum) -> std::ostream &
     return os << #NAME;
 
   switch (datum) {
-    BOILERPLATE(overwrite);
     BOILERPLATE(skip);
     BOILERPLATE(parallel);
     BOILERPLATE(override);

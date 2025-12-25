@@ -47,10 +47,17 @@ INSTANTIATE_TEST_SUITE_P(
   ValidValues, PriorityOperatorTest,
   ::testing::Values(
     std::make_pair("override", Priority::override),
-    std::make_pair("overwrite", Priority::overwrite),
     std::make_pair("skip", Priority::skip),
     std::make_pair("parallel", Priority::parallel)));
 // clang-format on
+
+TEST(DeprecatedPriorityTest, UseOverrideForOverwrite)
+{
+  std::stringstream input_stream("overwrite");
+  Priority priority;
+  input_stream >> priority;
+  EXPECT_EQ(priority.value, Priority::override);
+}
 
 class PriorityInvalidTest : public ::testing::TestWithParam<std::string>
 {

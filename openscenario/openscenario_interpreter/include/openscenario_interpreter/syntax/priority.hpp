@@ -53,13 +53,9 @@ struct Priority
   enum value_type {
 
     /*
-      If a starting event has priority Overwrite, all events in running state,
-      within the same scope (maneuver) as the starting event,
-      should be issued a stop command (stop transition).
-      Enumeration literal overwrite deprecated. With version 1.2.
-      Deprecated for consistency. Use override instead.
+      overwrite is deprecated and deleted from internal enum.
     */
-    overwrite,
+    // overwrite,
 
     /*
        If a starting event has priority Skip, then it will not be run if there
