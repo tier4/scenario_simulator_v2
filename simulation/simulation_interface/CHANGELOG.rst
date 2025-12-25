@@ -2,6 +2,17 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.1.0 (2025-12-25)
+-------------------
+* Merge pull request `#1777 <https://github.com/tier4/scenario_simulator_v2/issues/1777>`_ from wep21/migrate-cppzmq
+* Merge branch 'master' into migrate-cppzmq
+* apply ament clang format
+* Merge branch 'master' into migrate-cppzmq
+* fix cmake
+* fix cmake
+* feat: migrate zmqpp to cppzmq
+* Contributors: Daisuke Nishimatsu, Kotaro Yoshimoto, wep21
+
 22.0.4 (2025-12-24)
 -------------------
 * Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
