@@ -2,6 +2,73 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.3.2 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/pymdown-extensions-10.19.1
+* Merge branch 'master' into dependabot/uv/pymdown-extensions-10.19.1
+* Merge branch 'master' into dependabot/uv/pymdown-extensions-10.19.1
+* Contributors: Kotaro Yoshimoto
+
+22.3.1 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/python-markdown-math-0.9
+* Merge branch 'master' into dependabot/uv/python-markdown-math-0.9
+* Merge branch 'master' into dependabot/uv/python-markdown-math-0.9
+* Contributors: Kotaro Yoshimoto
+
+22.3.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
+22.2.2 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.1
+* Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.1
+* Contributors: Kotaro Yoshimoto
+
+22.2.1 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/markdown-3.10
+* Merge branch 'master' into dependabot/uv/markdown-3.10
+* Contributors: Kotaro Yoshimoto
+
+22.2.0 (2025-12-25)
+-------------------
+* Merge pull request `#1779 <https://github.com/tier4/scenario_simulator_v2/issues/1779>`_ from tier4/priority
+* Merge branch 'master' into priority
+* Delete Priority::overwrite internally and use override instead
+* Rename Priority::override\_ to Priority::override
+* Merge branch 'master' into priority
+* Merge branch 'master' into priority
+* Fix priority test
+* Add test_priority.cpp
+* Support Priority (OpenSCENARIO XML 1.3.1)
+* Contributors: Kotaro Yoshimoto
+
+22.1.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into migrate-cppzmq
+* Merge branch 'master' into migrate-cppzmq
+* Contributors: Daisuke Nishimatsu, Kotaro Yoshimoto
+
+22.0.4 (2025-12-24)
+-------------------
+* Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
+* Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
+* Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
+* Contributors: Kotaro Yoshimoto
+
+22.0.3 (2025-12-24)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/cache-5
+* Merge branch 'master' into dependabot/github_actions/actions/cache-5
+* Merge branch 'master' into dependabot/github_actions/actions/cache-5
+* Contributors: Kotaro Yoshimoto
+
 22.0.2 (2025-12-24)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/download-artifact-7
