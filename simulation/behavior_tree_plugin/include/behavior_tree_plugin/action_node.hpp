@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <geometry/spline/catmull_rom_spline.hpp>
+#include <geometry_msgs/msg/point.hpp>
 #include <memory>
 #include <optional>
 #include <string>
@@ -35,6 +36,7 @@
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace entity_behavior
@@ -46,15 +48,15 @@ class ActionNode : public BT::ActionNodeBase
 public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNode() override = default;
-  auto getDistanceToConflictingEntity(
-    const lanelet::Ids & route_lanelets,
-    const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
   auto getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<std::string>;
   auto calculateStopDistance(const traffic_simulator_msgs::msg::DynamicConstraints &) const
     -> double;
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<double>;
+  auto getFrontEntityNameAndDistanceByTrajectory(
+    const std::vector<geometry_msgs::msg::Point> & waypoints, const double width,
+    const std::size_t num_segments) const -> std::optional<std::pair<std::string, double>>;
   auto getDistanceToTrafficLightStopLine(
     const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
@@ -64,6 +66,10 @@ public:
   auto getYieldStopDistance(const lanelet::Ids & following_lanelets) const -> std::optional<double>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
+  auto getOtherEntitiesCanonicalizedLaneletPoses() const
+    -> std::vector<traffic_simulator::CanonicalizedLaneletPose>;
+  auto getOtherEntitiesCanonicalizedEntityStatuses() const
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
 
   /// throws if the derived class return RUNNING.
   auto executeTick() -> BT::NodeStatus override;
@@ -122,9 +128,6 @@ protected:
 
   virtual bool checkPreconditions() { return true; }
   virtual BT::NodeStatus doAction() = 0;
-  auto getDistanceToTargetEntity(
-    const math::geometry::CatmullRomSplineInterface & spline,
-    const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>;
 
 private:
   auto foundConflictingEntity(const lanelet::Ids & following_lanelets) const -> bool;
@@ -134,8 +137,6 @@ private:
   auto getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets) const
-    -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
-  auto getOtherEntityStatus(lanelet::Id lanelet_id) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto isOtherEntityAtConsideredAltitude(
     const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool;

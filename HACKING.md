@@ -96,8 +96,7 @@ implementation as well.
 Please follow the steps below to set up the environment and check the sample
 scenario behavior.
 
-1.[Build scenario_simulator_v2 with Autoware](https://autowarefoundation.github.io/autoware-documentation/main/tutorials/scenario-simulation/planning-simulation/installation/)
-2.[Run the sample scenario of `scenario_simulator_v2`](https://autowarefoundation.github.io/autoware-documentation/main/tutorials/scenario-simulation/planning-simulation/scenario-test-simulation/)
+- [Planning Evaluation Using Scenarios](https://autowarefoundation.github.io/autoware-documentation/main/tutorials/others/planning-evaluation-using-scenarios/)
 
 The sample scenario
 ([sample.yaml](test_runner/scenario_test_runner/scenario/sample.yaml)) is a

@@ -16,8 +16,10 @@
 #define TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_
 
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/distance.hpp>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -74,6 +76,14 @@ auto boundingBoxLaneLongitudinalDistance(
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box) -> std::optional<double>;
 
+auto splineDistanceToBoundingBox(
+  const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedLaneletPose & from_lanelet_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & target_lanelet_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & target_bounding_box,
+  const double lateral_collision_threshold = -1.0) -> std::optional<double>;
+
 // Bounds
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
@@ -106,16 +116,37 @@ auto distanceToRightLaneBound(
   -> double;
 
 // Other objects
-auto distanceToCrosswalk(
-  const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
-  const lanelet::Id target_crosswalk_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
-
 template <typename... Ts>
 auto distanceToStopLine(Ts &&... xs)
 {
   return lanelet_wrapper::distance::distanceToStopLine(std::forward<decltype(xs)>(xs)...);
 }
+
+template <typename... Ts>
+auto distanceToTrafficLightStopLine(Ts &&... xs)
+{
+  return lanelet_wrapper::distance::distanceToTrafficLightStopLine(
+    std::forward<decltype(xs)>(xs)...);
+}
+
+template <typename... Ts>
+auto distanceToCrosswalk(Ts &&... xs)
+{
+  return lanelet_wrapper::distance::distanceToCrosswalk(std::forward<decltype(xs)>(xs)...);
+}
+
+auto distanceToYieldStop(
+  const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
+  const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>;
+
+/*
+  Here it is required to pass the CanonicalizedEntityStatus vector, instead of just
+  the CanonicalizedLaneletPose vector, since it is necessary to know the msg::BoundingBox of each Entity
+*/
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedEntityStatus & from_status,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>;
 
 // spline
 auto distanceToSpline(
