@@ -18,6 +18,7 @@ endif()
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 find_package(Boost REQUIRED thread)
+find_package(cppzmq QUIET)
 find_package(rclcpp REQUIRED)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
@@ -64,6 +65,7 @@ target_link_libraries(simulation_interface
   pthread
   sodium
   zmq
+  $<TARGET_NAME_IF_EXISTS:cppzmq>
 )
 
 install(TARGETS simulation_interface
