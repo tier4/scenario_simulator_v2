@@ -2,6 +2,56 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.2.2 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.1
+* Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.1
+* Contributors: Kotaro Yoshimoto
+
+22.2.1 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/markdown-3.10
+* Merge branch 'master' into dependabot/uv/markdown-3.10
+* Contributors: Kotaro Yoshimoto
+
+22.2.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into priority
+* Merge branch 'master' into priority
+* Merge branch 'master' into priority
+* Contributors: Kotaro Yoshimoto
+
+22.1.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into migrate-cppzmq
+* Merge branch 'master' into migrate-cppzmq
+* Contributors: Daisuke Nishimatsu, Kotaro Yoshimoto
+
+22.0.4 (2025-12-24)
+-------------------
+* Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
+* Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
+* Merge branch 'master' into dependabot/uv/mkdocs-git-revision-date-localized-plugin-1.5.0
+* Contributors: Kotaro Yoshimoto
+
+22.0.3 (2025-12-24)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/cache-5
+* Merge branch 'master' into dependabot/github_actions/actions/cache-5
+* Merge branch 'master' into dependabot/github_actions/actions/cache-5
+* Contributors: Kotaro Yoshimoto
+
+22.0.2 (2025-12-24)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-7
+* Contributors: Kotaro Yoshimoto
+
+22.0.1 (2025-12-23)
+-------------------
+* Merge branch 'master' into experiment/signal-testing
+* Merge branch 'master' into experiment/signal-testing
+* Contributors: ぐるぐる
+
 22.0.0 (2025-12-22)
 -------------------
 
