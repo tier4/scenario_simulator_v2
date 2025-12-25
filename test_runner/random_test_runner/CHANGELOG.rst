@@ -2,6 +2,13 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.2.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into priority
+* Merge branch 'master' into priority
+* Merge branch 'master' into priority
+* Contributors: Kotaro Yoshimoto
+
 22.1.0 (2025-12-25)
 -------------------
 * Merge branch 'master' into migrate-cppzmq

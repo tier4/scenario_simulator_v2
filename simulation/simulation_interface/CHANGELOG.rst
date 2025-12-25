@@ -2,6 +2,13 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.2.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into priority
+* Merge branch 'master' into priority
+* Merge branch 'master' into priority
+* Contributors: Kotaro Yoshimoto
+
 22.1.0 (2025-12-25)
 -------------------
 * Merge pull request `#1777 <https://github.com/tier4/scenario_simulator_v2/issues/1777>`_ from wep21/migrate-cppzmq
