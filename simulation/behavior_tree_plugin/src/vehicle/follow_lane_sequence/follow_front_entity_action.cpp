@@ -99,10 +99,12 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  auto distance_to_stopline =
+  const auto distance_to_stopline =
     traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
-  auto distance_to_conflicting_entity =
-    getDistanceToConflictingEntity(route_lanelets_, *trajectory);
+  const auto distance_to_conflicting_entity =
+    traffic_simulator::distance::distanceToNearestConflictingPose(
+      route_lanelets_, *trajectory, *canonicalized_entity_status_,
+      getOtherEntitiesCanonicalizedEntityStatuses());
   std::optional<std::string> front_entity_name;
   distance_to_front_entity_ = std::nullopt;
   if (use_trajectory_based_front_entity_detection_) {
