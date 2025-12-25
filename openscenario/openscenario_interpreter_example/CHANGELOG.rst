@@ -2,6 +2,13 @@
 Changelog for package openscenario_interpreter_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.3.2 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/pymdown-extensions-10.19.1
+* Merge branch 'master' into dependabot/uv/pymdown-extensions-10.19.1
+* Merge branch 'master' into dependabot/uv/pymdown-extensions-10.19.1
+* Contributors: Kotaro Yoshimoto
+
 22.3.1 (2025-12-25)
 -------------------
 * Merge branch 'master' into dependabot/uv/python-markdown-math-0.9
