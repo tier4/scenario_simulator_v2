@@ -2,6 +2,14 @@
 Changelog for package status_monitor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.3.0 (2025-12-25)
+-------------------
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
 22.2.2 (2025-12-25)
 -------------------
 * Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.1

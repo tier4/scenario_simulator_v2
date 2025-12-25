@@ -2,6 +2,16 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.3.0 (2025-12-25)
+-------------------
+* Merge pull request `#1765 <https://github.com/tier4/scenario_simulator_v2/issues/1765>`_ from tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
+* Port distance::distanceToNearestConflictingPose function
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
 22.2.2 (2025-12-25)
 -------------------
 * Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.1
