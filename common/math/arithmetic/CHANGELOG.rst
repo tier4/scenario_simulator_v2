@@ -2,6 +2,13 @@
 Changelog for package arithmetic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.3.1 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/python-markdown-math-0.9
+* Merge branch 'master' into dependabot/uv/python-markdown-math-0.9
+* Merge branch 'master' into dependabot/uv/python-markdown-math-0.9
+* Contributors: Kotaro Yoshimoto
+
 22.3.0 (2025-12-25)
 -------------------
 * Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-distance-step-2-part2
