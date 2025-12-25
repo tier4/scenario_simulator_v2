@@ -2,6 +2,12 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.2.2 (2025-12-25)
+-------------------
+* Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.1
+* Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.1
+* Contributors: Kotaro Yoshimoto
+
 22.2.1 (2025-12-25)
 -------------------
 * Merge branch 'master' into dependabot/uv/markdown-3.10
