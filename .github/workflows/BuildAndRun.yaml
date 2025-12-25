@@ -59,7 +59,7 @@ jobs:
 
       - name: Cache apt and rosdep
         id: cache-apt-rosdep
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             /var/cache/apt/archives
@@ -86,6 +86,7 @@ jobs:
       - name: Install dependencies
         run: |
           vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
+          vcs import src < src/scenario_simulator_v2/test_dependency_${{ matrix.rosdistro }}.repos
 
       - name: Resolve rosdep and install colcon mixin
         run: |

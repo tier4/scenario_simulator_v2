@@ -27,3 +27,6 @@ $(find-pkg-share scenario_test_runner)/scenario/EntitySelection/SpeedAction_Spee
 $(find-pkg-share scenario_test_runner)/scenario/EntitySelection/TeleportAction_CollisionCondition_StandStillCondition.yaml
 $(find-pkg-share scenario_test_runner)/scenario/EntitySelection/TimeHeadwayCondition.yaml
 $(find-pkg-share scenario_test_runner)/scenario/collision_condition_by_type.yaml
+$(find-pkg-share scenario_test_runner)/scenario/Event.Priority.override.yaml
+$(find-pkg-share scenario_test_runner)/scenario/Event.Priority.parallel.yaml
+$(find-pkg-share scenario_test_runner)/scenario/Event.Priority.skip.yaml
