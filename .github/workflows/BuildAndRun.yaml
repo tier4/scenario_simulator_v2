@@ -59,7 +59,7 @@ jobs:
 
       - name: Cache apt and rosdep
         id: cache-apt-rosdep
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             /var/cache/apt/archives
@@ -188,7 +188,7 @@ jobs:
             })
 
       - name: Upload Lcov result
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: matrix.runs_on != 'ubuntu-22.04-arm'
         with:
           name: lcov-${{ matrix.cmake_build_type }}
@@ -196,7 +196,7 @@ jobs:
           retention-days: 1
 
       - name: Upload Gcov result
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: matrix.runs_on != 'ubuntu-22.04-arm'
         with:
           name: coverage${{ matrix.cmake_build_type }}.xml
@@ -236,7 +236,7 @@ jobs:
         run: echo "PR_NUMBER=${{ github.event.number }}" > install/pr_number.txt
 
       - name: Upload install directory
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: matrix.cmake_build_type == 'RelWithDebInfo'
         with:
           name: install-${{ matrix.runs_on }}-${{ matrix.cmake_build_type }}
