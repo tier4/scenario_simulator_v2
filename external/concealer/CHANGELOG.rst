@@ -2,6 +2,11 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.3.3 (2025-12-26)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-6
+* Contributors: Kotaro Yoshimoto
+
 22.3.2 (2025-12-25)
 -------------------
 * Merge branch 'master' into dependabot/uv/pymdown-extensions-10.19.1
