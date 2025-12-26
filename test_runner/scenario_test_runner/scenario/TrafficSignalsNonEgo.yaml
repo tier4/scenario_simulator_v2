@@ -19,32 +19,23 @@ OpenSCENARIO:
       TrafficSignalController:
         - name: controller-1
           Phase:
-            - name: phase-1
-              duration: 10
+            - name: "phase-1"
+              duration: 3
               TrafficSignalState:
-                - { trafficSignalId: "34802", state: "red solidOn circle" }
-                - { trafficSignalId: "34802", state: "green solidOn right" }
-                - { trafficSignalId: "34802 v2i", state: "red solidOn circle" }
-            - name: phase-2
-              duration: 10
+                - { trafficSignalId: "34802", state: "green" }
+            - name: "phase-2"
+              duration: 3
               TrafficSignalState:
-                - { trafficSignalId: "34802", state: "yellow solidOn circle" }
-            - name: dummy-phase (for debugging corner case)
-              duration: 0
-              TrafficSignalState: []
-            - name: phase-3
-              duration: 10
+                - { trafficSignalId: "34802", state: "red" }
+            - name: "phase-3"
+              duration: 3
               TrafficSignalState:
-                - { trafficSignalId: "34802", state: "green solidOn circle" }
-                - { trafficSignalId: "34802", state: "green solidOff right" }
-                - {
-                    trafficSignalId: "34802 v2i",
-                    state: "green solidOn circle",
-                  }
-                - {
-                    trafficSignalId: "34802 v2i",
-                    state: "green solidOff right",
-                  }
+                - { trafficSignalId: "34802", state: "green" }
+                - { trafficSignalId: "34802 v2i_detected", state: "yellow" }
+            - name: "phase-4"
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "red" }
   Entities:
     ScenarioObject:
       - name: ego
@@ -82,9 +73,67 @@ OpenSCENARIO:
                           h: 0
                           p: 0
                           r: 0
+        UserDefinedAction:
+          - CustomCommandAction:
+              type: EnableTrafficSignalV2IFeatureAction@v1(34802)
     Story:
       - name: ""
         Act:
+          - name: V2IFeatureToggle
+            # V2I sync: ON (0-3s) -> OFF (3-6s) -> ON (6-12s)
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: "disable_v2i_sync_at_3s"
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 3
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: DisableTrafficSignalV2IFeatureAction@v1(34802)
+                      - name: "enable_v2i_sync_at_6s"
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 6
+                                      rule: greaterOrEqual
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: EnableTrafficSignalV2IFeatureAction@v1(34802)
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
@@ -106,7 +155,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 30
+                                      value: 15
                                       rule: greaterThan
                         Action:
                           - name: ""

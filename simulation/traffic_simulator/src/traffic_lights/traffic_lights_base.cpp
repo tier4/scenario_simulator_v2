@@ -70,6 +70,7 @@ auto TrafficLightsBase::setTrafficLightsState(
 {
   clearTrafficLightsState(lanelet_id);
   addTrafficLightsState(lanelet_id, state);
+  notifyStateChange(lanelet_id, state, StateChangeType::SET);
 }
 
 auto TrafficLightsBase::clearTrafficLightsState(const lanelet::Id lanelet_id) -> void
@@ -77,6 +78,7 @@ auto TrafficLightsBase::clearTrafficLightsState(const lanelet::Id lanelet_id) ->
   for (const auto & traffic_light : getTrafficLights(lanelet_id)) {
     traffic_light.get().clear();
   }
+  notifyStateChange(lanelet_id, "", StateChangeType::CLEAR);
 }
 
 auto TrafficLightsBase::addTrafficLightsState(
@@ -85,6 +87,7 @@ auto TrafficLightsBase::addTrafficLightsState(
   for (const auto & traffic_light : getTrafficLights(lanelet_id)) {
     traffic_light.get().set(state);
   }
+  notifyStateChange(lanelet_id, state, StateChangeType::ADD);
 }
 
 auto TrafficLightsBase::setTrafficLightsConfidence(
@@ -140,6 +143,21 @@ auto TrafficLightsBase::getTrafficLight(const lanelet::Id traffic_light_id) -> T
     addTrafficLight(traffic_light_id);
   }
   return traffic_lights_map_.at(traffic_light_id);
+}
+
+auto TrafficLightsBase::registerStateChangeCallback(StateChangeCallback callback) -> void
+{
+  state_change_callbacks_.push_back(std::move(callback));
+}
+
+auto TrafficLightsBase::notifyStateChange(
+  const lanelet::Id lanelet_id, const std::string & state, StateChangeType change_type) -> void
+{
+  for (const auto & callback : state_change_callbacks_) {
+    if (callback) {
+      callback(lanelet_id, state, change_type);
+    }
+  }
 }
 
 auto TrafficLightsBase::getTrafficLights(const lanelet::Id lanelet_id)

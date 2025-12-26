@@ -11,14 +11,52 @@ from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
 from replay_testing.models import ReplayRunParams, RunnerArgs
 from traffic_simulator_msgs.msg import TrafficLightBulbV1
+from autoware_perception_msgs.msg import TrafficLightElement
 
+def extract_conventional_changes(msgs):
+    changes = {}
+    for _, msg, _ in msgs:
+        for light in msg.traffic_lights:
+            lid = light.lanelet_way_id
+            changes[lid] = changes.get(lid, [])
+            bulbs = list(light.traffic_light_bulbs)
+            if not changes[lid] or changes[lid][-1] != bulbs:
+                changes[lid].append(bulbs)
+    return changes
+
+
+def extract_v2i_changes(msgs):
+    changes = {}
+    for _, msg, _ in msgs:
+        for group in msg.traffic_light_groups:
+            gid = group.traffic_light_group_id
+            changes[gid] = changes.get(gid, [])
+            elements = list(group.elements)
+            if not changes[gid] or changes[gid][-1] != elements:
+                changes[gid].append(elements)
+    return changes
+
+
+def assert_conventional_state(bulbs, color, shape=TrafficLightBulbV1.CIRCLE, status=TrafficLightBulbV1.SOLID_ON):
+    assert bulbs[0].color == color
+    assert bulbs[0].shape == shape
+    assert bulbs[0].status == status
+
+
+def assert_v2i_state(elements, color, shape=TrafficLightElement.CIRCLE, status=TrafficLightElement.SOLID_ON):
+    assert elements[0].color == color
+    assert elements[0].shape == shape
+    assert elements[0].status == status
+
+CONVENTIONAL_TOPIC = "/simulation/traffic_lights"
+V2I_TOPIC = "/perception/traffic_light_recognition/external/traffic_signals"
 
 @fixtures.parameterize(
     [LocalFixture(path=Path(__file__).parent / "fixtures/empty.mcap")]
 )
 class Fixtures:
     input_topics = []
-    output_topics = ["/simulation/traffic_lights"]
+    output_topics = [CONVENTIONAL_TOPIC, V2I_TOPIC]
 
 
 @run.default(
@@ -48,7 +86,7 @@ class Run:
                                 "TrafficSignalsNonEgo.yaml",
                             ],
                         ),
-                        ("initialize_duration", "40"),
+                        ("initialize_duration", "15"),
                         ("launch_autoware", "False"),
                         ("record", "False"),
                         ("launch_rviz", "True"),
@@ -57,44 +95,50 @@ class Run:
             ]
         )
 
+# Scenario phases (3s each):
+# | Phase    | V2I sync | conventional | v2i    | v2i detected | v2i output |
+# |----------|----------|--------------|--------|--------------|------------|
+# | phase-1  | ON       | green        | green  | -            | green      |
+# | phase-2  | OFF      | red          | green* | -            | green      |
+# | phase-3  | ON       | green        | green  | yellow       | yellow     |
+# | phase-4  | ON       | red          | red    | -            | red        |
+# | phase-1' | ON       | green        | green  | -            | green      |
+#
+# *phase-2: V2I maintains previous state (green) because sync is OFF
+#
+# Expected changes:
+# CONVENTIONAL (34802): GREEN -> RED -> GREEN -> RED -> GREEN
+# V2I          (34806): GREEN -> AMBER -> RED -> GREEN
 
 @analyze
 class AnalyzeBasicReplay:
-    def test_cmd_vel(self):
-        msgs_it = read_messages(self.reader, topics=["/simulation/traffic_lights"])
+    def test_traffic_light_phase_changes(self):
+        all_messages = list(read_messages(self.reader, topics=[CONVENTIONAL_TOPIC, V2I_TOPIC]))
 
-        msgs = [(topic_name, msg, timestamp) for topic_name, msg, timestamp in msgs_it]
-        assert len(msgs) >= 1
-        changes = {}
-        for topic_name, msg, timestamp in msgs:
-            lights = msg.traffic_lights
-            for light in lights:
-                changes[light.lanelet_way_id] = changes.get(light.lanelet_way_id, [])
-                has_changed = changes[light.lanelet_way_id] == [] or (
-                    changes[light.lanelet_way_id][-1] != light.traffic_light_bulbs
-                )
-                if has_changed:
-                    changes[light.lanelet_way_id].append(light.traffic_light_bulbs)
+        # Split by topic
+        conventional_messages = [(t, m, ts) for t, m, ts in all_messages if t == CONVENTIONAL_TOPIC]
+        v2i_messages = [(t, m, ts) for t, m, ts in all_messages if t == V2I_TOPIC]
 
-        assert len(changes[34802]) == 3
-        assert len(changes[34836]) == 1
+        WAY_ID = 34802
+        RELATION_ID = 34806
 
-        assert changes[34802][0][0].color == TrafficLightBulbV1.GREEN
-        assert changes[34802][0][0].shape == TrafficLightBulbV1.RIGHT_ARROW
-        assert changes[34802][0][0].status == TrafficLightBulbV1.SOLID_ON
+        # Conventional GroundTruth
+        assert len(conventional_messages) >= 1
+        conventional = extract_conventional_changes(conventional_messages)
+        assert len(conventional[WAY_ID]) == 5
 
-        assert changes[34802][0][1].color == TrafficLightBulbV1.RED
-        assert changes[34802][0][1].shape == TrafficLightBulbV1.CIRCLE
-        assert changes[34802][0][1].status == TrafficLightBulbV1.SOLID_ON
+        assert_conventional_state(conventional[WAY_ID][0], TrafficLightBulbV1.GREEN)
+        assert_conventional_state(conventional[WAY_ID][1], TrafficLightBulbV1.RED)
+        assert_conventional_state(conventional[WAY_ID][2], TrafficLightBulbV1.GREEN)
+        assert_conventional_state(conventional[WAY_ID][3], TrafficLightBulbV1.RED)
+        assert_conventional_state(conventional[WAY_ID][4], TrafficLightBulbV1.GREEN)
 
-        assert changes[34802][1][0].color == TrafficLightBulbV1.AMBER
-        assert changes[34802][1][0].shape == TrafficLightBulbV1.CIRCLE
-        assert changes[34802][1][0].status == TrafficLightBulbV1.SOLID_ON
+        # V2I Output
+        assert len(v2i_messages) >= 1
+        v2i = extract_v2i_changes(v2i_messages)
+        assert len(v2i[RELATION_ID]) == 4
 
-        assert changes[34802][2][0].color == TrafficLightBulbV1.GREEN
-        assert changes[34802][2][0].shape == TrafficLightBulbV1.CIRCLE
-        assert changes[34802][2][0].status == TrafficLightBulbV1.SOLID_ON
-
-        assert changes[34802][2][1].color == TrafficLightBulbV1.GREEN
-        assert changes[34802][2][1].shape == TrafficLightBulbV1.RIGHT_ARROW
-        assert changes[34802][2][1].status == TrafficLightBulbV1.SOLID_OFF
+        assert_v2i_state(v2i[RELATION_ID][0], TrafficLightElement.GREEN)
+        assert_v2i_state(v2i[RELATION_ID][1], TrafficLightElement.AMBER)
+        assert_v2i_state(v2i[RELATION_ID][2], TrafficLightElement.RED)
+        assert_v2i_state(v2i[RELATION_ID][3], TrafficLightElement.GREEN)

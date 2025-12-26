@@ -18,26 +18,44 @@ namespace traffic_simulator
 {
 auto TrafficLights::isAnyTrafficLightChanged() -> bool
 {
-  return conventional_traffic_lights_->isAnyTrafficLightChanged() or
-         v2i_traffic_lights_->isAnyTrafficLightChanged();
+  return getConventionalTrafficLights()->isAnyTrafficLightChanged() or
+         getV2ITrafficLights()->isAnyTrafficLightChanged() or
+         conventional_channel_.hasDetectedChanges() or v2i_channel_.hasDetectedChanges();
 }
 
 auto TrafficLights::startTrafficLightsUpdate(
   const double conventional_traffic_light_update_rate, const double v2i_traffic_lights_update_rate)
   -> void
 {
-  conventional_traffic_lights_->startUpdate(conventional_traffic_light_update_rate);
-  v2i_traffic_lights_->startUpdate(v2i_traffic_lights_update_rate);
+  getConventionalTrafficLights()->startUpdate(conventional_traffic_light_update_rate);
+  getV2ITrafficLights()->startUpdate(v2i_traffic_lights_update_rate);
 }
 
 auto TrafficLights::getConventionalTrafficLights() const
   -> std::shared_ptr<ConventionalTrafficLights>
 {
-  return conventional_traffic_lights_;
+  return conventional_channel_.getGroundTruth();
 }
 
 auto TrafficLights::getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
 {
-  return v2i_traffic_lights_;
+  return v2i_channel_.getGroundTruth();
+}
+
+auto TrafficLights::getConventionalDetectedTrafficLights() const
+  -> std::shared_ptr<DetectedTrafficLights>
+{
+  return conventional_channel_.getDetected();
+}
+
+auto TrafficLights::getV2IDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>
+{
+  return v2i_channel_.getDetected();
+}
+
+auto TrafficLights::generateConventionalUpdateRequest() const
+  -> simulation_api_schema::UpdateTrafficLightsRequest
+{
+  return conventional_channel_.generateUpdateRequest();
 }
 }  // namespace traffic_simulator

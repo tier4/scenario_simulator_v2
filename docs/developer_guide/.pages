@@ -19,6 +19,7 @@ nav:
     - SimulationResultFormat.md
     - SystemArchitecture.md
     - TIERIVScenarioFormatVersion2.md
+    - TrafficLightsArchitecture.md
     - TrafficSimulator.md
     - VehicleDynamics.md
     - ZeroMQ.md
