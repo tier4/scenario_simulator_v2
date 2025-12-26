@@ -22,7 +22,7 @@ inline namespace syntax
 ParameterValueDistributionDefinition::ParameterValueDistributionDefinition(
   const pugi::xml_node & node, Scope & scope)
 : ParameterValueDistribution(
-    readElement<ParameterValueDistribution>("parameterValueDistribution", node, scope))
+    readElement<ParameterValueDistribution>("ParameterValueDistribution", node, scope))
 {
 }
 }  // namespace syntax

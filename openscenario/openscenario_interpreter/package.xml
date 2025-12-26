@@ -27,6 +27,7 @@
   <depend>tier4_simulation_msgs</depend>
   <depend>traffic_simulator</depend>
   <depend>traffic_simulator_msgs</depend>
+  <depend>ament_index_cpp</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>
@@ -34,6 +35,7 @@
   <test_depend>ament_cmake_pep257</test_depend>
   <test_depend>ament_cmake_xmllint</test_depend>
   <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_index_cpp</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
