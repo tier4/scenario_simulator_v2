@@ -2,6 +2,11 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.3.4 (2025-12-26)
+-------------------
+* Merge branch 'master' into fix/test-error-jazzy
+* Contributors: Kotaro Yoshimoto
+
 22.3.3 (2025-12-26)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-6
