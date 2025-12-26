@@ -77,9 +77,12 @@ auto AcquirePositionAction::start() -> void
     }
   };
 
+  traffic_simulator::v2::RouteOption route_option;
+  route_option.use_lane_ids_for_routing =
+    get_from_parameter("RoutingAction__use_lane_ids_for_routing", false);
+
   for (const auto & actor : actors) {
     actor.apply([&](const auto & object) {
-      traffic_simulator::v2::RouteOption route_option;
       route_option.allow_goal_modification = [&]() {
         if (auto from_property = get_from_controller_property(object, "allowGoalModification")) {
           // property specification takes precedence
