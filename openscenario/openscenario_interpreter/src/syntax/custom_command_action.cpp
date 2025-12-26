@@ -189,8 +189,8 @@ struct EnableTrafficSignalV2IFeatureAction : public CustomCommand,
         "EnableTrafficSignalV2IFeature requires at least 1 argument (traffic signal IDs). "
         "Usage: EnableTrafficSignalV2IFeatureAction(id1, id2, ...)");
     }
-    for (const auto & param : parameters) {
-      setTrafficSignalV2IFeature(std::stoll(param), true);
+    for (const auto & parameter : parameters) {
+      setTrafficSignalV2IFeature(boost::lexical_cast<std::int64_t>(parameter), true);
     }
   }
 };
@@ -207,8 +207,8 @@ struct DisableTrafficSignalV2IFeatureAction : public CustomCommand,
         "DisableTrafficSignalV2IFeatureAction requires at least 1 argument (traffic signal IDs). "
         "Usage: DisableTrafficSignalV2IFeatureAction(id1, id2, ...)");
     }
-    for (const auto & param : parameters) {
-      setTrafficSignalV2IFeature(std::stoll(param), false);
+    for (const auto & parameter : parameters) {
+      setTrafficSignalV2IFeature(boost::lexical_cast<std::int64_t>(parameter), false);
     }
   }
 };
@@ -344,14 +344,14 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
     std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
     commands{
       // clang-format off
+      ELEMENT("DisableTrafficSignalV2IFeatureAction@v1", DisableTrafficSignalV2IFeatureAction),
+      ELEMENT("EnableTrafficSignalV2IFeatureAction@v1", EnableTrafficSignalV2IFeatureAction),
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
       ELEMENT("PseudoTrafficSignalDetectorConfidenceSetAction@v1", ApplyPseudoTrafficSignalDetectorConfidenceSetAction<1>),
       ELEMENT("RequestToCooperateCommandAction@v1", ApplyRequestToCorporateCommandAction<1>),
       ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
-      ELEMENT("EnableTrafficSignalV2IFeatureAction@v1", EnableTrafficSignalV2IFeatureAction),
-      ELEMENT("DisableTrafficSignalV2IFeatureAction@v1", DisableTrafficSignalV2IFeatureAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
       ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED
