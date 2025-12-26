@@ -64,34 +64,36 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 
   auto evaluate() const -> Object;
 
-  struct TrafficSignalType
+  struct TrafficSignalChannelType
   {
     enum value_type { conventional, v2i } value;
 
-    explicit TrafficSignalType(value_type value) : value(value) {}
+    explicit TrafficSignalChannelType(const std::string &);
 
-    explicit TrafficSignalType(const std::string &);
+    constexpr TrafficSignalChannelType(value_type value) : value(value) {}
 
     constexpr operator value_type() const noexcept { return value; }
   };
 
-  struct ParsedTrafficSignalId
+  struct TargetTrafficSignalChannel
   {
+    explicit TargetTrafficSignalChannel(const std::string &);
+
     lanelet::Id id;
-    TrafficSignalType type;
+
+    TrafficSignalChannelType channel;
+
     bool detected;
   };
 
-  static auto parseTrafficSignalId(const std::string & traffic_signal_id) -> ParsedTrafficSignalId;
+  auto id() const -> lanelet::Id { return target.id; }
 
-  auto id() const -> lanelet::Id { return parsed_traffic_signal_id.id; }
+  auto channelType() const -> TrafficSignalChannelType { return target.channel; }
 
-  auto trafficSignalType() const -> TrafficSignalType { return parsed_traffic_signal_id.type; }
-
-  auto isDetected() const -> bool { return parsed_traffic_signal_id.detected; }
+  auto isDetected() const -> bool { return target.detected; }
 
 private:
-  const ParsedTrafficSignalId parsed_traffic_signal_id;
+  const TargetTrafficSignalChannel target;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
