@@ -25,5 +25,15 @@ ParameterValueSet::ParameterValueSet(
   parameter_assignments(readElements<ParameterAssignment, 1>("ParameterAssignment", node, local()))
 {
 }
+
+auto ParameterValueSet::evaluate() const -> std::shared_ptr<std::unordered_map<std::string, Object>>
+{
+  std::shared_ptr<std::unordered_map<std::string, Object>> parameters =
+    std::make_shared<std::unordered_map<std::string, Object>>();
+  for (const auto & parameter : parameter_assignments) {
+    (*parameters)[parameter.parameterRef] = make<String>(parameter.value);
+  }
+  return parameters;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -24,11 +24,12 @@ StochasticDistributionType::StochasticDistributionType(const pugi::xml_node & no
 : Group(
     choice(node, {
       { "ProbabilityDistributionSet", [&](auto && node) { return make<ProbabilityDistributionSet>(node, scope); } },
+      { "LogNormalDistribution",      [&](auto && node) { return make<LogNormalDistribution     >(node, scope); } },
       { "NormalDistribution",         [&](auto && node) { return make<NormalDistribution        >(node, scope); } },
       { "UniformDistribution",        [&](auto && node) { return make<UniformDistribution       >(node, scope); } },
       { "PoissonDistribution",        [&](auto && node) { return make<PoissonDistribution       >(node, scope); } },
       { "Histogram",                  [&](auto && node) { return make<Histogram                 >(node, scope); } },
-      { "UserDefinedDistribution",    [&](auto && node) { return make<UserDefinedDistribution   >(node, scope); } },
+      { "UserDefinedDistribution",    [&](auto && node) { return make<UserDefinedDistribution   >(node, scope); } }
     }))
 // clang-format on
 {

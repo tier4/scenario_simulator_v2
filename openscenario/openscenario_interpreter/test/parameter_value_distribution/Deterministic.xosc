@@ -1,0 +1,20 @@
+<OpenSCENARIO>
+  <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
+  <ParameterValueDistribution>
+    <ScenarioFile filepath="$(ros2 pkg prefix --share openscenario_interpreter)/test/parameter_value_distribution/sample.xosc"/>
+    <Deterministic>
+      <DeterministicSingleParameterDistribution parameterName="offset">
+        <DistributionRange stepWidth="0.53">
+          <Range lowerLimit="-1.0" upperLimit="1.0"/>
+        </DistributionRange>
+      </DeterministicSingleParameterDistribution>
+      <DeterministicSingleParameterDistribution parameterName="LANE_ID">
+        <DistributionSet>
+          <Element value="34510"/>
+          <Element value="34513"/>
+          <Element value="34564"/>
+        </DistributionSet>
+      </DeterministicSingleParameterDistribution>
+    </Deterministic>
+  </ParameterValueDistribution>
+</OpenSCENARIO>

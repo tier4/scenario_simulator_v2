@@ -12,33 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cmath>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/probability_distribution_set.hpp>
+#include <openscenario_interpreter/syntax/log_normal_distribution.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-ProbabilityDistributionSet::ProbabilityDistributionSet(
+LogNormalDistribution::LogNormalDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
-  elements([](const std::list<ProbabilityDistributionSetElement> & element_list) {
-    return std::vector<ProbabilityDistributionSetElement>(element_list.begin(), element_list.end());
-  }(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
-  distribute([this]() -> std::discrete_distribution<std::size_t> {
-    std::vector<double> probabilities;
-    for (const auto & element : elements) {
-      probabilities.push_back(element.weight);
-    }
-    return {std::begin(probabilities), std::end(probabilities)};
-  }())
+  range(readElement<Range>("Range", node, scope)),
+  expected_value(readAttribute<Double>("expectedValue", node, scope)),
+  variance(readAttribute<Double>("variance", node, scope)),
+  distribute(
+    static_cast<double>(expected_value.data), std::sqrt(static_cast<double>(variance.data)))
 {
 }
 
-auto ProbabilityDistributionSet::derive() -> Object
+auto LogNormalDistribution::derive() -> Object
 {
-  std::size_t index = distribute(random_engine);
-  return make<String>(elements.at(index).value);
+  return make<Double>([&]() {
+    double value;
+    auto in_range = [this](double value) {
+      return range.lower_limit.data <= value and value <= range.upper_limit.data;
+    };
+    // retry until the generated value is within the range
+    do {
+      value = distribute(random_engine);
+    } while (not in_range(value));
+    return value;
+  }());
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

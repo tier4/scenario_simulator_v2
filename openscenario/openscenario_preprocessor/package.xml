@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
-
 <package format="3">
   <name>openscenario_preprocessor</name>
   <version>22.3.5</version>
@@ -10,9 +9,9 @@
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
-  <depend>libgoogle-glog-dev</depend>
   <depend>openscenario_interpreter</depend>
   <depend>openscenario_preprocessor_msgs</depend>
+  <depend>openscenario_validator</depend>
   <depend>rclcpp</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>

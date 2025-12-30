@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/stochastic_distribution_type.hpp>
 #include <pugixml.hpp>
@@ -35,11 +36,14 @@ inline namespace syntax
      <xsd:attribute name="parameterName" type="String" use="required"/>
    </xsd:complexType>
 */
-struct StochasticDistribution : public StochasticDistributionType
+struct StochasticDistribution : public StochasticDistributionType,
+                                public StochasticParameterDistributionBase
 {
   const String parameter_name;
 
   explicit StochasticDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> Object override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

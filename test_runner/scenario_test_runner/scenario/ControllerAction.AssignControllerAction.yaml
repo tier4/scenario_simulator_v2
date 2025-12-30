@@ -189,6 +189,9 @@ OpenSCENARIO:
                                     Properties:
                                       Property:
                                         - { name: isBlind, value: 'true' }
+                          - name: ''
+                            PrivateAction:
+                              ControllerAction:
                                 OverrideControllerValueAction:
                                   Throttle:      { value:  0, active: false }
                                   Brake:         { value:  0, active: false }

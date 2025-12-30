@@ -35,11 +35,14 @@ inline namespace syntax
      </xsd:sequence>
    </xsd:complexType>
 */
-struct ParameterValueDistribution : public DistributionDefinition
+struct ParameterValueDistribution : public DistributionDefinition,
+                                    public ParameterDistributionContainer
 {
   const File scenario_file;
 
   explicit ParameterValueDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> ParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

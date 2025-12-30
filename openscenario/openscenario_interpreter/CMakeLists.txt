@@ -65,6 +65,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/evaluate.cpp
   src/object.cpp
   src/openscenario_interpreter.cpp
+  src/parameter_distribution.cpp
   src/record.cpp
   src/scope.cpp)
 
@@ -95,6 +96,10 @@ install(
   FILES ${CMAKE_CURRENT_SOURCE_DIR}/features
   DESTINATION lib/${PROJECT_NAME})
 
+install(
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test
+  DESTINATION share/${PROJECT_NAME})
+
 # ------------------------------------------------------------------------------
 #  test
 # ------------------------------------------------------------------------------
@@ -107,6 +112,9 @@ if(BUILD_TESTING)
   ament_add_gtest(test_double test/test_double.cpp)
   ament_add_gtest(test_priority test/test_priority.cpp)
   target_link_libraries(test_syntax ${PROJECT_NAME})
+  ament_add_gtest(test_parameter_value_distribution test/test_parameter_value_distribution.cpp)
+  target_link_libraries(test_parameter_value_distribution ${PROJECT_NAME})
+  ament_add_gtest(test_parsed_traffic_signal_id test/test_parsed_traffic_signal_id.cpp)
   target_link_libraries(test_parsed_traffic_signal_id ${PROJECT_NAME})
   target_link_libraries(test_double ${PROJECT_NAME})
   target_link_libraries(test_priority ${PROJECT_NAME})

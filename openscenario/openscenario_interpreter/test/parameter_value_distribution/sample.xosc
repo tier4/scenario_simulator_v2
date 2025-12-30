@@ -1,0 +1,146 @@
+<OpenSCENARIO>
+  <FileHeader author="Tatsuya Yamasaki" date="2022-03-04T18:06:53+09:00" description="Sample scenario (with Autoware)" revMajor="1" revMinor="0" />
+  <ParameterDeclarations>
+    <ParameterDeclaration name="offset" parameterType="double" value="0.0">
+      <ConstraintGroup>
+        <ValueConstraint rule="lessOrEqual" value="1.0" />
+        <ValueConstraint rule="greaterOrEqual" value="-1.0" />
+      </ConstraintGroup>
+    </ParameterDeclaration>
+    <ParameterDeclaration name="LANE_ID" parameterType="string" value="34510" />
+  </ParameterDeclarations>
+  <CatalogLocations>
+    <VehicleCatalog>
+      <Directory path="$(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle" />
+    </VehicleCatalog>
+  </CatalogLocations>
+  <RoadNetwork>
+    <LogicFile filepath="$(ros2 pkg prefix --share kashiwanoha_map)/map" />
+  </RoadNetwork>
+  <Entities>
+    <ScenarioObject name="ego">
+      <CatalogReference catalogName="sample_vehicle" entryName="sample_vehicle" />
+      <ObjectController>
+        <Controller name="">
+          <Properties>
+            <Property name="isEgo" value="true" />
+            <Property name="maxJerk" value="1.5" />
+            <Property name="minJerk" value="-1.5" />
+          </Properties>
+        </Controller>
+      </ObjectController>
+    </ScenarioObject>
+  </Entities>
+  <Storyboard>
+    <Init>
+      <Actions>
+        <Private entityRef="ego">
+          <PrivateAction>
+            <TeleportAction>
+              <Position>
+                <LanePosition roadId="" laneId="$LANE_ID" s="1" offset="$offset">
+                  <Orientation type="relative" h="0" p="0" r="0" />
+                </LanePosition>
+              </Position>
+            </TeleportAction>
+          </PrivateAction>
+          <PrivateAction>
+            <RoutingAction>
+              <AcquirePositionAction>
+                <Position>
+                  <LanePosition roadId="" laneId="34507" s="50" offset="0">
+                    <Orientation type="relative" h="0" p="0" r="0" />
+                  </LanePosition>
+                </Position>
+              </AcquirePositionAction>
+            </RoutingAction>
+          </PrivateAction>
+          <PrivateAction>
+            <LongitudinalAction>
+              <SpeedAction>
+                <SpeedActionDynamics dynamicsDimension="time" value="0" dynamicsShape="step" />
+                <SpeedActionTarget>
+                  <AbsoluteTargetSpeed value="2.778" />
+                </SpeedActionTarget>
+              </SpeedAction>
+            </LongitudinalAction>
+          </PrivateAction>
+        </Private>
+      </Actions>
+    </Init>
+    <Story name="">
+      <Act name="_EndCondition">
+        <ManeuverGroup maximumExecutionCount="1" name="">
+          <Actors selectTriggeringEntities="false">
+            <EntityRef entityRef="ego" />
+          </Actors>
+          <Maneuver name="">
+            <Event name="" priority="parallel">
+              <Action name="">
+                <UserDefinedAction>
+                  <CustomCommandAction type="exitSuccess" />
+                </UserDefinedAction>
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="" delay="0" conditionEdge="none">
+                    <ByEntityCondition>
+                      <TriggeringEntities triggeringEntitiesRule="any">
+                        <EntityRef entityRef="ego" />
+                      </TriggeringEntities>
+                      <EntityCondition>
+                        <ReachPositionCondition tolerance="0.5">
+                          <Position>
+                            <LanePosition roadId="" laneId="34507" s="50" offset="0">
+                              <Orientation type="relative" h="0" p="0" r="0" />
+                            </LanePosition>
+                          </Position>
+                        </ReachPositionCondition>
+                      </EntityCondition>
+                    </ByEntityCondition>
+                  </Condition>
+                  <Condition name="" delay="0" conditionEdge="none">
+                    <ByValueCondition>
+                      <UserDefinedValueCondition name="RelativeHeadingCondition(ego, 34507, 50)" rule="lessThan" value="0.1" />
+                    </ByValueCondition>
+                  </Condition>
+                  <Condition name="" delay="0" conditionEdge="none">
+                    <ByValueCondition>
+                      <UserDefinedValueCondition name="ego.currentState" rule="equalTo" value="ARRIVED_GOAL" />
+                    </ByValueCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+            <Event name="" priority="parallel">
+              <Action name="">
+                <UserDefinedAction>
+                  <CustomCommandAction type="exitFailure" />
+                </UserDefinedAction>
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="" delay="0" conditionEdge="none">
+                    <ByValueCondition>
+                      <SimulationTimeCondition value="180" rule="greaterThan" />
+                    </ByValueCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+        <StartTrigger>
+          <ConditionGroup>
+            <Condition name="" delay="0" conditionEdge="none">
+              <ByValueCondition>
+                <SimulationTimeCondition value="0" rule="greaterThan" />
+              </ByValueCondition>
+            </Condition>
+          </ConditionGroup>
+        </StartTrigger>
+      </Act>
+    </Story>
+    <StopTrigger />
+  </Storyboard>
+</OpenSCENARIO>

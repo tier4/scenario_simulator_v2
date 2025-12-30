@@ -20,9 +20,22 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 DistributionRange::DistributionRange(const pugi::xml_node & node, Scope & scope)
-: Scope(scope), range(readElement<Range>("Range", node, local()))
+: Scope(scope),
+  step_width(readAttribute<Double>("stepWidth", node, local())),
+  range(readElement<Range>("Range", node, local()))
 {
 }
 
+auto DistributionRange::derive() -> SingleUnnamedParameterDistribution
+{
+  SingleUnnamedParameterDistribution unnamed_distribution;
+  const auto number_of_parameters =
+    static_cast<std::size_t>((range.upper_limit - range.lower_limit) / step_width + 1);
+  for (std::size_t i = 0; i < number_of_parameters; ++i) {
+    unnamed_distribution.emplace_back(
+      make<Double>(range.lower_limit + static_cast<double>(i) * step_width));
+  }
+  return unnamed_distribution;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
