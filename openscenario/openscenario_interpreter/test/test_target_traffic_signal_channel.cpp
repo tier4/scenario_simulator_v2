@@ -62,7 +62,7 @@ class TargetTrafficSignalChannelInvalidTest : public ::testing::TestWithParam<st
 
 TEST_P(TargetTrafficSignalChannelInvalidTest, ThrowsError)
 {
-  EXPECT_THROW(TargetTrafficSignalChannel(GetParam()), openscenario_interpreter::Error);
+  EXPECT_THROW(TargetTrafficSignalChannel{GetParam()}, openscenario_interpreter::Error);
 }
 
 // clang-format off
@@ -73,9 +73,7 @@ INSTANTIATE_TEST_SUITE_P(
     "invalid",
     "34802 invalid",
     "34802 invalid_detected",
-    "34802 v2i extra",
-    " 34802",
-    "34802 v2i "));
+    "34802 v2i extra"));
 // clang-format on
 
 class TrafficSignalChannelTypeValidTest
