@@ -254,7 +254,12 @@ class ScenarioTestRunner(LifecycleController):
         future = self.load_preprocessor_client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         if future.result() is not None:
-            return True
+            if future.result().has_succeeded:
+                return True
+            else:
+                self.get_logger().error(
+                    'Failed to load scenario: ' + future.result().message)
+                return False
         else:
             self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/load: '
                              + str(future.exception()))
