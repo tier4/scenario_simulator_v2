@@ -304,6 +304,8 @@ public:
   auto generateConventionalUpdateRequest() const
     -> simulation_api_schema::UpdateTrafficLightsRequest;
 
+  auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool;
+
 private:
   TrafficLightsChannel<ConventionalTrafficLights> conventional_channel_;
 

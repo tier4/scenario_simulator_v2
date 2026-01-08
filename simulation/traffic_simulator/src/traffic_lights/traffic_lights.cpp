@@ -59,6 +59,11 @@ auto TrafficLights::generateConventionalUpdateRequest() const
   return conventional_channel_.generateUpdateRequest();
 }
 
+auto TrafficLights::isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool
+{
+  return v2i_enabled_traffic_lights_.count(lanelet_id) > 0;
+}
+
 auto V2ITrafficLights::addTrafficLightsStatePrediction(
   const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void
 {
