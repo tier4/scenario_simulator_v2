@@ -149,8 +149,8 @@ private:
     if (detected_) {
       detected_->apply(request);
     }
-    publisher_ptr_->publish(now, request);
-    legacy_topic_publisher_ptr_->publish(now, request);
+    publisher_ptr_->publish(now, request, &predictions_);
+    legacy_topic_publisher_ptr_->publish(now, request, &predictions_);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
