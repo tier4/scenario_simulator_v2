@@ -136,6 +136,11 @@ public:
     detected_ = detected;
   }
 
+  auto addTrafficLightsStatePrediction(
+    const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void;
+
+  auto clearTrafficLightsStatePredictions() -> void;
+
 private:
   auto update() const -> void override
   {
@@ -193,6 +198,8 @@ private:
   const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
 
   std::shared_ptr<DetectedTrafficLights> detected_;
+
+  TrafficLightStatePredictions predictions_;
 };
 
 template <typename GroundTruthType>
