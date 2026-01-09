@@ -11,7 +11,7 @@ from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
 from replay_testing.models import ReplayRunParams, RunnerArgs
 from traffic_simulator_msgs.msg import TrafficLightBulbV1
-from autoware_perception_msgs.msg import TrafficLightElement
+from autoware_perception_msgs.msg import TrafficLightElement, PredictedTrafficLightState
 
 def extract_conventional_changes(msgs):
     changes = {}
@@ -35,6 +35,22 @@ def extract_v2i_changes(msgs):
             if not changes[gid] or changes[gid][-1] != elements:
                 changes[gid].append(elements)
     return changes
+
+
+def extract_v2i_predictions(msgs):
+    """Extract predictions from V2I messages"""
+    all_predictions = {}
+    for _, msg, _ in msgs:
+        for group in msg.traffic_light_groups:
+            gid = group.traffic_light_group_id
+            if group.predictions:
+                all_predictions[gid] = all_predictions.get(gid, [])
+                # Store prediction snapshots to track changes
+                snapshot = [(p.predicted_stamp, list(p.simultaneous_elements))
+                           for p in group.predictions]
+                if not all_predictions[gid] or all_predictions[gid][-1] != snapshot:
+                    all_predictions[gid].append(snapshot)
+    return all_predictions
 
 
 def assert_conventional_state(bulbs, color, shape=TrafficLightBulbV1.CIRCLE, status=TrafficLightBulbV1.SOLID_ON):
@@ -142,3 +158,31 @@ class AnalyzeBasicReplay:
         assert_v2i_state(v2i[RELATION_ID][1], TrafficLightElement.AMBER)
         assert_v2i_state(v2i[RELATION_ID][2], TrafficLightElement.RED)
         assert_v2i_state(v2i[RELATION_ID][3], TrafficLightElement.GREEN)
+
+
+@analyze
+class AnalyzePredictions:
+    def test_traffic_light_predictions(self):
+        """Verify predictions field in V2I signals"""
+        v2i_messages = list(read_messages(self.reader, topics=[V2I_TOPIC]))
+
+        RELATION_ID = 34806
+
+        # Check that predictions are present in some messages
+        has_predictions = False
+        for _, msg, _ in v2i_messages:
+            for group in msg.traffic_light_groups:
+                if group.traffic_light_group_id == RELATION_ID and group.predictions:
+                    has_predictions = True
+                    for prediction in group.predictions:
+                        # Verify information_source is INFORMATION_SOURCE_SIMULATION
+                        assert prediction.information_source == PredictedTrafficLightState.INFORMATION_SOURCE_SIMULATION, \
+                            f"Expected information_source to be INFORMATION_SOURCE_SIMULATION, got {prediction.information_source}"
+                        # Verify reliability is 1.0
+                        assert prediction.reliability == 1.0, \
+                            f"Expected reliability to be 1.0, got {prediction.reliability}"
+                        # Verify simultaneous_elements is not empty
+                        assert len(prediction.simultaneous_elements) > 0, \
+                            "Expected simultaneous_elements to be non-empty"
+
+        assert has_predictions, "No predictions found in V2I messages for sync-enabled traffic signal"
