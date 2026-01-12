@@ -29,6 +29,7 @@ find_package(lanelet2_matching REQUIRED)
 find_package(tinyxml2_vendor REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(color_names REQUIRED)
 include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
@@ -102,6 +103,7 @@ target_link_libraries(traffic_simulator
   stdc++fs
   Boost::filesystem
   yaml-cpp
+  color_names::color_names
   ${PROTOBUF_LIBRARY})
 
 install(
