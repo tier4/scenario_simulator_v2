@@ -68,6 +68,11 @@ auto TrafficSignalController::changePhaseTo(std::list<Phase>::iterator next) -> 
     }
   }
 
+  // Clear states from the previous phase before switching
+  if (current_phase != std::end(phases)) {
+    (*current_phase).clearStates();
+  }
+
   current_phase_started_at = evaluateSimulationTime();
   current_phase = next;
 
