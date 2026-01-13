@@ -2,6 +2,17 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.4.0 (2026-01-13)
+-------------------
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Contributors: Kotaro Yoshimoto
+
 22.3.5 (2025-12-26)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/docker/bake-action-6.10.0
