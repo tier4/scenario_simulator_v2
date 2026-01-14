@@ -2,6 +2,43 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.5.0 (2026-01-14)
+-------------------
+* Merge pull request `#1641 <https://github.com/tier4/scenario_simulator_v2/issues/1641>`_ from tier4/fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Support RoutingAction__use_lane_ids_for_routing in AcquirePositionAction
+* Contributors: Kotaro Yoshimoto
+
+22.4.0 (2026-01-13)
+-------------------
+* Merge pull request `#1771 <https://github.com/tier4/scenario_simulator_v2/issues/1771>`_ from tier4/feature/detected_traffic_lights
+* Add most vexing parse problem handling
+* Merge branch 'master' into feature/detected_traffic_lights
+* Refactor Disable/EnableTrafficSignalV2IFeatureAction
+* Refactor TrafficSignalState
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Merge branch 'master' into feature/detected_traffic_lights
+* Fix linelint error
+* Add Enable/DisableTrafficSignalV2IFeaturActione@v1 to control ground-truth synchronization
+* Clean up traffic light states on phase exit
+* Enable detected traffic light states in TrafficSignalState
+* Simplify Phase class implementation
+* Add clear method to TrafficSignalState
+* Add new detected traffic light interfaces to  NonStandardOperation
+* Add test cases for TrafficSignalState parsing
+* Refactor test_parsed_traffic_signal_id.cpp
+* Update TrafficSignalState comments
+* Support detected traffic light in TrafficSignalState parsing
+* Contributors: Kotaro Yoshimoto
+
 22.3.5 (2025-12-26)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/docker/bake-action-6.10.0
