@@ -77,25 +77,28 @@ public:
       auto objects = [&]() {
         std::vector<Object> result;
         for (auto && frame : frames) {
-          boost::range::for_each(frame->variables.equal_range(name), [&](auto && name_and_value) {
+          const auto it = frame->variables.equal_range(name);
+          std::for_each(it.first, it.second, [&](auto && name_and_value) {
             return result.push_back(name_and_value.second);
           });
         }
         return result;
       }();
 
-      switch (boost::range::count_if(objects, is_also<T>())) {
+      switch (std::count_if(objects.begin(), objects.end(), is_also<T>())) {
         case 0:
           frames = [&]() {
             std::vector<const EnvironmentFrame *> result;
             for (auto && current_frame : frames) {
-              boost::range::copy(current_frame->unnamed_inner_frames, std::back_inserter(result));
+              std::copy(
+                current_frame->unnamed_inner_frames.begin(),
+                current_frame->unnamed_inner_frames.end(), std::back_inserter(result));
             }
             return result;
           }();
           break;
         case 1:
-          return *boost::range::find_if(objects, is_also<T>());
+          return *std::find_if(objects.begin(), objects.end(), is_also<T>());
         default:
           throw AmbiguousReferenceTo<T>(name);
       }
