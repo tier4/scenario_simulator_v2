@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__ITERABLE_HPP_
 
 #include <iterator>
-#include <openscenario_interpreter/type_traits/void_t.hpp>
+#include <type_traits>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -29,7 +29,8 @@ struct Iterable : public std::false_type
 };
 
 template <typename T>
-struct Iterable<T, void_t<decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()))>>
+struct Iterable<
+  T, std::void_t<decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()))>>
 : public std::true_type
 {
 };
