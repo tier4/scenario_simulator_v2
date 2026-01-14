@@ -16,9 +16,8 @@ endif()
 # cspell: ignore TOLOWER memaccess
 # silence Eigen NEON memcpy warning for ARM architecture
 string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" SYS_PROC_LOWER)
-
 if(SYS_PROC_LOWER STREQUAL "aarch64" OR SYS_PROC_LOWER STREQUAL "arm64")
-  add_compile_options(-Wno-class-memaccess)
+    add_compile_options(-Wno-class-memaccess)
 endif()
 
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")

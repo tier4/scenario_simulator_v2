@@ -15,7 +15,7 @@ find_package(ament_cmake_auto REQUIRED)
 ament_auto_find_build_dependencies()
 
 # ------------------------------------------------------------------------------
-# Boost.JSON (from Git)
+#  Boost.JSON (from Git)
 # ------------------------------------------------------------------------------
 # - Ubuntu 22.04 does not include libboost-json-dev, we need to build it from source
 # - We also use older version due to compatibility of Boost by Ubuntu 22.04
@@ -49,7 +49,7 @@ endif()
 ament_export_include_directories(${boost_json_SOURCE_DIR}/include)
 
 # ------------------------------------------------------------------------------
-# libopenscenario_interpreter
+#  libopenscenario_interpreter
 # ------------------------------------------------------------------------------
 file(GLOB ${PROJECT_NAME}_POSIX_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/posix/*.cpp)
 file(GLOB ${PROJECT_NAME}_READER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/reader/*.cpp)
@@ -72,19 +72,19 @@ target_link_libraries(${PROJECT_NAME} Boost::json glog pugixml)
 
 target_precompile_headers(${PROJECT_NAME}
   PUBLIC
-  "<boost/json.hpp>"
-  "<openscenario_interpreter/expression.hpp>"
-  "<openscenario_interpreter/pointer.hpp>"
-  "<openscenario_interpreter/record.hpp>"
-  "<openscenario_interpreter/simulator_core.hpp>"
-  "<pugixml.hpp>"
-  "<rclcpp/rclcpp.hpp>"
-  "<traffic_simulator/api/api.hpp>"
-  "<openscenario_interpreter/object.hpp>"
-  "<openscenario_interpreter/scope.hpp>")
+    "<boost/json.hpp>"
+    "<openscenario_interpreter/expression.hpp>"
+    "<openscenario_interpreter/pointer.hpp>"
+    "<openscenario_interpreter/record.hpp>"
+    "<openscenario_interpreter/simulator_core.hpp>"
+    "<pugixml.hpp>"
+    "<rclcpp/rclcpp.hpp>"
+    "<traffic_simulator/api/api.hpp>"
+    "<openscenario_interpreter/object.hpp>"
+    "<openscenario_interpreter/scope.hpp>")
 
 # ------------------------------------------------------------------------------
-# openscenario_interpreter_node
+#  openscenario_interpreter_node
 # ------------------------------------------------------------------------------
 ament_auto_add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 
@@ -95,8 +95,9 @@ install(
   DESTINATION lib/${PROJECT_NAME})
 
 # ------------------------------------------------------------------------------
-# test
+#  test
 # ------------------------------------------------------------------------------
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
