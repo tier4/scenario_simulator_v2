@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
-#include <boost/variant.hpp>
 #include <chrono>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
