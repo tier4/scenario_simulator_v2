@@ -150,40 +150,31 @@ auto TrafficSignalController::updatePredictions() -> void
       (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
 
     auto phase_iterator = current_phase;
-    std::size_t extracted_phases_number = 0;
+    size_t extracted_phases_number = 0;
+    std::unordered_map<lanelet::Id, std::vector<std::string>> current_states;
 
-    using LaneletPredictionMap =
-      std::unordered_map<lanelet::Id, std::vector<std::pair<double, std::string>>>;
-
-    LaneletPredictionMap predictions_by_id;
-
-    auto extract_prediction = [this](
-                                const auto & phase, double time_offset) -> LaneletPredictionMap {
-      LaneletPredictionMap phase_predictions;
+    auto collect_states =
+      [](const Phase & phase) -> std::unordered_map<lanelet::Id, std::vector<std::string>> {
+      std::unordered_map<lanelet::Id, std::vector<std::string>> states;
       std::set<lanelet::Id> v2i_ids;
 
-      //
-      for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
-        if (
-          traffic_signal_state.channelType() == TrafficSignalState::TrafficSignalChannelType::v2i) {
-          const auto & id = traffic_signal_state.id();
-          phase_predictions[id].emplace_back(time_offset, traffic_signal_state.state);
-          v2i_ids.insert(id);
+      for (const auto & signal : phase.traffic_signal_states) {
+        if (signal.channelType() == TrafficSignalState::TrafficSignalChannelType::v2i) {
+          states[signal.id()].push_back(signal.state);
+          v2i_ids.insert(signal.id());
         }
       }
 
-      for (const auto & traffic_signal_state : (*phase).traffic_signal_states) {
-        if (
-          traffic_signal_state.channelType() ==
-          TrafficSignalState::TrafficSignalChannelType::conventional) {
-          const auto & id = traffic_signal_state.id();
+      for (const auto & signal : phase.traffic_signal_states) {
+        if (signal.channelType() == TrafficSignalState::TrafficSignalChannelType::conventional) {
+          const auto & id = signal.id();
           if (v2i_ids.count(id) == 0 && isV2ITrafficLightEnabled(id)) {
-            phase_predictions[id].emplace_back(time_offset, traffic_signal_state.state);
+            states[id].push_back(signal.state);
           }
         }
       }
 
-      return phase_predictions;
+      return states;
     };
 
     while (extracted_phases_number < OUTPUT_PREDICTION_SIZE) {
@@ -191,28 +182,25 @@ auto TrafficSignalController::updatePredictions() -> void
       const double phase_duration = (*phase_iterator).duration;
 
       if (std::isinf(accumulated_time) or std::isinf(phase_duration)) {
-		// avoid infinity phase
+        // avoid infinity phase
         break;
       } else if (extracted_phases_number == 0 && accumulated_time > cycleTime()) {
-		// avoid infinity loop with empty phases
+        // avoid infinity loop with empty phases
         break;
-      }
+      } else {
+        // update current states
+        for (const auto & [id, states] : collect_states(*phase_iterator)) {
+          current_states[id] = states;
+        }
 
-      auto phase_predictions = extract_prediction(phase_iterator, accumulated_time);
-      if (not phase_predictions.empty()) {
-        // merge phase predictions into accumulated predictions
-        for (auto & [id, preds] : phase_predictions) {
-          predictions_by_id[id].insert(predictions_by_id[id].end(), preds.begin(), preds.end());
+        // push states to traffic_simulator
+        for (const auto & [id, states] : current_states) {
+          for (const auto & state : states) {
+            addV2ITrafficLightsStatePrediction(id, state, accumulated_time);
+          }
         }
         ++extracted_phases_number;
-      }
-
-      accumulated_time += phase_duration;
-    }
-
-    for (const auto & [lanelet_id, predictions] : predictions_by_id) {
-      for (const auto & [time_offset, state] : predictions) {
-        addV2ITrafficLightsStatePrediction(lanelet_id, state, time_offset);
+        accumulated_time += phase_duration;
       }
     }
   }
