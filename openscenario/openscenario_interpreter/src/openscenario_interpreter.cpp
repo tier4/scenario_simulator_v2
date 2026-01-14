@@ -376,7 +376,7 @@ auto Interpreter::reset() -> void
 
   // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
   // INFO_STREAM.
-  boost::apply_visitor(
+  std::visit(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
       [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },

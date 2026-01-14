@@ -89,7 +89,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   common::JUnit5 results;
 
-  boost::variant<common::junit::Pass, common::junit::Failure, common::junit::Error> result;
+  std::variant<common::junit::Pass, common::junit::Failure, common::junit::Error> result;
 
   ExecutionTimer<> execution_timer;
 
@@ -134,7 +134,7 @@ public:
 
     const auto case_name = std::filesystem::path(osc_path).stem().string();
 
-    boost::apply_visitor(
+    std::visit(
       overload(
         [&](const common::junit::Pass & it) {
           results.testsuite(suite_name).testcase(case_name).pass.push_back(it);
