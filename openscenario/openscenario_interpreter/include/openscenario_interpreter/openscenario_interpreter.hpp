@@ -128,11 +128,11 @@ public:
   {
     result = T(std::forward<decltype(xs)>(xs)...);
 
-    results.name = boost::filesystem::path(osc_path).parent_path().parent_path().string();
+    results.name = std::filesystem::path(osc_path).parent_path().parent_path().string();
 
-    const auto suite_name = boost::filesystem::path(osc_path).parent_path().filename().string();
+    const auto suite_name = std::filesystem::path(osc_path).parent_path().filename().string();
 
-    const auto case_name = boost::filesystem::path(osc_path).stem().string();
+    const auto case_name = std::filesystem::path(osc_path).stem().string();
 
     boost::apply_visitor(
       overload(
@@ -147,10 +147,9 @@ public:
         }),
       result);
 
-    results.write_to(
-      (boost::filesystem::path(output_directory) / "result.junit.xml").c_str(), "  ");
+    results.write_to((std::filesystem::path(output_directory) / "result.junit.xml").c_str(), "  ");
 
-    execution_timer.save(boost::filesystem::path(output_directory) / "execution_timer.json");
+    execution_timer.save(std::filesystem::path(output_directory) / "execution_timer.json");
   }
 
   template <typename ExceptionHandler, typename Thunk>

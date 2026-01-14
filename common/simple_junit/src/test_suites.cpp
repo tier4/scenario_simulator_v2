@@ -14,8 +14,6 @@
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/time_formatters.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
 #include <simple_junit/test_suites.hpp>
 #include <string>
 
@@ -26,12 +24,10 @@ TestSuites::TestSuites()
 {
 }
 
-void TestSuites::write(const boost::filesystem::path & destination)
+void TestSuites::write(const std::filesystem::path & destination)
 {
-  boost::system::error_code error;
-
-  if (boost::filesystem::exists(destination, error)) {
-    boost::filesystem::remove(destination);
+  if (std::filesystem::exists(destination)) {
+    std::filesystem::remove(destination);
   }
 
   pugi::xml_document document;

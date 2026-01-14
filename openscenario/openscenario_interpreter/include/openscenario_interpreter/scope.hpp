@@ -15,9 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
-#include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/range/algorithm.hpp>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <openscenario_interpreter/name.hpp>
