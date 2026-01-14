@@ -2,6 +2,17 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.5.0 (2026-01-14)
+-------------------
+* Merge pull request `#1641 <https://github.com/tier4/scenario_simulator_v2/issues/1641>`_ from tier4/fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing
+* Support RoutingAction__use_lane_ids_for_routing in AcquirePositionAction
+* Contributors: Kotaro Yoshimoto
+
 22.4.0 (2026-01-13)
 -------------------
 * Merge pull request `#1771 <https://github.com/tier4/scenario_simulator_v2/issues/1771>`_ from tier4/feature/detected_traffic_lights
