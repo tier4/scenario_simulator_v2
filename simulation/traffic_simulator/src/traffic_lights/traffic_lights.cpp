@@ -73,7 +73,6 @@ auto V2ITrafficLights::addTrafficLightsStatePrediction(
     for (const auto & traffic_light : regulatory_element->trafficLights()) {
       addTrafficLightsStatePrediction(traffic_light.id(), state, time_ahead_seconds);
     }
-    return;
   } else if (not hdmap_utils_->isTrafficLight(lanelet_id)) {
     throw common::scenario_simulator_exception::Error(
       "Given lanelet ID (", lanelet_id, ") is not a traffic light.");

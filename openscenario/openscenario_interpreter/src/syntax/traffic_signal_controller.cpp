@@ -144,17 +144,16 @@ auto TrafficSignalController::updatePredictions() -> void
         of ROS driver nodes for V2I traffic lights.
         However, the specifications, including this parameter, may change in the future.
     */
-    constexpr size_t OUTPUT_PREDICTION_SIZE = 6;
+    constexpr std::size_t output_prediction_size = 6;
 
     double accumulated_time =
       (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
 
     auto phase_iterator = current_phase;
-    size_t extracted_phases_number = 0;
+    std::size_t extracted_phases_number = 0;
     std::unordered_map<lanelet::Id, std::vector<std::string>> current_states;
 
-    auto collect_states =
-      [](const Phase & phase) -> std::unordered_map<lanelet::Id, std::vector<std::string>> {
+    auto collect_states = [](const Phase & phase) {
       std::unordered_map<lanelet::Id, std::vector<std::string>> states;
       std::set<lanelet::Id> v2i_ids;
 
@@ -177,7 +176,7 @@ auto TrafficSignalController::updatePredictions() -> void
       return states;
     };
 
-    while (extracted_phases_number < OUTPUT_PREDICTION_SIZE) {
+    while (extracted_phases_number < output_prediction_size) {
       ++phase_iterator;
       const double phase_duration = (*phase_iterator).duration;
 
