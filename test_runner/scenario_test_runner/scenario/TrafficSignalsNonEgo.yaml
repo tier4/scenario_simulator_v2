@@ -27,6 +27,7 @@ OpenSCENARIO:
               duration: 3
               TrafficSignalState:
                 - { trafficSignalId: "34802", state: "red" }
+                - { trafficSignalId: "34802", state: "red solidOn right" }
             - name: "phase-3"
               duration: 3
               TrafficSignalState:
