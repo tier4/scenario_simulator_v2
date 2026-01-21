@@ -40,6 +40,7 @@ jobs:
         uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: false
+          large-packages: false
 
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
