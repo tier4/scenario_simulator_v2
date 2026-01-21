@@ -17,8 +17,8 @@ on:
       - "!sonar-project.properties"
       - "!uv.lock"
   push:
-    branches:
-      - master
+  #   branches:
+  #     - master
 # concurrency:
   # group: ${{ github.workflow }}-${{ github.ref }}
   # cancel-in-progress: true
