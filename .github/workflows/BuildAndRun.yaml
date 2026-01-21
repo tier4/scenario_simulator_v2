@@ -78,16 +78,27 @@ jobs:
       - name: Downgrade CMake to 3.22 for compatibility
         run: |
           # Check current CMake version
+          echo "Current CMake version:"
           cmake --version
-          # If CMake is newer than 3.22, downgrade to Ubuntu's default version
-          if dpkg --compare-versions "$(cmake --version | head -1 | awk '{print $3}')" gt "3.22"; then
-            echo "Downgrading CMake from $(cmake --version | head -1 | awk '{print $3}') to 3.22.1"
-            sudo apt-get update
-            sudo apt-get install --reinstall --allow-downgrades -y cmake=3.22.1-1ubuntu1.22.04.2 cmake-data=3.22.1-1ubuntu1.22.04.2
-            # Hold the version to prevent automatic upgrades
-            sudo apt-mark hold cmake cmake-data
+          which cmake
+
+          # Remove any CMake installed in /usr/local (which takes precedence over apt packages)
+          if [ -f /usr/local/bin/cmake ]; then
+            echo "Removing CMake from /usr/local"
+            sudo rm -rf /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
+            sudo rm -rf /usr/local/share/cmake-*
           fi
+
+          # Install Ubuntu's default CMake 3.22.1
+          echo "Installing CMake 3.22.1"
+          sudo apt-get update
+          sudo apt-get install --reinstall --allow-downgrades -y cmake=3.22.1-1ubuntu1.22.04.2 cmake-data=3.22.1-1ubuntu1.22.04.2
+          # Hold the version to prevent automatic upgrades
+          sudo apt-mark hold cmake cmake-data
+
+          echo "Final CMake version:"
           cmake --version
+          which cmake
         shell: bash
 
       # - name: Setup ROS environment
@@ -136,20 +147,6 @@ jobs:
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: Debug CMake environment
-        run: |
-          echo "=== CMake version ==="
-          cmake --version
-          echo "=== ament_cmake_auto version ==="
-          dpkg -l | grep ament-cmake-auto || true
-          echo "=== rosidl_cmake version ==="
-          dpkg -l | grep rosidl-cmake || true
-          echo "=== ROS setup file ==="
-          ls -la /opt/ros/${{ matrix.rosdistro }}/setup.bash
-          echo "=== CMAKE_PREFIX_PATH (after sourcing ROS) ==="
-          source /opt/ros/${{ matrix.rosdistro }}/setup.bash && echo "$CMAKE_PREFIX_PATH"
-        shell: bash
-
       - name: Build with SonarCloud Build Wrapper
         # Note: `-Wno-error=class-memaccess` is temporary workaround for aarch64 GCC error
         # This should be removed when Eigen is updated in Ubuntu package repository
@@ -165,8 +162,7 @@ jobs:
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
             -DBUILD_TESTING=true \
             -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess' \
-            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
-            -DCMAKE_FIND_DEBUG_MODE=ON 
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' 
             # --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
