@@ -75,6 +75,21 @@ jobs:
         with:
           required-ros-distributions: ${{ matrix.rosdistro }}
 
+      - name: Downgrade CMake to 3.22 for compatibility
+        run: |
+          # Check current CMake version
+          cmake --version
+          # If CMake is newer than 3.22, downgrade to Ubuntu's default version
+          if dpkg --compare-versions "$(cmake --version | head -1 | awk '{print $3}')" gt "3.22"; then
+            echo "Downgrading CMake from $(cmake --version | head -1 | awk '{print $3}') to 3.22.1"
+            sudo apt-get update
+            sudo apt-get install --reinstall --allow-downgrades -y cmake=3.22.1-1ubuntu1.22.04.2 cmake-data=3.22.1-1ubuntu1.22.04.2
+            # Hold the version to prevent automatic upgrades
+            sudo apt-mark hold cmake cmake-data
+          fi
+          cmake --version
+        shell: bash
+
       # - name: Setup ROS environment
       #   run: |
       #     sudo apt update && sudo apt install -y curl gnupg lsb-release
