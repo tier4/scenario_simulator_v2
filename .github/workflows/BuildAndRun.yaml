@@ -27,9 +27,9 @@ jobs:
     name: BuildAndRun
     runs-on: ${{ matrix.runs_on }}
     # Use ROS Humble Docker container to ensure consistent environment
-    # Using ros-core (minimal) image to reduce disk usage
+    # Using ros-base image (ros-core lacks necessary build tools like vcs)
     container:
-      image: ros:humble-ros-core-jammy
+      image: ros:humble-ros-base-jammy
       options: --user root
     timeout-minutes: 180
     env:
