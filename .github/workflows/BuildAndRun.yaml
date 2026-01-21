@@ -97,15 +97,17 @@ jobs:
       - name: Resolve rosdep and install colcon mixin
         run: |
           apt-get update
-          # Install required packages including pip and unzip
-          apt-get install -y gcovr libunwind-dev python3-colcon-common-extensions python3-pip unzip
+          # Install required packages including pip, unzip, and colcon-lcov-result
+          apt-get install -y gcovr libunwind-dev python3-colcon-common-extensions python3-colcon-lcov-result python3-pip unzip
           # Initialize and update rosdep
           rosdep init || true
           rosdep update
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           df -h
+          # Clean up to save disk space
           apt-get clean
           rm -rf /var/lib/apt/lists/*
+          rm -rf /tmp/*
           df -h
         shell: bash
 
