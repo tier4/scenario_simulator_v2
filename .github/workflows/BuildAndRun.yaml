@@ -135,8 +135,8 @@ jobs:
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
             -DBUILD_TESTING=true \
             -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess' \
-            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
-            --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' 
+            # --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Colcon test
@@ -145,8 +145,10 @@ jobs:
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
-          colcon test --event-handlers console_cohesion+ --packages-select ${{ steps.list_packages.outputs.package_list }}
-          colcon lcov-result --packages-select ${{ steps.list_packages.outputs.package_list }}
+          colcon test --event-handlers console_cohesion+ 
+          # --packages-select ${{ steps.list_packages.outputs.package_list }}
+          colcon lcov-result 
+          # --packages-select ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: generate gcov report for sonarcloud
