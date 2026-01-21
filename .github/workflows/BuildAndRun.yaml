@@ -121,6 +121,20 @@ jobs:
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
+      - name: Debug CMake environment
+        run: |
+          echo "=== CMake version ==="
+          cmake --version
+          echo "=== ament_cmake_auto version ==="
+          dpkg -l | grep ament-cmake-auto || true
+          echo "=== rosidl_cmake version ==="
+          dpkg -l | grep rosidl-cmake || true
+          echo "=== ROS setup file ==="
+          ls -la /opt/ros/${{ matrix.rosdistro }}/setup.bash
+          echo "=== CMAKE_PREFIX_PATH (after sourcing ROS) ==="
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash && echo "$CMAKE_PREFIX_PATH"
+        shell: bash
+
       - name: Build with SonarCloud Build Wrapper
         # Note: `-Wno-error=class-memaccess` is temporary workaround for aarch64 GCC error
         # This should be removed when Eigen is updated in Ubuntu package repository
@@ -136,7 +150,8 @@ jobs:
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
             -DBUILD_TESTING=true \
             -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess' \
-            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' 
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
+            -DCMAKE_FIND_DEBUG_MODE=ON 
             # --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
