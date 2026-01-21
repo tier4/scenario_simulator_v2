@@ -26,6 +26,11 @@ jobs:
   job1:
     name: BuildAndRun
     runs-on: ${{ matrix.runs_on }}
+    # Use ROS Humble Docker container to ensure consistent environment
+    # Using a date before 2026-01-07 to avoid rosidl_cmake 3.1.8 issues
+    container:
+      image: ros:humble-ros-base-jammy
+      options: --user root
     timeout-minutes: 180
     env:
       DEBIAN_FRONTEND: noninteractive
@@ -41,6 +46,12 @@ jobs:
         with:
           tool-cache: false
           large-packages: false
+
+      - name: Install git (required in container)
+        run: |
+          apt-get update
+          apt-get install -y git
+        shell: bash
 
       - name: Suppress warnings
         run: git config --global --add safe.directory '*'
@@ -58,51 +69,7 @@ jobs:
           repository: RobotecAI/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
 
-      # - name: Cache apt and rosdep
-      #   id: cache-apt-rosdep
-      #   uses: actions/cache@v5
-      #   with:
-      #     path: |
-      #       /var/cache/apt/archives
-      #       /var/lib/apt/lists
-      #       /etc/ros/rosdep
-      #     key: ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-${{ hashFiles('**/package.xml', '**/dependency_*.repos') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-
-
-      - name: Setup ROS environment
-        uses: ros-tooling/setup-ros@v0.7
-        with:
-          required-ros-distributions: ${{ matrix.rosdistro }}
-
-      - name: Downgrade CMake to 3.22 for compatibility
-        run: |
-          # Check current CMake version
-          echo "Current CMake version:"
-          cmake --version
-          which cmake
-
-          # Remove any CMake installed in /usr/local (which takes precedence over apt packages)
-          if [ -f /usr/local/bin/cmake ]; then
-            echo "Removing CMake from /usr/local"
-            sudo rm -rf /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
-            sudo rm -rf /usr/local/share/cmake-*
-            # Clear bash's command hash cache
-            hash -r
-          fi
-
-          # Install Ubuntu's default CMake 3.22.1
-          echo "Installing CMake 3.22.1"
-          sudo apt-get update
-          sudo apt-get install --reinstall --allow-downgrades -y cmake=3.22.1-1ubuntu1.22.04.2 cmake-data=3.22.1-1ubuntu1.22.04.2
-          # Hold the version to prevent automatic upgrades
-          sudo apt-mark hold cmake cmake-data
-
-          echo "Final CMake version:"
-          cmake --version
-          which cmake
-        shell: bash
-
+      # ROS environment is provided by the container
       # - name: Setup ROS environment
       #   run: |
       #     sudo apt update && sudo apt install -y curl gnupg lsb-release
@@ -129,16 +96,16 @@ jobs:
 
       - name: Resolve rosdep and install colcon mixin
         run: |
-          sudo apt-get update
-          # sudo apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
-          sudo apt-get install -y gcovr libunwind-dev
+          apt-get update
+          # Install required packages
+          apt-get install -y gcovr libunwind-dev python3-colcon-common-extensions
+          # Initialize and update rosdep
+          rosdep init || true
           rosdep update
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
-          # colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
-          # colcon mixin update default
           df -h
-          sudo apt-get clean
-          sudo rm -rf /var/lib/apt/lists/*
+          apt-get clean
+          rm -rf /var/lib/apt/lists/*
           df -h
         shell: bash
 
