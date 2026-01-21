@@ -19,9 +19,9 @@ on:
   push:
     branches:
       - master
-concurrency:
+# concurrency:
   # group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # cancel-in-progress: true
 jobs:
   job1:
     name: BuildAndRun
