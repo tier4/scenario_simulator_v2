@@ -87,6 +87,8 @@ jobs:
             echo "Removing CMake from /usr/local"
             sudo rm -rf /usr/local/bin/cmake /usr/local/bin/ctest /usr/local/bin/cpack
             sudo rm -rf /usr/local/share/cmake-*
+            # Clear bash's command hash cache
+            hash -r
           fi
 
           # Install Ubuntu's default CMake 3.22.1
