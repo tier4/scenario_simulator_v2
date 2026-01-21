@@ -97,8 +97,8 @@ jobs:
       - name: Resolve rosdep and install colcon mixin
         run: |
           apt-get update
-          # Install required packages
-          apt-get install -y gcovr libunwind-dev python3-colcon-common-extensions
+          # Install required packages including pip
+          apt-get install -y gcovr libunwind-dev python3-colcon-common-extensions python3-pip
           # Initialize and update rosdep
           rosdep init || true
           rosdep update
