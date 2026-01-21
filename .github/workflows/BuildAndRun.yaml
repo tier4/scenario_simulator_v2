@@ -20,7 +20,7 @@ on:
     branches:
       - master
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   job1:
@@ -58,17 +58,17 @@ jobs:
           repository: RobotecAI/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
 
-      - name: Cache apt and rosdep
-        id: cache-apt-rosdep
-        uses: actions/cache@v5
-        with:
-          path: |
-            /var/cache/apt/archives
-            /var/lib/apt/lists
-            /etc/ros/rosdep
-          key: ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-${{ hashFiles('**/package.xml', '**/dependency_*.repos') }}
-          restore-keys: |
-            ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-
+      # - name: Cache apt and rosdep
+      #   id: cache-apt-rosdep
+      #   uses: actions/cache@v5
+      #   with:
+      #     path: |
+      #       /var/cache/apt/archives
+      #       /var/lib/apt/lists
+      #       /etc/ros/rosdep
+      #     key: ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-${{ hashFiles('**/package.xml', '**/dependency_*.repos') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-
 
       - name: Setup ROS environment
         uses: ros-tooling/setup-ros@v0.7
