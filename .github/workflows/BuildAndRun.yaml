@@ -136,8 +136,7 @@ jobs:
             COVERAGE_FLAGS=''
           fi
 
-          # Limit parallel workers to reduce memory and disk I/O pressure
-          $COMMAND_PREFIX colcon build --symlink-install --parallel-workers 2 \
+          $COMMAND_PREFIX colcon build --symlink-install \
           --cmake-args \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
