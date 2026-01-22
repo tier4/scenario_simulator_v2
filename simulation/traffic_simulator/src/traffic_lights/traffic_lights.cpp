@@ -88,7 +88,11 @@ auto V2ITrafficLights::addTrafficLightsStatePrediction(
 
     auto existing_prediction = std::find_if(
       predictions_for_current_traffic_light.begin(), predictions_for_current_traffic_light.end(),
-      [&predicted_time](const auto & prediction) { return prediction.first == predicted_time; });
+      [&predicted_time](const auto & prediction) {
+        // 10ms, chosen by Hans_Robo as reasonable tolerance to match predictions in the same phase while unmatching predictions in different phases.
+        constexpr std::int64_t tolerance_ns = 1e7;
+        return std::abs((prediction.first - predicted_time).nanoseconds()) <= tolerance_ns;
+      });
 
     if (existing_prediction != predictions_for_current_traffic_light.end()) {
       // merge if exist
