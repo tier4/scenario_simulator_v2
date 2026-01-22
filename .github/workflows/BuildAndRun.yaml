@@ -106,22 +106,14 @@ jobs:
           if [[ -n "${{ steps.build_wrapper.outputs.build-wrapper-binary }}" ]]; then
             COMMAND_PREFIX="${{ steps.build_wrapper.outputs.build-wrapper-binary }} --out-dir src/scenario_simulator_v2/bw-output"
           fi
-
-          # Set coverage flags only for RelWithDebInfo builds to reduce disk usage
-          if [ "${{ matrix.cmake_build_type }}" = "RelWithDebInfo" ]; then
-            COVERAGE_FLAGS='-fprofile-arcs -ftest-coverage'
-          else
-            COVERAGE_FLAGS=''
-          fi
-
           $COMMAND_PREFIX colcon build --symlink-install \
           --cmake-args \
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
             -DBUILD_TESTING=true \
-            -DCMAKE_CXX_FLAGS="$COVERAGE_FLAGS -Wno-error=class-memaccess" \
-            -DCMAKE_C_FLAGS="$COVERAGE_FLAGS"
-            # --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess' \
+            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
+#            --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Colcon test
