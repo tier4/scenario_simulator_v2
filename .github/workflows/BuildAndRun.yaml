@@ -26,6 +26,9 @@ jobs:
   job1:
     name: BuildAndRun
     runs-on: ${{ matrix.runs_on }}
+    container:
+      image: ros:humble-ros-base-jammy
+      options: --user root
     timeout-minutes: 180
     env:
       DEBIAN_FRONTEND: noninteractive
@@ -57,23 +60,6 @@ jobs:
           repository: RobotecAI/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
 
-      - name: Cache apt and rosdep
-        id: cache-apt-rosdep
-        uses: actions/cache@v5
-        with:
-          path: |
-            /var/cache/apt/archives
-            /var/lib/apt/lists
-            /etc/ros/rosdep
-          key: ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-${{ hashFiles('**/package.xml', '**/dependency_*.repos') }}
-          restore-keys: |
-            ${{ runner.os }}-ros-${{ matrix.rosdistro }}-apt-
-
-      - name: Setup ROS environment
-        uses: ros-tooling/setup-ros@v0.7
-        with:
-          required-ros-distributions: ${{ matrix.rosdistro }}
-
       - name: Search packages in this repository
         id: list_packages
         run: |
@@ -90,15 +76,15 @@ jobs:
 
       - name: Resolve rosdep and install colcon mixin
         run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
-          rosdep update --include-eol-distros
+          apt-get update
+          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
+          rosdep update
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
           colcon mixin update default
           df -h
-          sudo apt-get clean
-          sudo rm -rf /var/lib/apt/lists/*
+          apt-get clean
+          rm -rf /var/lib/apt/lists/*
           df -h
         shell: bash
 
