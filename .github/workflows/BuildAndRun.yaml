@@ -83,6 +83,8 @@ jobs:
           df -h
           apt-get clean
           rm -rf /var/lib/apt/lists/*
+          rm -rf /tmp/*
+          rm -rf /root/.ros/rosdep
           df -h
         shell: bash
 
