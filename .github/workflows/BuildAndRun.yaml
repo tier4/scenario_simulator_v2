@@ -74,14 +74,12 @@ jobs:
           vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
           vcs import src < src/scenario_simulator_v2/test_dependency_${{ matrix.rosdistro }}.repos
 
-      - name: Resolve rosdep and install colcon mixin
+      - name: Resolve rosdep
         run: |
           apt-get update
           apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
           rosdep update
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
-          colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
-          colcon mixin update default
           df -h
           apt-get clean
           rm -rf /var/lib/apt/lists/*
