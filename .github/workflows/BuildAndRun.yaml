@@ -80,8 +80,6 @@ jobs:
         run: |
           apt-get update
           apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
-          # Initialize and update rosdep
-          rosdep init
           rosdep update
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           df -h
