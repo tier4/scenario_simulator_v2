@@ -2,6 +2,9 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.5.1 (2026-01-22)
+-------------------
+
 22.5.0 (2026-01-14)
 -------------------
 * Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing

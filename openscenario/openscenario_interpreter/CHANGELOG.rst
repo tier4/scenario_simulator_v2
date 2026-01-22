@@ -2,6 +2,9 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.5.1 (2026-01-22)
+-------------------
+
 22.5.0 (2026-01-14)
 -------------------
 * Merge pull request `#1641 <https://github.com/tier4/scenario_simulator_v2/issues/1641>`_ from tier4/fix/RoutingAction__use_lane_ids_for_routing
