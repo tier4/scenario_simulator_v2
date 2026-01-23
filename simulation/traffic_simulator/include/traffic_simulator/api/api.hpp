@@ -262,6 +262,9 @@ public:
   auto getConventionalDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>;
 
   auto setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled) -> void;
+
+  auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool;
+
   /**
    * @brief Add a traffic source to the simulation
    * @param radius The radius defining the area on which entities will be spawned
