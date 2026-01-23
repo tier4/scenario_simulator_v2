@@ -2,6 +2,12 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.0 (2026-01-23)
+-------------------
+* Merge branch 'master' into feature/prediction
+* Merge branch 'master' into feature/prediction
+* Contributors: Kotaro Yoshimoto
+
 22.5.1 (2026-01-22)
 -------------------
 

@@ -2,6 +2,18 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.0 (2026-01-23)
+-------------------
+* Merge pull request `#1787 <https://github.com/tier4/scenario_simulator_v2/issues/1787>`_ from tier4/feature/prediction
+* Use tolerance for prediction matching in V2ITrafficLights::addTrafficLightsStatePrediction
+* Merge branch 'master' into feature/prediction
+* refactor variable/constant naming and type
+* Merge branch 'master' into feature/prediction
+* Add V2I prediction APIs
+* Add prediction to TrafficLightPublisher
+* Add add/clearTrafficLightsStatePrediction API to V2ITrafficLights class
+* Contributors: Kotaro Yoshimoto
+
 22.5.1 (2026-01-22)
 -------------------
 
