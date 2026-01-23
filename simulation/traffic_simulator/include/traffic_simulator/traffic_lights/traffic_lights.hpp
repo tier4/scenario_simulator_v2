@@ -136,6 +136,11 @@ public:
     detected_ = detected;
   }
 
+  auto addTrafficLightsStatePrediction(
+    const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void;
+
+  auto clearTrafficLightsStatePredictions() -> void;
+
 private:
   auto update() const -> void override
   {
@@ -144,8 +149,8 @@ private:
     if (detected_) {
       detected_->apply(request);
     }
-    publisher_ptr_->publish(now, request);
-    legacy_topic_publisher_ptr_->publish(now, request);
+    publisher_ptr_->publish(now, request, &predictions_);
+    legacy_topic_publisher_ptr_->publish(now, request, &predictions_);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
@@ -193,6 +198,8 @@ private:
   const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
 
   std::shared_ptr<DetectedTrafficLights> detected_;
+
+  TrafficLightStatePredictions predictions_;
 };
 
 template <typename GroundTruthType>
@@ -296,6 +303,8 @@ public:
 
   auto generateConventionalUpdateRequest() const
     -> simulation_api_schema::UpdateTrafficLightsRequest;
+
+  auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool;
 
 private:
   TrafficLightsChannel<ConventionalTrafficLights> conventional_channel_;

@@ -2,6 +2,19 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.0 (2026-01-23)
+-------------------
+* Merge pull request `#1787 <https://github.com/tier4/scenario_simulator_v2/issues/1787>`_ from tier4/feature/prediction
+* Merge branch 'master' into feature/prediction
+* Update TrafficSignalsNonEgo.yaml for testing same traffic light merging in same phase
+* Merge branch 'master' into feature/prediction
+* Add prediction test in test_traffic_signals.py
+* Add basic test for predictions in test_traffic_signals.py
+* Contributors: Kotaro Yoshimoto
+
+22.5.1 (2026-01-22)
+-------------------
+
 22.5.0 (2026-01-14)
 -------------------
 * Merge branch 'master' into fix/RoutingAction__use_lane_ids_for_routing

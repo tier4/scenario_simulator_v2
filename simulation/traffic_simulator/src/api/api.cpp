@@ -389,6 +389,11 @@ auto API::setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool en
   traffic_lights_ptr_->setV2IFeature(lanelet_id, enabled);
 }
 
+auto API::isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool
+{
+  return traffic_lights_ptr_->isV2ITrafficLightEnabled(lanelet_id);
+}
+
 auto API::addTrafficSource(
   const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
   const traffic::TrafficSource::Distribution & distribution, const bool allow_spawn_outside_lane,

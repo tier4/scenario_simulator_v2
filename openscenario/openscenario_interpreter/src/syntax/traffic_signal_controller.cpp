@@ -76,6 +76,8 @@ auto TrafficSignalController::changePhaseTo(std::list<Phase>::iterator next) -> 
   current_phase_started_at = evaluateSimulationTime();
   current_phase = next;
 
+  updatePredictions();
+
   return current_phase != std::end(phases) ? (*current_phase).evaluate() : unspecified;
 }
 
@@ -128,6 +130,78 @@ auto TrafficSignalController::shouldChangePhaseToBegin() -> bool
     return true;
   } else {
     return false;
+  }
+}
+
+auto TrafficSignalController::updatePredictions() -> void
+{
+  if (current_phase != std::end(phases)) {
+    clearV2ITrafficLightsStatePredictions();
+
+    /*
+      NOTE:
+        This parameter was set with the help of developers familiar with the implementation
+        of ROS driver nodes for V2I traffic lights.
+        However, the specifications, including this parameter, may change in the future.
+    */
+    constexpr std::size_t output_prediction_size = 6;
+
+    double accumulated_time =
+      (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
+
+    auto phase_iterator = current_phase;
+    std::size_t extracted_phases_number = 0;
+    std::unordered_map<lanelet::Id, std::vector<std::string>> current_states;
+
+    auto collect_states = [](const Phase & phase) {
+      std::unordered_map<lanelet::Id, std::vector<std::string>> states;
+      std::set<lanelet::Id> v2i_ids;
+
+      for (const auto & signal : phase.traffic_signal_states) {
+        if (signal.channelType() == TrafficSignalState::TrafficSignalChannelType::v2i) {
+          states[signal.id()].push_back(signal.state);
+          v2i_ids.insert(signal.id());
+        }
+      }
+
+      for (const auto & signal : phase.traffic_signal_states) {
+        if (signal.channelType() == TrafficSignalState::TrafficSignalChannelType::conventional) {
+          const auto & id = signal.id();
+          if (v2i_ids.count(id) == 0 && isV2ITrafficLightEnabled(id)) {
+            states[id].push_back(signal.state);
+          }
+        }
+      }
+
+      return states;
+    };
+
+    while (extracted_phases_number < output_prediction_size) {
+      ++phase_iterator;
+      const double phase_duration = (*phase_iterator).duration;
+
+      if (std::isinf(accumulated_time) or std::isinf(phase_duration)) {
+        // avoid infinity phase
+        break;
+      } else if (extracted_phases_number == 0 && accumulated_time > cycleTime()) {
+        // avoid infinity loop with empty phases
+        break;
+      } else {
+        // update current states
+        for (const auto & [id, states] : collect_states(*phase_iterator)) {
+          current_states[id] = states;
+        }
+
+        // push states to traffic_simulator
+        for (const auto & [id, states] : current_states) {
+          for (const auto & state : states) {
+            addV2ITrafficLightsStatePrediction(id, state, accumulated_time);
+          }
+        }
+        ++extracted_phases_number;
+        accumulated_time += phase_duration;
+      }
+    }
   }
 }
 }  // namespace syntax

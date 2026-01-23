@@ -30,6 +30,10 @@
 
 namespace traffic_simulator
 {
+using TrafficLightStatePredictions = std::unordered_map<
+  lanelet::Id,
+  std::vector<std::pair<rclcpp::Time, std::vector<simulation_api_schema::TrafficLight>>>>;
+
 /*
    TrafficLightsBase class is designed in such a way that while trying to perform an operation
    on a TrafficLight (add, set, etc.) that is not added to traffic_light_map_,
