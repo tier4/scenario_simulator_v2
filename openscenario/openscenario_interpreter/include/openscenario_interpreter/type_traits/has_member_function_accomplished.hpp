@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_ACCOMPLISHED_HPP_
 
-#include <openscenario_interpreter/type_traits/void_t.hpp>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
@@ -27,7 +27,7 @@ struct HasMemberFunctionAccomplished : public std::false_type
 };
 
 template <typename T>
-struct HasMemberFunctionAccomplished<T, void_t<decltype(std::declval<T>().accomplished())>>
+struct HasMemberFunctionAccomplished<T, std::void_t<decltype(std::declval<T>().accomplished())>>
 : public std::true_type
 {
 };

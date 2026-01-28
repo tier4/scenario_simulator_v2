@@ -230,7 +230,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [&]() {
         if (record) {
           std::vector<std::string> options{
-            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+            "-a", "-o", std::filesystem::path(osc_path).replace_extension("").string()};
 
           if (not record_storage_id.empty()) {
             options.insert(options.end(), {"-s", record_storage_id});
@@ -376,7 +376,7 @@ auto Interpreter::reset() -> void
 
   // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
   // INFO_STREAM.
-  boost::apply_visitor(
+  std::visit(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
       [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
