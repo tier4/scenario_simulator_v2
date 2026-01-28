@@ -853,6 +853,25 @@ public:
     {
       return core->getV2ITrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
     }
+
+    template <typename... Ts>
+    static auto addV2ITrafficLightsStatePrediction(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->addTrafficLightsStatePrediction(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearV2ITrafficLightsStatePredictions(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->clearTrafficLightsStatePredictions(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    static auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) -> bool
+    {
+      return core->isV2ITrafficLightEnabled(lanelet_id);
+    }
   };
 };
 }  // namespace openscenario_interpreter

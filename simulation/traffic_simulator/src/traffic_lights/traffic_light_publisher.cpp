@@ -27,11 +27,23 @@
 
 namespace traffic_simulator
 {
+template <typename T, typename = void>
+struct HasMemberPredictions : std::false_type
+{
+};
+
+template <typename T>
+struct HasMemberPredictions<T, std::void_t<decltype(std::declval<T>().predictions)>>
+: std::true_type
+{
+};
+
 #if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
 template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::generateMessage(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &)
+  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &,
+  const TrafficLightStatePredictions *)
   -> std::unique_ptr<autoware_perception_msgs::msg::TrafficSignalArray>
 {
   auto message = std::make_unique<autoware_perception_msgs::msg::TrafficSignalArray>();
@@ -63,7 +75,8 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::g
 template <>
 auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::generateMessage(
   const rclcpp::Time &, const simulation_api_schema::UpdateTrafficLightsRequest & request,
-  const std::string &) -> std::unique_ptr<traffic_simulator_msgs::msg::TrafficLightArrayV1>
+  const std::string &, const TrafficLightStatePredictions *)
+  -> std::unique_ptr<traffic_simulator_msgs::msg::TrafficLightArrayV1>
 {
   auto message = std::make_unique<traffic_simulator_msgs::msg::TrafficLightArrayV1>();
 
@@ -87,7 +100,8 @@ auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::ge
 template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray>::generateMessage(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &)
+  const simulation_api_schema::UpdateTrafficLightsRequest & request, const std::string &,
+  const TrafficLightStatePredictions * predictions)
   -> std::unique_ptr<autoware_perception_msgs::msg::TrafficLightGroupArray>
 {
   auto message = std::make_unique<autoware_perception_msgs::msg::TrafficLightGroupArray>();
@@ -108,6 +122,32 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
           simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
           traffic_light_group_message.elements.push_back(light_bulb_message);
         }
+
+        if constexpr (HasMemberPredictions<TrafficLightGroupType>::value) {
+          if (predictions) {
+            auto prediction_phases = predictions->find(traffic_light.id());
+            if (prediction_phases != predictions->end()) {
+              using PredictedTrafficLightState =
+                autoware_perception_msgs::msg::PredictedTrafficLightState;
+
+              for (const auto & [stamp, bulbs] : prediction_phases->second) {
+                auto prediction = PredictedTrafficLightState()
+                                    .set__predicted_stamp(stamp)
+                                    .set__information_source(
+                                      PredictedTrafficLightState::INFORMATION_SOURCE_SIMULATION)
+                                    .set__reliability(1.0);
+
+                for (const auto & bulb_proto : bulbs) {
+                  TrafficLightBulbType bulb_message;
+                  simulation_interface::toMsg<TrafficLightBulbType>(bulb_proto, bulb_message);
+                  prediction.simultaneous_elements.push_back(bulb_message);
+                }
+                traffic_light_group_message.predictions.push_back(prediction);
+              }
+            }
+          }
+        }
+
         message->traffic_light_groups.push_back(traffic_light_group_message);
       }
     }
