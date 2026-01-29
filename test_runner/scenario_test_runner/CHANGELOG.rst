@@ -2,6 +2,11 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.1 (2026-01-29)
+-------------------
+* Merge branch 'master' into refactor/boost
+* Contributors: Kotaro Yoshimoto
+
 22.6.0 (2026-01-23)
 -------------------
 * Merge pull request `#1787 <https://github.com/tier4/scenario_simulator_v2/issues/1787>`_ from tier4/feature/prediction

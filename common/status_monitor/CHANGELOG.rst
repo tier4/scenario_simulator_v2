@@ -2,6 +2,11 @@
 Changelog for package status_monitor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.1 (2026-01-29)
+-------------------
+* Merge branch 'master' into refactor/boost
+* Contributors: Kotaro Yoshimoto
+
 22.6.0 (2026-01-23)
 -------------------
 * Merge branch 'master' into feature/prediction

@@ -2,6 +2,13 @@
 Changelog for package openscenario_preprocessor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.1 (2026-01-29)
+-------------------
+* Merge pull request `#1785 <https://github.com/tier4/scenario_simulator_v2/issues/1785>`_ from tier4/refactor/boost
+* Merge branch 'master' into refactor/boost
+* replace boost::filesystem with std::filesystem
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
 22.6.0 (2026-01-23)
 -------------------
 * Merge branch 'master' into feature/prediction
