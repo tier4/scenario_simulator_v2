@@ -71,7 +71,7 @@ Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
 {
 }
 
-bool Preprocessor::validateXOSC(const boost::filesystem::path & file_name, bool verbose = false)
+bool Preprocessor::validateXOSC(const std::filesystem::path & file_name, bool verbose = false)
 {
   auto result =
     concealer::dollar("ros2 run openscenario_utility validation.py " + file_name.string());
@@ -88,7 +88,7 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
         script->category.is<ParameterValueDistribution>()) {
       auto base_scenario_path =
         script->category.as<ParameterValueDistribution>().scenario_file.filepath;
-      if (boost::filesystem::exists(base_scenario_path)) {
+      if (std::filesystem::exists(base_scenario_path)) {
         if (validateXOSC(base_scenario_path, true)) {
           // TODO : implement in feature/parameter_value_distribution branch
           //
@@ -121,8 +121,8 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
 
       // move original scenario file to "raw" directory
       auto raw_scenario_directory = scenario.path.parent_path() / "raw";
-      boost::filesystem::create_directories(raw_scenario_directory);
-      boost::filesystem::rename(scenario.path, raw_scenario_directory / scenario.path.filename());
+      std::filesystem::create_directories(raw_scenario_directory);
+      std::filesystem::rename(scenario.path, raw_scenario_directory / scenario.path.filename());
 
       const auto & preprocessed_scenario_path = scenario.path;
 

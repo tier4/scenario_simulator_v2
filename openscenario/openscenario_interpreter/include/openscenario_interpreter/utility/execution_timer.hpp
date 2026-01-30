@@ -17,9 +17,9 @@
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics.hpp>
-#include <boost/filesystem.hpp>
 #include <chrono>
 #include <cmath>
+#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <nlohmann/json.hpp>
@@ -57,7 +57,7 @@ public:
     return end - begin;
   }
 
-  auto save(const boost::filesystem::path & output_file) -> void
+  auto save(const std::filesystem::path & output_file) -> void
   {
     // the unit of each statistics is seconds
     nlohmann::json json_data;

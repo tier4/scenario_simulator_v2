@@ -16,8 +16,8 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
-#include <boost/filesystem.hpp>
 #include <concealer/field_operator_application.hpp>
+#include <filesystem>
 #include <get_parameter/get_parameter.hpp>
 #include <memory>
 #include <optional>

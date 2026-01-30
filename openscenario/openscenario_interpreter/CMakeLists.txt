@@ -68,7 +68,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/record.cpp
   src/scope.cpp)
 
-target_link_libraries(${PROJECT_NAME} Boost::filesystem Boost::json glog pugixml)
+target_link_libraries(${PROJECT_NAME} Boost::json glog pugixml)
 
 target_precompile_headers(${PROJECT_NAME}
   PUBLIC
@@ -86,7 +86,6 @@ target_precompile_headers(${PROJECT_NAME}
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
 # ------------------------------------------------------------------------------
-
 ament_auto_add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})

@@ -19,12 +19,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
-
-#if __cplusplus >= 201606
 #include <variant>
-#else
-#include <boost/variant.hpp>
-#endif
 
 namespace openscenario_interpreter
 {
@@ -32,7 +27,7 @@ inline namespace reader
 {
 struct Value
 {
-  using ExpressionType = Variant<int, unsigned int, unsigned short, double, bool>;
+  using ExpressionType = std::variant<int, unsigned int, unsigned short, double, bool>;
   ExpressionType data;
 
   struct Numeric;

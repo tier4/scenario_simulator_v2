@@ -45,9 +45,9 @@ auto EnvironmentFrame::resolvePrefix(const Prefixed<Name> & prefixed_name) const
 {
   std::list<const EnvironmentFrame *> result;
 
-  boost::range::for_each(
-    inner_frames.equal_range(prefixed_name.prefixes.front()),
-    [&](auto && name_and_frame) { result.push_back(name_and_frame.second); });
+  const auto it = inner_frames.equal_range(prefixed_name.prefixes.front());
+  std::for_each(
+    it.first, it.second, [&](auto && name_and_frame) { result.push_back(name_and_frame.second); });
 
   if (result.empty()) {
     // BUG: must be breadth first search
