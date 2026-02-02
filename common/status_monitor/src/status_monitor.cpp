@@ -77,6 +77,12 @@ StatusMonitor::~StatusMonitor()
   }
 }
 
+auto StatusMonitor::updateThreshold(const std::chrono::seconds & t) -> void
+{
+  auto lock = std::scoped_lock<std::mutex>(mutex);
+  threshold = t;
+}
+
 auto StatusMonitor::write() const -> void
 {
   auto lock = std::scoped_lock<std::mutex>(mutex);
