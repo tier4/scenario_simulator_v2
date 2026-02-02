@@ -114,11 +114,8 @@ auto TrafficLightsBase::generateUpdateTrafficLightsRequest() const
 {
   simulation_api_schema::UpdateTrafficLightsRequest update_traffic_lights_request;
   for (auto && [lanelet_id, traffic_light] : traffic_lights_map_) {
-    auto traffic_signal = static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
-    for (const auto & relation_id : traffic_light.regulatory_elements_ids) {
-      traffic_signal.add_relation_ids(relation_id);
-    }
-    *update_traffic_lights_request.add_states() = traffic_signal;
+    *update_traffic_lights_request.add_states() =
+      static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
   }
   return update_traffic_lights_request;
 }
