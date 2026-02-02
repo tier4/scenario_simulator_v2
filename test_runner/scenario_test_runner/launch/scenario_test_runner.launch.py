@@ -99,6 +99,7 @@ def launch_setup(context, *args, **kwargs):
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
     simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
     speed_condition                     = LaunchConfiguration("speed_condition",                        default="legacy")
+    status_monitor_threshold            = LaunchConfiguration("status_monitor_threshold",               default="10")
     use_custom_centerline               = LaunchConfiguration("use_custom_centerline",                  default=True)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
@@ -131,6 +132,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
     print(f"simulate_localization               := {simulate_localization.perform(context)}")
     print(f"speed_condition                     := {speed_condition.perform(context)}")
+    print(f"status_monitor_threshold            := {status_monitor_threshold.perform(context)}")
     print(f"use_custom_centerline               := {use_custom_centerline.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
@@ -161,6 +163,7 @@ def launch_setup(context, *args, **kwargs):
             {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
+            {"status_monitor_threshold": status_monitor_threshold},
             {"use_custom_centerline": use_custom_centerline},
             {"use_sim_time": use_sim_time},
             {"vehicle_model": vehicle_model},
@@ -229,6 +232,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("sigterm_timeout",                     default_value=sigterm_timeout                    ),
         DeclareLaunchArgument("simulate_localization",               default_value=simulate_localization              ),
         DeclareLaunchArgument("speed_condition",                     default_value=speed_condition                    ),
+        DeclareLaunchArgument("status_monitor_threshold",            default_value=status_monitor_threshold           ),
         DeclareLaunchArgument("use_custom_centerline",               default_value=use_custom_centerline              ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
