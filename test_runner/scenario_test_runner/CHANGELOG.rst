@@ -2,6 +2,9 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.2 (2026-02-02)
+-------------------
+
 22.6.1 (2026-01-29)
 -------------------
 * Merge branch 'master' into refactor/boost

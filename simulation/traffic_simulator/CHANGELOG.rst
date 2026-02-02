@@ -2,6 +2,12 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.2 (2026-02-02)
+-------------------
+* Merge pull request `#1793 <https://github.com/tier4/scenario_simulator_v2/issues/1793>`_ from tier4/fix/relation-ids
+* Fill relation_ids in simulation_api_schema::TrafficSignal operator
+* Contributors: Kotaro Yoshimoto
+
 22.6.1 (2026-01-29)
 -------------------
 * Merge pull request `#1785 <https://github.com/tier4/scenario_simulator_v2/issues/1785>`_ from tier4/refactor/boost
