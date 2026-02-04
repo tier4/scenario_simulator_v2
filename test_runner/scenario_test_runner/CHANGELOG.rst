@@ -2,6 +2,13 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.3 (2026-02-04)
+-------------------
+* Merge pull request `#1795 <https://github.com/tier4/scenario_simulator_v2/issues/1795>`_ from tier4/feature/health_check_threshold
+  Make StatusMonitor threshold configurable
+* Update: read threshold prameter for StatusMonitor
+* Contributors: Shota Minami
+
 22.6.2 (2026-02-02)
 -------------------
 

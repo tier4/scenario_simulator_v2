@@ -2,6 +2,9 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+22.6.3 (2026-02-04)
+-------------------
+
 22.6.2 (2026-02-02)
 -------------------
 * Merge pull request `#1793 <https://github.com/tier4/scenario_simulator_v2/issues/1793>`_ from tier4/fix/relation-ids
