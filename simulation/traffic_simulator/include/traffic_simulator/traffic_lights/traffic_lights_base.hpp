@@ -17,6 +17,7 @@
 
 #include <simulation_interface/simulation_api_schema.pb.h>
 
+#include <functional>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -29,6 +30,10 @@
 
 namespace traffic_simulator
 {
+using TrafficLightStatePredictions = std::unordered_map<
+  lanelet::Id,
+  std::vector<std::pair<rclcpp::Time, std::vector<simulation_api_schema::TrafficLight>>>>;
+
 /*
    TrafficLightsBase class is designed in such a way that while trying to perform an operation
    on a TrafficLight (add, set, etc.) that is not added to traffic_light_map_,
@@ -38,6 +43,16 @@ namespace traffic_simulator
 class TrafficLightsBase
 {
 public:
+  // State change callback types
+  enum class StateChangeType {
+    SET,    // setTrafficLightsState()
+    CLEAR,  // clearTrafficLightsState()
+    ADD,    // addTrafficLightsState()
+  };
+
+  using StateChangeCallback = std::function<void(
+    lanelet::Id lanelet_id, const std::string & state, StateChangeType change_type)>;
+
   template <typename NodeTypePointer>
   explicit TrafficLightsBase(
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
@@ -84,8 +99,13 @@ public:
 
   auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
 
+  auto registerStateChangeCallback(StateChangeCallback callback) -> void;
+
 protected:
   virtual auto update() const -> void = 0;
+
+  auto notifyStateChange(
+    const lanelet::Id lanelet_id, const std::string & state, StateChangeType change_type) -> void;
 
   auto isTrafficLightAdded(const lanelet::Id traffic_light_id) const -> bool;
 
@@ -100,6 +120,8 @@ protected:
   std::unordered_map<lanelet::Id, TrafficLight> traffic_lights_map_;
   const std::unique_ptr<TrafficLightMarkerPublisher> marker_publisher_ptr_;
   ConfigurableRateUpdater rate_updater_;
+
+  std::vector<StateChangeCallback> state_change_callbacks_;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_BASE_HPP_

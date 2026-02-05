@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_EVALUATE_HPP_
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_MEMBER_FUNCTION_EVALUATE_HPP_
 
-#include <openscenario_interpreter/type_traits/void_t.hpp>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
@@ -27,7 +27,7 @@ struct HasMemberFunctionEvaluate : public std::false_type
 };
 
 template <typename T>
-struct HasMemberFunctionEvaluate<T, void_t<decltype(std::declval<T>().evaluate())>>
+struct HasMemberFunctionEvaluate<T, std::void_t<decltype(std::declval<T>().evaluate())>>
 : public std::true_type
 {
 };

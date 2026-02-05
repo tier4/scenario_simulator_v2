@@ -127,6 +127,9 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       script = std::make_shared<OpenScenario>(osc_path);
 
+      common::status_monitor.updateThreshold(
+        std::chrono::seconds(common::getParameter<std::int64_t>("status_monitor_threshold", 10)));
+
       // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
       traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
@@ -230,7 +233,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [&]() {
         if (record) {
           std::vector<std::string> options{
-            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+            "-a", "-o", std::filesystem::path(osc_path).replace_extension("").string()};
 
           if (not record_storage_id.empty()) {
             options.insert(options.end(), {"-s", record_storage_id});
@@ -376,7 +379,7 @@ auto Interpreter::reset() -> void
 
   // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
   // INFO_STREAM.
-  boost::apply_visitor(
+  std::visit(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
       [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },

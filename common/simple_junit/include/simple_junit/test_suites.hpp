@@ -15,7 +15,7 @@
 #ifndef JUNIT_EXPORTER__JUNIT_EXPORTER_HPP_
 #define JUNIT_EXPORTER__JUNIT_EXPORTER_HPP_
 
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 #include <numeric>
 #include <pugixml.hpp>
 #include <simple_junit/test_suite.hpp>
@@ -32,7 +32,7 @@ class TestSuites
 public:
   explicit TestSuites();
 
-  void write(const boost::filesystem::path & path);
+  void write(const std::filesystem::path & path);
 
   auto contains(const std::string & suite_name, const std::string & case_name) const
   {
