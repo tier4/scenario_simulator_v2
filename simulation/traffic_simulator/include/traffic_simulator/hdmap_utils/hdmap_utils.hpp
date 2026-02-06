@@ -265,8 +265,6 @@ private:
   auto getVectorFromPose(const geometry_msgs::msg::Pose &, const double magnitude) const
     -> geometry_msgs::msg::Vector3;
 
-  auto overwriteLaneletsCenterline() -> void;
-
   auto resamplePoints(const lanelet::ConstLineString3d &, const std::int32_t num_segments) const
     -> lanelet::BasicPoints3d;
 };
