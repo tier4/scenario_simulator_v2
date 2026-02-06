@@ -19,7 +19,7 @@
 
 #include <spdlog/fmt/fmt.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <rclcpp/logger.hpp>
 #include <rclcpp/rclcpp.hpp>
 
@@ -73,7 +73,7 @@ public:
     std::string message = fmt::format("Saving results to {}", output_directory_);
     RCLCPP_INFO_STREAM(logger_, message);
     results_.write_to(
-      (boost::filesystem::path(output_directory_) / "result.junit.xml").c_str(), "  ");
+      (std::filesystem::path(output_directory_) / "result.junit.xml").c_str(), "  ");
   }
 
 private:

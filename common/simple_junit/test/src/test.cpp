@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <simple_junit/junit5.hpp>
@@ -53,13 +53,13 @@ std::string trim(const std::string & string)
 
 void cleanup(const std::string & filename)
 {
-  const boost::filesystem::path path(filename);
-  boost::system::error_code error;
-  const bool result = boost::filesystem::exists(path, error);
+  const std::filesystem::path path(filename);
+  std::error_code error;
+  const bool result = std::filesystem::exists(path, error);
   if (!result || error) {
     throw std::runtime_error("file : " + filename + " does not found.");
   }
-  boost::filesystem::remove(path);
+  std::filesystem::remove(path);
 }
 
 #define EXPECT_TEXT_FILE_EQ(FILE0, FILE1)             \

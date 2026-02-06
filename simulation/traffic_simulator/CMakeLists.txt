@@ -102,7 +102,6 @@ target_link_libraries(traffic_simulator
   sodium
   zmq
   stdc++fs
-  Boost::filesystem
   yaml-cpp
   ${PROTOBUF_LIBRARY})
 

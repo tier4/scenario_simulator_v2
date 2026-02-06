@@ -72,6 +72,7 @@ auto TrafficLightsBase::setTrafficLightsState(
 {
   clearTrafficLightsState(lanelet_id);
   addTrafficLightsState(lanelet_id, state);
+  notifyStateChange(lanelet_id, state, StateChangeType::SET);
 }
 
 auto TrafficLightsBase::clearTrafficLightsState(const lanelet::Id lanelet_id) -> void
@@ -79,6 +80,7 @@ auto TrafficLightsBase::clearTrafficLightsState(const lanelet::Id lanelet_id) ->
   for (const auto & traffic_light : getTrafficLights(lanelet_id)) {
     traffic_light.get().clear();
   }
+  notifyStateChange(lanelet_id, "", StateChangeType::CLEAR);
 }
 
 auto TrafficLightsBase::addTrafficLightsState(
@@ -87,6 +89,7 @@ auto TrafficLightsBase::addTrafficLightsState(
   for (const auto & traffic_light : getTrafficLights(lanelet_id)) {
     traffic_light.get().set(state);
   }
+  notifyStateChange(lanelet_id, state, StateChangeType::ADD);
 }
 
 auto TrafficLightsBase::setTrafficLightsConfidence(
@@ -113,11 +116,8 @@ auto TrafficLightsBase::generateUpdateTrafficLightsRequest() const
 {
   simulation_api_schema::UpdateTrafficLightsRequest update_traffic_lights_request;
   for (auto && [lanelet_id, traffic_light] : traffic_lights_map_) {
-    auto traffic_signal = static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
-    for (const auto & relation_id : traffic_light.regulatory_elements_ids) {
-      traffic_signal.add_relation_ids(relation_id);
-    }
-    *update_traffic_lights_request.add_states() = traffic_signal;
+    *update_traffic_lights_request.add_states() =
+      static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
   }
   return update_traffic_lights_request;
 }
@@ -142,6 +142,21 @@ auto TrafficLightsBase::getTrafficLight(const lanelet::Id traffic_light_id) -> T
     addTrafficLight(traffic_light_id);
   }
   return traffic_lights_map_.at(traffic_light_id);
+}
+
+auto TrafficLightsBase::registerStateChangeCallback(StateChangeCallback callback) -> void
+{
+  state_change_callbacks_.push_back(std::move(callback));
+}
+
+auto TrafficLightsBase::notifyStateChange(
+  const lanelet::Id lanelet_id, const std::string & state, StateChangeType change_type) -> void
+{
+  for (const auto & callback : state_change_callbacks_) {
+    if (callback) {
+      callback(lanelet_id, state, change_type);
+    }
+  }
 }
 
 auto TrafficLightsBase::getTrafficLights(const lanelet::Id lanelet_id)
@@ -176,12 +191,7 @@ auto TrafficLightsBase::getDistanceToActiveTrafficLightStopLine(
   }
   std::optional<double> min_distance{std::nullopt};
   for (const auto id : traffic_light_ids) {
-    using Color = traffic_simulator::TrafficLight::Color;
-    using Status = traffic_simulator::TrafficLight::Status;
-    using Shape = traffic_simulator::TrafficLight::Shape;
-    if (const auto & traffic_light = getTrafficLight(id);
-        traffic_light.contains(Color::red, Status::solid_on, Shape::circle) or
-        traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
+    if (isRequiredStopTrafficLightState(id)) {
       const auto collision_point =
         traffic_simulator::distance::distanceToTrafficLightStopLine(spline, id);
       if (

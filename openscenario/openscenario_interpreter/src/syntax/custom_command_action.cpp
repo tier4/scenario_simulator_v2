@@ -177,6 +177,42 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
   }
 };
 
+struct EnableTrafficSignalV2IFeatureAction : public CustomCommand,
+                                             public SimulatorCore::NonStandardOperation
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope &) -> void override
+  {
+    if (parameters.empty()) {
+      throw Error(
+        "EnableTrafficSignalV2IFeature requires at least 1 argument (traffic signal IDs). "
+        "Usage: EnableTrafficSignalV2IFeatureAction(id1, id2, ...)");
+    }
+    for (const auto & parameter : parameters) {
+      setTrafficSignalV2IFeature(boost::lexical_cast<std::int64_t>(parameter), true);
+    }
+  }
+};
+
+struct DisableTrafficSignalV2IFeatureAction : public CustomCommand,
+                                              public SimulatorCore::NonStandardOperation
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope &) -> void override
+  {
+    if (parameters.empty()) {
+      throw Error(
+        "DisableTrafficSignalV2IFeatureAction requires at least 1 argument (traffic signal IDs). "
+        "Usage: DisableTrafficSignalV2IFeatureAction(id1, id2, ...)");
+    }
+    for (const auto & parameter : parameters) {
+      setTrafficSignalV2IFeature(boost::lexical_cast<std::int64_t>(parameter), false);
+    }
+  }
+};
+
 struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::ActionApplication
 {
   using CustomCommand::CustomCommand;
@@ -308,6 +344,8 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
     std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
     commands{
       // clang-format off
+      ELEMENT("DisableTrafficSignalV2IFeatureAction@v1", DisableTrafficSignalV2IFeatureAction),
+      ELEMENT("EnableTrafficSignalV2IFeatureAction@v1", EnableTrafficSignalV2IFeatureAction),
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),

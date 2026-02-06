@@ -133,8 +133,8 @@ auto distanceToYieldStop(
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>;
 
 /*
-   Here it is required to pass the CanonicalizedEntityStatus vector, instead of just
-   the CanonicalizedLaneletPose vector, since it is necessary to know the msg::BoundingBox of each Entity
+  Here it is required to pass the CanonicalizedEntityStatus vector, instead of just
+  the CanonicalizedLaneletPose vector, since it is necessary to know the msg::BoundingBox of each Entity
 */
 auto distanceToNearestConflictingPose(
   const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
