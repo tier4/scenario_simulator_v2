@@ -90,6 +90,10 @@ public:
 
   auto getTrafficLightsComposedState(const lanelet::Id lanelet_id) -> std::string;
 
+  auto getDistanceToActiveTrafficLightStopLine(
+    const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+    -> std::optional<double>;
+
   auto generateUpdateTrafficLightsRequest() const
     -> simulation_api_schema::UpdateTrafficLightsRequest;
 

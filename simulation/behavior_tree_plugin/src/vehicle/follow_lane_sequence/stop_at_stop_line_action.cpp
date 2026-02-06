@@ -91,7 +91,7 @@ bool StopAtStopLineAction::checkPreconditions()
     return false;
   } else if (!behavior_parameter_.see_around) {
     return false;
-  } else if (!getRightOfWayEntities(route_lanelets_).empty()) {
+  } else if (isNeedToRightOfWay(route_lanelets_)) {
     return false;
   } else if (!canonicalized_entity_status_->isInLanelet()) {
     return false;
