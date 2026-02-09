@@ -97,7 +97,7 @@ BT::NodeStatus FollowLaneAction::doAction()
     return BT::NodeStatus::FAILURE;
   }
   if (behavior_parameter_.see_around) {
-    if (getRightOfWayEntities(route_lanelets_).size() != 0) {
+    if (isNeedToRightOfWay(route_lanelets_)) {
       return BT::NodeStatus::FAILURE;
     }
     if (trajectory == nullptr) {
@@ -125,7 +125,7 @@ BT::NodeStatus FollowLaneAction::doAction()
       }
     }
     const auto distance_to_traffic_stop_line =
-      getDistanceToTrafficLightStopLine(route_lanelets_, *trajectory);
+      traffic_lights_->getDistanceToActiveTrafficLightStopLine(route_lanelets_, *trajectory);
     if (distance_to_traffic_stop_line) {
       if (distance_to_traffic_stop_line.value() <= getHorizon()) {
         return BT::NodeStatus::FAILURE;

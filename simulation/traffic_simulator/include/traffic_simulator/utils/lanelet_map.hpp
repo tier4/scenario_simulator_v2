@@ -37,11 +37,13 @@ inline auto activate(Ts &&... xs)
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
-template <typename... Ts>
-inline auto laneletAltitude(Ts &&... xs)
-{
-  return lanelet_wrapper::lanelet_map::laneletAltitude(std::forward<decltype(xs)>(xs)...);
-}
+auto laneletAltitude(
+  const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
+  const double matching_distance) -> std::optional<double>;
+
+auto nearbyLaneletIds(
+  const Pose & pose, const double distance_threshold, const bool include_crosswalk,
+  const std::size_t search_count = 5) -> lanelet::Ids;
 
 /// @brief Calculates all poses on the map that have no next lanelet (dead ends)
 /// @return A vector of final poses and their corresponding lanelet IDs

@@ -50,6 +50,7 @@ auto lateralDistance(
   }
 }
 
+/// @todo HdMapUtils will be removed when lanelet_wrapper:lane_change is added
 auto countLaneChanges(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const traffic_simulator::RoutingConfiguration & routing_configuration,

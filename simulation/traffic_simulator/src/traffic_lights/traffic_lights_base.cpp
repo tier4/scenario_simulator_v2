@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 
 namespace traffic_simulator
 {
@@ -175,5 +177,30 @@ auto TrafficLightsBase::getTrafficLights(const lanelet::Id lanelet_id)
       "Given lanelet ID ", lanelet_id, " is neither a traffic light ID not a traffic relation ID.");
   }
   return traffic_lights;
+}
+
+auto TrafficLightsBase::getDistanceToActiveTrafficLightStopLine(
+  const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+  -> std::optional<double>
+{
+  /// @todo this will be changed when traffic_lights is added to utils
+  const auto traffic_light_ids =
+    lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(route_lanelets);
+  if (traffic_light_ids.empty()) {
+    return std::nullopt;
+  }
+  std::optional<double> min_distance{std::nullopt};
+  for (const auto id : traffic_light_ids) {
+    if (isRequiredStopTrafficLightState(id)) {
+      const auto collision_point =
+        traffic_simulator::distance::distanceToTrafficLightStopLine(spline, id);
+      if (
+        collision_point.has_value() and
+        (not min_distance.has_value() or collision_point.value() < min_distance.value())) {
+        min_distance = collision_point;
+      }
+    }
+  }
+  return min_distance;
 }
 }  // namespace traffic_simulator

@@ -174,76 +174,32 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
   return std::nullopt;
 }
 
-auto ActionNode::getRightOfWayEntities(const lanelet::Ids & following_lanelets) const
-  -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
+/// @todo it will be moved to traffic_simulator::route::isNeedToRightOfWay(...)
+auto ActionNode::isNeedToRightOfWay(const lanelet::Ids & following_lanelets) const -> bool
 {
-  auto is_the_same_right_of_way =
+  auto isTheSameRightOfWay =
     [&](const std::int64_t & lanelet_id, const std::int64_t & following_lanelet) {
-      const auto right_of_way_lanelet_ids = hdmap_utils_->getRightOfWayLaneletIds(lanelet_id);
+      const auto right_of_way_lanelet_ids =
+        traffic_simulator::lanelet_wrapper::lanelet_map::rightOfWayLaneletIds(lanelet_id);
       const auto the_same_right_of_way_it = std::find(
         right_of_way_lanelet_ids.begin(), right_of_way_lanelet_ids.end(), following_lanelet);
       return the_same_right_of_way_it != std::end(right_of_way_lanelet_ids);
     };
 
-  std::vector<traffic_simulator::CanonicalizedEntityStatus> ret;
-  const auto lanelet_ids_list = hdmap_utils_->getRightOfWayLaneletIds(following_lanelets);
-  for (const auto & [name, status] : other_entity_status_) {
+  const auto lanelet_ids_list =
+    traffic_simulator::lanelet_wrapper::lanelet_map::rightOfWayLaneletIds(following_lanelets);
+  for (const auto & pose : getOtherEntitiesCanonicalizedLaneletPoses()) {
     for (const auto & following_lanelet : following_lanelets) {
-      for (const lanelet::Id & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
+      for (const lanelet::Id lanelet_id : lanelet_ids_list.at(following_lanelet)) {
         if (
-          status.isInLanelet() && traffic_simulator::isSameLaneletId(status, lanelet_id) &&
-          not is_the_same_right_of_way(lanelet_id, following_lanelet)) {
-          ret.emplace_back(status);
+          isSameLaneletId(pose, lanelet_id) &&
+          not isTheSameRightOfWay(lanelet_id, following_lanelet)) {
+          return true;
         }
       }
     }
   }
-  return ret;
-}
-
-auto ActionNode::getRightOfWayEntities() const
-  -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
-{
-  if (!canonicalized_entity_status_->isInLanelet()) {
-    return {};
-  }
-  std::vector<traffic_simulator::CanonicalizedEntityStatus> ret;
-  const auto lanelet_ids =
-    hdmap_utils_->getRightOfWayLaneletIds(canonicalized_entity_status_->getLaneletId());
-  if (lanelet_ids.empty()) {
-    return ret;
-  }
-  for (const auto & [name, status] : other_entity_status_) {
-    for (const lanelet::Id & lanelet_id : lanelet_ids) {
-      if (status.isInLanelet() && traffic_simulator::isSameLaneletId(status, lanelet_id)) {
-        ret.emplace_back(status);
-      }
-    }
-  }
-  return ret;
-}
-
-auto ActionNode::getDistanceToTrafficLightStopLine(
-  const lanelet::Ids & route_lanelets,
-  const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
-{
-  if (const auto traffic_light_ids = hdmap_utils_->getTrafficLightIdsOnPath(route_lanelets);
-      !traffic_light_ids.empty()) {
-    std::set<double> collision_points = {};
-    for (const auto traffic_light_id : traffic_light_ids) {
-      if (traffic_lights_->isRequiredStopTrafficLightState(traffic_light_id)) {
-        if (
-          const auto collision_point =
-            traffic_simulator::distance::distanceToTrafficLightStopLine(spline, traffic_light_id)) {
-          collision_points.insert(collision_point.value());
-        }
-      }
-    }
-    if (!collision_points.empty()) {
-      return *collision_points.begin();
-    }
-  }
-  return std::nullopt;
+  return false;
 }
 
 auto ActionNode::getDistanceToFrontEntity(
@@ -336,24 +292,13 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   return std::nullopt;
 }
 
-auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
-  const math::geometry::CatmullRomSplineInterface & spline,
-  const traffic_simulator::CanonicalizedEntityStatus & status) const -> std::optional<double>
-{
-  if (status.isInLanelet()) {
-    return spline.getCollisionPointIn2D(
-      hdmap_utils_->getLaneletPolygon(status.getLaneletId()), false);
-  }
-  return std::nullopt;
-}
-
 auto ActionNode::getEntityStatus(const std::string & target_name) const
   -> const traffic_simulator::CanonicalizedEntityStatus &
 {
   if (auto it = other_entity_status_.find(target_name); it != other_entity_status_.end()) {
     return it->second;
   } else {
-    THROW_SEMANTIC_ERROR("other entity : ", target_name, " does not exist.");
+    THROW_SEMANTIC_ERROR("Other entity ", std::quoted(target_name), " does not exist.");
   }
 }
 
@@ -491,69 +436,6 @@ auto ActionNode::getFrontEntityNameAndDistanceByTrajectory(
     return collision;
   }
   return std::nullopt;
-}
-
-auto ActionNode::isOtherEntityAtConsideredAltitude(
-  const traffic_simulator::CanonicalizedEntityStatus & entity_status) const -> bool
-{
-  if (canonicalized_entity_status_->isInLanelet() && entity_status.isInLanelet()) {
-    return traffic_simulator::pose::isAltitudeMatching(
-      canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
-      entity_status.getCanonicalizedLaneletPose().value());
-  } else {
-    return false;
-  }
-}
-
-auto ActionNode::getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & route_lanelets_) const
-  -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
-{
-  std::vector<traffic_simulator::CanonicalizedEntityStatus> conflicting_entity_status;
-  auto conflicting_crosswalks = hdmap_utils_->getConflictingCrosswalkIds(route_lanelets_);
-  for (const auto & [name, status] : other_entity_status_) {
-    if (
-      status.isInLanelet() &&
-      std::count(
-        conflicting_crosswalks.begin(), conflicting_crosswalks.end(), status.getLaneletId()) >= 1) {
-      conflicting_entity_status.emplace_back(status);
-    }
-  }
-  return conflicting_entity_status;
-}
-
-auto ActionNode::getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets_) const
-  -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
-{
-  std::vector<traffic_simulator::CanonicalizedEntityStatus> conflicting_entity_status;
-  auto conflicting_lanes = hdmap_utils_->getConflictingLaneIds(route_lanelets_);
-  for (const auto & [name, status] : other_entity_status_) {
-    if (
-      status.isInLanelet() &&
-      std::count(conflicting_lanes.begin(), conflicting_lanes.end(), status.getLaneletId()) >= 1) {
-      conflicting_entity_status.emplace_back(status);
-    }
-  }
-  return conflicting_entity_status;
-}
-
-auto ActionNode::foundConflictingEntity(const lanelet::Ids & following_lanelets) const -> bool
-{
-  auto conflicting_crosswalks = hdmap_utils_->getConflictingCrosswalkIds(following_lanelets);
-  auto conflicting_lanes = hdmap_utils_->getConflictingLaneIds(following_lanelets);
-  for (const auto & [name, status] : other_entity_status_) {
-    if (
-      status.isInLanelet() &&
-      std::count(
-        conflicting_crosswalks.begin(), conflicting_crosswalks.end(), status.getLaneletId()) >= 1) {
-      return true;
-    }
-    if (
-      status.isInLanelet() &&
-      std::count(conflicting_lanes.begin(), conflicting_lanes.end(), status.getLaneletId()) >= 1) {
-      return true;
-    }
-  }
-  return false;
 }
 
 auto ActionNode::calculateUpdatedEntityStatus(
