@@ -21,6 +21,8 @@ namespace traffic_simulator
 {
 namespace traffic_lights
 {
+auto wayIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+
 auto wayId(const lanelet::Id lanelet_id) -> lanelet::Id;
 
 auto trafficLightsIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
