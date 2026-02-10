@@ -18,6 +18,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
 
@@ -91,8 +92,9 @@ auto CanonicalizedLaneletPose::alignOrientationToLanelet() -> void
 {
   using math::geometry::convertEulerAngleToQuaternion;
   using math::geometry::convertQuaternionToEulerAngle;
-  map_pose_.orientation =
-    route::toSpline({lanelet_pose_.lanelet_id}).getPose(lanelet_pose_.s, true).orientation;
+  map_pose_.orientation = lanelet_wrapper::lanelet_map::centerPointsSpline(lanelet_pose_.lanelet_id)
+                            ->getPose(lanelet_pose_.s, true)
+                            .orientation;
   lanelet_pose_.rpy = geometry_msgs::msg::Vector3();
 }
 
@@ -101,14 +103,14 @@ auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition() -> void
   using math::geometry::convertEulerAngleToQuaternion;
   using math::geometry::convertQuaternionToEulerAngle;
   using math::geometry::getRotation;
-  const auto spline = route::toSpline({lanelet_pose_.lanelet_id});
+  const auto spline = lanelet_wrapper::lanelet_map::centerPointsSpline(lanelet_pose_.lanelet_id);
   // adjust Oz position
-  if (const auto s_value = spline.getSValue(map_pose_)) {
-    map_pose_.position.z = spline.getPoint(s_value.value()).z;
+  if (const auto s_value = spline->getSValue(map_pose_)) {
+    map_pose_.position.z = spline->getPoint(s_value.value()).z;
   }
   // adjust pitch
   if (consider_pose_by_road_slope_) {
-    const auto lanelet_quaternion = spline.getPose(lanelet_pose_.s, true).orientation;
+    const auto lanelet_quaternion = spline->getPose(lanelet_pose_.s, true).orientation;
     const auto lanelet_rpy = convertQuaternionToEulerAngle(lanelet_quaternion);
     const auto entity_rpy = convertQuaternionToEulerAngle(map_pose_.orientation);
     map_pose_.orientation =

@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
@@ -156,7 +157,8 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   if (previous_route_lanelets_ != route_lanelets) {
     previous_route_lanelets_ = route_lanelets;
     try {
-      spline_ = std::make_shared<math::geometry::CatmullRomSpline>(route::toSpline(route_lanelets));
+      spline_ = std::make_shared<math::geometry::CatmullRomSpline>(
+        lanelet_wrapper::lanelet_map::centerPoints(route_lanelets));
     } catch (const common::scenario_simulator_exception::SemanticError & error) {
       // reset the ptr when spline cannot be calculated
       spline_.reset();
