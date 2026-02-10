@@ -17,8 +17,8 @@
 
 #include <simulation_interface/simulation_api_schema.pb.h>
 
-#include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <functional>
+#include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
