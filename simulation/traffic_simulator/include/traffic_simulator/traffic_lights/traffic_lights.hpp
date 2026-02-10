@@ -24,6 +24,8 @@
 #include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
 #endif
 
+#include <algorithm>
+#include <set>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
@@ -57,6 +59,60 @@ private:
   const std::unique_ptr<TrafficLightPublisherBase> backward_compatible_publisher_ptr_;
 };
 
+class DetectedTrafficLights
+{
+public:
+  explicit DetectedTrafficLights(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
+  : hdmap_utils_(hdmap_utils)
+  {
+  }
+
+  auto setState(const lanelet::Id lanelet_id, const std::string & state) -> void
+  {
+    clearState(lanelet_id);
+    addState(lanelet_id, state);
+  }
+
+  auto addState(const lanelet::Id lanelet_id, const std::string & state) -> void
+  {
+    auto [iter, inserted] =
+      detected_traffic_lights_.try_emplace(lanelet_id, lanelet_id, *hdmap_utils_);
+    iter->second.set(state);
+  }
+
+  auto clearState(const lanelet::Id lanelet_id) -> bool
+  {
+    return detected_traffic_lights_.erase(lanelet_id) > 0;
+  }
+
+  auto empty() const -> bool { return detected_traffic_lights_.empty(); }
+
+  auto apply(simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
+  {
+    for (const auto & [lanelet_id, detected_light] : detected_traffic_lights_) {
+      if (auto matched_state = std::find_if(
+            request.mutable_states()->begin(), request.mutable_states()->end(),
+            [lanelet_id](const auto & state) { return state.id() == lanelet_id; });
+          matched_state != request.mutable_states()->end()) {
+        // Only update traffic_light_status (bulbs), preserve relation_ids
+        auto detected_signal = static_cast<simulation_api_schema::TrafficSignal>(detected_light);
+        matched_state->clear_traffic_light_status();
+        for (const auto & status : detected_signal.traffic_light_status()) {
+          *matched_state->add_traffic_light_status() = status;
+        }
+      } else {
+        // add ground-truth-less detected traffic light
+        *request.add_states() = static_cast<simulation_api_schema::TrafficSignal>(detected_light);
+      }
+    }
+  }
+
+private:
+  std::map<lanelet::Id, TrafficLight> detected_traffic_lights_;
+
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+};
+
 class V2ITrafficLights : public TrafficLightsBase
 {
 public:
@@ -72,13 +128,26 @@ public:
 
   ~V2ITrafficLights() override = default;
 
+  auto setDetectedTrafficLights(std::shared_ptr<DetectedTrafficLights> detected) -> void
+  {
+    detected_ = detected;
+  }
+
+  auto addTrafficLightsStatePrediction(
+    const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void;
+
+  auto clearTrafficLightsStatePredictions() -> void;
+
 private:
   auto update() const -> void override
   {
     const auto now = clock_ptr_->now();
-    const auto request = generateUpdateTrafficLightsRequest();
-    publisher_ptr_->publish(now, request);
-    legacy_topic_publisher_ptr_->publish(now, request);
+    auto request = generateUpdateTrafficLightsRequest();
+    if (detected_) {
+      detected_->apply(request);
+    }
+    publisher_ptr_->publish(now, request, &predictions_);
+    legacy_topic_publisher_ptr_->publish(now, request, &predictions_);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
@@ -122,17 +191,96 @@ private:
   }
 
   const std::unique_ptr<TrafficLightPublisherBase> publisher_ptr_;
+
   const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
+
+  std::shared_ptr<DetectedTrafficLights> detected_;
+
+  TrafficLightStatePredictions predictions_;
+};
+
+template <typename GroundTruthType>
+class TrafficLightsChannel
+{
+public:
+  template <typename NodeTypePointer, typename... Args>
+  explicit TrafficLightsChannel(
+    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+    Args &&... args)
+  : ground_truth_(
+      std::make_shared<GroundTruthType>(node_ptr, hdmap_utils, std::forward<Args>(args)...)),
+    detected_(std::make_shared<DetectedTrafficLights>(hdmap_utils))
+  {
+  }
+
+  auto getGroundTruth() const -> std::shared_ptr<GroundTruthType> { return ground_truth_; }
+
+  auto getDetected() const -> std::shared_ptr<DetectedTrafficLights> { return detected_; }
+
+  auto hasDetectedChanges() const -> bool { return not detected_->empty(); }
+
+  auto generateUpdateRequest() const -> simulation_api_schema::UpdateTrafficLightsRequest
+  {
+    auto request = ground_truth_->generateUpdateTrafficLightsRequest();
+    detected_->apply(request);
+    return request;
+  }
+
+private:
+  std::shared_ptr<GroundTruthType> ground_truth_;
+
+  std::shared_ptr<DetectedTrafficLights> detected_;
 };
 
 class TrafficLights
 {
 public:
   template <typename NodeTypePointer>
-  explicit TrafficLights(const NodeTypePointer & node_ptr, const std::string & architecture_type)
-  : conventional_traffic_lights_(std::make_shared<ConventionalTrafficLights>(node_ptr)),
-    v2i_traffic_lights_(std::make_shared<V2ITrafficLights>(node_ptr, architecture_type))
+  explicit TrafficLights(
+    const NodeTypePointer & node_ptr,
+    const std::string & architecture_type)
+  : conventional_channel_(node_ptr),
+    v2i_channel_(node_ptr, architecture_type)
   {
+    v2i_channel_.getGroundTruth()->setDetectedTrafficLights(v2i_channel_.getDetected());
+
+    conventional_channel_.getGroundTruth()->registerStateChangeCallback(
+      [this, v2i = v2i_channel_.getGroundTruth()](
+        lanelet::Id lanelet_id, const std::string & state,
+        TrafficLightsBase::StateChangeType change_type) {
+        if (v2i_enabled_traffic_lights_.count(lanelet_id) > 0) {
+          switch (change_type) {
+            case TrafficLightsBase::StateChangeType::SET:
+              v2i->setTrafficLightsState(lanelet_id, state);
+              break;
+            case TrafficLightsBase::StateChangeType::CLEAR:
+              v2i->clearTrafficLightsState(lanelet_id);
+              break;
+            case TrafficLightsBase::StateChangeType::ADD:
+              v2i->addTrafficLightsState(lanelet_id, state);
+              break;
+          }
+        }
+      });
+  }
+
+  auto setV2IFeature(const lanelet::Id lanelet_id, const bool enabled) -> void
+  {
+    if (hdmap_utils_->isTrafficLightRegulatoryElement(lanelet_id)) {
+      // relation ID -> convert to way IDs
+      const auto regulatory_element = hdmap_utils_->getTrafficLightRegulatoryElement(lanelet_id);
+      for (const auto & ref_member :
+           regulatory_element->getParameters<lanelet::ConstLineString3d>("refers")) {
+        setV2IFeature(ref_member.id(), enabled);
+      }
+    } else if (hdmap_utils_->isTrafficLight(lanelet_id)) {
+      // way ID -> use directly
+      if (enabled) {
+        v2i_enabled_traffic_lights_.insert(lanelet_id);
+      } else {
+        v2i_enabled_traffic_lights_.erase(lanelet_id);
+      }
+    }
   }
 
   auto isAnyTrafficLightChanged() -> bool;
@@ -145,9 +293,21 @@ public:
 
   auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>;
 
+  auto getConventionalDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>;
+
+  auto getV2IDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>;
+
+  auto generateConventionalUpdateRequest() const
+    -> simulation_api_schema::UpdateTrafficLightsRequest;
+
+  auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool;
+
 private:
-  const std::shared_ptr<ConventionalTrafficLights> conventional_traffic_lights_;
-  const std::shared_ptr<V2ITrafficLights> v2i_traffic_lights_;
+  TrafficLightsChannel<ConventionalTrafficLights> conventional_channel_;
+
+  TrafficLightsChannel<V2ITrafficLights> v2i_channel_;
+
+  std::set<lanelet::Id> v2i_enabled_traffic_lights_;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_HPP_

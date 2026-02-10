@@ -29,11 +29,6 @@ auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route_lanelets
          }) != route_lanelets.end();
 }
 
-auto toSpline(const lanelet::Ids & route_lanelets) -> Spline
-{
-  return Spline(lanelet_wrapper::lanelet_map::centerPoints(route_lanelets));
-}
-
 // Move
 auto isAnyConflictingEntity(
   const lanelet::Ids & following_lanelets,

@@ -748,6 +748,12 @@ public:
       return core->getEgoEntity(ego_ref).getTurnIndicatorsCommandName();
     }
 
+    static auto setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled)
+      -> decltype(auto)
+    {
+      return core->setTrafficSignalV2IFeature(lanelet_id, enabled);
+    }
+
     // TrafficLights - Conventional and V2I
     template <typename... Ts>
     static auto setConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
@@ -767,6 +773,20 @@ public:
     static auto addConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
     {
       return core->getConventionalTrafficLights()->addTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearConventionalDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalDetectedTrafficLights()->clearState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addConventionalDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalDetectedTrafficLights()->addState(
         std::forward<decltype(xs)>(xs)...);
     }
 
@@ -817,9 +837,40 @@ public:
     }
 
     template <typename... Ts>
+    static auto clearV2IDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2IDetectedTrafficLights()->clearState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addV2IDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2IDetectedTrafficLights()->addState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
     static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
     {
       return core->getV2ITrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addV2ITrafficLightsStatePrediction(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->addTrafficLightsStatePrediction(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearV2ITrafficLightsStatePredictions(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->clearTrafficLightsStatePredictions(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    static auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) -> bool
+    {
+      return core->isV2ITrafficLightEnabled(lanelet_id);
     }
   };
 };

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/filesystem.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog.hpp>
 #include <openscenario_interpreter/syntax/catalog_location.hpp>
@@ -24,7 +23,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 auto convertScenario(
-  const boost::filesystem::path & yaml_path, const boost::filesystem::path & output_dir)
+  const std::filesystem::path & yaml_path, const std::filesystem::path & output_dir)
 {
   std::stringstream command;
 
@@ -42,17 +41,17 @@ auto convertScenario(
 CatalogLocation::CatalogLocation(const pugi::xml_node & node, Scope & scope)
 : directory(readElement<Directory>("Directory", node, scope))
 {
-  if (not boost::filesystem::exists(directory.path)) {
+  if (not std::filesystem::exists(directory.path)) {
     THROW_SYNTAX_ERROR(directory.path.string() + " is not found");
   }
-  if (not boost::filesystem::is_directory(directory.path)) {
+  if (not std::filesystem::is_directory(directory.path)) {
     THROW_SYNTAX_ERROR(directory.path.string() + " is not directory");
   }
 
   for (auto path : Directory::ls(directory)) {
     if (path.extension() == ".yaml") {
       path = convertScenario(
-        path, boost::filesystem::path("/tmp/converted_scenario") / directory.path.filename());
+        path, std::filesystem::path("/tmp/converted_scenario") / directory.path.filename());
     } else if (path.extension() != ".xosc") {
       continue;
     }

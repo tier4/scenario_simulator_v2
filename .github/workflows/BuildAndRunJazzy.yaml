@@ -35,6 +35,7 @@ jobs:
       - name: Install dependencies
         run: |
           vcs import src < src/scenario_simulator_v2/dependency_humble.repos
+          vcs import src < src/scenario_simulator_v2/test_dependency_humble.repos
           rm -rf src/agnocast # currently, agnocast occurs build errors with ROS 2 Jazzy
 
       - name: Resolve rosdep and install colcon mixin
