@@ -17,6 +17,7 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -91,9 +92,8 @@ bool StopAtStopLineAction::checkPreconditions()
     return false;
   } else if (!behavior_parameter_.see_around) {
     return false;
-  } else if (isNeedToRightOfWay(route_lanelets_)) {
-    return false;
-  } else if (!canonicalized_entity_status_->isInLanelet()) {
+  } else if (traffic_simulator::route::isNeedToRightOfWay(
+               route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return false;
   } else {
     return true;
@@ -136,7 +136,7 @@ BT::NodeStatus StopAtStopLineAction::doAction()
         distance_to_stopline_.value() <=
         vehicle_parameters.bounding_box.dimensions.x + front_stopline_margin) {
         if (!target_speed_) {
-          target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+          target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
         }
         setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
         setOutput("waypoints", waypoints);

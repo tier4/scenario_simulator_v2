@@ -23,6 +23,7 @@
 #include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
@@ -280,7 +281,7 @@ void EgoEntity::requestAssignRoute(
 
     for (const auto & route_point : route) {
       // NOTE: Interpolating between lanelets because set route API requires continuous lanelet ids on lanelet graph
-      auto segment_route = hdmap_utils_ptr_->getRoute(
+      auto segment_route = route::routeFromGraph(
         route_segments.back().preferred.id, route_point.getLaneletId(), routing_configuration);
       std::transform(
         segment_route.begin(), segment_route.end(), std::back_inserter(route_segments),

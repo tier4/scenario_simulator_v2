@@ -18,7 +18,6 @@
 #include <deque>
 #include <memory>
 #include <traffic_simulator/data_type/entity_status.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -26,8 +25,7 @@ namespace traffic_simulator
 class RoutePlanner
 {
 public:
-  explicit RoutePlanner(
-    const traffic_simulator::RoutingGraphType &, const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+  explicit RoutePlanner(const traffic_simulator::RoutingGraphType &);
 
   auto getWholeRouteLanelets() const -> lanelet::Ids { return whole_lanelet_ids_; }
   auto getRouteLanelets(const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon = 100)
@@ -45,7 +43,6 @@ private:
   auto updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void;
 
   std::optional<lanelet::Ids> route_;
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   const traffic_simulator::RoutingGraphType routing_graph_type_;
 
   /*

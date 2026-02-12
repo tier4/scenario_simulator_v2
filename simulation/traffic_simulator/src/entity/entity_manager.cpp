@@ -17,6 +17,10 @@
 #include <std_msgs/msg/header.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
+#include <unordered_map>
+#include <vector>
 
 namespace traffic_simulator
 {

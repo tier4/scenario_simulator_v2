@@ -31,9 +31,9 @@
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
-#include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -172,34 +172,6 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
     }
   }
   return std::nullopt;
-}
-
-/// @todo it will be moved to traffic_simulator::route::isNeedToRightOfWay(...)
-auto ActionNode::isNeedToRightOfWay(const lanelet::Ids & following_lanelets) const -> bool
-{
-  auto isTheSameRightOfWay =
-    [&](const std::int64_t & lanelet_id, const std::int64_t & following_lanelet) {
-      const auto right_of_way_lanelet_ids =
-        traffic_simulator::lanelet_wrapper::lanelet_map::rightOfWayLaneletIds(lanelet_id);
-      const auto the_same_right_of_way_it = std::find(
-        right_of_way_lanelet_ids.begin(), right_of_way_lanelet_ids.end(), following_lanelet);
-      return the_same_right_of_way_it != std::end(right_of_way_lanelet_ids);
-    };
-
-  const auto lanelet_ids_list =
-    traffic_simulator::lanelet_wrapper::lanelet_map::rightOfWayLaneletIds(following_lanelets);
-  for (const auto & pose : getOtherEntitiesCanonicalizedLaneletPoses()) {
-    for (const auto & following_lanelet : following_lanelets) {
-      for (const lanelet::Id lanelet_id : lanelet_ids_list.at(following_lanelet)) {
-        if (
-          isSameLaneletId(pose, lanelet_id) &&
-          not isTheSameRightOfWay(lanelet_id, following_lanelet)) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
 }
 
 auto ActionNode::getDistanceToFrontEntity(
@@ -464,10 +436,8 @@ auto ActionNode::calculateUpdatedEntityStatus(
     entity_status_updated.action_status.twist = twist_new;
     entity_status_updated.action_status.accel = accel_new;
     entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-    /// @todo it will be moved to route::moveAlongLaneletPose(...)
-    entity_status_updated.lanelet_pose = traffic_simulator::lanelet_wrapper::pose::alongLaneletPose(
-      static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()),
-      route_lanelets_, distance);
+    entity_status_updated.lanelet_pose = traffic_simulator::route::moveAlongLaneletPose(
+      canonicalized_lanelet_pose.value(), route_lanelets_, distance);
     entity_status_updated.lanelet_pose_valid = true;
     entity_status_updated.pose =
       traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_pose);
