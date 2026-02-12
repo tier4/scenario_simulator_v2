@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
@@ -133,7 +133,7 @@ auto TrafficLightsBase::addTrafficLight(const lanelet::Id traffic_light_id) -> v
   // emplace will not modify the map if the key already exists
   traffic_lights_map_.emplace(
     std::piecewise_construct, std::forward_as_tuple(traffic_light_id),
-    std::forward_as_tuple(traffic_light_id, *hdmap_utils_));
+    std::forward_as_tuple(traffic_light_id));
 }
 
 auto TrafficLightsBase::getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &
@@ -162,19 +162,10 @@ auto TrafficLightsBase::notifyStateChange(
 auto TrafficLightsBase::getTrafficLights(const lanelet::Id lanelet_id)
   -> std::vector<std::reference_wrapper<TrafficLight>>
 {
-  // if passed id is regulatory element containing traffic_lights, add all of them
-  // if passed id is single traffic_light - add it, return all added traffic_lights
+  const auto traffic_lights_ids = traffic_lights::trafficLightsIds(lanelet_id);
   std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
-  if (hdmap_utils_->isTrafficLightRegulatoryElement(lanelet_id)) {
-    const auto & regulatory_element = hdmap_utils_->getTrafficLightRegulatoryElement(lanelet_id);
-    for (auto && traffic_light : regulatory_element->trafficLights()) {
-      traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
-    }
-  } else if (hdmap_utils_->isTrafficLight(lanelet_id)) {
-    traffic_lights.emplace_back(getTrafficLight(lanelet_id));
-  } else {
-    throw common::scenario_simulator_exception::Error(
-      "Given lanelet ID ", lanelet_id, " is neither a traffic light ID not a traffic relation ID.");
+  for (auto && traffic_light_id : traffic_lights_ids) {
+    traffic_lights.emplace_back(getTrafficLight(traffic_light_id));
   }
   return traffic_lights;
 }
@@ -183,9 +174,7 @@ auto TrafficLightsBase::getDistanceToActiveTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
   -> std::optional<double>
 {
-  /// @todo this will be changed when traffic_lights is added to utils
-  const auto traffic_light_ids =
-    lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(route_lanelets);
+  const auto traffic_light_ids = traffic_lights::trafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.empty()) {
     return std::nullopt;
   }

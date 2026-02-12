@@ -18,13 +18,13 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <string>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/distance.hpp>
 #include <traffic_simulator/lanelet_wrapper/lane_change.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
 
 #include "../expect_eq_macros.hpp"
 #include "../helper_functions.hpp"
@@ -38,155 +38,46 @@ int main(int argc, char ** argv)
 class HdMapUtilsTest_StandardMap : public testing::Test
 {
 protected:
-  HdMapUtilsTest_StandardMap()
-  : hdmap_utils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/standard_map/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0))
-  {
-    activateLaneletWrapper("standard_map");
-  }
-
-  hdmap_utils::HdMapUtils hdmap_utils;
+  HdMapUtilsTest_StandardMap() { activateLaneletWrapper("standard_map"); }
 };
 class HdMapUtilsTest_WithoutLightBulb : public testing::Test
 {
 protected:
-  HdMapUtilsTest_WithoutLightBulb()
-  : hdmap_utils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/minimal_map/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0))
-  {
-    activateLaneletWrapper("minimal_map");
-  }
-
-  hdmap_utils::HdMapUtils hdmap_utils;
+  HdMapUtilsTest_WithoutLightBulb() { activateLaneletWrapper("minimal_map"); }
 };
 class HdMapUtilsTest_WithRoadShoulderMap : public testing::Test
 {
 protected:
-  HdMapUtilsTest_WithRoadShoulderMap()
-  : hdmap_utils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/with_road_shoulder/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0))
-  {
-    activateLaneletWrapper("with_road_shoulder");
-  }
-
-  hdmap_utils::HdMapUtils hdmap_utils;
+  HdMapUtilsTest_WithRoadShoulderMap() { activateLaneletWrapper("with_road_shoulder"); }
 };
 class HdMapUtilsTest_FourTrackHighwayMap : public testing::Test
 {
 protected:
-  HdMapUtilsTest_FourTrackHighwayMap()
-  : hdmap_utils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/four_track_highway/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.22312494055522)
-        .longitude(138.8024583466017)
-        .altitude(0.0))
-  {
-    activateLaneletWrapper("four_track_highway");
-  }
-
-  hdmap_utils::HdMapUtils hdmap_utils;
+  HdMapUtilsTest_FourTrackHighwayMap() { activateLaneletWrapper("four_track_highway"); }
 };
 class HdMapUtilsTest_CrossroadsWithStoplinesMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_CrossroadsWithStoplinesMap()
-  : hdmap_utils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/crossroads_with_stoplines/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.23808753540768)
-        .longitude(139.9009591876285)
-        .altitude(0.0))
   {
     activateLaneletWrapper("crossroads_with_stoplines");
   }
-
-  hdmap_utils::HdMapUtils hdmap_utils;
 };
 class HdMapUtilsTest_KashiwanohaMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_KashiwanohaMap()
-  : hdmap_utils(
-      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(0.0)
-        .longitude(0.0)
-        .altitude(0.0))
   {
     const auto lanelet_path =
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map/lanelet2_map.osm";
     traffic_simulator::lanelet_map::activate(lanelet_path);
   }
-
-  hdmap_utils::HdMapUtils hdmap_utils;
 };
 class HdMapUtilsTest_IntersectionMap : public testing::Test
 {
 protected:
-  HdMapUtilsTest_IntersectionMap()
-  : hdmap_utils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/intersection/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.64200728302)
-        .longitude(139.74821144562)
-        .altitude(0.0))
-  {
-    activateLaneletWrapper("intersection");
-  }
-
-  hdmap_utils::HdMapUtils hdmap_utils;
+  HdMapUtilsTest_IntersectionMap() { activateLaneletWrapper("intersection"); }
 };
-
-/**
- * @note Test basic functionality.
- * Test initialization correctness with a correct path to a lanelet map.
- */
-TEST(HdMapUtils, Construct)
-{
-  ASSERT_NO_THROW(
-    auto hdmap_utils = hdmap_utils::HdMapUtils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/standard_map/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0)));
-}
-
-/**
- * @note Test basic functionality.
- * Test initialization correctness with an invalid path to a lanelet map.
- */
-TEST(HdMapUtils, Construct_invalid)
-{
-  EXPECT_THROW(
-    auto hdmap_utils = hdmap_utils::HdMapUtils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") + "invalid_path",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0)),
-    std::runtime_error);
-}
 
 /**
  * @note Test basic functionality.
@@ -194,15 +85,9 @@ TEST(HdMapUtils, Construct_invalid)
  */
 TEST(HdMapUtils, Construct_emptyMap)
 {
-  EXPECT_THROW(
-    auto hdmap_utils = hdmap_utils::HdMapUtils(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/empty/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0)),
-    std::runtime_error);
+  activateLaneletWrapper("empty");
+  // Call function that uses map, because of lazy initialization of the singleton
+  EXPECT_THROW(traffic_simulator::lanelet_wrapper::lanelet_map::laneletIds(), std::runtime_error);
 }
 
 /**
@@ -1217,7 +1102,8 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift0)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIds_correct)
 {
-  auto result_traffic_lights = hdmap_utils.getTrafficLightIds();
+  auto result_traffic_lights =
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIds();
 
   std::sort(result_traffic_lights.begin(), result_traffic_lights.end());
   EXPECT_EQ(result_traffic_lights, (lanelet::Ids{34802, 34836}));
@@ -1228,7 +1114,9 @@ TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIds_correct)
  */
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getTrafficLightIds_noTrafficLight)
 {
-  EXPECT_EQ(hdmap_utils.getTrafficLightIds().size(), static_cast<size_t>(0));
+  EXPECT_EQ(
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIds().size(),
+    static_cast<size_t>(0));
 }
 
 /**
@@ -1242,28 +1130,35 @@ TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightBulbPosition_correct)
   const double epsilon = 0.1;
 
   {
-    const auto return_bulb_position = hdmap_utils.getTrafficLightBulbPosition(light_id, "green");
+    const auto return_bulb_position =
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+        light_id, "green");
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3761.05, 73755.30, 5.35), epsilon);
   }
 
   {
-    const auto return_bulb_position = hdmap_utils.getTrafficLightBulbPosition(light_id, "yellow");
+    const auto return_bulb_position =
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+        light_id, "yellow");
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.60, 73755.07, 5.35), epsilon);
   }
 
   {
-    const auto return_bulb_position = hdmap_utils.getTrafficLightBulbPosition(light_id, "red");
+    const auto return_bulb_position =
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(light_id, "red");
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.16, 73754.87, 5.35), epsilon);
   }
 
   {
-    EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(light_id, "pink").has_value());
+    EXPECT_FALSE(
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(light_id, "pink")
+        .has_value());
   }
 }
 
@@ -1279,7 +1174,8 @@ TEST_F(HdMapUtilsTest_WithoutLightBulb, getTrafficLightBulbPositionInfer_correct
 
   {
     const auto return_bulb_position =
-      hdmap_utils.getTrafficLightBulbPosition(light_id, "green", true);
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+        light_id, "green", true);
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3761.05, 73755.30, 5.35), epsilon);
@@ -1287,7 +1183,8 @@ TEST_F(HdMapUtilsTest_WithoutLightBulb, getTrafficLightBulbPositionInfer_correct
 
   {
     const auto return_bulb_position =
-      hdmap_utils.getTrafficLightBulbPosition(light_id, "yellow", true);
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+        light_id, "yellow", true);
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.60, 73755.07, 5.35), epsilon);
@@ -1295,26 +1192,35 @@ TEST_F(HdMapUtilsTest_WithoutLightBulb, getTrafficLightBulbPositionInfer_correct
 
   {
     const auto return_bulb_position =
-      hdmap_utils.getTrafficLightBulbPosition(light_id, "red", true);
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+        light_id, "red", true);
 
     EXPECT_TRUE(return_bulb_position.has_value());
     EXPECT_POINT_NEAR(return_bulb_position.value(), makePoint(3760.16, 73754.87, 5.35), epsilon);
   }
 
   {
-    EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(light_id, "green").has_value());
+    EXPECT_FALSE(traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+                   light_id, "green")
+                   .has_value());
   }
 
   {
-    EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(light_id, "yellow").has_value());
+    EXPECT_FALSE(traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
+                   light_id, "yellow")
+                   .has_value());
   }
 
   {
-    EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(light_id, "red").has_value());
+    EXPECT_FALSE(
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(light_id, "red")
+        .has_value());
   }
 
   {
-    EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(light_id, "pink").has_value());
+    EXPECT_FALSE(
+      traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(light_id, "pink")
+        .has_value());
   }
 }
 
@@ -1326,7 +1232,9 @@ TEST_F(HdMapUtilsTest_WithoutLightBulb, getTrafficLightBulbPositionInfer_correct
  */
 TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightBulbPosition_invalidTrafficLight)
 {
-  EXPECT_FALSE(hdmap_utils.getTrafficLightBulbPosition(1000003, "red").has_value());
+  EXPECT_FALSE(
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightBulbPosition(1000003, "red")
+      .has_value());
 }
 
 /**
@@ -1790,7 +1698,7 @@ TEST_F(HdMapUtilsTest_StandardMap, getCenterPoints_empty)
  */
 TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_trafficLight)
 {
-  EXPECT_TRUE(hdmap_utils.isTrafficLight(34836));
+  EXPECT_TRUE(traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLight(34836));
 }
 
 /**
@@ -1799,7 +1707,7 @@ TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_trafficLight)
  */
 TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_notTrafficLight)
 {
-  EXPECT_FALSE(hdmap_utils.isTrafficLight(120659));
+  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLight(120659));
 }
 
 /**
@@ -1807,7 +1715,7 @@ TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_notTrafficLight)
  */
 TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_invalidId)
 {
-  EXPECT_FALSE(hdmap_utils.isTrafficLight(1000003));
+  EXPECT_FALSE(traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLight(1000003));
 }
 
 /**
@@ -1817,7 +1725,8 @@ TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_invalidId)
  */
 TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
 {
-  EXPECT_TRUE(hdmap_utils.isTrafficLightRegulatoryElement(34806));
+  EXPECT_TRUE(
+    traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLightRegulatoryElement(34806));
 }
 
 /**
@@ -1827,7 +1736,8 @@ TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_trafficLightR
  */
 TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_noTrafficLightRegulatoryElement)
 {
-  EXPECT_FALSE(hdmap_utils.isTrafficLightRegulatoryElement(120659));
+  EXPECT_FALSE(
+    traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLightRegulatoryElement(120659));
 }
 
 /**
@@ -1835,7 +1745,8 @@ TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_noTrafficLigh
  */
 TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_invalidId)
 {
-  EXPECT_FALSE(hdmap_utils.isTrafficLightRegulatoryElement(1000003));
+  EXPECT_FALSE(
+    traffic_simulator::lanelet_wrapper::traffic_lights::isTrafficLightRegulatoryElement(1000003));
 }
 
 /**
@@ -1868,7 +1779,8 @@ TEST_F(HdMapUtilsTest_StandardMap, getLaneletLength_cache)
 TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_noTrafficLights)
 {
   EXPECT_EQ(
-    hdmap_utils.getTrafficLightIdsOnPath(lanelet::Ids{34579, 34774, 120659, 120660, 34468, 34438})
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(
+      lanelet::Ids{34579, 34774, 120659, 120660, 34468, 34438})
       .size(),
     static_cast<size_t>(0));
 }
@@ -1879,8 +1791,9 @@ TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_noTrafficLights)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_trafficLights)
 {
-  auto result_traffic_light_ids = hdmap_utils.getTrafficLightIdsOnPath(
-    {34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630});
+  auto result_traffic_light_ids =
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(
+      {34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630});
   auto actual_traffic_light_ids = lanelet::Ids{34802, 34836};
 
   std::sort(result_traffic_light_ids.begin(), result_traffic_light_ids.end());
@@ -1894,7 +1807,9 @@ TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_trafficLights)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_empty)
 {
-  EXPECT_EQ(hdmap_utils.getTrafficLightIdsOnPath({}).size(), static_cast<size_t>(0));
+  EXPECT_EQ(
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightIdsOnPath({}).size(),
+    static_cast<size_t>(0));
 }
 
 /**
@@ -2151,7 +2066,9 @@ TEST_F(HdMapUtilsTest_IntersectionMap, stopLineIds_intersectionMap)
  */
 TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_stopLine)
 {
-  EXPECT_EQ(hdmap_utils.getTrafficLightStopLineIds(34802), (lanelet::Ids{34805}));
+  EXPECT_EQ(
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightStopLineIds(34802),
+    (lanelet::Ids{34805}));
 }
 
 /**
@@ -2163,7 +2080,8 @@ TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_sto
  */
 TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_severalStopLines)
 {
-  auto result_stoplines = hdmap_utils.getTrafficLightStopLineIds(34836);
+  auto result_stoplines =
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightStopLineIds(34836);
   auto actual_stoplines = lanelet::Ids{120663, 34805};
 
   std::sort(result_stoplines.begin(), result_stoplines.end());
@@ -2177,7 +2095,9 @@ TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_sev
  */
 TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_invalidTrafficLightId)
 {
-  EXPECT_THROW(hdmap_utils.getTrafficLightStopLineIds(1000039), std::runtime_error);
+  EXPECT_THROW(
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightStopLineIds(1000039),
+    std::runtime_error);
 }
 
 void sortStoplines(std::vector<std::vector<geometry_msgs::msg::Point>> & stoplines)
@@ -2223,7 +2143,8 @@ void compareStoplines(
  */
 TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_stopLine)
 {
-  auto result_stoplines_points = hdmap_utils.getTrafficLightStopLinesPoints(34802);
+  auto result_stoplines_points =
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightStopLinesPoints(34802);
   auto actual_stoplines_points = std::vector<std::vector<geometry_msgs::msg::Point>>{
     {makePoint(3762.0, 73756.0, -0.5), makePoint(3759.0, 73754.5, -0.5)}};
 
@@ -2242,7 +2163,8 @@ TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints
  */
 TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_severalStopLines)
 {
-  auto result_stoplines_points = hdmap_utils.getTrafficLightStopLinesPoints(34836);
+  auto result_stoplines_points =
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightStopLinesPoints(34836);
   auto actual_stoplines_points = std::vector<std::vector<geometry_msgs::msg::Point>>{
     {makePoint(3762.0, 73756.0, -0.5), makePoint(3759.0, 73754.5, -0.5)},
     {makePoint(3768.5, 73737.0, -0.5), makePoint(3765.5, 73736.0, -0.5)}};
@@ -2261,7 +2183,9 @@ TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints
 TEST_F(
   HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_invalidTrafficLightId)
 {
-  EXPECT_THROW(hdmap_utils.getTrafficLightStopLinesPoints(1000039), std::runtime_error);
+  EXPECT_THROW(
+    traffic_simulator::lanelet_wrapper::traffic_lights::trafficLightStopLinesPoints(1000039),
+    std::runtime_error);
 }
 
 /**

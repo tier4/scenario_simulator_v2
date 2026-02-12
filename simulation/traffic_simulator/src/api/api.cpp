@@ -359,11 +359,6 @@ auto API::checkCollision(
 }
 
 // traffics, lanelet
-auto API::getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
-{
-  return entity_manager_ptr_->getHdmapUtils();
-}
-
 auto API::getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
 {
   return traffic_lights_ptr_->getV2ITrafficLights();
