@@ -2,6 +2,9 @@
 Changelog for package scenario_simulator_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+24.0.1 (2026-02-12)
+-------------------
+
 24.0.0 (2026-02-12)
 -------------------
 * Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route

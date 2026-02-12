@@ -2,6 +2,9 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+24.0.1 (2026-02-12)
+-------------------
+
 24.0.0 (2026-02-12)
 -------------------
 * Merge pull request `#1480 <https://github.com/tier4/scenario_simulator_v2/issues/1480>`_ from tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route
