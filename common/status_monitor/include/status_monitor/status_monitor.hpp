@@ -142,6 +142,8 @@ public:
     return thunk();
   }
 
+  auto updateThreshold(const std::chrono::seconds & t) -> void;
+
   auto write() const -> void;
 } static status_monitor;
 }  // namespace common

@@ -29,9 +29,7 @@ public:
   explicit FollowLanePlanner(const double goal_threshold);
   ~FollowLanePlanner() final = default;
 
-  void setWaypoints(
-    const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-    const std::vector<lanelet::Id> & route_ids);
+  void setWaypoints(const std::vector<lanelet::Id> & route_ids);
 
   auto calculateNextGoalPoint() -> std::optional<geometry_msgs::msg::Point> override;
 

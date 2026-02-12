@@ -31,7 +31,6 @@
 #include <simulation_interface/zmq_multi_server.hpp>
 #include <string>
 #include <thread>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
 
@@ -154,8 +153,6 @@ private:
   simulation_api_schema::UpdateTrafficLightsRequest traffic_signals_states_;
   traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string & name);
   zeromq::MultiServer server_;
-  geographic_msgs::msg::GeoPoint getOrigin();
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   std::shared_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
 
   bool isEgo(const std::string & name);

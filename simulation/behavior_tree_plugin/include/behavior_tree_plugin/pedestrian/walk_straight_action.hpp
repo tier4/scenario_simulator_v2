@@ -32,7 +32,6 @@
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
 #include <memory>
 #include <string>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <vector>

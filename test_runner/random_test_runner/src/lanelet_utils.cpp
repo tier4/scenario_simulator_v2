@@ -26,11 +26,11 @@
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <optional>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/route.hpp>
 #include <traffic_simulator/utils/lanelet_map.hpp>
 
-LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
+LaneletUtils::LaneletUtils(const std::filesystem::path & filename)
 {
   lanelet::projection::MGRSProjector projector;
   lanelet::ErrorMessages errors;
@@ -45,14 +45,12 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
   vehicle_routing_graph_ptr_ =
     lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_vehicle_ptr, costPtrs);
 
-  hdmap_utils_ptr_ =
-    std::make_shared<hdmap_utils::HdMapUtils>(filename, geographic_msgs::msg::GeoPoint());
   traffic_simulator::lanelet_map::activate(filename.string());
 }
 
 std::vector<int64_t> LaneletUtils::getLaneletIds() const
 {
-  return hdmap_utils_ptr_->getLaneletIds();
+  return traffic_simulator::lanelet_wrapper::lanelet_map::laneletIds();
 }
 
 geometry_msgs::msg::PoseStamped LaneletUtils::toMapPose(
@@ -63,7 +61,7 @@ geometry_msgs::msg::PoseStamped LaneletUtils::toMapPose(
 
 std::vector<int64_t> LaneletUtils::getRoute(int64_t from_lanelet_id, int64_t to_lanelet_id)
 {
-  return hdmap_utils_ptr_->getRoute(from_lanelet_id, to_lanelet_id);
+  return traffic_simulator::lanelet_wrapper::route::routeFromGraph(from_lanelet_id, to_lanelet_id);
 }
 
 double LaneletUtils::getLaneletLength(int64_t lanelet_id) const
@@ -86,7 +84,7 @@ double LaneletUtils::computeDistance(
 
 bool LaneletUtils::isInLanelet(int64_t lanelet_id, double s) const
 {
-  return hdmap_utils_ptr_->isInLanelet(lanelet_id, s);
+  return traffic_simulator::lanelet_wrapper::lanelet_map::isInLanelet(lanelet_id, s);
 }
 
 std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOppositeLaneLet(
@@ -107,10 +105,9 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
     return {};
   }
 
-  auto tangent_vector = hdmap_utils_ptr_->getTangentVector(pose.lanelet_id, pose.s);
-  if (!tangent_vector) {
-    return {};
-  }
+  auto tangent_vector =
+    traffic_simulator::lanelet_wrapper::lanelet_map::centerPointsSpline(pose.lanelet_id)
+      ->getTangentVector(pose.s);
   lanelet::ConstLanelet current_lanelet = lanelet_map_ptr_->laneletLayer.get(pose.lanelet_id);
   auto left_point = current_lanelet.leftBound().front();
   auto right_point = current_lanelet.rightBound().front();
@@ -123,8 +120,8 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
   }
 
   geometry_msgs::msg::Vector3 perpendicular_vector;
-  perpendicular_vector.x = tangent_vector->y;
-  perpendicular_vector.y = -tangent_vector->x;
+  perpendicular_vector.x = tangent_vector.y;
+  perpendicular_vector.y = -tangent_vector.x;
   perpendicular_vector.z = 0.0;
   perpendicular_vector = math::geometry::normalize(perpendicular_vector);
 

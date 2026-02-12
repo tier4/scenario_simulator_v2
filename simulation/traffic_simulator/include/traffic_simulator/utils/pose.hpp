@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__UTILS__POSE_HPP_
 
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 
 namespace traffic_simulator
@@ -105,9 +106,7 @@ auto isInLanelet(
 
 auto isInLanelet(const geometry_msgs::msg::Point & point, const lanelet::Id lanelet_id) -> bool;
 
-auto isAtEndOfLanelets(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
+auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool;
 
 auto findRoutableAlternativeLaneletPoseFrom(
   const lanelet::Id from_lanelet_id, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,

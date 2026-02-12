@@ -62,6 +62,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/lanelet_wrapper/lanelet_map.cpp
   src/lanelet_wrapper/lanelet_wrapper.cpp
   src/lanelet_wrapper/pose.cpp
+  src/lanelet_wrapper/lane_change.cpp
   src/lanelet_wrapper/route.cpp
   src/lanelet_wrapper/traffic_lights.cpp
   src/lanelet_wrapper/traffic_rules.cpp
@@ -78,6 +79,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/utils/distance.cpp
   src/utils/lanelet_map.cpp
   src/utils/pose.cpp
+  src/utils/route.cpp
 )
 
 ament_auto_add_library(visualization_component SHARED
@@ -100,7 +102,6 @@ target_link_libraries(traffic_simulator
   sodium
   zmq
   stdc++fs
-  Boost::filesystem
   yaml-cpp
   ${PROTOBUF_LIBRARY})
 

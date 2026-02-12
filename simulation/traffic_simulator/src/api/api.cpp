@@ -116,8 +116,7 @@ auto API::updateEntitiesStatusInSim() -> bool
 auto API::updateTrafficLightsInSim() -> bool
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
-    const auto request =
-      traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
+    const auto request = traffic_lights_ptr_->generateConventionalUpdateRequest();
     return zeromq_client_.call(request).result().success();
   }
   /// @todo handle response
@@ -375,6 +374,26 @@ auto API::getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTr
   return traffic_lights_ptr_->getConventionalTrafficLights();
 }
 
+auto API::getV2IDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>
+{
+  return traffic_lights_ptr_->getV2IDetectedTrafficLights();
+}
+
+auto API::getConventionalDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>
+{
+  return traffic_lights_ptr_->getConventionalDetectedTrafficLights();
+}
+
+auto API::setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled) -> void
+{
+  traffic_lights_ptr_->setV2IFeature(lanelet_id, enabled);
+}
+
+auto API::isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool
+{
+  return traffic_lights_ptr_->isV2ITrafficLightEnabled(lanelet_id);
+}
+
 auto API::addTrafficSource(
   const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
   const traffic::TrafficSource::Distribution & distribution, const bool allow_spawn_outside_lane,
@@ -388,7 +407,7 @@ auto API::addTrafficSource(
 
   traffic_controller_ptr_->addModule<traffic::TrafficSource>(
     radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
-    entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
+    [this, speed](const auto & name, auto &&... xs) {
       this->spawn(name, std::forward<decltype(xs)>(xs)...);
       getEntity(name).setLinearVelocity(speed);
     });
