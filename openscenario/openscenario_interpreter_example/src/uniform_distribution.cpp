@@ -33,7 +33,7 @@ auto main(const int argc, char const * const * const argv) -> int
     }
   };
 
-  std::cout << number() << std::endl;
+  RCLCPP_INFO_STREAM(node->get_logger(), number());
 
   return EXIT_SUCCESS;
 }
