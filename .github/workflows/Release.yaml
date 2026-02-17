@@ -35,6 +35,13 @@ jobs:
     outputs:
       new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
+      - name: Generate token
+        id: generate-token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
       # Fetch the pull request information (even if the workflow is triggered by a push event).
       - uses: 8BitJonny/gh-get-current-pr@4.0.0
         id: pull-request
@@ -58,7 +65,7 @@ jobs:
           repository: ${{ github.event.pull_request.base.repo.full_name }}
           fetch-depth: 0
           fetch-tags: true
-          token: ${{ secrets.STRONG_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup git
         run: |
@@ -108,7 +115,7 @@ jobs:
         if: github.event_name == 'push' && steps.old_version.outputs.old_version != steps.new_version.outputs.new_version
         uses: CasperWA/push-protected@v2
         with:
-          token: ${{ secrets.STRONG_GITHUB_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token }}
           branch: master
           force: true
 
