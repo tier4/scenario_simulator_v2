@@ -153,11 +153,11 @@ auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obst
 auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
 {
   lanelet::Ids ids{};
-
-  for (const auto & point : getPathWithLaneId().points) {
-    ids += point.lane_ids;
+  for (const auto & route_data : getRoute().data) {
+    for (const auto & segment : route_data.segments) {
+      ids.push_back(segment.preferred.id);
+    }
   }
-
   return ids;
 }
 
