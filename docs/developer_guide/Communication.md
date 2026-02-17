@@ -59,6 +59,6 @@
 
 ### Service Servers
 
-| service name                    | type                                                                                                                                                                     | note                                                         |
-|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| `/control/control_mode_request` | [`autoware_auto_vehicle_msgs/srv/ControlModeCommand`](https://github.com/tier4/autoware_auto_msgs/blob/tier4/main/autoware_auto_vehicle_msgs/srv/ControlModeCommand.srv) | Simulated by `simple_sensor_simulator` for a manual override |
+| service name                    | type                                                                                                                                                             | note                                                         |
+|---------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| `/control/control_mode_request` | [`autoware_vehicle_msgs/srv/ControlModeCommand`](https://github.com/autowarefoundation/autoware_msgs/blob/main/autoware_vehicle_msgs/srv/ControlModeCommand.srv) | Simulated by `simple_sensor_simulator` for a manual override |
