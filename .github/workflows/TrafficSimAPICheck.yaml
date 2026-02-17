@@ -93,7 +93,7 @@ jobs:
           run-id: "${{ steps.previous_run.outputs.result }}"
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
           path: previous
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Download current install artifact
         uses: actions/download-artifact@v7
@@ -101,7 +101,7 @@ jobs:
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
           run-id: ${{ github.event.workflow_run.id || github.event.inputs.run_id }}
           path: current
-          github-token: ${{ secrets.GH_PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Call ABIDIFF
         continue-on-error: true
