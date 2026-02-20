@@ -18,24 +18,33 @@ namespace traffic_simulator
 {
 namespace traffic_lights
 {
-auto wayId(const lanelet::Id lanelet_id) -> lanelet::Id
+auto wayIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   if (lanelet_wrapper::traffic_lights::isTrafficLight(lanelet_id)) {
-    return lanelet_id;
+    return {lanelet_id};
   } else {
     // lanelet::RoleName::Refers
     if (auto traffic_light_members =
           lanelet_wrapper::traffic_lights::toTrafficLightRegulatoryElement(lanelet_id)
             ->getParameters<lanelet::ConstLineString3d>("refers");
         traffic_light_members.size() > 0) {
-      // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.
-      // This is because the output can be guaranteed for the original relation id by the way id.
-      return traffic_light_members.front().id();
+      lanelet::Ids ids(traffic_light_members.size());
+      std::transform(
+        traffic_light_members.begin(), traffic_light_members.end(), ids.begin(),
+        [](const auto & member) { return member.id(); });
+      return ids;
     } else {
       throw std::invalid_argument(
         "Given lanelet ID " + std::to_string(lanelet_id) + " is neither relation id nor way id.");
     }
   }
+}
+
+auto wayId(const lanelet::Id lanelet_id) -> lanelet::Id
+{
+  // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.
+  // This is because the output can be guaranteed for the original relation id by the way id.
+  return wayIds(lanelet_id).front();
 }
 
 auto trafficLightsIds(const lanelet::Id lanelet_id) -> lanelet::Ids

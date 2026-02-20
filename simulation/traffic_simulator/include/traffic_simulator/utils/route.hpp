@@ -33,8 +33,6 @@ using Spline = math::geometry::CatmullRomSpline;
 
 auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
 
-auto toSpline(const lanelet::Ids & route) -> Spline;
-
 // Move
 template <typename... Ts>
 auto routeFromGraph(Ts &&... xs)

@@ -143,6 +143,85 @@ TEST_F(TrafficLightsTest, startTrafficLightsUpdate)
   EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
 }
 
+// ============================================================================
+// Detected traffic lights tests
+// ============================================================================
+
+TEST_F(TrafficLightsTest, detectedTrafficLights_addState)
+{
+  auto detected = this->lights->getConventionalDetectedTrafficLights();
+  detected->addState(this->id, "red circle");
+  detected->addState(this->id, "green up");
+
+  const auto request = this->lights->generateConventionalUpdateRequest();
+  ASSERT_EQ(request.states_size(), 1);
+  EXPECT_EQ(request.states(0).traffic_light_status_size(), 2);
+}
+
+TEST_F(TrafficLightsTest, detectedTrafficLights_clearState)
+{
+  auto detected = this->lights->getConventionalDetectedTrafficLights();
+  detected->addState(this->id, "red circle");
+  detected->addState(this->id, "green up");
+
+  EXPECT_TRUE(detected->clearState(this->id));
+  EXPECT_EQ(this->lights->generateConventionalUpdateRequest().states_size(), 0);
+  EXPECT_FALSE(detected->clearState(this->id));
+}
+
+// ============================================================================
+// Merged request tests (detected + ground truth)
+// ============================================================================
+
+TEST_F(TrafficLightsTest, mergedRequest_groundTruthOnly)
+{
+  this->lights->getConventionalTrafficLights()->setTrafficLightsState(this->id, this->red_state);
+
+  const auto request = this->lights->generateConventionalUpdateRequest();
+
+  ASSERT_EQ(request.states_size(), 1);
+}
+
+TEST_F(TrafficLightsTest, mergedRequest_detectedOnly)
+{
+  this->lights->getConventionalDetectedTrafficLights()->setState(this->id, this->red_state);
+
+  const auto request = this->lights->generateConventionalUpdateRequest();
+
+  ASSERT_EQ(request.states_size(), 1);
+}
+
+TEST_F(TrafficLightsTest, mergedRequest_detectedOverridesGroundTruth)
+{
+  this->lights->getConventionalTrafficLights()->setTrafficLightsState(
+    this->id, "green solidOn circle");
+  this->lights->getConventionalDetectedTrafficLights()->setState(this->id, this->red_state);
+
+  const auto request = this->lights->generateConventionalUpdateRequest();
+
+  ASSERT_EQ(request.states_size(), 1);
+  // ground truth: green, detected: red -> red
+  EXPECT_EQ(
+    request.states(0).traffic_light_status(0).color(),
+    simulation_api_schema::TrafficLight_Color_RED);
+}
+
+TEST_F(TrafficLightsTest, mergedRequest_unknownPreserved)
+{
+  this->lights->getConventionalDetectedTrafficLights()->setState(
+    this->id, "unknown unknown circle");
+
+  const auto request = this->lights->generateConventionalUpdateRequest();
+
+  ASSERT_EQ(request.states_size(), 1);
+  EXPECT_EQ(
+    request.states(0).traffic_light_status(0).color(),
+    simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR);
+  EXPECT_EQ(
+    request.states(0).traffic_light_status(0).status(),
+    simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

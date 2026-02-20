@@ -68,7 +68,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/record.cpp
   src/scope.cpp)
 
-target_link_libraries(${PROJECT_NAME} Boost::filesystem Boost::json glog pugixml)
+target_link_libraries(${PROJECT_NAME} Boost::json glog pugixml)
 
 target_precompile_headers(${PROJECT_NAME}
   PUBLIC
@@ -86,7 +86,6 @@ target_precompile_headers(${PROJECT_NAME}
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
 # ------------------------------------------------------------------------------
-
 ament_auto_add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
@@ -103,11 +102,13 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
   ament_add_gtest(test_syntax test/test_syntax.cpp)
-  ament_add_gtest(test_parsed_traffic_signal_id test/test_parsed_traffic_signal_id.cpp)
+  ament_add_gtest(test_target_traffic_signal_channel test/test_target_traffic_signal_channel.cpp)
   ament_add_gtest(test_double test/test_double.cpp)
+  ament_add_gtest(test_priority test/test_priority.cpp)
   target_link_libraries(test_syntax ${PROJECT_NAME})
-  target_link_libraries(test_parsed_traffic_signal_id ${PROJECT_NAME})
+  target_link_libraries(test_target_traffic_signal_channel ${PROJECT_NAME})
   target_link_libraries(test_double ${PROJECT_NAME})
+  target_link_libraries(test_priority ${PROJECT_NAME})
 endif()
 
 ament_auto_package()

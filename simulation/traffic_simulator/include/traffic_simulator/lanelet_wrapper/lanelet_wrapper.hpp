@@ -147,22 +147,6 @@ private:
 class CenterPointsCache
 {
 public:
-  auto centerPoints(lanelet::Id lanelet_id) -> decltype(auto)
-  {
-    if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
-    }
-    return readData(lanelet_id);
-  }
-
-  auto centerPointsSpline(lanelet::Id lanelet_id) -> decltype(auto)
-  {
-    if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
-    }
-    return readDataSpline(lanelet_id);
-  }
-
   auto getCenterPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map)
     -> decltype(auto)
   {

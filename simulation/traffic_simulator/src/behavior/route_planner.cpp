@@ -54,7 +54,8 @@ auto RoutePlanner::getRouteLanelets(
   }
   if (route_ && route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return route::followingLanelets(
-      lanelet_pose.lanelet_id, route_.value(), horizon, true, routing_graph_type_);
+      lanelet_pose.lanelet_id, route_.value(), horizon, include_current_lanelet,
+      routing_graph_type_);
   }
   // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
   cancelWaypoint(entity_lanelet_pose);

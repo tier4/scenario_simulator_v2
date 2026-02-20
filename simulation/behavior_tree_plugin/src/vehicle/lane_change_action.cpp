@@ -117,6 +117,9 @@ BT::NodeStatus LaneChangeAction::doAction()
           lane_change_velocity_ = curve_->getLength() / lane_change_parameters_->constraint.value;
           break;
       }
+      if (target_speed_) {
+        lane_change_velocity_ = std::clamp(lane_change_velocity_, 0.0, target_speed_.value());
+      }
     } else {
       return BT::NodeStatus::FAILURE;
     }

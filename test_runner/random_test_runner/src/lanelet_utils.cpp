@@ -31,7 +31,7 @@
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
 
-LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
+LaneletUtils::LaneletUtils(const std::filesystem::path & filename)
 {
   lanelet::projection::MGRSProjector projector;
   lanelet::ErrorMessages errors;

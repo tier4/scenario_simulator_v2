@@ -20,7 +20,7 @@
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_routing/RoutingGraph.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <optional>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
@@ -36,7 +36,7 @@ struct LaneletPart
 class LaneletUtils
 {
 public:
-  LaneletUtils(const boost::filesystem::path & filename);
+  LaneletUtils(const std::filesystem::path & filename);
 
   LaneletUtils() = delete;
   LaneletUtils(const LaneletUtils &) = delete;
