@@ -2,6 +2,93 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.0 (2026-02-20)
+-------------------
+* Merge pull request `#1482 <https://github.com/tier4/scenario_simulator_v2/issues/1482>`_ from tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+  HdMapUtils refactor (PR 5/6) - extend lanelet_wrapper: add ::traffic_lights, use wide in traffic_simulator, remove hdmap_utils
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+  # Conflicts:
+  #	simulation/traffic_simulator/include/traffic_simulator/hdmap_utils/hdmap_utils.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/traffic_lights.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/traffic_lights_base.hpp
+  #	simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+  Bring back `const` to `getCurrentAction` member functions
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge remote-tracking branch 'origin/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* Merge branch 'ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-route' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-traffic-lights
+* ref(traffic_simulator, behavior_tree_plugin, random_test_runner): remove hdmap_utiils
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Mateusz Palczuk
+
 24.0.8 (2026-02-19)
 -------------------
 * Merge branch 'master' into feat/remove_autoware_common_depend
