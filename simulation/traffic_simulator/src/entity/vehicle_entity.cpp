@@ -28,10 +28,9 @@ namespace entity
 {
 VehicleEntity::VehicleEntity(
   const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const std::string & plugin_name)
-: EntityBase(name, entity_status, hdmap_utils_ptr),
+: EntityBase(name, entity_status),
   vehicle_parameters(parameters),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
@@ -41,7 +40,6 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_->setVehicleParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
-  behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
   behavior_plugin_ptr_->setDefaultMatchingDistanceForLaneletPoseCalculation(
     getDefaultMatchingDistanceForLaneletPoseCalculation());
 }

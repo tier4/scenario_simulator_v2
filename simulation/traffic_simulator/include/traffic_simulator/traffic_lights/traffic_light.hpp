@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
+#include <lanelet2_core/geometry/Lanelet.h>
 #include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <color_names/color_names.hpp>
@@ -28,13 +29,13 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <stdexcept>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <visualization_msgs/msg/marker.hpp>
 
 namespace traffic_simulator
 {
@@ -448,7 +449,7 @@ struct TrafficLight
     }
   };
 
-  explicit TrafficLight(const lanelet::Id, const hdmap_utils::HdMapUtils &);
+  explicit TrafficLight(const lanelet::Id);
 
   const lanelet::Id way_id;
 

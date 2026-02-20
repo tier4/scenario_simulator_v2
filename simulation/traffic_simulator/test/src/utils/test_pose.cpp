@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 #include "../helper_functions.hpp"
@@ -27,19 +28,7 @@ int main(int argc, char ** argv)
 class PoseTest : public testing::Test
 {
 protected:
-  PoseTest()
-  : hdmap_utils(std::make_shared<hdmap_utils::HdMapUtils>(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/four_track_highway/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.22312494055522)
-        .longitude(138.8024583466017)
-        .altitude(0.0)))
-  {
-    activateLaneletWrapper("four_track_highway");
-  }
-
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  PoseTest() { activateLaneletWrapper("four_track_highway"); }
 };
 
 /**
@@ -91,8 +80,7 @@ TEST_F(PoseTest, canonicalize_default)
 TEST_F(PoseTest, canonicalize_invalid)
 {
   EXPECT_THROW(
-    traffic_simulator::pose::toCanonicalizedLaneletPose(
-      traffic_simulator::pose::quietNaNLaneletPose()),
+    traffic_simulator::pose::canonicalize(traffic_simulator::pose::quietNaNLaneletPose()),
     std::runtime_error);
   EXPECT_FALSE(traffic_simulator::pose::toCanonicalizedLaneletPose(
     traffic_simulator::helper::constructLaneletPose(203, 1000.0, 0.0)));
@@ -128,7 +116,7 @@ TEST_F(PoseTest, toMapPose_CanonicalizedLaneletPose)
 }
 
 /**
- * @note Test conversion to geometry_msgs::msg::Pose from LaneletPose with HdMapUtils pointer.
+ * @note Test conversion to geometry_msgs::msg::Pose from LaneletPose.
  */
 TEST_F(PoseTest, toMapPose_LaneletPose)
 {

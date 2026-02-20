@@ -67,13 +67,12 @@ auto TrafficLights::isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const
 auto V2ITrafficLights::addTrafficLightsStatePrediction(
   const lanelet::Id lanelet_id, const std::string & state, double time_ahead_seconds) -> void
 {
-  if (hdmap_utils_->isTrafficLightRegulatoryElement(lanelet_id)) {
-    // relation id -> way id
-    const auto & regulatory_element = hdmap_utils_->getTrafficLightRegulatoryElement(lanelet_id);
-    for (const auto & traffic_light : regulatory_element->trafficLights()) {
-      addTrafficLightsStatePrediction(traffic_light.id(), state, time_ahead_seconds);
+  if (lanelet_wrapper::traffic_lights::isTrafficLightRegulatoryElement(lanelet_id)) {
+    for (const auto & traffic_light_way_id :
+         traffic_simulator::traffic_lights::wayIds(lanelet_id)) {
+      addTrafficLightsStatePrediction(traffic_light_way_id, state, time_ahead_seconds);
     }
-  } else if (not hdmap_utils_->isTrafficLight(lanelet_id)) {
+  } else if (not lanelet_wrapper::traffic_lights::isTrafficLight(lanelet_id)) {
     throw common::scenario_simulator_exception::Error(
       "Given lanelet ID (", lanelet_id, ") is not a traffic light.");
   } else {

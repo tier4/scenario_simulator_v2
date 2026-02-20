@@ -43,7 +43,6 @@ public:
 
   explicit EgoEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &);
 

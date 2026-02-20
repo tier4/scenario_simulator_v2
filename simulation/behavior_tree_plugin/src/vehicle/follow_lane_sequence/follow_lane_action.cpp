@@ -20,6 +20,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/route.hpp>
 #include <vector>
 

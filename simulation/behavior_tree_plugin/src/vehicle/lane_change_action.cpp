@@ -21,7 +21,6 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
 #include <vector>
 

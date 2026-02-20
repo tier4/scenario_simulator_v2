@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/primitives/Primitive.h>
+
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
@@ -43,6 +45,29 @@ auto isInIntersection(const lanelet::Id lanelet_id) -> bool
 auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
   return LaneletWrapper::laneletLengthCache().getLength(lanelet_id, LaneletWrapper::map());
+}
+
+auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
+  -> std::tuple<double, Point, Point>
+{
+  if (const auto centerline_points = lanelet_wrapper::lanelet_map::centerPoints(lanelet_id);
+      centerline_points.empty()) {
+    THROW_SIMULATION_ERROR(
+      "There is no center points for lanelet with id: " + std::to_string(lanelet_id));
+  } else {
+    auto findNearestPointIndex = [](const std::vector<Point> & points, const Point & point) {
+      return std::distance(
+        points.begin(),
+        std::min_element(points.begin(), points.end(), [&](const Point & p1, const Point & p2) {
+          return math::geometry::hypot(p1, point) < math::geometry::hypot(p2, point);
+        }));
+    };
+    const size_t nearest_point_index = findNearestPointIndex(centerline_points, point);
+    const auto & nearest_point = centerline_points.at(nearest_point_index);
+    const auto & next_point = centerline_points.at(nearest_point_index + 1);
+    const auto yaw = std::atan2(next_point.y - nearest_point.y, next_point.x - nearest_point.x);
+    return std::make_tuple(yaw, nearest_point, next_point);
+  }
 }
 
 auto laneletAltitude(
