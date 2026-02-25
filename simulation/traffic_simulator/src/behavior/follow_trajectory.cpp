@@ -137,11 +137,13 @@ auto makeUpdatedStatus(
   //                 WAYPOINT QUERIES
   //  ==============================================
 
-  const auto previous_waypoint = [&polyline_trajectory]() -> const auto & {
+  const auto previous_waypoint = [&polyline_trajectory]() -> const auto &
+  {
     return polyline_trajectory.shape.vertices[0];
   };
 
-  const auto target_waypoint = [&polyline_trajectory]() -> const auto & {
+  const auto target_waypoint = [&polyline_trajectory]() -> const auto &
+  {
     return polyline_trajectory.shape.vertices[1];
   };
 
