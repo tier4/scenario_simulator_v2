@@ -38,7 +38,7 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
 }
 
 LaneletPose constructLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
+  const lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
 {
   LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;

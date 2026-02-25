@@ -18,6 +18,10 @@
 #include <std_msgs/msg/header.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
+#include <unordered_map>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -135,7 +139,7 @@ auto EntityManager::updateNpcLogic(
   return entity.getCanonicalizedStatus();
 }
 
-auto EntityManager::updateHdmapMarker() const -> void
+auto EntityManager::updateLaneletMarker() const -> void
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();
@@ -358,12 +362,6 @@ auto EntityManager::resetBehaviorPlugin(
 auto EntityManager::despawnEntity(const std::string & name) -> bool
 {
   return isEntityExist(name) && entities_.erase(name);
-}
-
-// traffics, lanelet
-auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
-{
-  return hdmap_utils_ptr_;
 }
 
 auto EntityManager::calculateEuclideanDistances() -> std::shared_ptr<EuclideanDistancesMap>

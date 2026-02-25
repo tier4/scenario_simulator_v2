@@ -24,6 +24,7 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -31,14 +32,11 @@ namespace traffic_simulator
 {
 namespace entity
 {
-EntityBase::EntityBase(
-  const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+EntityBase::EntityBase(const std::string & name, const CanonicalizedEntityStatus & entity_status)
 : name(name),
   verbose(true),
   status_(std::make_shared<CanonicalizedEntityStatus>(entity_status)),
-  status_before_update_(*status_),
-  hdmap_utils_ptr_(hdmap_utils_ptr)
+  status_before_update_(*status_)
 {
   job_list_.append(
     [this](double) {
@@ -164,8 +162,8 @@ auto EntityBase::requestLaneChange(const lane_change::Direction & direction) -> 
 {
   if (isInLanelet()) {
     if (
-      const auto target_lanelet_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-        getCanonicalizedStatus().getLaneletId(), direction)) {
+      const auto target_lanelet_id =
+        route::laneChangeableLaneletId(getCanonicalizedStatus().getLaneletId(), direction)) {
       requestLaneChange(target_lanelet_id.value());
     }
   }
@@ -207,8 +205,8 @@ auto EntityBase::requestLaneChange(
   }
 
   if (
-    const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-      reference_lanelet_id, target.direction, target.shift)) {
+    const auto lane_change_target_id =
+      route::laneChangeableLaneletId(reference_lanelet_id, target.direction, target.shift)) {
     requestLaneChange(
       traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);

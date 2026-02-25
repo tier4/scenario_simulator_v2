@@ -28,11 +28,7 @@ int main(int argc, char ** argv)
 class CanonicalizedLaneletPoseTest : public testing::Test
 {
 protected:
-  CanonicalizedLaneletPoseTest() : hdmap_utils(makeHdMapUtilsSharedPointer())
-  {
-    activateLaneletWrapper("standard_map");
-  }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  CanonicalizedLaneletPoseTest() { activateLaneletWrapper("standard_map"); }
 };
 
 /**

@@ -61,7 +61,6 @@ public:
 
   explicit VehicleEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 
@@ -143,7 +142,8 @@ private:
 
   const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
 
-  traffic_simulator::RoutePlanner route_planner_;
+  traffic_simulator::RoutePlanner route_planner_{
+    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER};
 
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 

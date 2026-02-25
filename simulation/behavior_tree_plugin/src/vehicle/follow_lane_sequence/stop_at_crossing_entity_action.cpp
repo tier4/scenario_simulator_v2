@@ -18,6 +18,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -92,7 +94,8 @@ bool StopAtCrossingEntityAction::checkPreconditions()
     return false;
   } else if (!behavior_parameter_.see_around) {
     return false;
-  } else if (!getRightOfWayEntities(route_lanelets_).empty()) {
+  } else if (traffic_simulator::route::isNeedToRightOfWay(
+               route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return false;
   } else {
     return true;

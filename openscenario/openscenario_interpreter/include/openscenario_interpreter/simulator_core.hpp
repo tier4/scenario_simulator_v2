@@ -27,6 +27,7 @@
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace openscenario_interpreter
 {
@@ -277,9 +278,8 @@ public:
           routing_configuration.allow_lane_change =
             (routing_algorithm == RoutingAlgorithm::value_type::shortest);
           if (
-            const auto lane_changes = traffic_simulator::distance::countLaneChanges(
-              from_lanelet_pose.value(), to_lanelet_pose.value(), routing_configuration,
-              core->getHdmapUtils())) {
+            const auto lane_changes = traffic_simulator::route::countLaneChanges(
+              from_lanelet_pose.value(), to_lanelet_pose.value(), routing_configuration)) {
             return lane_changes.value().first - lane_changes.value().second;
           }
         }
@@ -852,6 +852,25 @@ public:
     static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
     {
       return core->getV2ITrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addV2ITrafficLightsStatePrediction(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->addTrafficLightsStatePrediction(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearV2ITrafficLightsStatePredictions(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->clearTrafficLightsStatePredictions(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    static auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) -> bool
+    {
+      return core->isV2ITrafficLightEnabled(lanelet_id);
     }
   };
 };

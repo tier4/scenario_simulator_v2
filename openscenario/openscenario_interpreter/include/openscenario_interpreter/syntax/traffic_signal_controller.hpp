@@ -40,7 +40,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalController : private SimulatorCore::ConditionEvaluation
+struct TrafficSignalController : private SimulatorCore::ConditionEvaluation,
+                                 private SimulatorCore::NonStandardOperation
 {
   // ID of the traffic signal controller in the road network.
   const String name;
@@ -103,6 +104,8 @@ public:
   auto notifyBegin() -> void;
 
   auto shouldChangePhaseToBegin() -> bool;
+
+  auto updatePredictions() -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

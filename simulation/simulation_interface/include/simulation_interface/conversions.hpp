@@ -262,7 +262,7 @@ auto toMsg(
   traffic_light_bulb_state.color = convert_color(proto.color());
   traffic_light_bulb_state.confidence = proto.confidence();
 }
-// clang-format off
+// clang-format on
 
 auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex &)
   -> traffic_simulator_msgs::Vertex;

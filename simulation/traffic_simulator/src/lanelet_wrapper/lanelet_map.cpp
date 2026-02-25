@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <lanelet2_core/primitives/BasicRegulatoryElements.h>
-#include <lanelet2_routing/RoutingGraphContainer.h>
+#include <lanelet2_core/primitives/Primitive.h>
 
-#include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/normalize.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 
@@ -40,9 +37,37 @@ auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool
     LaneletWrapper::map()->laneletLayer.get(lanelet_id), lanelet::BasicPoint2d(point.x, point.y));
 }
 
+auto isInIntersection(const lanelet::Id lanelet_id) -> bool
+{
+  return LaneletWrapper::map()->laneletLayer.get(lanelet_id).hasAttribute("turn_direction");
+}
+
 auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
   return LaneletWrapper::laneletLengthCache().getLength(lanelet_id, LaneletWrapper::map());
+}
+
+auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
+  -> std::tuple<double, Point, Point>
+{
+  if (const auto centerline_points = lanelet_wrapper::lanelet_map::centerPoints(lanelet_id);
+      centerline_points.empty()) {
+    THROW_SIMULATION_ERROR(
+      "There is no center points for lanelet with id: " + std::to_string(lanelet_id));
+  } else {
+    auto findNearestPointIndex = [](const std::vector<Point> & points, const Point & point) {
+      return std::distance(
+        points.begin(),
+        std::min_element(points.begin(), points.end(), [&](const Point & p1, const Point & p2) {
+          return math::geometry::hypot(p1, point) < math::geometry::hypot(p2, point);
+        }));
+    };
+    const size_t nearest_point_index = findNearestPointIndex(centerline_points, point);
+    const auto & nearest_point = centerline_points.at(nearest_point_index);
+    const auto & next_point = centerline_points.at(nearest_point_index + 1);
+    const auto yaw = std::atan2(next_point.y - nearest_point.y, next_point.x - nearest_point.x);
+    return std::make_tuple(yaw, nearest_point, next_point);
+  }
 }
 
 auto laneletAltitude(
@@ -68,12 +93,36 @@ auto laneletIds() -> lanelet::Ids
   return ids;
 }
 
+auto filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]) -> lanelet::Ids
+{
+  const auto convertToLanelets = [](const lanelet::Ids & lanelet_ids) -> lanelet::Lanelets {
+    lanelet::Lanelets lanelets;
+    lanelets.reserve(lanelet_ids.size());
+    for (const auto & id : lanelet_ids) {
+      lanelets.push_back(LaneletWrapper::map()->laneletLayer.get(id));
+    }
+    return lanelets;
+  };
+
+  const auto lanelets = convertToLanelets(lanelet_ids);
+  lanelet::Lanelets filtered_lanelets;
+  for (const auto & lanelet : lanelets) {
+    if (lanelet.hasAttribute(lanelet::AttributeName::Subtype)) {
+      lanelet::Attribute attr = lanelet.attribute(lanelet::AttributeName::Subtype);
+      if (attr.value() == subtype) {
+        filtered_lanelets.emplace_back(lanelet);
+      }
+    }
+  }
+  return laneletIds(filtered_lanelets);
+}
+
 auto nearbyLaneletIds(
-  const Point & point, const double distance_thresh, const bool include_crosswalk,
+  const Point & point, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids
 {
-  auto isEmptyOrBeyondThreshold = [&distance_thresh](const auto & lanelets) {
-    return lanelets.empty() || lanelets.front().first > distance_thresh;
+  auto isEmptyOrBeyondThreshold = [distance_threshold](const auto & lanelets) {
+    return lanelets.empty() || lanelets.front().first > distance_threshold;
   };
 
   auto excludeSubtypeLanelets =
@@ -109,7 +158,7 @@ auto nearbyLaneletIds(
   } else {
     lanelet::Ids target_lanelet_ids;
     for (const auto & [distance, lanelet] : nearest_lanelets) {
-      if (distance <= distance_thresh) {
+      if (distance <= distance_threshold) {
         target_lanelet_ids.push_back(lanelet.id());
       }
     }

@@ -58,7 +58,6 @@ public:
 
   explicit PedestrianEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::PedestrianParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 
@@ -131,7 +130,8 @@ public:
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
   const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
-  traffic_simulator::RoutePlanner route_planner_;
+  traffic_simulator::RoutePlanner route_planner_{
+    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER};
 };
 }  // namespace entity
 }  // namespace traffic_simulator

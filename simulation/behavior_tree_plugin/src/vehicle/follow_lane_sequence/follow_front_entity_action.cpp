@@ -20,6 +20,8 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -81,7 +83,8 @@ bool FollowFrontEntityAction::checkPreconditions()
     request_ != traffic_simulator::behavior::Request::NONE &&
     request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return false;
-  } else if (!getRightOfWayEntities(route_lanelets_).empty()) {
+  } else if (traffic_simulator::route::isNeedToRightOfWay(
+               route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return false;
   } else if (!behavior_parameter_.see_around) {
     return false;
@@ -146,7 +149,7 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
     }
   }
   if (!target_speed_) {
-    target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+    target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
   }
   const double front_entity_linear_velocity = front_entity_status.getTwist().linear.x;
   if (target_speed_.value() <= front_entity_linear_velocity) {

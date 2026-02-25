@@ -359,11 +359,6 @@ auto API::checkCollision(
 }
 
 // traffics, lanelet
-auto API::getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
-{
-  return entity_manager_ptr_->getHdmapUtils();
-}
-
 auto API::getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
 {
   return traffic_lights_ptr_->getV2ITrafficLights();
@@ -389,6 +384,11 @@ auto API::setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool en
   traffic_lights_ptr_->setV2IFeature(lanelet_id, enabled);
 }
 
+auto API::isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool
+{
+  return traffic_lights_ptr_->isV2ITrafficLightEnabled(lanelet_id);
+}
+
 auto API::addTrafficSource(
   const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
   const traffic::TrafficSource::Distribution & distribution, const bool allow_spawn_outside_lane,
@@ -402,7 +402,7 @@ auto API::addTrafficSource(
 
   traffic_controller_ptr_->addModule<traffic::TrafficSource>(
     radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
-    entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
+    [this, speed](const auto & name, auto &&... xs) {
       this->spawn(name, std::forward<decltype(xs)>(xs)...);
       getEntity(name).setLinearVelocity(speed);
     });

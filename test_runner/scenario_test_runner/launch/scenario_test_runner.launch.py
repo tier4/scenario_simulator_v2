@@ -101,6 +101,7 @@ def launch_setup(context, *args, **kwargs):
     sigterm_timeout                             = LaunchConfiguration("sigterm_timeout",                             default=8)
     simulate_localization                       = LaunchConfiguration("simulate_localization",                       default=True)
     speed_condition                             = LaunchConfiguration("speed_condition",                             default="legacy")
+    status_monitor_threshold                    = LaunchConfiguration("status_monitor_threshold",                    default=10)
     trajectory_based_detection_offset           = LaunchConfiguration("trajectory_based_detection_offset",           default=0.0)
     use_custom_centerline                       = LaunchConfiguration("use_custom_centerline",                       default=True)
     use_sim_time                                = LaunchConfiguration("use_sim_time",                                default=False)
@@ -138,6 +139,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"sigterm_timeout                             := {sigterm_timeout.perform(context)}")
     print(f"simulate_localization                       := {simulate_localization.perform(context)}")
     print(f"speed_condition                             := {speed_condition.perform(context)}")
+    print(f"status_monitor_threshold                    := {status_monitor_threshold.perform(context)}")
     print(f"trajectory_based_detection_offset           := {trajectory_based_detection_offset.perform(context)}")
     print(f"use_custom_centerline                       := {use_custom_centerline.perform(context)}")
     print(f"use_sim_time                                := {use_sim_time.perform(context)}")
@@ -172,6 +174,7 @@ def launch_setup(context, *args, **kwargs):
             {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
+            {"status_monitor_threshold": status_monitor_threshold},
             {"trajectory_based_detection_offset": trajectory_based_detection_offset},
             {"use_custom_centerline": use_custom_centerline},
             {"use_sim_time": use_sim_time},
@@ -229,7 +232,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("enable_perf",                                 default_value=enable_perf                                ),
         DeclareLaunchArgument("global_frame_rate",                           default_value=global_frame_rate                          ),
         DeclareLaunchArgument("global_real_time_factor",                     default_value=global_real_time_factor                    ),
-        DeclareLaunchArgument("global_timeout",                              default_value=global_timeout                             ),        
+        DeclareLaunchArgument("global_timeout",                              default_value=global_timeout                             ),
         DeclareLaunchArgument("initialize_localization",                     default_value=initialize_localization                    ),
         DeclareLaunchArgument("launch_autoware",                             default_value=launch_autoware                            ),
         DeclareLaunchArgument("launch_rviz",                                 default_value=launch_rviz                                ),
@@ -244,6 +247,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("sigterm_timeout",                             default_value=sigterm_timeout                            ),
         DeclareLaunchArgument("simulate_localization",                       default_value=simulate_localization                      ),
         DeclareLaunchArgument("speed_condition",                             default_value=speed_condition                            ),
+        DeclareLaunchArgument("status_monitor_threshold",                    default_value=status_monitor_threshold                   ),
         DeclareLaunchArgument("trajectory_based_detection_offset",           default_value=trajectory_based_detection_offset          ),
         DeclareLaunchArgument("use_custom_centerline",                       default_value=use_custom_centerline                      ),
         DeclareLaunchArgument("use_sim_time",                                default_value=use_sim_time                               ),

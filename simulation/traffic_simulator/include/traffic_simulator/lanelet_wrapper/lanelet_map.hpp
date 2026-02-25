@@ -15,9 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
 #define TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
 
-#include <lanelet2_core/geometry/Lanelet.h>
-#include <lanelet2_core/primitives/LaneletSequence.h>
-
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator
@@ -31,7 +28,12 @@ auto isInLanelet(const lanelet::Id lanelet_id, const double lanelet_pose_s) -> b
 
 auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
 
+auto isInIntersection(const lanelet::Id) -> bool;
+
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
+
+auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
+  -> std::tuple<double, Point, Point>;
 
 auto laneletAltitude(
   const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
@@ -48,6 +50,8 @@ auto laneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
 }
 
 auto laneletIds() -> lanelet::Ids;
+
+auto filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]) -> lanelet::Ids;
 
 auto nearbyLaneletIds(
   const Point & point, const double distance_threshold, const bool include_crosswalk,
