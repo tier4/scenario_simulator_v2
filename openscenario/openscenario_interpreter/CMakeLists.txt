@@ -71,7 +71,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 target_link_libraries(${PROJECT_NAME} Boost::json glog pugixml)
 
 target_precompile_headers(${PROJECT_NAME}
-  PUBLIC
+  PRIVATE
     "<boost/json.hpp>"
     "<openscenario_interpreter/expression.hpp>"
     "<openscenario_interpreter/pointer.hpp>"
