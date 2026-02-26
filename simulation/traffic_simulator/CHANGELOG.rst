@@ -2,6 +2,9 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.2 (2026-02-26)
+-------------------
+
 25.0.1 (2026-02-25)
 -------------------
 * Merge pull request `#1483 <https://github.com/tier4/scenario_simulator_v2/issues/1483>`_ from tier4/ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-tests

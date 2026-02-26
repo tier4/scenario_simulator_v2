@@ -2,6 +2,12 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.2 (2026-02-26)
+-------------------
+* Merge pull request `#1801 <https://github.com/tier4/scenario_simulator_v2/issues/1801>`_ from tier4/chore/reduce-precompile
+* Reduce precompiled header generation for small code
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
 25.0.1 (2026-02-25)
 -------------------
 * Merge branch 'master' into ref/RJD-1387-hdmap-utils-to-lanelet-wrapper-tests
