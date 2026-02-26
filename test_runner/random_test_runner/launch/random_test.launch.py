@@ -79,6 +79,15 @@ class RandomTestRunnerLaunch(object):
 
             "initialize_duration": {"default": 35, "description": "How long test runner will wait for Autoware to initialize"},
 
+            "spawn_ego_as_npc": 
+                {"default": "false", 
+                 "description": "If true, the EGO will be spawned as a npc (not controlled by Autoware)."},
+
+            "launch_rviz": 
+                {"default": "false", 
+                 "description": "If true, RViz will be launched to visualize the simulation. "
+                                "Recommended when running without Autoware (e.g., with spawn_ego_as_npc:=true)"},
+
             # test suite arguments #
             "test_name": {"default": "random_test",
                           "description": "Test name. Used for descriptive purposes only"},
@@ -149,6 +158,7 @@ class RandomTestRunnerLaunch(object):
 
         return declared_launch_arguments
 
+
     def launch_setup(self, context, *args, **kwargs):
         test_param_file = self.random_test_runner_launch_configuration["test_parameters_filename"].perform(context)
         print("Test param file '{}'".format(test_param_file))
@@ -166,8 +176,11 @@ class RandomTestRunnerLaunch(object):
                   "Parameters passed there override passed via arguments".format(test_param_file_path))
             parameters.append(test_param_file_path)
 
+        is_ego_spawned_as_npc = self.random_test_runner_launch_configuration["spawn_ego_as_npc"]\
+            .perform(context).strip().lower() == "true"
+
         # not tested for other architectures but required for "awf/universe"
-        if "awf/universe" in autoware_architecture:
+        if "awf/universe" in autoware_architecture and not is_ego_spawned_as_npc:
             vehicle_model = self.autoware_launch_configuration["vehicle_model"].perform(context)
             if vehicle_model:
                 vehicle_model_description_dir = get_package_share_directory(vehicle_model + "_description")
@@ -216,6 +229,18 @@ class RandomTestRunnerLaunch(object):
                     PythonExpression([
                         "'", self.random_test_runner_launch_configuration["simulator_type"], "'",
                         ' == "simple_sensor_simulator"'
+                    ])
+                ),
+            ),
+            Node(
+                package="rviz2",
+                executable="rviz2",
+                name="rviz2",
+                output={"stderr": "log", "stdout": "log"},
+                arguments=["-d", self.autoware_launch_configuration["rviz_config"]],
+                condition=IfCondition(
+                    PythonExpression([
+                        "'", self.random_test_runner_launch_configuration["launch_rviz"], "' == 'true'"
                     ])
                 ),
             )

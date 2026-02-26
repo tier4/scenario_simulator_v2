@@ -61,6 +61,7 @@ struct TestControlParameters
   ArchitectureType architecture_type = ArchitectureType::AWF_UNIVERSE;
   std::string simulator_host = "localhost";
   double test_timeout = 60.0;
+  bool spawn_ego_as_npc = false;
 };
 
 struct TestSuiteParameters
