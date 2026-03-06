@@ -35,15 +35,14 @@ RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
     bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
     apt-get update && \
-    rosdep install -iy --from-paths . --rosdistro ${ROS_DISTRO} && \
-    pip install xmlschema"
+    rosdep install -iy --from-paths . --rosdistro ${ROS_DISTRO}"
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
 
 ENV CC="/usr/lib/ccache/gcc"
 ENV CXX="/usr/lib/ccache/g++"
 ENV CCACHE_DIR="/ccache"
-RUN bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
+RUN --mount=type=cache,target=/ccache bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
     colcon build --cmake-args \ 
     -DCMAKE_BUILD_TYPE=Release \
     -DBUILD_CPP_MOCK_SCENARIOS=ON \
@@ -68,7 +67,6 @@ RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
     libpugixml1v5 libtbb12 libboost-filesystem1.74.0 ros-humble-lanelet2-matching \
     ros-humble-lanelet2-io ros-humble-lanelet2-routing libgeographic19 \
     ros-humble-behaviortree-cpp-v3 ros-humble-geographic-msgs && \
-    pip install xmlschema && \
     apt-get remove --purge -y software-properties-common python3-pip && \
     apt-get autoremove -y && \
     apt-get clean && \
@@ -88,3 +86,17 @@ RUN chmod a+x /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
+# ===================================================================  
+# Development Stage: Inherit from runtime and add dev tools like rviz  
+# ===================================================================  
+FROM runtime AS development  
+
+# Install ros2 destop packages and rviz2  
+RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \  
+    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \  
+    apt-get update && \  
+    apt-get install -y --no-install-recommends \  
+        ros-${ROS_DISTRO}-desktop \  
+        ros-${ROS_DISTRO}-rviz2 && \  
+    apt-get clean && \  
+    rm -rf /var/lib/apt/lists/*
