@@ -8,7 +8,8 @@ This section describes properties for configuring perception topics that
 ### Syntax
 
 Perception topics are configurable with the following syntax:
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'
@@ -79,7 +80,8 @@ guaranteed.
 `"0.0"`, meaning no missing other vehicles.
 
 **[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectMissingProbability.yaml)** -
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'
@@ -134,7 +136,8 @@ not supported.
 `"0.0"`, meaning no randomization.
 
 **[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPositionStandardDeviation.yaml)** -
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'
@@ -184,7 +187,8 @@ it reaches the planning module.
 `"0.0"`, meaning no delay.
 
 **[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPublishingDelay.yaml)** -
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'
@@ -221,7 +225,8 @@ it reaches the receiver node.
 `"0.0"`, meaning no delay.
 
 **Example** -
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'
@@ -264,7 +269,8 @@ produces an undistorted pointcloud.
 mimics Velodyne VLP-16.
 
 **[Example](https://github.com/tier4/scenario_simulator_v2/blob/487556437b448186e2de484f5130eb2b1d015e74/test_runner/scenario_test_runner/scenario/Property.pointcloudVerticalFieldOfView.yaml)** -
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'
@@ -294,7 +300,8 @@ The unit is degrees. If the value is zero or negative, it is an error.
 `"1.0"`.
 
 **[Example](https://github.com/tier4/scenario_simulator_v2/blob/487556437b448186e2de484f5130eb2b1d015e74/test_runner/scenario_test_runner/scenario/Property.pointcloudVerticalFieldOfView.yaml)** -
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'
@@ -329,7 +336,8 @@ field of view is +15° to -15°.
 mimics Velodyne VLP-16.
 
 **[Example](https://github.com/tier4/scenario_simulator_v2/blob/487556437b448186e2de484f5130eb2b1d015e74/test_runner/scenario_test_runner/scenario/Property.pointcloudVerticalFieldOfView.yaml)** -
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'
@@ -363,7 +371,8 @@ deterministic.
 `"0"`.
 
 **Example** -
-```
+
+```yaml
         ObjectController:
           Controller:
             name: '...'

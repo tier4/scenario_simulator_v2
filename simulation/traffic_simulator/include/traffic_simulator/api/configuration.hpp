@@ -16,9 +16,8 @@
 #define TRAFFIC_SIMULATOR__API__CONFIGURATION_HPP_
 
 #include <algorithm>
-#include <boost/filesystem.hpp>
-#include <boost/filesystem/operations.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <filesystem>
 #include <iomanip>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
@@ -31,7 +30,7 @@ struct Configuration
 {
   using Filename = std::string;
 
-  using Pathname = boost::filesystem::path;
+  using Pathname = std::filesystem::path;
 
   bool verbose = false;
 
@@ -94,7 +93,7 @@ struct Configuration
   {
     if (map_path.empty()) {
       throw common::SimulationError("No map path is given");
-    } else if (not boost::filesystem::is_directory(map_path)) {
+    } else if (not std::filesystem::is_directory(map_path)) {
       throw common::SimulationError(
         "The map_path must be a directory (given an ", std::quoted(map_path.string()), ")");
     } else if (not contains(map_path, ".osm")) {
@@ -117,8 +116,7 @@ struct Configuration
   {
     Filename result;
 
-    for (const auto & each :
-         boost::make_iterator_range(boost::filesystem::directory_iterator(pathname), {})) {
+    for (const auto & each : std::filesystem::directory_iterator(pathname)) {
       const auto filename = each.path().filename().string();
       if (
         each.path().extension() == extension and
@@ -149,9 +147,9 @@ struct Configuration
     }
   }
 
-  auto lanelet2_map_path() const -> boost::filesystem::path { return map_path / lanelet2_map_file; }
+  auto lanelet2_map_path() const -> std::filesystem::path { return map_path / lanelet2_map_file; }
 
-  auto pointcloud_map_path() const -> boost::filesystem::path
+  auto pointcloud_map_path() const -> std::filesystem::path
   {
     return map_path / pointcloud_map_file;
   }

@@ -27,6 +27,7 @@
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace openscenario_interpreter
 {
@@ -182,7 +183,7 @@ public:
       routing_configuration.allow_lane_change =
         (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::relativeLaneletPose(
-        from_lanelet_pose, to_lanelet_pose, routing_configuration, core->getHdmapUtils());
+        from_lanelet_pose, to_lanelet_pose, routing_configuration);
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -230,7 +231,7 @@ public:
         (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
         from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box,
-        routing_configuration, core->getHdmapUtils());
+        routing_configuration);
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(
@@ -277,9 +278,8 @@ public:
           routing_configuration.allow_lane_change =
             (routing_algorithm == RoutingAlgorithm::value_type::shortest);
           if (
-            const auto lane_changes = traffic_simulator::distance::countLaneChanges(
-              from_lanelet_pose.value(), to_lanelet_pose.value(), routing_configuration,
-              core->getHdmapUtils())) {
+            const auto lane_changes = traffic_simulator::route::countLaneChanges(
+              from_lanelet_pose.value(), to_lanelet_pose.value(), routing_configuration)) {
             return lane_changes.value().first - lane_changes.value().second;
           }
         }
@@ -338,6 +338,12 @@ public:
       entity.setVelocityLimit(controller.properties.template get<Double>(
         "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
+      if (controller.properties.contains("lateralCollisionThreshold")) {
+        entity.setLateralCollisionThreshold(
+          controller.properties.template get<Double>("lateralCollisionThreshold"));
+      } else {
+        entity.setLateralCollisionThreshold(std::nullopt);
+      }
       entity.setBehaviorParameter([&]() {
         auto message = entity.getBehaviorParameter();
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
@@ -487,9 +493,16 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyFollowTrajectoryAction(const std::string & entity_ref, Ts &&... xs)
+    static auto applyFollowTrajectoryAction(
+      const std::string & entity_ref,
+      const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter)
     {
-      return core->getEntity(entity_ref).requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
+      /// @note add current entity pose as the first waypoint in the trajectory
+      traffic_simulator_msgs::msg::Vertex initial_vertex;
+      initial_vertex.time = std::numeric_limits<double>::quiet_NaN();
+      initial_vertex.position = core->getEntity(entity_ref).getMapPose();
+      parameter->shape.vertices.insert(parameter->shape.vertices.begin(), initial_vertex);
+      return core->getEntity(entity_ref).requestFollowTrajectory(parameter);
     }
 
     template <typename... Ts>
@@ -735,11 +748,45 @@ public:
       return core->getEgoEntity(ego_ref).getTurnIndicatorsCommandName();
     }
 
+    static auto setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled)
+      -> decltype(auto)
+    {
+      return core->setTrafficSignalV2IFeature(lanelet_id, enabled);
+    }
+
     // TrafficLights - Conventional and V2I
     template <typename... Ts>
     static auto setConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
     {
       return core->getConventionalTrafficLights()->setTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->clearTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights()->addTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearConventionalDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalDetectedTrafficLights()->clearState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addConventionalDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalDetectedTrafficLights()->addState(
         std::forward<decltype(xs)>(xs)...);
     }
 
@@ -777,9 +824,53 @@ public:
     }
 
     template <typename... Ts>
+    static auto clearV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->clearTrafficLightsState(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->addTrafficLightsState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearV2IDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2IDetectedTrafficLights()->clearState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addV2IDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2IDetectedTrafficLights()->addState(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
     static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
     {
       return core->getV2ITrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto addV2ITrafficLightsStatePrediction(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->addTrafficLightsStatePrediction(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto clearV2ITrafficLightsStatePredictions(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights()->clearTrafficLightsStatePredictions(
+        std::forward<decltype(xs)>(xs)...);
+    }
+
+    static auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) -> bool
+    {
+      return core->isV2ITrafficLightEnabled(lanelet_id);
     }
   };
 };

@@ -1,0 +1,5 @@
+repositories:
+  replay_testing:
+    type: git
+    url: https://github.com/polymathrobotics/replay_testing.git
+    version: main

@@ -18,6 +18,7 @@
 #include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <array>
+#include <concealer/publisher.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <random>
@@ -50,7 +51,7 @@ public:
 
   virtual auto update(
     const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> bool = 0;
+    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) -> bool = 0;
 
 protected:
   const bool add_gravity_;
@@ -61,39 +62,45 @@ protected:
   mutable std::normal_distribution<> noise_distribution_orientation_;
   mutable std::normal_distribution<> noise_distribution_twist_;
   mutable std::normal_distribution<> noise_distribution_acceleration_;
-  const std::array<double, 9> orientation_covariance_;
-  const std::array<double, 9> angular_velocity_covariance_;
-  const std::array<double, 9> linear_acceleration_covariance_;
+  std::array<double, 9> orientation_covariance_;
+  std::array<double, 9> angular_velocity_covariance_;
+  std::array<double, 9> linear_acceleration_covariance_;
 
   auto calculateCovariance(const double stddev) const -> std::array<double, 9>
   {
     return {std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2), 0, 0, 0, std::pow(stddev, 2)};
-  };
+  }
 };
 
 template <typename MessageType>
 class ImuSensor : public ImuSensorBase
 {
 public:
+  template <typename NodeType>
   explicit ImuSensor(
-    const simulation_api_schema::ImuSensorConfiguration & configuration,
-    const typename rclcpp::Publisher<MessageType>::SharedPtr & publisher)
+    const simulation_api_schema::ImuSensorConfiguration & configuration, const std::string & topic,
+    NodeType & node)
   : ImuSensorBase(configuration),
+    override_legacy_configuration_(common::getParameter<bool>(
+      node.get_node_parameters_interface(), topic + ".override_legacy_configuration", false)),
     entity_name_(configuration.entity()),
     frame_id_(configuration.frame_id()),
-    publisher_(publisher)
+    publish(topic, node)
   {
+    if (not override_legacy_configuration_) {
+      publish.getRandomizer().active = false;
+    }
   }
 
   auto update(
     const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> bool override
+    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) -> bool override
   {
     for (const auto & status : statuses) {
       if (status.name() == entity_name_) {
         traffic_simulator_msgs::msg::EntityStatus status_msg;
         simulation_interface::toMsg(status, status_msg);
-        publisher_->publish(generateMessage(current_ros_time, status_msg));
+        publish(generateMessage(current_ros_time, status_msg));
         return true;
       }
     }
@@ -105,9 +112,10 @@ private:
     const rclcpp::Time & current_ros_time,
     const traffic_simulator_msgs::msg::EntityStatus & status) const -> const MessageType;
 
+  const bool override_legacy_configuration_;
   const std::string entity_name_;
   const std::string frame_id_;
-  const typename rclcpp::Publisher<MessageType>::SharedPtr publisher_;
+  concealer::Publisher<MessageType, concealer::NormalDistribution> publish;
 };
 }  // namespace simple_sensor_simulator
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__IMU_SENSOR_HPP_

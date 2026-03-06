@@ -17,10 +17,11 @@
 
 #include <simulation_interface/simulation_api_schema.pb.h>
 
+#include <functional>
+#include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
@@ -29,6 +30,10 @@
 
 namespace traffic_simulator
 {
+using TrafficLightStatePredictions = std::unordered_map<
+  lanelet::Id,
+  std::vector<std::pair<rclcpp::Time, std::vector<simulation_api_schema::TrafficLight>>>>;
+
 /*
    TrafficLightsBase class is designed in such a way that while trying to perform an operation
    on a TrafficLight (add, set, etc.) that is not added to traffic_light_map_,
@@ -38,11 +43,19 @@ namespace traffic_simulator
 class TrafficLightsBase
 {
 public:
+  // State change callback types
+  enum class StateChangeType {
+    SET,    // setTrafficLightsState()
+    CLEAR,  // clearTrafficLightsState()
+    ADD,    // addTrafficLightsState()
+  };
+
+  using StateChangeCallback = std::function<void(
+    lanelet::Id lanelet_id, const std::string & state, StateChangeType change_type)>;
+
   template <typename NodeTypePointer>
-  explicit TrafficLightsBase(
-    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-  : hdmap_utils_(hdmap_utils),
-    clock_ptr_(node_ptr->get_clock()),
+  explicit TrafficLightsBase(const NodeTypePointer & node_ptr)
+  : clock_ptr_(node_ptr->get_clock()),
     marker_publisher_ptr_(std::make_unique<TrafficLightMarkerPublisher>(node_ptr)),
     rate_updater_(node_ptr, [this]() { update(); })
   {
@@ -67,17 +80,30 @@ public:
 
   auto setTrafficLightsState(const lanelet::Id lanelet_id, const std::string & state) -> void;
 
+  auto clearTrafficLightsState(const lanelet::Id lanelet_id) -> void;
+
+  auto addTrafficLightsState(const lanelet::Id lanelet_id, const std::string & state) -> void;
+
   auto setTrafficLightsConfidence(const lanelet::Id lanelet_id, const double confidence) -> void;
 
   auto getTrafficLightsComposedState(const lanelet::Id lanelet_id) -> std::string;
+
+  auto getDistanceToActiveTrafficLightStopLine(
+    const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+    -> std::optional<double>;
 
   auto generateUpdateTrafficLightsRequest() const
     -> simulation_api_schema::UpdateTrafficLightsRequest;
 
   auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
 
+  auto registerStateChangeCallback(StateChangeCallback callback) -> void;
+
 protected:
   virtual auto update() const -> void = 0;
+
+  auto notifyStateChange(
+    const lanelet::Id lanelet_id, const std::string & state, StateChangeType change_type) -> void;
 
   auto isTrafficLightAdded(const lanelet::Id traffic_light_id) const -> bool;
 
@@ -86,12 +112,13 @@ protected:
   auto getTrafficLights(const lanelet::Id lanelet_id)
     -> std::vector<std::reference_wrapper<TrafficLight>>;
 
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
   std::unordered_map<lanelet::Id, TrafficLight> traffic_lights_map_;
   const std::unique_ptr<TrafficLightMarkerPublisher> marker_publisher_ptr_;
   ConfigurableRateUpdater rate_updater_;
+
+  std::vector<StateChangeCallback> state_change_callbacks_;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_BASE_HPP_

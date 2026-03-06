@@ -15,6 +15,8 @@
 #include <gtest/gtest.h>
 #include <simulation_interface/geometry_msgs.pb.h>
 
+#include <traffic_simulator_msgs/msg/traffic_light_bulb_v1.hpp>
+
 #include "expect_equal_macros.hpp"
 /**
  * @brief Test cases
@@ -526,6 +528,129 @@ TEST(Conversion, LaneletPose)
   EXPECT_NO_THROW(simulation_interface::toMsg(proto, pose));
   EXPECT_LANELET_POSE_EQ(pose, proto);
 }
+
+struct ColorConversionTestParameters
+{
+  simulation_api_schema::TrafficLight_Color given_proto_color;
+  std::uint8_t expected_message_value;
+  std::string test_name;
+};
+
+struct StatusConversionTestParameters
+{
+  simulation_api_schema::TrafficLight_Status given_proto_status;
+  uint8_t expected_message_value;
+  std::string test_name;
+};
+
+struct ShapeConversionTestParameters
+{
+  simulation_api_schema::TrafficLight_Shape given_proto_shape;
+  uint8_t expected_message_value;
+  std::string test_name;
+};
+
+class TrafficLightColorConversionTest
+: public ::testing::TestWithParam<ColorConversionTestParameters>
+{
+};
+
+class TrafficLightStatusConversionTest
+: public ::testing::TestWithParam<StatusConversionTestParameters>
+{
+};
+
+class TrafficLightShapeConversionTest
+: public ::testing::TestWithParam<ShapeConversionTestParameters>
+{
+};
+
+TEST_P(TrafficLightColorConversionTest, ColorConversion)
+{
+  auto param = GetParam();
+  simulation_api_schema::TrafficLight proto;
+  traffic_simulator_msgs::msg::TrafficLightBulbV1 message;
+
+  proto.set_color(param.given_proto_color);
+  proto.set_status(simulation_api_schema::TrafficLight_Status_SOLID_ON);
+  proto.set_shape(simulation_api_schema::TrafficLight_Shape_CIRCLE);
+
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, message));
+  EXPECT_EQ(message.color, param.expected_message_value);
+}
+
+TEST_P(TrafficLightStatusConversionTest, StatusConversion)
+{
+  auto param = GetParam();
+  simulation_api_schema::TrafficLight proto;
+  traffic_simulator_msgs::msg::TrafficLightBulbV1 message;
+
+  proto.set_color(simulation_api_schema::TrafficLight_Color_RED);
+  proto.set_status(param.given_proto_status);
+  proto.set_shape(simulation_api_schema::TrafficLight_Shape_CIRCLE);
+
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, message));
+  EXPECT_EQ(message.status, param.expected_message_value);
+}
+
+TEST_P(TrafficLightShapeConversionTest, ShapeConversion)
+{
+  auto param = GetParam();
+  simulation_api_schema::TrafficLight proto;
+  traffic_simulator_msgs::msg::TrafficLightBulbV1 message;
+
+  proto.set_color(simulation_api_schema::TrafficLight_Color_GREEN);
+  proto.set_status(simulation_api_schema::TrafficLight_Status_SOLID_ON);
+  proto.set_shape(param.given_proto_shape);
+
+  EXPECT_NO_THROW(simulation_interface::toMsg(proto, message));
+  EXPECT_EQ(message.shape, param.expected_message_value);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+  TrafficLightColors, TrafficLightColorConversionTest,
+  // clang-format off
+  ::testing::Values(
+    ColorConversionTestParameters{simulation_api_schema::TrafficLight_Color_RED,           traffic_simulator_msgs::msg::TrafficLightBulbV1::RED,     "Red"     },
+    ColorConversionTestParameters{simulation_api_schema::TrafficLight_Color_AMBER,         traffic_simulator_msgs::msg::TrafficLightBulbV1::AMBER,   "Amber"   },
+    ColorConversionTestParameters{simulation_api_schema::TrafficLight_Color_GREEN,         traffic_simulator_msgs::msg::TrafficLightBulbV1::GREEN,   "Green"   },
+    ColorConversionTestParameters{simulation_api_schema::TrafficLight_Color_WHITE,         traffic_simulator_msgs::msg::TrafficLightBulbV1::WHITE,   "White"   },
+    ColorConversionTestParameters{simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR, traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN, "Unknown" }),
+  // clang-format on
+  [](const ::testing::TestParamInfo<ColorConversionTestParameters> & info) {
+    return info.param.test_name;
+  });
+
+INSTANTIATE_TEST_SUITE_P(
+  TrafficLightStatuses, TrafficLightStatusConversionTest,
+  // clang-format off
+  ::testing::Values(
+    StatusConversionTestParameters{simulation_api_schema::TrafficLight_Status_SOLID_OFF,      traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_OFF, "SolidOff" },
+    StatusConversionTestParameters{simulation_api_schema::TrafficLight_Status_SOLID_ON,       traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_ON,  "SolidOn"  },
+    StatusConversionTestParameters{simulation_api_schema::TrafficLight_Status_FLASHING,       traffic_simulator_msgs::msg::TrafficLightBulbV1::FLASHING,  "Flashing" },
+    StatusConversionTestParameters{simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS, traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN,   "Unknown"  }),
+  // clang-format on
+  [](const ::testing::TestParamInfo<StatusConversionTestParameters> & info) {
+    return info.param.test_name;
+  });
+
+INSTANTIATE_TEST_SUITE_P(
+  TrafficLightShapes, TrafficLightShapeConversionTest,
+  // clang-format off
+  ::testing::Values(
+    ShapeConversionTestParameters{simulation_api_schema::TrafficLight_Shape_CIRCLE,         traffic_simulator_msgs::msg::TrafficLightBulbV1::CIRCLE,      "Circle"       },
+    ShapeConversionTestParameters{simulation_api_schema::TrafficLight_Shape_LEFT_ARROW,     traffic_simulator_msgs::msg::TrafficLightBulbV1::LEFT_ARROW,  "LeftArrow"    },
+    ShapeConversionTestParameters{simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW,    traffic_simulator_msgs::msg::TrafficLightBulbV1::RIGHT_ARROW, "RightArrow"   },
+    ShapeConversionTestParameters{simulation_api_schema::TrafficLight_Shape_UP_ARROW,       traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_ARROW,    "UpArrow"      },
+    ShapeConversionTestParameters{simulation_api_schema::TrafficLight_Shape_DOWN_ARROW,     traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_ARROW,  "DownArrow"    },
+    ShapeConversionTestParameters{simulation_api_schema::TrafficLight_Shape_CROSS,          traffic_simulator_msgs::msg::TrafficLightBulbV1::CROSS,       "Cross"        },
+    ShapeConversionTestParameters{simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE,  traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN,     "Unknown"      },
+    ShapeConversionTestParameters{simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW,  traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN,     "UpLeftArrow"  },  // temporarily disabled
+    ShapeConversionTestParameters{simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW, traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN,     "UpRightArrow" }), // temporarily disabled
+  // clang-format on
+  [](const ::testing::TestParamInfo<ShapeConversionTestParameters> & info) {
+    return info.param.test_name;
+  });
 
 int main(int argc, char ** argv)
 {

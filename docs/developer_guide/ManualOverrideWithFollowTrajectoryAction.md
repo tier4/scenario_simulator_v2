@@ -8,11 +8,11 @@ During the executing `FollowTrajectoryAction`, the control of the ego entity is 
 There are 3 types of override for Autoware.
 
 - Local: Manually control the vehicle from nearby with some device such as a joystick.
-  - This is one of operation modes.
+    - This is one of operation modes.
 - Remote: Manually control the vehicle from a web application on the cloud.
-  - This is one of operation modes.
+    - This is one of operation modes.
 - Direct: Manually control the vehicle from handle, brake and/or accel directly.
-  - Please note that this is not a operation mode but a control mode of vehicle interface.
+    - Please note that this is not a operation mode but a control mode of vehicle interface.
 
 ## override simulation in scenario_simulator_v2
 

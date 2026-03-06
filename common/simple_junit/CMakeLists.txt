@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(simple_junit)
 
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -18,12 +18,11 @@ ament_auto_add_library(${PROJECT_NAME} SHARED src/test_suites.cpp)
 
 target_link_libraries(${PROJECT_NAME}
   Boost::date_time
-  Boost::filesystem
   pugixml)
 
-  install(
-    DIRECTORY test/expected
-    DESTINATION share/${PROJECT_NAME})
+install(
+  DIRECTORY test/expected
+  DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

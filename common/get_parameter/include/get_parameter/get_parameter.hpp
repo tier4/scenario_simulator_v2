@@ -29,6 +29,9 @@ namespace common
  */
 inline auto getParameterNode() -> rclcpp::Node &
 {
+  if (not rclcpp::ok()) {
+    rclcpp::init(0, nullptr);
+  }
   static rclcpp::Node node{
     [](std::string name_base) { return name_base + "_pid" + std::to_string(getpid()); }(__func__),
     "simulation",

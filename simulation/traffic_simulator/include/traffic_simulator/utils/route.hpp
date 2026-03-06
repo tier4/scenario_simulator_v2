@@ -20,17 +20,81 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/lane_change.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
 
 namespace traffic_simulator
 {
 inline namespace route
 {
+using Point = geometry_msgs::msg::Point;
+using Curve = math::geometry::HermiteCurve;
+using Spline = math::geometry::CatmullRomSpline;
+
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
+
+// Move
 template <typename... Ts>
-auto route(Ts &&... xs)
+auto routeFromGraph(Ts &&... xs)
 {
-  return lanelet_wrapper::route::route(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::route::routeFromGraph(std::forward<decltype(xs)>(xs)...);
 }
+
+template <typename... Ts>
+auto speedLimit(Ts &&... xs)
+{
+  return lanelet_wrapper::route::speedLimit(std::forward<decltype(xs)>(xs)...);
+}
+
+auto isAnyConflictingEntity(
+  const lanelet::Ids & following_lanelets,
+  const std::vector<CanonicalizedLaneletPose> & other_poses) -> bool;
+
+auto isNeedToRightOfWay(
+  const lanelet::Ids & following_lanelets,
+  const std::vector<CanonicalizedLaneletPose> & other_entity_poses) -> bool;
+
+// Move forward
+template <typename... Ts>
+auto followingLanelets(Ts &&... xs)
+{
+  return lanelet_wrapper::route::followingLanelets(std::forward<decltype(xs)>(xs)...);
+}
+
+auto moveAlongLaneletPose(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
+  const double distance) -> LaneletPose;
+
+// Move backward
+template <typename... Ts>
+auto previousLanelets(Ts &&... xs)
+{
+  return lanelet_wrapper::route::previousLanelets(std::forward<decltype(xs)>(xs)...);
+}
+
+auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
+  -> std::vector<Point>;
+
+// Lane change
+template <typename... Ts>
+auto laneChangeableLaneletId(Ts &&... xs)
+{
+  return lanelet_wrapper::lane_change::laneChangeableLaneletId(std::forward<decltype(xs)>(xs)...);
+}
+
+auto laneChangeAlongLaneletPose(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const lane_change::Parameter & parameter) -> LaneletPose;
+
+auto laneChangeTrajectory(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const lane_change::Parameter & parameter) -> std::optional<std::pair<Curve, double>>;
+
+auto laneChangePoints(const Curve & curve, const double current_s) -> std::vector<Point>;
+
+auto countLaneChanges(
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  const RoutingConfiguration & routing_configuration) -> std::optional<std::pair<int, int>>;
 }  // namespace route
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__ROUTE_HPP_

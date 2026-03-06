@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 #include "../helper_functions.hpp"
@@ -27,19 +28,7 @@ int main(int argc, char ** argv)
 class PoseTest : public testing::Test
 {
 protected:
-  PoseTest()
-  : hdmap_utils(std::make_shared<hdmap_utils::HdMapUtils>(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/four_track_highway/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.22312494055522)
-        .longitude(138.8024583466017)
-        .altitude(0.0)))
-  {
-    activateLaneletWrapper("four_track_highway");
-  }
-
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  PoseTest() { activateLaneletWrapper("four_track_highway"); }
 };
 
 /**
@@ -91,8 +80,7 @@ TEST_F(PoseTest, canonicalize_default)
 TEST_F(PoseTest, canonicalize_invalid)
 {
   EXPECT_THROW(
-    traffic_simulator::pose::toCanonicalizedLaneletPose(
-      traffic_simulator::pose::quietNaNLaneletPose()),
+    traffic_simulator::pose::canonicalize(traffic_simulator::pose::quietNaNLaneletPose()),
     std::runtime_error);
   EXPECT_FALSE(traffic_simulator::pose::toCanonicalizedLaneletPose(
     traffic_simulator::helper::constructLaneletPose(203, 1000.0, 0.0)));
@@ -128,7 +116,7 @@ TEST_F(PoseTest, toMapPose_CanonicalizedLaneletPose)
 }
 
 /**
- * @note Test conversion to geometry_msgs::msg::Pose from LaneletPose with HdMapUtils pointer.
+ * @note Test conversion to geometry_msgs::msg::Pose from LaneletPose.
  */
 TEST_F(PoseTest, toMapPose_LaneletPose)
 {
@@ -419,7 +407,7 @@ TEST_F(PoseTest, relativeLaneletPose_s_invalid)
   const auto to = traffic_simulator::helper::constructCanonicalizedLaneletPose(196, 0.0, 0.0);
 
   const auto relative = traffic_simulator::pose::relativeLaneletPose(
-    from, to, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, to, traffic_simulator::RoutingConfiguration());
 
   EXPECT_TRUE(std::isnan(relative.s));
 }
@@ -433,7 +421,7 @@ TEST_F(PoseTest, relativeLaneletPose_s_valid)
   const auto to = traffic_simulator::helper::constructCanonicalizedLaneletPose(3002163, 0.0, 0.0);
 
   const auto relative = traffic_simulator::pose::relativeLaneletPose(
-    from, to, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, to, traffic_simulator::RoutingConfiguration());
 
   EXPECT_NEAR(relative.s, 107.74, 0.001);
 }
@@ -447,7 +435,7 @@ TEST_F(PoseTest, relativeLaneletPose_offset_invalid)
   const auto to = traffic_simulator::helper::constructCanonicalizedLaneletPose(196, 0.0, 0.0);
 
   const auto relative = traffic_simulator::pose::relativeLaneletPose(
-    from, to, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, to, traffic_simulator::RoutingConfiguration());
 
   EXPECT_TRUE(std::isnan(relative.offset));
 }
@@ -462,8 +450,8 @@ TEST_F(PoseTest, relativeLaneletPose_offset_valid)
 
   traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
   lane_changeable_routing_configuration.allow_lane_change = true;
-  const auto relative = traffic_simulator::pose::relativeLaneletPose(
-    from, to, lane_changeable_routing_configuration, hdmap_utils);
+  const auto relative =
+    traffic_simulator::pose::relativeLaneletPose(from, to, lane_changeable_routing_configuration);
 
   EXPECT_EQ(relative.offset, 1.0);
 }
@@ -478,7 +466,7 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_s_invalid)
   const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration());
 
   EXPECT_TRUE(std::isnan(relative.s));
 }
@@ -493,7 +481,7 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_s_valid)
   const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration());
 
   EXPECT_NEAR(relative.s, 103.74, 0.01);
 }
@@ -508,7 +496,7 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_offset_invalid)
   const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration());
 
   EXPECT_TRUE(std::isnan(relative.s));
 }
@@ -523,7 +511,7 @@ TEST_F(PoseTest, boundingBoxRelativeLaneletPose_offset_valid)
   const auto bounding_box = makeBoundingBox();
 
   const auto relative = traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration(), hdmap_utils);
+    from, bounding_box, to, bounding_box, traffic_simulator::RoutingConfiguration());
 
   EXPECT_EQ(relative.offset, 0.0);
 }
@@ -535,8 +523,8 @@ TEST_F(PoseTest, isInLanelet_inside)
 {
   const auto pose = traffic_simulator::helper::constructCanonicalizedLaneletPose(195, 0.0, 0.0);
 
-  EXPECT_TRUE(traffic_simulator::pose::isInLanelet(
-    pose, 195, std::numeric_limits<double>::epsilon(), hdmap_utils));
+  EXPECT_TRUE(
+    traffic_simulator::pose::isInLanelet(pose, 195, std::numeric_limits<double>::epsilon()));
 }
 
 /**
@@ -547,7 +535,7 @@ TEST_F(PoseTest, isInLanelet_outsideFrontFar)
   const auto pose =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(3002163, -10.0, 0.0);
 
-  EXPECT_FALSE(traffic_simulator::pose::isInLanelet(pose, 3002163, 1.0, hdmap_utils));
+  EXPECT_FALSE(traffic_simulator::pose::isInLanelet(pose, 3002163, 1.0));
 }
 
 /**
@@ -558,7 +546,7 @@ TEST_F(PoseTest, isInLanelet_outsideFrontClose)
   const auto pose =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(3002163, -1.0, 0.0);
 
-  EXPECT_TRUE(traffic_simulator::pose::isInLanelet(pose, 3002163, 2.0, hdmap_utils));
+  EXPECT_TRUE(traffic_simulator::pose::isInLanelet(pose, 3002163, 2.0));
 }
 
 /**
@@ -568,7 +556,7 @@ TEST_F(PoseTest, isInLanelet_outsideBackFar)
 {
   const auto pose = traffic_simulator::helper::constructCanonicalizedLaneletPose(195, 120.0, 0.0);
 
-  EXPECT_FALSE(traffic_simulator::pose::isInLanelet(pose, 195, 2, hdmap_utils));
+  EXPECT_FALSE(traffic_simulator::pose::isInLanelet(pose, 195, 2));
 }
 
 /**
@@ -578,7 +566,7 @@ TEST_F(PoseTest, isInLanelet_outsideBackClose)
 {
   const auto pose = traffic_simulator::helper::constructCanonicalizedLaneletPose(195, 110.0, 0.0);
 
-  EXPECT_TRUE(traffic_simulator::pose::isInLanelet(pose, 195, 10.0, hdmap_utils));
+  EXPECT_TRUE(traffic_simulator::pose::isInLanelet(pose, 195, 10.0));
 }
 
 /**
@@ -589,7 +577,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_noFollowing_within)
   const auto pose =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(3002171, 31.0, 0.0);
 
-  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose, hdmap_utils));
+  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose));
 }
 
 /**
@@ -599,7 +587,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_singleFollowing_within)
 {
   const auto pose = traffic_simulator::helper::constructCanonicalizedLaneletPose(3002167, 5.0, 0.0);
 
-  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose, hdmap_utils));
+  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose));
 }
 
 /**
@@ -610,7 +598,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_singleFollowing_outside)
   const auto pose =
     traffic_simulator::helper::constructCanonicalizedLaneletPose(3002167, 20.0, 0.0);
 
-  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose, hdmap_utils));
+  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose));
 }
 
 /**
@@ -620,7 +608,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_multipleFollowing_within)
 {
   const auto pose = traffic_simulator::helper::constructCanonicalizedLaneletPose(195, 5.0, 0.0);
 
-  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose, hdmap_utils));
+  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose));
 }
 
 /**
@@ -630,7 +618,7 @@ TEST_F(PoseTest, isAtEndOfLanelets_multipleFollowing_outside)
 {
   const auto pose = traffic_simulator::helper::constructCanonicalizedLaneletPose(195, 120.0, 0.0);
 
-  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose, hdmap_utils));
+  EXPECT_FALSE(traffic_simulator::pose::isAtEndOfLanelets(pose));
 }
 
 /**

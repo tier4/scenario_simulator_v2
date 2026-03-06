@@ -15,7 +15,7 @@ It enables Autoware developers to write a scenario at once and run in various ki
 Currently, various kinds of simulators and scenario formats are developed all over the world.
 We need an open-source framework for integrating those testing tools with Autoware easily and quickly.
 So, we are developing this package.
-<font color="#065479E">**This package is designed to easily accommodate multiple simulators and scenario description formats.**</font>
+**This package is designed to easily accommodate multiple simulators and scenario description formats.**
 
 This package is licensed under the Apache License, Version 2.0.
 See also [LICENSE](https://github.com/tier4/scenario_simulator_v2/blob/master/LICENSE).

@@ -153,12 +153,12 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
     architectureTypeFromString(this->declare_parameter<std::string>("architecture_type", ""));
   tp.simulator_host = this->declare_parameter<std::string>("simulator_host", "localhost");
 
-  if (!tp.input_dir.empty() && !boost::filesystem::is_directory(tp.input_dir)) {
+  if (!tp.input_dir.empty() && !std::filesystem::is_directory(tp.input_dir)) {
     throw std::runtime_error(
       fmt::format("Input directory {} does not exists or is not a directory", tp.input_dir));
   }
 
-  if (tp.output_dir.empty() || !boost::filesystem::is_directory(tp.output_dir)) {
+  if (tp.output_dir.empty() || !std::filesystem::is_directory(tp.output_dir)) {
     throw std::runtime_error(fmt::format(
       "Output directory {} is empty, does not exists or is not a directory", tp.output_dir));
   }

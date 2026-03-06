@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/move_backward_action.hpp>
 #include <optional>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace entity_behavior
 {
@@ -35,29 +36,18 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> MoveBackwardAction::c
 
 const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoints()
 {
-  if (!canonicalized_entity_status_->isInLanelet()) {
-    THROW_SIMULATION_ERROR("failed to assign lane");
-  }
   if (canonicalized_entity_status_->getTwist().linear.x >= 0) {
     return traffic_simulator_msgs::msg::WaypointsArray();
+  } else if (
+    const auto canonicalized_lanelet_pose =
+      canonicalized_entity_status_->getCanonicalizedLaneletPose()) {
+    return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::WaypointsArray>().waypoints(
+      traffic_simulator::route::moveBackPoints(canonicalized_lanelet_pose.value()));
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Cannot move backward along lanelet - entity ",
+      std::quoted(canonicalized_entity_status_->getName()), " has invalid lanelet pose.");
   }
-  const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
-  const auto ids = hdmap_utils_->getPreviousLanelets(lanelet_pose.lanelet_id);
-  // DIFFERENT SPLINE - recalculation needed
-  math::geometry::CatmullRomSpline spline(hdmap_utils_->getCenterPoints(ids));
-  double s_in_spline = 0;
-  for (const auto id : ids) {
-    if (id == lanelet_pose.lanelet_id) {
-      s_in_spline = s_in_spline + lanelet_pose.s;
-      break;
-    } else {
-      s_in_spline = traffic_simulator::lanelet_map::laneletLength(id) + s_in_spline;
-    }
-  }
-  traffic_simulator_msgs::msg::WaypointsArray waypoints;
-  waypoints.waypoints =
-    spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0, lanelet_pose.offset);
-  return waypoints;
 }
 
 void MoveBackwardAction::getBlackBoardValues() { VehicleActionNode::getBlackBoardValues(); }
@@ -82,8 +72,8 @@ BT::NodeStatus MoveBackwardAction::doAction()
     return BT::NodeStatus::FAILURE;
   }
   if (!target_speed_) {
-    target_speed_ = hdmap_utils_->getSpeedLimit(
-      hdmap_utils_->getPreviousLanelets(canonicalized_entity_status_->getLaneletId()));
+    target_speed_ = traffic_simulator::route::speedLimit(
+      traffic_simulator::route::previousLanelets(canonicalized_entity_status_->getLaneletId()));
   }
 
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));

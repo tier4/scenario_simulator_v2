@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -29,6 +33,10 @@ namespace follow_lane_sequence
 FollowLaneAction::FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config)
 : entity_behavior::VehicleActionNode(name, config)
 {
+  use_trajectory_based_front_entity_detection_ =
+    common::getParameter<bool>("use_trajectory_based_front_entity_detection", false);
+  trajectory_based_detection_offset_ =
+    common::getParameter<double>("trajectory_based_detection_offset", 0.0);
 }
 
 const std::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::calculateObstacle(
@@ -91,13 +99,26 @@ BT::NodeStatus FollowLaneAction::doAction()
     return BT::NodeStatus::FAILURE;
   }
   if (behavior_parameter_.see_around) {
-    if (getRightOfWayEntities(route_lanelets_).size() != 0) {
+    if (traffic_simulator::route::isNeedToRightOfWay(
+          route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
       return BT::NodeStatus::FAILURE;
     }
     if (trajectory == nullptr) {
       return BT::NodeStatus::FAILURE;
     }
-    const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
+    std::optional<double> distance_to_front_entity;
+    if (use_trajectory_based_front_entity_detection_) {
+      constexpr std::size_t trajectory_segments = 50;
+      if (
+        const auto front_entity_info = getFrontEntityNameAndDistanceByTrajectory(
+          waypoints.waypoints,
+          vehicle_parameters.bounding_box.dimensions.y + trajectory_based_detection_offset_,
+          trajectory_segments)) {
+        distance_to_front_entity = front_entity_info->second;
+      }
+    } else {
+      distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
+    }
     if (distance_to_front_entity) {
       if (
         distance_to_front_entity.value() <=
@@ -107,17 +128,16 @@ BT::NodeStatus FollowLaneAction::doAction()
       }
     }
     const auto distance_to_traffic_stop_line =
-      getDistanceToTrafficLightStopLine(route_lanelets_, *trajectory);
+      traffic_lights_->getDistanceToActiveTrafficLightStopLine(route_lanelets_, *trajectory);
     if (distance_to_traffic_stop_line) {
       if (distance_to_traffic_stop_line.value() <= getHorizon()) {
         return BT::NodeStatus::FAILURE;
       }
     }
-    auto distance_to_stopline =
-      traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
-    auto distance_to_conflicting_entity =
-      getDistanceToConflictingEntity(route_lanelets_, *trajectory);
-    if (distance_to_stopline) {
+
+    if (
+      const auto distance_to_stopline =
+        traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory)) {
       if (
         distance_to_stopline.value() <=
         calculateStopDistance(behavior_parameter_.dynamic_constraints) +
@@ -126,7 +146,11 @@ BT::NodeStatus FollowLaneAction::doAction()
         return BT::NodeStatus::FAILURE;
       }
     }
-    if (distance_to_conflicting_entity) {
+    if (
+      const auto distance_to_conflicting_entity =
+        traffic_simulator::distance::distanceToNearestConflictingPose(
+          route_lanelets_, *trajectory, *canonicalized_entity_status_,
+          getOtherEntitiesCanonicalizedEntityStatuses())) {
       if (
         distance_to_conflicting_entity.value() <
         (vehicle_parameters.bounding_box.dimensions.x + conflicting_entity_margin +
@@ -136,7 +160,7 @@ BT::NodeStatus FollowLaneAction::doAction()
     }
   }
   if (!target_speed_) {
-    target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+    target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
   }
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   setOutput("waypoints", waypoints);

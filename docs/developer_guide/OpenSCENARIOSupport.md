@@ -15,8 +15,8 @@ The interpreter supports some substitution syntax of [the ROS 2 Launch system](h
 
 Substitution syntaxes can be nested and the substitution is performed from the innermost to the outermost in order.
 
-> [!IMPORTANT]
-> This substitution is performed only once during the reading of the attribute, so changes in parameters that occur during the simulation, such as those from `ParameterModifyAction`, do not affect the substitution.
+!!! warning
+    This substitution is performed only once during the reading of the attribute, so changes in parameters that occur during the simulation, such as those from `ParameterModifyAction`, do not affect the substitution.
 
 #### Available Syntax
 
@@ -216,8 +216,8 @@ ByValueCondition:
 
 Within the scenario, you can end the scenario simulation with a status of either `success` or `failure` by using `exitSuccess` and `exitFailure` from `CustomCommandAction`.
 
-> [!IMPORTANT]
-> `exitSuccess` and `exitFailure` terminate the simulation immediately without any state transitions in the lifecycle of a `StoryboardElement`. This means there is no way to detect simulations terminated by `exitSuccess` or `exitFailure` from within the scenario using conditions like `StoryboardElementStateCondition`.
+!!! warning
+    `exitSuccess` and `exitFailure` terminate the simulation immediately without any state transitions in the lifecycle of a `StoryboardElement`. This means there is no way to detect simulations terminated by `exitSuccess` or `exitFailure` from within the scenario using conditions like `StoryboardElementStateCondition`.
 
 Currently, the only way to know the result of the simulation is by viewing the status string printed to standard output. However, this method may change in the future.
 
@@ -230,7 +230,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | AbsoluteTargetLaneOffset                     | unimplemented     |                                            |
 | AbsoluteTargetSpeed                          | 1.3               |                                            |
 | AccelerationCondition                        | 1.3               |                                            |
-| AcquirePositionAction                        | 1.3 (partial)     | [detail](#AcquirePositionAction)           |
+| AcquirePositionAction                        | 1.3 (partial)     | [detail](#acquirepositionaction)           |
 | Act                                          | 1.3               |                                            |
 | Action                                       | 1.3               |                                            |
 | ActivateControllerAction                     | unimplemented     |                                            |
@@ -243,20 +243,20 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | AnimationState                               | unimplemented     |                                            |
 | AnimationType                                | unimplemented     |                                            |
 | AppearanceAction                             | unimplemented     |                                            |
-| AssignControllerAction                       | 1.2 (partial)     | [detail](#AssignControllerAction)          |
+| AssignControllerAction                       | 1.2 (partial)     | [detail](#assigncontrolleraction)          |
 | AssignRouteAction                            | 1.3               |                                            |
 | AutomaticGear                                | unimplemented     |                                            |
 | AutomaticGearType                            | unimplemented     |                                            |
 | Axle                                         | 1.3               |                                            |
-| Axles                                        | 1.3               | [detail](#Axles)                           |
+| Axles                                        | 1.3               | [detail](#axles)                           |
 | BoundingBox                                  | 1.3               |                                            |
 | Brake                                        | unimplemented     |                                            |
 | BrakeInput                                   | unimplemented     |                                            |
 | ByEntityCondition                            | 1.3               |                                            |
 | ByObjectType                                 | unimplemented     |                                            |
 | ByType                                       | 1.3               |                                            |
-| ByValueCondition                             | 1.3 (partial)     | [detail](#ByValueCondition)                |
-| Catalog                                      | 1.3 (partial)     | [detail](#Catalog)                         |
+| ByValueCondition                             | 1.3 (partial)     | [detail](#byvaluecondition)                |
+| Catalog                                      | 1.3 (partial)     | [detail](#catalog)                         |
 | CatalogDefinition                            | 1.3               |                                            |
 | CatalogLocations                             | 1.3               |                                            |
 | CatalogReference                             | 1.3               |                                            |
@@ -266,24 +266,24 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | ClothoidSpline                               | unimplemented     |                                            |
 | ClothoidSplineSegment                        | unimplemented     |                                            |
 | CloudState                                   | unimplemented     |                                            |
-| CollisionCondition                           | 1.3 (partial)     | [detail](#CollisionCondition)              |
+| CollisionCondition                           | 1.3 (partial)     | [detail](#collisioncondition)              |
 | Color                                        | unimplemented     |                                            |
 | ColorCmyk                                    | unimplemented     |                                            |
 | ColorRgb                                     | unimplemented     |                                            |
 | ColorType                                    | unimplemented     |                                            |
 | ComponentAnimation                           | unimplemented     |                                            |
 | Condition                                    | 1.3               |                                            |
-| ConditionEdge                                | 1.3 (modified)    | [detail](#ConditionEdge)                   |
+| ConditionEdge                                | 1.3 (modified)    | [detail](#conditionedge)                   |
 | ConditionGroup                               | 1.3               |                                            |
 | ConnectTrailerAction                         | unimplemented     |                                            |
 | ControlPoint                                 | unimplemented     |                                            |
-| Controller                                   | 1.1               | [detail](#Controller)                      |
-| ControllerAction                             | 1.0               | [detail](#ControllerAction)                |
+| Controller                                   | 1.1               | [detail](#controller)                      |
+| ControllerAction                             | 1.0               | [detail](#controlleraction)                |
 | ControllerCatalogLocation                    | 1.3               |                                            |
 | ControllerDistribution                       | unimplemented     |                                            |
 | ControllerDistributionEntry                  | unimplemented     |                                            |
 | ControllerType                               | unimplemented     |                                            |
-| CoordinateSystem                             | 1.2 (partial)     | [detail](#CoordinateSystem)                |
+| CoordinateSystem                             | 1.2 (partial)     | [detail](#coordinatesystem)                |
 | CustomCommandAction                          | 1.3               |                                            |
 | CustomContent                                | unimplemented     |                                            |
 | DeleteEntityAction                           | 1.3               |                                            |
@@ -298,22 +298,22 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | DirectionalDimension                         | unimplemented     |                                            |
 | Directory                                    | 1.3               |                                            |
 | DisconnectTrailerAction                      | unimplemented     |                                            |
-| DistanceCondition                            | 1.3 (partial)     | [detail](#DistanceCondition)               |
+| DistanceCondition                            | 1.3 (partial)     | [detail](#distancecondition)               |
 | DistributionDefinition                       | 1.3               |                                            |
-| DistributionRange                            | 1.3 (partial)     | [detail](#DistributionRange)               |
+| DistributionRange                            | 1.3 (partial)     | [detail](#distributionrange)               |
 | DistributionSet                              | 1.3               |                                            |
 | DistributionSetElement                       | 1.3               |                                            |
 | DomeImage                                    | 1.3               |                                            |
 | DynamicConstraints                           | 1.3               |                                            |
 | DynamicsDimension                            | 1.3               |                                            |
-| DynamicsShape                                | 1.3 (partial)     | [detail](#DynamicsShape)                   |
+| DynamicsShape                                | 1.3 (partial)     | [detail](#dynamicsshape)                   |
 | EndOfRoadCondition                           | unimplemented     |                                            |
 | Entities                                     | 1.3.1             |                                            |
 | EntityAction                                 | 1.3               |                                            |
-| EntityCondition                              | 1.3 (partial)     | [detail](#EntityCondition)                 |
+| EntityCondition                              | 1.3 (partial)     | [detail](#entitycondition)                 |
 | EntityDistribution                           | unimplemented     |                                            |
 | EntityDistributionEntry                      | unimplemented     |                                            |
-| EntityObject                                 | 1.3 (partial)     | [detail](#EntityObject)                    |
+| EntityObject                                 | 1.3 (partial)     | [detail](#entityobject)                    |
 | EntityRef                                    | 1.3               |                                            |
 | EntitySelection                              | 1.3               |                                            |
 | Environment                                  | 1.3               |                                            |
@@ -325,12 +325,12 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | FileHeader                                   | 1.3               |                                            |
 | FinalSpeed                                   | unimplemented     |                                            |
 | Fog                                          | 1.3               |                                            |
-| FollowTrajectoryAction                       | 1.3               | [detail](#FollowTrajectoryAction)          |
+| FollowTrajectoryAction                       | 1.3               | [detail](#followtrajectoryaction)          |
 | FollowingMode                                | 1.3               |                                            |
 | FractionalCloudCover                         | 1.3               |                                            |
 | Gear                                         | unimplemented     |                                            |
 | GeoPosition                                  | unimplemented     |                                            |
-| GlobalAction                                 | 1.1 (partial)     | [detail](#GlobalAction)                    |
+| GlobalAction                                 | 1.1 (partial)     | [detail](#globalaction)                    |
 | Histogram                                    | 1.3               |                                            |
 | HistogramBin                                 | 1.3               |                                            |
 | InRoutePosition                              | unimplemented     |                                            |
@@ -339,13 +339,13 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | InitActions                                  | 1.3               |                                            |
 | Knot                                         | unimplemented     |                                            |
 | Lane                                         | unimplemented     |                                            |
-| LaneChangeAction                             | 1.3 (partial)     | [detail](#LaneChangeAction)                |
+| LaneChangeAction                             | 1.3 (partial)     | [detail](#lanechangeaction)                |
 | LaneChangeTarget                             | 1.3               |                                            |
 | LaneOffsetAction                             | unimplemented     |                                            |
 | LaneOffsetActionDynamics                     | unimplemented     |                                            |
 | LaneOffsetTarget                             | unimplemented     |                                            |
 | LanePosition                                 | 1.3               |                                            |
-| LateralAction                                | 1.3 (partial)     | [detail](#LateralAction)                   |
+| LateralAction                                | 1.3 (partial)     | [detail](#lateralaction)                   |
 | LateralDisplacement                          | unimplemented     |                                            |
 | LateralDistanceAction                        | unimplemented     |                                            |
 | License                                      | 1.3               |                                            |
@@ -354,7 +354,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | LightStateAction                             | unimplemented     |                                            |
 | LightType                                    | unimplemented     |                                            |
 | LogNormalDistribution                        | unimplemented     |                                            |
-| LongitudinalAction                           | 1.3               | [detail](#LongitudinalAction)              |
+| LongitudinalAction                           | 1.3               | [detail](#longitudinalaction)              |
 | LongitudinalDisplacement                     | unimplemented     |                                            |
 | LongitudinalDistanceAction                   | unimplemented     |                                            |
 | Maneuver                                     | 1.3               |                                            |
@@ -363,18 +363,18 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | ManualGear                                   | unimplemented     |                                            |
 | MiscObject                                   | 1.3               |                                            |
 | MiscObjectCatalogLocation                    | 1.3               |                                            |
-| MiscObjectCategory                           | 1.3 (partial)     | [detail](#MiscObjectCategory)              |
-| ModifyRule                                   | 1.1               | [detail](#ModifyRule)                      |
+| MiscObjectCategory                           | 1.3 (partial)     | [detail](#miscobjectcategory)              |
+| ModifyRule                                   | 1.1               | [detail](#modifyrule)                      |
 | MonitorDeclaration                           | unimplemented     |                                            |
 | MonitorDeclarations                          | unimplemented     |                                            |
 | None                                         | 1.3               |                                            |
 | NormalDistribution                           | 1.3               |                                            |
 | Nurbs                                        | unimplemented     |                                            |
-| ObjectController                             | 1.3               | [detail](#ObjectController)                |
+| ObjectController                             | 1.3               | [detail](#objectcontroller)                |
 | ObjectType                                   | 1.3               |                                            |
 | OffroadCondition                             | unimplemented     |                                            |
 | OpenScenario                                 | 1.3               |                                            |
-| OpenScenarioCategory                         | 1.3 (modified)    | [detail](#OpenScenarioCategory)            |
+| OpenScenarioCategory                         | 1.3 (modified)    | [detail](#openscenariocategory)            |
 | Orientation                                  | 1.3               |                                            |
 | OverrideBrakeAction                          | unimplemented     |                                            |
 | OverrideClutchAction                         | unimplemented     |                                            |
@@ -383,51 +383,51 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | OverrideParkingBrakeAction                   | unimplemented     |                                            |
 | OverrideSteeringWheelAction                  | unimplemented     |                                            |
 | OverrideThrottleAction                       | unimplemented     |                                            |
-| ParameterAction                              | 1.1               | [detail](#ParameterAction)                 |
-| ParameterAddValueRule                        | 1.1               | [detail](#ParameterAddValueRule)           |
+| ParameterAction                              | 1.1               | [detail](#parameteraction)                 |
+| ParameterAddValueRule                        | 1.1               | [detail](#parameteraddvaluerule)           |
 | ParameterAssignment                          | 1.3               |                                            |
 | ParameterCondition                           | 1.3               |                                            |
 | ParameterDeclaration                         | 1.3               |                                            |
-| ParameterModifyAction                        | 1.1               | [detail](#ParameterModifyAction)           |
-| ParameterMultiplyByValueRule                 | 1.1               | [detail](#ParameterMultiplyByValueRule)    |
-| ParameterSetAction                           | 1.1               | [detail](#ParameterSetAction)              |
-| ParameterType                                | 1.3               | [detail](#ParameterType)                   |
+| ParameterModifyAction                        | 1.1               | [detail](#parametermodifyaction)           |
+| ParameterMultiplyByValueRule                 | 1.1               | [detail](#parametermultiplybyvaluerule)    |
+| ParameterSetAction                           | 1.1               | [detail](#parametersetaction)              |
+| ParameterType                                | 1.3               | [detail](#parametertype)                   |
 | ParameterValueDistribution                   | 1.3               |                                            |
 | ParameterValueDistributionDefinition         | 1.3               |                                            |
 | ParameterValueSet                            | 1.3               |                                            |
-| Pedestrian                                   | 1.3 (partial)     | [detail](#Pedestrian)                      |
+| Pedestrian                                   | 1.3 (partial)     | [detail](#pedestrian)                      |
 | PedestrianAnimation                          | unimplemented     |                                            |
 | PedestrianCatalogLocation                    | 1.3               |                                            |
-| PedestrianCategory                           | 1.3 (partial)     | [detail](#PedestrianCategory)              |
+| PedestrianCategory                           | 1.3 (partial)     | [detail](#pedestriancategory)              |
 | PedestrianGesture                            | unimplemented     |                                            |
 | PedestrianGestureType                        | unimplemented     |                                            |
 | PedestrianMotionType                         | unimplemented     |                                            |
 | Performance                                  | 1.3               |                                            |
-| Phase                                        | 1.1               | [detail](#Phase)                           |
+| Phase                                        | 1.1               | [detail](#phase)                           |
 | PoissonDistribution                          | 1.3               |                                            |
 | Polygon                                      | unimplemented     |                                            |
 | Polyline                                     | 1.3               |                                            |
-| Position                                     | 1.3 (partial)     | [detail](#Position)                        |
+| Position                                     | 1.3 (partial)     | [detail](#position)                        |
 | PositionInLaneCoordinates                    | unimplemented     |                                            |
 | PositionInRoadCoordinates                    | unimplemented     |                                            |
 | PositionOfCurrentEntity                      | unimplemented     |                                            |
-| Precipitation                                | 1.3               | [detail](#Precipitation)                   |
+| Precipitation                                | 1.3               | [detail](#precipitation)                   |
 | PrecipitationType                            | 1.3               |                                            |
-| Priority                                     | 1.1               | [detail](#Priority)                        |
+| Priority                                     | 1.1               | [detail](#priority)                        |
 | Private                                      | 1.3               |                                            |
-| PrivateAction                                | 1.3               | [detail](#PrivateAction)                   |
+| PrivateAction                                | 1.3               | [detail](#privateaction)                   |
 | ProbabilityDistributionSet                   | 1.3               |                                            |
 | ProbabilityDistributionSetElement            | 1.3               |                                            |
-| Properties                                   | 1.3 (partial)     | [detail](#Properties)                      |
+| Properties                                   | 1.3 (partial)     | [detail](#properties)                      |
 | Property                                     | 1.3               |                                            |
 | RandomRouteAction                            | unimplemented     |                                            |
 | Range                                        | 1.3               |                                            |
-| ReachPositionCondition                       | 1.1               | [detail](#ReachPositionCondition)          |
-| ReferenceContext                             | 1.3 (partial)     | [detail](#ReferenceContext)                |
+| ReachPositionCondition                       | 1.1               | [detail](#reachpositioncondition)          |
+| ReferenceContext                             | 1.3 (partial)     | [detail](#referencecontext)                |
 | RelativeAngleCondition                       | unimplemented     |                                            |
-| RelativeClearanceCondition                   | 1.3 (partial)     | [detail](#RelativeClearanceCondition)      |
-| RelativeDistanceCondition                    | 1.3 (partial)     | [detail](#RelativeDistanceCondition)       |
-| RelativeDistanceType                         | 1.3               | [detail](#RelativeDistanceType)            |
+| RelativeClearanceCondition                   | 1.3 (partial)     | [detail](#relativeclearancecondition)      |
+| RelativeDistanceCondition                    | 1.3 (partial)     | [detail](#relativedistancecondition)       |
+| RelativeDistanceType                         | 1.3               | [detail](#relativedistancetype)            |
 | RelativeLanePosition                         | unimplemented     |                                            |
 | RelativeLaneRange                            | 1.3               |                                            |
 | RelativeObjectPosition                       | 1.3               |                                            |
@@ -440,7 +440,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | RelativeWorldPosition                        | 1.3               |                                            |
 | RoadCondition                                | 1.3               |                                            |
 | RoadCursor                                   | unimplemented     |                                            |
-| RoadNetwork                                  | 1.3 (partial)     | [detail](#RoadNetwork)                     |
+| RoadNetwork                                  | 1.3 (partial)     | [detail](#roadnetwork)                     |
 | RoadPosition                                 | unimplemented     |                                            |
 | RoadRange                                    | unimplemented     |                                            |
 | Role                                         | unimplemented     |                                            |
@@ -448,22 +448,22 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | RouteCatalogLocation                         | 1.3               |                                            |
 | RoutePosition                                | unimplemented     |                                            |
 | RouteRef                                     | unimplemented     |                                            |
-| RouteStrategy                                | 1.3 (partial)     | [detail](#RouteStrategy)                   |
-| RoutingAction                                | 1.2               | [detail](#RoutingAction)                   |
+| RouteStrategy                                | 1.3 (partial)     | [detail](#routestrategy)                   |
+| RoutingAction                                | 1.2               | [detail](#routingaction)                   |
 | RoutingAlgorithm                             | 1.3               |                                            |
 | Rule                                         | 1.3               |                                            |
-| ScenarioDefinition                           | 1.1               | [detail](#ScenarioDefinition)              |
+| ScenarioDefinition                           | 1.1               | [detail](#scenariodefinition)              |
 | ScenarioObject                               | 1.3               |                                            |
 | ScenarioObjectTemplate                       | unimplemented     |                                            |
 | SelectedEntities                             | 1.3               |                                            |
 | SensorReference                              | unimplemented     |                                            |
 | SensorReferenceSet                           | unimplemented     |                                            |
 | SetMonitorAction                             | unimplemented     |                                            |
-| Shape                                        | 1.2               | [detail](#Shape)                           |
+| Shape                                        | 1.2               | [detail](#shape)                           |
 | SimulationTimeCondition                      | 1.3               |                                            |
-| SpeedAction                                  | 1.3 (partial)     | [detail](#SpeedAction)                     |
+| SpeedAction                                  | 1.3 (partial)     | [detail](#speedaction)                     |
 | SpeedActionTarget                            | 1.3               |                                            |
-| SpeedCondition                               | 1.3 (partial)     | [detail](#SpeedCondition)                  |
+| SpeedCondition                               | 1.3 (partial)     | [detail](#speedcondition)                  |
 | SpeedProfileAction                           | 1.3               |                                            |
 | SpeedProfileEntry                            | 1.3               |                                            |
 | SpeedTargetValueType                         | 1.3               |                                            |
@@ -471,22 +471,22 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | SteadyState                                  | unimplemented     |                                            |
 | Stochastic                                   | 1.3               |                                            |
 | StochasticDistribution                       | 1.3               |                                            |
-| StochasticDistributionType                   | 1.2               | [detail](#StochasticDistributionType)      |
+| StochasticDistributionType                   | 1.2               | [detail](#stochasticdistributiontype)      |
 | Story                                        | 1.3               |                                            |
 | Storyboard                                   | 1.3               |                                            |
 | StoryboardElementState                       | 1.3               |                                            |
-| StoryboardElementStateCondition              | 1.3 (modified)    | [detail](#StoryboardElementStateCondition) |
+| StoryboardElementStateCondition              | 1.3 (modified)    | [detail](#storyboardelementstatecondition) |
 | StoryboardElementType                        | 1.3               |                                            |
-| Sun                                          | 1.3               | [detail](#Sun)                             |
+| Sun                                          | 1.3               | [detail](#sun)                             |
 | SynchronizeAction                            | unimplemented     |                                            |
 | TargetDistanceSteadyState                    | unimplemented     |                                            |
 | TargetTimeSteadyState                        | unimplemented     |                                            |
-| TeleportAction                               | 1.3               | [detail](#TeleportAction)                  |
-| TimeHeadwayCondition                         | 1.0               | [detail](#TimeHeadwayCondition)            |
+| TeleportAction                               | 1.3               | [detail](#teleportaction)                  |
+| TimeHeadwayCondition                         | 1.0               | [detail](#timeheadwaycondition)            |
 | TimeOfDay                                    | 1.3               |                                            |
 | TimeOfDayCondition                           | unimplemented     |                                            |
 | TimeReference                                | 1.3               |                                            |
-| TimeToCollisionCondition                     | 1.3.1 (partial)   | [detail](#TimeToCollisionCondition)        |
+| TimeToCollisionCondition                     | 1.3.1 (partial)   | [detail](#timetocollisioncondition)        |
 | TimeToCollisionConditionTarget               | 1.3.1             |                                            |
 | Timing                                       | 1.3               |                                            |
 | TrafficAction                                | unimplemented     |                                            |
@@ -516,11 +516,11 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | TrajectoryFollowingMode                      | 1.3               |                                            |
 | TrajectoryPosition                           | unimplemented     |                                            |
 | TrajectoryRef                                | 1.3               |                                            |
-| TransitionDynamics                           | 1.1               | [detail](#TransitionDynamics)              |
+| TransitionDynamics                           | 1.1               | [detail](#transitiondynamics)              |
 | TraveledDistanceCondition                    | unimplemented     |                                            |
 | Trigger                                      | 1.3               |                                            |
 | TriggeringEntities                           | 1.3               |                                            |
-| TriggeringEntitiesRule                       | 1.3 (modified)    | [detail](#TriggeringEntitiesRule)          |
+| TriggeringEntitiesRule                       | 1.3 (modified)    | [detail](#triggeringentitiesrule)          |
 | UniformDistribution                          | 1.3               |                                            |
 | UsedArea                                     | unimplemented     |                                            |
 | UserDefinedAction                            | 1.3               |                                            |
@@ -541,7 +541,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | VariableModifyRule                           | unimplemented     |                                            |
 | VariableMultiplyByValueRule                  | unimplemented     |                                            |
 | VariableSetAction                            | unimplemented     |                                            |
-| Vehicle                                      | 1.1 (partial)     | [detail](#Vehicle)                         |
+| Vehicle                                      | 1.1 (partial)     | [detail](#vehicle)                         |
 | VehicleCatalogLocation                       | 1.3               |                                            |
 | VehicleCategory                              | 1.3               |                                            |
 | VehicleCategoryDistribution                  | unimplemented     |                                            |
@@ -569,7 +569,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### AssignControllerAction
 
 - Properties `activateAnimation`, `activateLateral`, `activateLighting`, and `activateLongitudinal` are ignored.
-  - The simulator behaves as if these properties are `false`.
+    - The simulator behaves as if these properties are `false`.
 - Property `ObjectController` created in version 1.3 is **not** supported.
 - Properties `Controller` and `CatalogReference` deprecated in version 1.3 are supported.
 
@@ -612,6 +612,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 - Property `alongRoute` deprecated in version 1.1 is **not** supported.
 - Property `Position` of types `RoadPosition`, `RelativeRoadPosition`, `RelativeLanePosition`, `RoutePosition`, `GeoPosition`, and `TrajectoryPosition` are **not** supported.
 - Not all combinations of properties for distance calculation are supported. Supported combinations are listed below:
+
   | coordinateSystem | relativeDistanceType | routingAlgorithm | freespace |
   |:----------------:|:--------------------:|:----------------:|:---------:|
   | entity           | euclidianDistance    | undefined        | false     |
@@ -660,7 +661,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### LaneChangeAction
 
 - Specifying `step` for `LaneChangeActionDynamics.dynamicsDimension` is **not** supported.
-  - Simulator may lead to an undefined behavior if `step` is specified.
+    - Simulator may lead to an undefined behavior if `step` is specified.
 
 #### LateralAction
 
@@ -717,9 +718,9 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### Pedestrian
 
 - Property `role` is ignored.
-  - The simulator does not take into account `role`.
+    - The simulator does not take into account `role`.
 - Property `model` deprecated version 1.1 is ignored but mandatory.
-  - Maybe this is simulator bug and need to be fixed.
+    - Maybe this is simulator bug and need to be fixed.
 
 #### PedestrianCategory
 
@@ -749,7 +750,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### Properties
 
 - Property `CustomContent` is ignored.
-  - The simulator does not take into account `CustomContent`.
+    - The simulator does not take into account `CustomContent`.
 
 #### ReachPositionCondition
 
@@ -763,12 +764,13 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### RelativeClearanceCondition
 
 - Property `oppositeLanes` is ignored.
-  - The simulator behaves as if `oppositeLanes` is `false`.
+    - The simulator behaves as if `oppositeLanes` is `false`.
 
 #### RelativeDistanceCondition
 
 - Property `Position` of types `RoadPosition`, `RelativeRoadPosition`, `RelativeLanePosition`, `RoutePosition`, `GeoPosition`, and `TrajectoryPosition` are **not** supported.
 - Not all combinations of properties for distance calculation are supported. Supported combinations are listed below:
+
   | coordinateSystem | relativeDistanceType | routingAlgorithm | freespace |
   |:----------------:|:--------------------:|:----------------:|:---------:|
   | entity           | euclidianDistance    | undefined        | false     |
@@ -815,14 +817,14 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### SpeedAction
 
 - Specifying `time` or `distance` for `SpeedActionDynamics.dynamicsDimension` is **not** supported.
-  - Simulator may lead to an undefined behavior if `time` or `distance` is specified.
+    - Simulator may lead to an undefined behavior if `time` or `distance` is specified.
 - Specifying `cubic` for `SpeedActionDynamics.dynamicsShape` is **not** supported.
-  - Simulator may lead to an undefined behavior if `cubic` is specified.
+    - Simulator may lead to an undefined behavior if `cubic` is specified.
 
 #### SpeedCondition
 
 - Property `direction` is ignored.
-  - The simulator behaves as if `direction` is not given.
+    - The simulator behaves as if `direction` is not given.
 
 #### StochasticDistributionType
 
@@ -831,7 +833,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### StoryboardElementStateCondition
 
 - [name prefix](https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#:~:text=A%20name%20prefix%20,new%20name%20reference.) in OpenSCENARIO User Guide 3.1.2. is **not** supported.
-  - The interpreter uses lexical scope instead. See [Scoping](#Scoping) for more details.
+    - The interpreter uses lexical scope instead. See [Scoping](#scoping) for more details.
 
 #### Sun
 
@@ -846,7 +848,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 - Properties `coordinateSystem` and `relativeDistanceType` created in version 1.1 is ignored.
 - Property `alongRoute` deprecated in version 1.1 is ignored.
 - Property `freespace` is ignored.
-  - The simulator behaves as if `freespace` is `false`.
+    - The simulator behaves as if `freespace` is `false`.
 
 #### TimeToCollisionCondition
 
@@ -866,6 +868,6 @@ Currently, the only way to know the result of the simulation is by viewing the s
 #### Vehicle
 
 - Property `role` created in version 1.1 is ignored.
-  - The simulator does not take into account `role`.
+    - The simulator does not take into account `role`.
 - Property `mass` is ignored.
-  - The simulator behaves as if `mass` is not given.
+    - The simulator behaves as if `mass` is not given.

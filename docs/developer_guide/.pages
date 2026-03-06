@@ -5,6 +5,7 @@ nav:
     - AutowareAPI.md
     - BehaviorPlugin.md
     - CONTRIBUTING.md
+    - ContextGammaPlanner.md
     - Communication.md
     - ConfiguringLocalizationTopics.md
     - ConfiguringPerceptionTopics.md
@@ -18,6 +19,7 @@ nav:
     - SimulationResultFormat.md
     - SystemArchitecture.md
     - TIERIVScenarioFormatVersion2.md
+    - TrafficLightsArchitecture.md
     - TrafficSimulator.md
     - VehicleDynamics.md
     - ZeroMQ.md

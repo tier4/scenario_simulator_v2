@@ -16,7 +16,9 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 
@@ -26,21 +28,18 @@ namespace entity
 {
 VehicleEntity::VehicleEntity(
   const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const std::string & plugin_name)
-: EntityBase(name, entity_status, hdmap_utils_ptr),
+: EntityBase(name, entity_status),
   vehicle_parameters(parameters),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
-  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
-  route_planner_(traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER, hdmap_utils_ptr_)
+  behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name))
 {
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
-  behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
   behavior_plugin_ptr_->setDefaultMatchingDistanceForLaneletPoseCalculation(
     getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
@@ -157,7 +156,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
     previous_route_lanelets_ = route_lanelets;
     try {
       spline_ = std::make_shared<math::geometry::CatmullRomSpline>(
-        hdmap_utils_ptr_->getCenterPoints(route_lanelets));
+        lanelet_wrapper::lanelet_map::centerPoints(route_lanelets));
     } catch (const common::scenario_simulator_exception::SemanticError & error) {
       // reset the ptr when spline cannot be calculated
       spline_.reset();
@@ -168,7 +167,7 @@ auto VehicleEntity::onUpdate(const double current_time, const double step_time) 
   behavior_plugin_ptr_->update(current_time, step_time);
 
   if (const auto canonicalized_lanelet_pose = status_->getCanonicalizedLaneletPose()) {
-    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
+    if (pose::isAtEndOfLanelets(canonicalized_lanelet_pose.value())) {
       stopAtCurrentPosition();
       return;
     }

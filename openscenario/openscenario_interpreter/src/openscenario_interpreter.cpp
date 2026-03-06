@@ -127,6 +127,9 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       script = std::make_shared<OpenScenario>(osc_path);
 
+      common::status_monitor.updateThreshold(
+        std::chrono::seconds(common::getParameter<std::int64_t>("status_monitor_threshold", 10)));
+
       // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
       traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
@@ -230,7 +233,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [&]() {
         if (record) {
           std::vector<std::string> options{
-            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string()};
+            "-a", "-o", std::filesystem::path(osc_path).replace_extension("").string()};
 
           if (not record_storage_id.empty()) {
             options.insert(options.end(), {"-s", record_storage_id});
@@ -319,7 +322,8 @@ auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
   timer.reset();
   scenarios.clear();
   script.reset();
-  SimulatorCore::deactivate();
+  common::status_monitor.overrideThreshold(
+    simulator_core_shutdown_threshold, SimulatorCore::deactivate);
   return Interpreter::Result::SUCCESS;  // => Finalized
 }
 
@@ -358,32 +362,24 @@ auto Interpreter::reset() -> void
     output_time_publisher->on_deactivate();
   }
 
-  if (not has_parameter("initialize_duration")) {
-    declare_parameter<int>("initialize_duration", 30);
-  }
-
   /*
-     Although we have not analyzed the details yet, the process of deactivating
-     the simulator core takes quite a long time (especially the
-     traffic_simulator::API::despawnEntities function is slow). During the
-     process, the interpreter becomes unresponsive, which often resulted in the
-     status monitor thread judging the interpreter as "not good". Therefore, we
-     will increase the threshold of the judgment only during the process of
-     deactivating the simulator core.
-
-     The threshold value here is set to the value of initialize_duration, but
-     there is no rationale for this; it should be larger than the original
-     threshold value of the status monitor and long enough for the simulator
-     core to be deactivated.
+  Interpreter::reset() and Interpreter::on_shutdown() functions are slow,
+  because they call in sequence:
+  openscenario_interpreter::SimulatorCore::deactivate()
+  traffic_simulator::API::despawnEntities()
+  traffic_simulator::API::despawn()
+  traffic_simulator:entity::EntityManager::despawnEntity()
+  concealer::FieldOperatorApplication::~FieldOperatorApplication()
+  The destructor waits for autoware process group to die.
   */
   common::status_monitor.overrideThreshold(
-    std::chrono::seconds(get_parameter("initialize_duration").as_int()), SimulatorCore::deactivate);
+    simulator_core_shutdown_threshold, SimulatorCore::deactivate);
 
   scenarios.pop_front();
 
   // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
   // INFO_STREAM.
-  boost::apply_visitor(
+  std::visit(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
       [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
@@ -391,7 +387,11 @@ auto Interpreter::reset() -> void
     result);
 
   if (record) {
-    record::stop();
+    /*
+    openscenario_interpreter::record::stop() is also slower,
+    as it sleeps for 3s and then waits until rosbag saving is finished.
+    */
+    common::status_monitor.overrideThreshold(simulator_core_shutdown_threshold, record::stop);
   }
 }
 }  // namespace openscenario_interpreter

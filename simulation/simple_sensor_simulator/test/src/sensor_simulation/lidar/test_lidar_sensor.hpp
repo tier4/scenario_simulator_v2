@@ -32,20 +32,27 @@ using namespace simple_sensor_simulator;
 class LidarSensorTest : public ::testing::Test
 {
 protected:
+  static void SetUpTestSuite() { rclcpp::init(0, nullptr); }
+
+  static void TearDownTestSuite() { rclcpp::shutdown(); }
+
   LidarSensorTest()
   : config_(utils::constructLidarConfiguration("ego", "awf/universe/20240605", 0.0, 0.5))
   {
-    rclcpp::init(0, nullptr);
+    // Note: Executor must be created after rclcpp::init. If created before, it causes context is null error.
+    executor_ = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
     node_ = std::make_shared<rclcpp::Node>("lidar_sensor_test_node");
+    executor_->add_node(node_);
     makeRosInterface();
     initializeEntityStatuses();
 
     lidar_ = std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(0.0, config_, publisher_);
   }
 
-  ~LidarSensorTest() { rclcpp::shutdown(); }
+  ~LidarSensorTest() = default;
 
   rclcpp::Node::SharedPtr node_;
+  rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
   agnocast_wrapper::PublisherPtr<sensor_msgs::msg::PointCloud2> publisher_;
   agnocast_wrapper::SubscriptionPtr<sensor_msgs::msg::PointCloud2> subscription_;
 

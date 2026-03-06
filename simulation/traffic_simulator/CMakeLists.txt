@@ -12,7 +12,14 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+  add_compile_options(-Wall -Wextra -Wpedantic -Wno-deprecated-declarations -Werror)
+endif()
+
+# cspell: ignore TOLOWER memaccess
+# silence Eigen NEON memcpy warning for ARM architecture
+string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" SYS_PROC_LOWER)
+if(SYS_PROC_LOWER STREQUAL "aarch64" OR SYS_PROC_LOWER STREQUAL "arm64")
+    add_compile_options(-Wno-class-memaccess)
 endif()
 
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
@@ -47,7 +54,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/misc_object_entity.cpp
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
-  src/hdmap_utils/hdmap_utils.cpp
   src/helper/helper.cpp
   src/helper/ostream_helpers.cpp
   src/job/job.cpp
@@ -57,6 +63,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/lanelet_wrapper/lanelet_map.cpp
   src/lanelet_wrapper/lanelet_wrapper.cpp
   src/lanelet_wrapper/pose.cpp
+  src/lanelet_wrapper/lane_change.cpp
   src/lanelet_wrapper/route.cpp
   src/lanelet_wrapper/traffic_lights.cpp
   src/lanelet_wrapper/traffic_rules.cpp
@@ -73,6 +80,8 @@ ament_auto_add_library(traffic_simulator SHARED
   src/utils/distance.cpp
   src/utils/lanelet_map.cpp
   src/utils/pose.cpp
+  src/utils/route.cpp
+  src/utils/traffic_lights.cpp
 )
 
 ament_auto_add_library(visualization_component SHARED
@@ -95,7 +104,6 @@ target_link_libraries(traffic_simulator
   sodium
   zmq
   stdc++fs
-  Boost::filesystem
   yaml-cpp
   ${PROTOBUF_LIBRARY})
 

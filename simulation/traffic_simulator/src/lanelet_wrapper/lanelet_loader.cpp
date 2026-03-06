@@ -13,11 +13,14 @@
 // limitations under the License.
 
 #include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_io/io_handlers/Serialize.h>
 #include <yaml-cpp/yaml.h>
 
 #include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <autoware_lanelet2_extension/projection/transverse_mercator_projector.hpp>
-#include <autoware_lanelet2_extension/utility/query.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <get_parameter/get_parameter.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_loader.hpp>
 
@@ -114,6 +117,23 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
   }
 }
 
+auto LaneletLoader::convertMapToBin(const lanelet::LaneletMapPtr lanelet_map_ptr)
+  -> autoware_map_msgs::msg::LaneletMapBin
+{
+  std::stringstream ss;
+  boost::archive::binary_oarchive oa(ss);
+  oa << *lanelet_map_ptr;
+  auto id_counter = lanelet::utils::getId();
+  oa << id_counter;
+  std::string tmp_str = ss.str();
+  autoware_map_msgs::msg::LaneletMapBin msg;
+  msg.data.clear();
+  msg.data.resize(tmp_str.size());
+  msg.data.assign(tmp_str.begin(), tmp_str.end());
+  msg.header.frame_id = "map";
+  return msg;
+}
+
 auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_map_ptr) -> void
 {
   constexpr double resolution{2.0};
@@ -145,8 +165,18 @@ auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_m
     return centerline;
   };
 
+  const bool use_custom_centerline = common::getParameter<bool>("use_custom_centerline", true);
+
+  if (use_custom_centerline) {
+    RCLCPP_WARN(
+      rclcpp::get_logger("traffic_simulator"),
+      "use_custom_centerline is set to true (legacy mode). "
+      "This default will change to false after end of January 2026. "
+      "Please update your configuration to explicitly set use_custom_centerline to false.");
+  }
+
   for (auto & lanelet_obj : lanelet_map_ptr->laneletLayer) {
-    if (!lanelet_obj.hasCustomCenterline()) {
+    if (not use_custom_centerline or not lanelet_obj.hasCustomCenterline()) {
       lanelet_obj.setCenterline(generateFineCenterline(lanelet_obj));
     }
   }

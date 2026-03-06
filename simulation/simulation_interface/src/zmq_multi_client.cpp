@@ -23,8 +23,8 @@ MultiClient::MultiClient(
   const unsigned int socket_port)
 : protocol(protocol),
   hostname(hostname),
-  context_(zmqpp::context()),
-  type_(zmqpp::socket_type::request),
+  context_(1),
+  type_(zmq::socket_type::req),
   socket_(context_, type_)
 {
   socket_.connect(simulation_interface::getEndPoint(protocol, hostname, socket_port));
@@ -43,10 +43,10 @@ MultiClient::~MultiClient() { closeConnection(); }
 auto MultiClient::call(const simulation_api_schema::SimulationRequest & req)
   -> simulation_api_schema::SimulationResponse
 {
-  zmqpp::message message = toZMQ(req);
-  socket_.send(message);
-  zmqpp::message buffer;
-  socket_.receive(buffer);
+  zmq::message_t message = toZMQ(req);
+  socket_.send(message, zmq::send_flags::none);
+  zmq::message_t buffer;
+  socket_.recv(buffer, zmq::recv_flags::none);
   return toProto<simulation_api_schema::SimulationResponse>(buffer);
 }
 

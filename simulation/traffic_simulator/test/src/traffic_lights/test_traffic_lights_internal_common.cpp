@@ -57,6 +57,10 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsColor)
   this->lights->setTrafficLightsColor(this->id, Color::white);
   EXPECT_FALSE(
     this->lights->getTrafficLightsComposedState(this->id).find("white") == std::string::npos);
+
+  this->lights->setTrafficLightsColor(this->id, Color::unknown);
+  EXPECT_FALSE(
+    this->lights->getTrafficLightsComposedState(this->id).find("unknown") == std::string::npos);
 }
 
 TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_color)
@@ -84,6 +88,9 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_color)
 
   this->lights->setTrafficLightsState(this->id, stateFromColor("white"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("white"));
+
+  this->lights->setTrafficLightsState(this->id, stateFromColor("unknown"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("unknown"));
 }
 
 TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_status)
@@ -141,6 +148,9 @@ TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_shape)
 
   this->lights->setTrafficLightsState(this->id, stateFromShape("straight"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("up"));
+
+  this->lights->setTrafficLightsState(this->id, stateFromShape("unknown"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("unknown"));
 }
 
 TYPED_TEST(TrafficLightsInternalTest, isAnyTrafficLightChanged)
@@ -197,7 +207,7 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
   this->lights->startUpdate(20.0);
   const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
+    this->executor.spin_some();
   }
 
   const auto verify_delete_marker =
@@ -301,7 +311,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     this->lights->startUpdate(20.0);
     const auto first_end = std::chrono::system_clock::now() + 0.5s;
     while (std::chrono::system_clock::now() < first_end) {
-      rclcpp::spin_some(this->node_ptr);
+      this->executor.spin_some();
     }
   }
 
@@ -318,7 +328,7 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
     this->lights->resetUpdate(10.0);
     const auto second_end = std::chrono::system_clock::now() + 0.5s;
     while (std::chrono::system_clock::now() < second_end) {
-      rclcpp::spin_some(this->node_ptr);
+      this->executor.spin_some();
     }
   }
 
@@ -526,3 +536,17 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionTrafficLightGrou
   EXPECT_NEAR(msg.traffic_light_groups[0].elements[1].confidence, expected_confidence, eps);
 }
 #endif  // __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+
+TYPED_TEST(TrafficLightsInternalTest, addAndClearTrafficLightsState)
+{
+  this->lights->addTrafficLightsState(this->id, "green solidOn circle");
+  this->lights->addTrafficLightsState(this->id, "red solidOn circle");
+
+  const auto state_before_clear = this->lights->getTrafficLightsComposedState(this->id);
+  EXPECT_TRUE(state_before_clear.find("green") != std::string::npos);
+  EXPECT_TRUE(state_before_clear.find("red") != std::string::npos);
+
+  this->lights->clearTrafficLightsState(this->id);
+  const auto state_after_clear = this->lights->getTrafficLightsComposedState(this->id);
+  EXPECT_TRUE(state_after_clear.empty());
+}

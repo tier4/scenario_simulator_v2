@@ -24,40 +24,76 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- TrafficSignalState -----------------------------------------------------
- *
- *  <xsd:complexType name="TrafficSignalState">
- *    <xsd:attribute name="trafficSignalId" type="String" use="required"/>
- *    <xsd:attribute name="state" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   TrafficSignalState (OpenSCENARIO XML 1.3.1)
+
+   State of a traffic signal for this phase. One state per phase and traffic signal.
+
+   <xsd:complexType name="TrafficSignalState">
+     <xsd:attribute name="state" type="String" use="required"/>
+     <xsd:attribute name="trafficSignalId" type="String" use="required"/>
+   </xsd:complexType>
+*/
 struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 {
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  ID of the referenced signal in a road network. The signal ID must be
-   *  listed in TrafficSignal list of the RoadNetwork.
-   *
-   *  In the TIER IV OpenSCENARIO implementation, it is the Lanelet ID (positive
-   *  integer) of the traffic light.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     NOTE:
+       ID of the referenced signal in a road network. The signal ID must be
+       listed in TrafficSignal list of the RoadNetwork.
+
+       In the TIER IV OpenSCENARIO implementation, it is the Lanelet ID (positive
+       integer) of the traffic light, optionally followed by:
+         - Signal type: "v2i" (default is "conventional" if omitted)
+         - Detected suffix: "_detected" to indicate detected traffic light
+
+       Format: "<lanelet_id> [<type>]" or "<lanelet_id> [<type>_detected]"
+       Examples: "34802", "34802 v2i", "34802 conventional_detected", "34802 v2i_detected"
+   */
   const String traffic_signal_id;
 
-  /* ---- NOTE -----------------------------------------------------------------
-   *
-   *  State of the signal. The available states are listed in the TrafficSignal
-   *  list of the RoadNetwork.
-   *
-   * ------------------------------------------------------------------------ */
+  /*
+     NOTE:
+       State of the signal. The available states are listed in the TrafficSignal
+       list of the RoadNetwork.
+   */
   const String state;
 
   explicit TrafficSignalState(const pugi::xml_node &, Scope &);
 
+  auto clear() const -> void;
+
   auto evaluate() const -> Object;
 
-  auto id() const -> lanelet::Id;
+  struct TrafficSignalChannelType
+  {
+    enum value_type { conventional, v2i } value;
+
+    explicit TrafficSignalChannelType(const std::string &);
+
+    constexpr TrafficSignalChannelType(value_type value) : value(value) {}
+
+    constexpr operator value_type() const noexcept { return value; }
+  };
+
+  struct TargetTrafficSignalChannel
+  {
+    explicit TargetTrafficSignalChannel(const std::string &);
+
+    lanelet::Id id;
+
+    TrafficSignalChannelType channel;
+
+    bool detected;
+  };
+
+  auto id() const -> lanelet::Id { return target.id; }
+
+  auto channelType() const -> TrafficSignalChannelType { return target.channel; }
+
+  auto isDetected() const -> bool { return target.detected; }
+
+private:
+  const TargetTrafficSignalChannel target;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -28,7 +28,7 @@ Each new feature development should be worked on in its own branch.
 
 Please add the `feature/` prefix to your branch name. For example:
 
-```
+```plaintext
 feature/(name of the feature you are developing)
 ```
 
@@ -36,7 +36,7 @@ feature/(name of the feature you are developing)
 
 Please add the `fix/` prefix to your branch name. For example:
 
-```
+```plaintext
 fix/(name of bug what you are fixing)
 ```
 
@@ -44,7 +44,7 @@ fix/(name of bug what you are fixing)
 
 Only maintainers create the `release/` branch.
 
-```
+```plaintext
 release/prepare_(version_tag)
 ```
 
@@ -101,6 +101,7 @@ If your pull request changes the behavior of the software, please update the doc
 The documentation is built by [mkdocs](https://www.mkdocs.org/).
 
 You may rename existing files or add new files to the `docs/` directory.
+
 * If you add new files, you should add the file name to the `nav` section in the `mkdocs.yml` file.
 
 * If you rename existing files, you should set up a redirect from the old file to the new file.
@@ -112,10 +113,11 @@ Any contribution that you make to this repository will
 be under the Apache 2 License, as dictated by that
 [license](http://www.apache.org/licenses/LICENSE-2.0.html):
 
+<!-- markdownlint-disable ol-prefix -->
 > 5. Submission of Contributions. Unless You explicitly state otherwise,
-     >    any Contribution intentionally submitted for inclusion in the Work
-     >    by You to the Licensor shall be under the terms and conditions of
-     >    this License, without any additional terms or conditions.
-     >    Notwithstanding the above, nothing herein shall supersede or modify
-     >    the terms of any separate license agreement you may have executed
-     >    with Licensor regarding such Contributions.
+>    any Contribution intentionally submitted for inclusion in the Work
+>    by You to the Licensor shall be under the terms and conditions of
+>    this License, without any additional terms or conditions.
+>    Notwithstanding the above, nothing herein shall supersede or modify
+>    the terms of any separate license agreement you may have executed
+>    with Licensor regarding such Contributions.

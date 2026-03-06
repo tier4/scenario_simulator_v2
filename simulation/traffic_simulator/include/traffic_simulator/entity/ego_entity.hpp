@@ -16,8 +16,8 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
-#include <boost/filesystem.hpp>
 #include <concealer/field_operator_application.hpp>
+#include <filesystem>
 #include <get_parameter/get_parameter.hpp>
 #include <memory>
 #include <optional>
@@ -43,7 +43,6 @@ public:
 
   explicit EgoEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &);
 

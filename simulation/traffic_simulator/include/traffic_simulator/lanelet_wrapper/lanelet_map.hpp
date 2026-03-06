@@ -15,9 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
 #define TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
 
-#include <lanelet2_core/geometry/Lanelet.h>
-#include <lanelet2_core/primitives/LaneletSequence.h>
-
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator
@@ -26,11 +23,17 @@ namespace lanelet_wrapper
 {
 namespace lanelet_map
 {
+// Basics
 auto isInLanelet(const lanelet::Id lanelet_id, const double lanelet_pose_s) -> bool;
 
 auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
 
+auto isInIntersection(const lanelet::Id) -> bool;
+
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
+
+auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
+  -> std::tuple<double, Point, Point>;
 
 auto laneletAltitude(
   const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
@@ -48,16 +51,20 @@ auto laneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
 
 auto laneletIds() -> lanelet::Ids;
 
+auto filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]) -> lanelet::Ids;
+
 auto nearbyLaneletIds(
   const Point & point, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids;
 
+// Center points
 auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>;
 
 auto centerPoints(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>;
 
+// Next lanelet
 auto nextLaneletIds(
   const lanelet::Id lanelet_id,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
@@ -74,6 +81,7 @@ auto nextLaneletIds(
   const lanelet::Ids & lanelet_ids, std::string_view turn_direction,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
+// Previous lanelet
 auto previousLaneletIds(
   const lanelet::Id lanelet_id,
   const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
@@ -96,9 +104,23 @@ auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 // Polygons
+auto laneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
+
 auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
+
+// Relations
+auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
+  -> std::unordered_map<lanelet::Id, lanelet::Ids>;
+
+auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+
+auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+
+auto conflictingLaneIds(
+  const lanelet::Ids & lanelet_ids,
+  const RoutingGraphType type = RoutingConfiguration().routing_graph_type) -> lanelet::Ids;
 
 // Objects on path
 auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)

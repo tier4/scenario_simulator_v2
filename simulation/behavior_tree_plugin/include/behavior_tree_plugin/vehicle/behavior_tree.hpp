@@ -26,7 +26,6 @@
 #include <optional>
 #include <string>
 #include <traffic_simulator/behavior/behavior_plugin_base.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
@@ -38,9 +37,9 @@ namespace entity_behavior
 class VehicleBehaviorTree : public BehaviorPluginBase
 {
 public:
+  auto configure(const rclcpp::Logger & logger) -> void override;
   auto update(const double current_time, const double step_time) -> void override;
-  void configure(const rclcpp::Logger & logger) override;
-  auto getCurrentAction() -> const std::string & override;
+  auto getCurrentAction() const -> const std::string & override;
 
   auto getBehaviorParameter() -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
@@ -59,9 +58,10 @@ public:
   DEFINE_GETTER_SETTER(CurrentTime,                                      double)
   DEFINE_GETTER_SETTER(DebugMarker,                                      std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, double)
+  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            std::shared_ptr<EuclideanDistancesMap>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        std::vector<geometry_msgs::msg::Pose>)
-  DEFINE_GETTER_SETTER(HdMapUtils,                                       std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             traffic_simulator::lane_change::Parameter)
+  DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        std::optional<double>)
   DEFINE_GETTER_SETTER(Obstacle,                                         std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             traffic_simulator_msgs::msg::PedestrianParameters)
@@ -74,7 +74,6 @@ public:
   DEFINE_GETTER_SETTER(TrafficLights,                                    std::shared_ptr<traffic_simulator::TrafficLightsBase>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        traffic_simulator_msgs::msg::WaypointsArray)
-  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            std::shared_ptr<EuclideanDistancesMap>)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 

@@ -28,6 +28,8 @@ namespace concealer
 template <typename Node>
 class ContinuousTransformBroadcaster
 {
+  const std::string child_frame_id;
+
   tf2_ros::Buffer transform_buffer;
 
   tf2_ros::TransformBroadcaster transform_broadcaster;
@@ -52,7 +54,7 @@ public:
   {
     current_transform.header.stamp = static_cast<Node &>(*this).get_clock()->now();
     current_transform.header.frame_id = "map";
-    current_transform.child_frame_id = "base_link";
+    current_transform.child_frame_id = child_frame_id;
     current_transform.transform.translation.x = pose.position.x;
     current_transform.transform.translation.y = pose.position.y;
     current_transform.transform.translation.z = pose.position.z;
@@ -61,8 +63,9 @@ public:
     return current_transform;
   }
 
-  explicit ContinuousTransformBroadcaster()
-  : transform_buffer(static_cast<Node &>(*this).get_clock()),
+  explicit ContinuousTransformBroadcaster(const std::string & child_frame_id)
+  : child_frame_id(child_frame_id),
+    transform_buffer(static_cast<Node &>(*this).get_clock()),
     transform_broadcaster(static_cast<Node *>(this)),
     timer(static_cast<Node &>(*this).create_wall_timer(
       std::chrono::milliseconds(5), [this]() { return updateTransform(); }))

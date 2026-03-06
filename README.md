@@ -1,4 +1,4 @@
-# scenario_simulator_v2 {#mainpage}
+# scenario_simulator_v2
 
 Scenario testing framework for Autoware.
 

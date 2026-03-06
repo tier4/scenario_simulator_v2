@@ -16,6 +16,7 @@ rules:
       - openscenario/openscenario_utility/resource/openscenario_utility
       - test_runner/scenario_test_runner/resource/scenario_test_runner
       - test_runner/scenario_test_runner/scenario_test_runner/__init__.py
+      - "*.jsonc"
 
     # if true also checks if file ends in a single newline character
     single-new-line: true

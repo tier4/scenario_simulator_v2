@@ -98,14 +98,19 @@ If you want to develop behavior plugin, first, you have to add three functions b
 ```C++
 void configure(const rclcpp::Logger & logger) override;
 ```
+
 configure plugin class, this function only calls once at the start of simulation.
+
 ```C++
 void update(double current_time, double step_time) override;
 ```
+
 update plugin class, this function calls once in every frame in simulation.
+
 ```C++
 const std::string & getCurrentAction() const override;
 ```
+
 return current actions of NPC, this result only use for visualization.
 
 After that, you have to define getter and setters for each data.  

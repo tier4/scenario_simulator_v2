@@ -1,6 +1,7 @@
 # Cpp scenario demo
 
-**Note! This demo does not use Autoware. Ego Vehicle is interpreted as an NPC**
+!!!tip
+    This demo does not use Autoware. Ego Vehicle is interpreted as an NPC
 
 Before you try to run this demo, you have to build and install scenario_simulator_v2 in your local computer.
 If you want to know how to do that, please refer to [this documentation](../BuildInstructions.md).

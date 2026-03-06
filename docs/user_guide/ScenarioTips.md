@@ -8,7 +8,7 @@ with this piece of scenario, lane change will be executed as below.
 
 - the shape of trajectory is smooth, and it is based on a cubic spline curve
 - it takes 5 seconds to finish the lane change
--  the target lane is left (left is positive)
+- the target lane is left (left is positive)
 
 ```yaml
 Action:
@@ -26,14 +26,13 @@ Action:
               value: 1
 ```
 
-
-![](../image/lane_change.gif)
-
+![Lane Change](../image/lane_change.gif)
 
 ## Exit with Success when Autoware reaches the target
 
 When the state of Autoware becomes `ARRIVED_GOAL`, execute `exitSuccess` of `CustomCommandAction`.
 If you have set multiple destinations, it is a good idea to use `DistanceCondition` to check if the Autoware have arrived at the correct destination.
+
 ```yaml
 Event:
   - name: ''
@@ -57,8 +56,10 @@ Event:
 ```
 
 ## Exit with failure when scenario has timed out
+
 It's important to have a timeout in case the scenario or Autoware doesn't work as intended.
 The example below is written to time out after 3 minutes(180 seconds).
+
 ```yaml
 Event:
   - name: ''
@@ -81,9 +82,11 @@ Event:
 ```
 
 ## Use custom topic content in scenario
+
 In `UserDefinedValueCondition`, you can treat ros2 topic content by writing the name of topic in the name field.
 Caution: this function supports `tier4_simulation_msgs::msg::UserDefinedValue` type only
 The example below is using the value from `/count_up` topic.
+
 ```yaml
 Condition:
 - name: ''

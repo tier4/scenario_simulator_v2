@@ -1,0 +1,134 @@
+OpenSCENARIO:
+  FileHeader:
+    author: Kotaro Yoshimoto
+    date: '2025-12-24T00:00:00+09:00'
+    description: |
+      Test Event priority="override".
+    revMajor: 1
+    revMinor: 3
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: car
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: car
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 10
+                      offset: 0
+    Story:
+      - name: story
+        Act:
+          - name: act
+            ManeuverGroup:
+              - name: mg
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: car
+                Maneuver:
+                  - name: m
+                    Event:
+                      # SpeedAction(10s): should be stopped by override
+                      - name: event1
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: speed
+                            PrivateAction:
+                              LongitudinalAction:
+                                SpeedAction:
+                                  SpeedActionDynamics:
+                                    dynamicsDimension: time
+                                    dynamicsShape: linear
+                                    value: 10
+                                  SpeedActionTarget:
+                                    AbsoluteTargetSpeed:
+                                      value: 10
+                      # priority=override: stops event1
+                      - name: event2
+                        priority: override
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: noop
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: ':'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0.5
+                                      rule: greaterThan
+                      # exit_success - event1 was stopped (override worked)
+                      - name: exit_success
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: exit
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: event1
+                                      storyboardElementType: event
+                                      state: stopTransition
+                      # exit_failure: timeout (override didn't work)
+                      - name: exit_failure
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: exit
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 5
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

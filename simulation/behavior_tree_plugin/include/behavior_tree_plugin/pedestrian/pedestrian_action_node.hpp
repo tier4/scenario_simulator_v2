@@ -24,6 +24,7 @@
 
 namespace entity_behavior
 {
+enum class SeeAroundMode { blind, aware };
 class PedestrianActionNode : public ActionNode
 {
 public:
@@ -41,6 +42,9 @@ public:
   auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
     -> traffic_simulator::EntityStatus;
   auto calculateUpdatedEntityStatus(double target_speed) const -> traffic_simulator::EntityStatus;
+
+protected:
+  SeeAroundMode should_respect_see_around;
 };
 }  // namespace entity_behavior
 
