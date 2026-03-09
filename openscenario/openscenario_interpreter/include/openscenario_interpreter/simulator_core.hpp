@@ -335,8 +335,8 @@ public:
       const std::string & entity_ref, Controller && controller) -> void
     {
       auto & entity = core->getEntity(entity_ref);
-      entity.setVelocityLimit(controller.properties.template get<Double>(
-        "maxSpeed", std::numeric_limits<Double::value_type>::max()));
+      // entity.setVelocityLimit(controller.properties.template get<Double>(
+      //   "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
       entity.setBehaviorParameter([&]() {
         auto message = entity.getBehaviorParameter();
