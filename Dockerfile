@@ -54,6 +54,7 @@ RUN --mount=type=cache,target=/ccache bash -c "source /opt/ros/${ROS_DISTRO}/set
 # ===================================================================
 FROM docker.io/library/ros:${ROS_DISTRO}-ros-base AS runtime
 
+# cspell: ignore libtbb libprotobuf
 # Install runtime dependencies in a single layer and clean up
 RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
@@ -91,7 +92,7 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 # ===================================================================  
 FROM runtime AS development  
 
-# Install ros2 destop packages and rviz2  
+# Install ros2 desktop packages and rviz2  
 RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \  
     --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \  
     apt-get update && \  
