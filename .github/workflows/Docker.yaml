@@ -24,13 +24,30 @@ on:
         required: true
 
 jobs:
-  push_traffic_sim_docker:
-    name: Push Docker Image for traffic_simulator
-    runs-on: ubuntu-22.04
+  build:
+    name: Build Docker Image (${{ matrix.image_tag }} - ${{ matrix.platform }})
+    runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 720
     strategy:
       matrix:
         rosdistro: [humble]
+        include:
+          - runs-on: ubuntu-22.04
+            platform: linux/amd64
+            dockerfile: Dockerfile
+            image_tag: humble
+          - runs-on: ubuntu-22.04-arm
+            platform: linux/arm64
+            dockerfile: Dockerfile
+            image_tag: humble
+          - runs-on: ubuntu-22.04
+            platform: linux/amd64
+            dockerfile: Dockerfile.traffic_simulator
+            image_tag: traffic_simulator_humble
+          - runs-on: ubuntu-22.04-arm
+            platform: linux/arm64
+            dockerfile: Dockerfile.traffic_simulator
+            image_tag: traffic_simulator_humble
 
     steps:
       - name: Free Disk Space (Ubuntu)
@@ -57,105 +74,87 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build
-        if: github.event_name == 'pull_request'
-        uses: docker/bake-action@v7.0.0
+      - name: Create image tag
+        id: image_tag
+        run: echo "image_tag=ghcr.io/tier4/scenario_simulator_v2:${{ matrix.image_tag }}-${{ github.event.inputs.version || steps.version.outputs.version }}" >> $GITHUB_OUTPUT
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-          push: false
-          targets: |
-            traffic_simulator_${{ matrix.rosdistro }}
+          images: ${{ steps.image_tag.outputs.image_tag }}
 
-      - name: Build and push
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: docker/bake-action@v7.0.0
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v7
         with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_${{ matrix.rosdistro }}-${{ github.event.inputs.version || steps.version.outputs.version }}
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator-latest
-          push: true
-          targets: |
-            traffic_simulator_${{ matrix.rosdistro }}
+          context: .
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ steps.image_tag.outputs.image_tag }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+            ROS_DISTRO=${{ matrix.rosdistro }}
 
-  push_docker:
-    name: Push Docker Image
-    runs-on: ubuntu-22.04
-    timeout-minutes: 720
-    strategy:
-      matrix:
-        rosdistro: [humble]
-        arch: [amd64, arm64]
-
-    steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-
-      - name: Install catkin-pkg
-        run: sudo apt update && sudo apt install -y python3-catkin-pkg git curl
-
-      - name: Install docker for ubuntu runner
-        uses: docker/setup-buildx-action@v3
-
-      - name: Install QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - uses: actions/checkout@v6
-
-      - name: Get version
-        id: version
-        run: echo "version=$(catkin_package_version)" >> $GITHUB_OUTPUT
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker Qemu Setup
+      - name: Export digest
         run: |
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-          docker buildx create --use
-          docker buildx inspect --bootstrap
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
 
-      - name: Build (${{ matrix.arch }})
-        if: github.event_name == 'pull_request'
-        uses: docker/bake-action@v7.0.0
-        with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-          push: false
-          targets: |
-            ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
+      - name: Prepare
+        id: prepare
+        run: |
+          echo "image=${{ steps.image_tag.outputs.image_tag }}" >> $GITHUB_OUTPUT
+          echo "digest=${{ steps.build.outputs.digest }}" >> $GITHUB_OUTPUT
 
-      - name: Build and push (${{ matrix.arch }})
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: docker/bake-action@v7.0.0
+      - name: Upload digest
+        uses: actions/upload-artifact@v7
         with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-${{ github.event.inputs.version || steps.version.outputs.version }}
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-latest
-          push: true
-          targets: |
-            ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
+          name: digests-${{ matrix.image_tag }}-${{ matrix.platform }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    strategy:
+      matrix:
+        include:
+          - image_tag: humble
+          - image_tag: traffic_simulator_humble
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v7
+        with:
+          path: /tmp/digests
+          pattern: digests-${{ matrix.image_tag }}-*
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Create image tag
+        id: image_tag
+        run: echo "image_tag=ghcr.io/tier4/scenario_simulator_v2:${{ matrix.image_tag }}-${{ github.event.inputs.version || steps.version.outputs.version }}" >> $GITHUB_OUTPUT
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.image_tag.outputs.image_tag }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create -t ${{ steps.image_tag.outputs.image_tag }} $(printf '${{ steps.image_tag.outputs.image_tag }}@sha256:%s ' *)
