@@ -2,6 +2,9 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.8 (2026-03-10)
+-------------------
+
 25.0.7 (2026-03-10)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/download-artifact-8

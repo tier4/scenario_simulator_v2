@@ -21,26 +21,28 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Wetness 1.2 --------------------------------------------------------
- *
- * <xsd:simpleType name="Wetness">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="dry"/>
- *         <xsd:enumeration value="moist"/>
- *         <xsd:enumeration value="wetWithPuddles"/>
- *         <xsd:enumeration value="lowFlooded"/>
- *         <xsd:enumeration value="highFlooded"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Wetness (OpenSCENARIO XML 1.3.1)
+
+   Definition of the wetness of the road.
+
+   <xsd:simpleType name="Wetness">
+     <xsd:union>
+       <xsd:simpleType>
+         <xsd:restriction base="xsd:string">
+           <xsd:enumeration value="dry"/>
+           <xsd:enumeration value="moist"/>
+           <xsd:enumeration value="wetWithPuddles"/>
+           <xsd:enumeration value="lowFlooded"/>
+           <xsd:enumeration value="highFlooded"/>
+         </xsd:restriction>
+       </xsd:simpleType>
+       <xsd:simpleType>
+         <xsd:restriction base="parameter"/>
+       </xsd:simpleType>
+     </xsd:union>
+   </xsd:simpleType>
+*/
 struct Wetness
 {
   enum value_type {
