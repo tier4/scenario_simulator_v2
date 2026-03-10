@@ -2,6 +2,17 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.9 (2026-03-10)
+-------------------
+* Merge branch 'master' into fix/labeler
+* Contributors: Kotaro Yoshimoto
+
+25.0.8 (2026-03-10)
+-------------------
+* Merge pull request `#1811 <https://github.com/tier4/scenario_simulator_v2/issues/1811>`_ from tier4/feature/environment-bump
+* confirm Environment schema in ASAM OSC v1.3.1
+* Contributors: Kotaro Yoshimoto, f0reachARR
+
 25.0.7 (2026-03-10)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/download-artifact-8
