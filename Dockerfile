@@ -3,8 +3,8 @@ FROM docker.io/library/ros:${ROS_DISTRO} AS build-stage
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-${TARGETARCH},target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         python3-pip \
@@ -31,8 +31,8 @@ RUN git clone --depth 1 https://github.com/autowarefoundation/autoware_launch.gi
     mkdir -p external && \
     vcs import external < dependency_${ROS_DISTRO}.repos
 
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-${TARGETARCH},target=/var/lib/apt,sharing=locked \
     bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
     apt-get update && \
     rosdep install -iy --from-paths . --rosdistro ${ROS_DISTRO}"
@@ -56,8 +56,8 @@ FROM docker.io/library/ros:${ROS_DISTRO}-ros-base AS runtime
 
 # cspell: ignore libtbb libprotobuf
 # Install runtime dependencies in a single layer and clean up
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-${TARGETARCH},target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get install -y --no-install-recommends \
     software-properties-common python3-pip && \
@@ -93,8 +93,8 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 FROM runtime AS development  
 
 # Install ros2 desktop packages and rviz2  
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \  
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \  
+RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=locked \  
+    --mount=type=cache,id=apt-lib-${TARGETARCH},target=/var/lib/apt,sharing=locked \  
     apt-get update && \  
     apt-get install -y --no-install-recommends \  
         ros-${ROS_DISTRO}-desktop \  
