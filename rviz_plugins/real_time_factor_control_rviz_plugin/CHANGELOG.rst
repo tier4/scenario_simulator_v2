@@ -2,6 +2,11 @@
 Changelog for package real_time_factor_control_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.4 (2026-03-10)
+-------------------
+* Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.4
+* Contributors: Kotaro Yoshimoto
+
 25.0.3 (2026-03-10)
 -------------------
 
