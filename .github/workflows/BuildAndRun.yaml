@@ -152,7 +152,7 @@ jobs:
         shell: bash
 
       - uses: actions/github-script@v8
-        if: steps.optional-scenario-test.outputs.failure > 0 && matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false
+        if: steps.optional-scenario-test.outputs.failure > 0 && matrix.runs_on != 'ubuntu-22.04-arm' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -206,7 +206,7 @@ jobs:
       #        shell: bash
 
       - name: Report error if SonarQube scan failed
-        if: steps.sonarcloud.outcome == 'failure' && github.actor != 'dependabot[bot]'
+        if: steps.sonarcloud.outcome == 'failure' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
         uses: mshick/add-pr-comment@v2
         with:
           message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
