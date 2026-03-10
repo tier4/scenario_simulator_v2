@@ -2,6 +2,11 @@
 Changelog for package agnocast_wrapper
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.9 (2026-03-10)
+-------------------
+* Merge branch 'master' into fix/labeler
+* Contributors: Kotaro Yoshimoto
+
 25.0.8 (2026-03-10)
 -------------------
 
