@@ -2,6 +2,11 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.7 (2026-03-10)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-8
+* Contributors: Kotaro Yoshimoto
+
 25.0.6 (2026-03-10)
 -------------------
 * Merge branch 'master' into fix/badge-error
