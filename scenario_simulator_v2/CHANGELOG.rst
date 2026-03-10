@@ -2,6 +2,21 @@
 Changelog for package scenario_simulator_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.7 (2026-03-10)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/actions/download-artifact-8
+* Contributors: Kotaro Yoshimoto
+
+25.0.6 (2026-03-10)
+-------------------
+* Merge branch 'master' into fix/badge-error
+* Contributors: Kotaro Yoshimoto
+
+25.0.5 (2026-03-10)
+-------------------
+* Merge branch 'master' into dependabot/github_actions/docker/bake-action-7.0.0
+* Contributors: Kotaro Yoshimoto
+
 25.0.4 (2026-03-10)
 -------------------
 * Merge branch 'master' into dependabot/uv/mkdocs-material-9.7.4
