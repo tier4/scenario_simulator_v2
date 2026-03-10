@@ -31,6 +31,9 @@ jobs:
     strategy:
       matrix:
         rosdistro: [humble]
+        runs-on: [ubuntu-22.04, ubuntu-22.04-arm]
+        dockerfile: [Dockerfile]
+        image_tag: [humble]
         include:
           - runs-on: ubuntu-22.04
             platform: linux/amd64
