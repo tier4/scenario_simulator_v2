@@ -2,6 +2,11 @@
 Changelog for package simple_cross_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.6 (2026-03-10)
+-------------------
+* Merge branch 'master' into fix/badge-error
+* Contributors: Kotaro Yoshimoto
+
 25.0.5 (2026-03-10)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/docker/bake-action-7.0.0
