@@ -2,6 +2,14 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.10 (2026-03-11)
+--------------------
+* Merge branch 'master' into feature/minimal-containers
+* Merge branch 'master' into feature/minimal-containers
+* Merge branch 'master' into feature/minimal-containers
+* Merge remote-tracking branch 'origin/master' into feature/minimal-containers
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
 25.0.9 (2026-03-10)
 -------------------
 * Merge branch 'master' into fix/labeler

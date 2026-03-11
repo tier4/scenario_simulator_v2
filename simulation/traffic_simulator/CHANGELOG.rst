@@ -2,6 +2,16 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.10 (2026-03-11)
+--------------------
+* Merge pull request `#1807 <https://github.com/tier4/scenario_simulator_v2/issues/1807>`_ from tier4/feature/minimal-containers
+* Merge branch 'master' into feature/minimal-containers
+* Merge branch 'master' into feature/minimal-containers
+* Merge branch 'master' into feature/minimal-containers
+* Merge remote-tracking branch 'origin/master' into feature/minimal-containers
+* address build time errors for traffic simulator
+* Contributors: Dustin Black, Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
 25.0.9 (2026-03-10)
 -------------------
 * Merge branch 'master' into fix/labeler
