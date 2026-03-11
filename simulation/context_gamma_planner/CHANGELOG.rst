@@ -2,6 +2,12 @@
 Changelog for package context_gamma_planner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.11 (2026-03-11)
+--------------------
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-7
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-7
+* Contributors: Kotaro Yoshimoto
+
 25.0.10 (2026-03-11)
 --------------------
 * Merge branch 'master' into feature/minimal-containers
