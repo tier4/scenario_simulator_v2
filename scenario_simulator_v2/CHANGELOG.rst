@@ -2,6 +2,11 @@
 Changelog for package scenario_simulator_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.12 (2026-03-11)
+--------------------
+* Merge branch 'master' into dependabot/github_actions/lycheeverse/lychee-action-2.8.0
+* Contributors: Kotaro Yoshimoto
+
 25.0.11 (2026-03-11)
 --------------------
 * Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-7
