@@ -190,7 +190,7 @@ Replace `$PWD/path/to/your/scenario.yaml` in two places with your custom scenari
 and execute the command below
 
 ```bash
-rocker --x11 --oyr-mount $PWD/path/to/your/scenario.yaml \
+rocker --x11 --volume $PWD/path/to/your/ \
     -- ghcr.io/tier4/scenario_simulator_v2:humble \
     ros2 launch scenario_test_runner scenario_test_runner.launch.py \
     scenario:=$PWD/path/to/your/scenario.yaml launch_rviz:=True
@@ -202,9 +202,8 @@ Please also refer to the sample we prepared.
 wget https://gist.github.com/hakuturu583/5e6a651df9abdf25dca7071ff5ea8ac3/archive/1448057aeebc34cbfc04598b965440fcf7ecb636.zip
 unzip 1448057aeebc34cbfc04598b965440fcf7ecb636.zip
 mv 5e6a651df9abdf25dca7071ff5ea8ac3-1448057aeebc34cbfc04598b965440fcf7ecb636 scenarios
-sudo pip3 install git+https://github.com/sloretz/off-your-rocker.git
 docker pull ghcr.io/tier4/scenario_simulator_v2:humble
-rocker --x11 --oyr-mount $PWD/scenarios/UC-001-0001-Kashiwa.yaml -- ghcr.io/tier4/scenario_simulator_v2:humble ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:=$PWD/scenarios/UC-001-0001-Kashiwa.yaml launch_rviz:=True
+rocker --x11 --volume $PWD/scenarios -- ghcr.io/tier4/scenario_simulator_v2:humble ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:=$PWD/scenarios/UC-001-0001-Kashiwa.yaml launch_rviz:=True
 ```
 
 Our sample should run like the video below.
