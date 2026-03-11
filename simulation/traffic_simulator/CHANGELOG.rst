@@ -2,6 +2,12 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.11 (2026-03-11)
+--------------------
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-7
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-7
+* Contributors: Kotaro Yoshimoto
+
 25.0.10 (2026-03-11)
 --------------------
 * Merge pull request `#1807 <https://github.com/tier4/scenario_simulator_v2/issues/1807>`_ from tier4/feature/minimal-containers
