@@ -21,31 +21,33 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- FractionalCloudCover 1.2 ----------------------------------------
- *
- * <xsd:simpleType name="FractionalCloudCover">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="zeroOktas"/>
- *         <xsd:enumeration value="oneOktas"/>
- *         <xsd:enumeration value="twoOktas"/>
- *         <xsd:enumeration value="threeOktas"/>
- *         <xsd:enumeration value="fourOktas"/>
- *         <xsd:enumeration value="fiveOktas"/>
- *         <xsd:enumeration value="sixOktas"/>
- *         <xsd:enumeration value="sevenOktas"/>
- *         <xsd:enumeration value="eightOktas"/>
- *         <xsd:enumeration value="nineOktas"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   FractionalCloudCover (OpenSCENARIO XML 1.3.1)
+
+   Definition of cloud states using the fractional cloud cover in oktas.
+
+   <xsd:simpleType name="FractionalCloudCover">
+     <xsd:union>
+       <xsd:simpleType>
+         <xsd:restriction base="xsd:string">
+           <xsd:enumeration value="zeroOktas"/>
+           <xsd:enumeration value="oneOktas"/>
+           <xsd:enumeration value="twoOktas"/>
+           <xsd:enumeration value="threeOktas"/>
+           <xsd:enumeration value="fourOktas"/>
+           <xsd:enumeration value="fiveOktas"/>
+           <xsd:enumeration value="sixOktas"/>
+           <xsd:enumeration value="sevenOktas"/>
+           <xsd:enumeration value="eightOktas"/>
+           <xsd:enumeration value="nineOktas"/>
+         </xsd:restriction>
+       </xsd:simpleType>
+       <xsd:simpleType>
+         <xsd:restriction base="parameter"/>
+       </xsd:simpleType>
+     </xsd:union>
+   </xsd:simpleType>
+*/
 struct FractionalCloudCover
 {
   enum value_type {
