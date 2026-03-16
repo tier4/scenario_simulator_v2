@@ -112,7 +112,8 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
       return status;
     });
   sensor_sim_.updateSensorFrame(
-    current_simulation_time_, current_ros_time_, entity_status, traffic_signals_states_);
+    current_simulation_time_, current_scenario_time_, current_ros_time_, entity_status,
+    traffic_signals_states_);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
   return res;
