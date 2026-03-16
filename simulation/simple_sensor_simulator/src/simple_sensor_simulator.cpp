@@ -49,6 +49,14 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     },
     [this](auto &&... xs) { return updateStepTime(std::forward<decltype(xs)>(xs)...); })
 {
+  const auto replay_bag_path =
+    common::getParameter<std::string>(get_node_parameters_interface(), "replay_bag_path", "");
+  if (not replay_bag_path.empty()) {
+    const auto replay_start_time =
+      common::getParameter<double>(get_node_parameters_interface(), "replay_start_time", 0.0);
+    sensor_sim_.attachPerceptionReproducerSensor(replay_bag_path, replay_start_time, *this);
+    sensor_sim_.setSuppressDetectionSensor(true);
+  }
 }
 
 ScenarioSimulator::~ScenarioSimulator() {}
@@ -81,6 +89,9 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   pedestrians_.clear();
   misc_objects_.clear();
   entity_status_.clear();
+
+  sensor_sim_.resetPerceptionReproducerSensors();
+
   return res;
 }
 
