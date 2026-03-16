@@ -207,7 +207,7 @@ jobs:
 
       - name: Report error if SonarQube scan failed
         if: steps.sonarcloud.outcome == 'failure' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
           message-id: "sonarcloud-scan-failure"
