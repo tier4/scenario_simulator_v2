@@ -30,4 +30,7 @@ auto BagStream<T>::pushMessage(
   this->data_.emplace_back(time_s, message);
 }
 
+template class BagStream<autoware_perception_msgs::msg::DetectedObjects>;
+template class BagStream<autoware_planning_msgs::msg::Trajectory>;
+
 }  // namespace simple_sensor_simulator
