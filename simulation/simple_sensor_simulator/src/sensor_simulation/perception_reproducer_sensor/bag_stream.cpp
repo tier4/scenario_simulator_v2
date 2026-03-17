@@ -20,8 +20,8 @@ namespace simple_sensor_simulator
 {
 
 template <typename T>
-auto BagStream<T>::pushMessage(
-  double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data) -> void
+auto BagStream<T>::pushMessage(double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data)
+  -> void
 {
   auto message = this->deserialize(data);
   if (message.header.frame_id == "base_link") {

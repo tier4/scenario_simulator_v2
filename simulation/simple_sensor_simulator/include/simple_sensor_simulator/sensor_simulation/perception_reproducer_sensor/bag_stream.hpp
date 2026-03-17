@@ -15,10 +15,9 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PERCEPTION_REPRODUCER_SENSOR__BAG_STREAM_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PERCEPTION_REPRODUCER_SENSOR__BAG_STREAM_HPP_
 
-#include <rosbag2_storage/serialized_bag_message.hpp>
-
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/serialization.hpp>
+#include <rosbag2_storage/serialized_bag_message.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -35,8 +34,8 @@ public:
   virtual ~BagStreamBase() = default;
 
   auto tryPushMessage(
-    const std::shared_ptr<rosbag2_storage::SerializedBagMessage> & bag_message,
-    double time_s) -> void
+    const std::shared_ptr<rosbag2_storage::SerializedBagMessage> & bag_message, double time_s)
+    -> void
   {
     if (bag_message->topic_name == topic_name_) {
       pushMessage(time_s, bag_message->serialized_data);
@@ -55,8 +54,8 @@ public:
   }
 
 protected:
-  virtual auto pushMessage(
-    double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data) -> void = 0;
+  virtual auto pushMessage(double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data)
+    -> void = 0;
 
   const std::string topic_name_;
 
@@ -87,8 +86,8 @@ public:
   auto done() const -> bool { return index_ >= this->data_.size(); }
 
 protected:
-  auto pushMessage(
-    double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data) -> void override;
+  auto pushMessage(double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data)
+    -> void override;
 
 private:
   typename rclcpp::Publisher<T>::SharedPtr publisher_;

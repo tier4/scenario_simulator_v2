@@ -81,8 +81,7 @@ PerceptionReproducerSensor::PerceptionReproducerSensor(
 : logger_(node.get_logger()),
   detected_objects_stream_(detected_objects_topic_, publisher),
   trajectory_stream_(
-    trajectory_topic_,
-    node.create_publisher<Trajectory>("/simulation/replay/trajectory", 1)),
+    trajectory_topic_, node.create_publisher<Trajectory>("/simulation/replay/trajectory", 1)),
   odometry_stream_(odometry_topic_, "replay_base_link", node),
   vehicle_marker_pub_(node.create_publisher<visualization_msgs::msg::MarkerArray>(
     "/simulation/replay/vehicle_marker", 1))

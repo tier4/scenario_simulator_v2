@@ -20,8 +20,8 @@
 #include <autoware_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <geometry_msgs/msg/pose.hpp>
-#include <nav_msgs/msg/odometry.hpp>
 #include <memory>
+#include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/bag_stream.hpp>
 #include <string>
@@ -33,7 +33,8 @@ namespace simple_sensor_simulator
 class TFStreamFromOdometry : public BagStreamBase<nav_msgs::msg::Odometry>
 {
 public:
-  TFStreamFromOdometry(const std::string & topic_name, const std::string & frame_id, rclcpp::Node & node)
+  TFStreamFromOdometry(
+    const std::string & topic_name, const std::string & frame_id, rclcpp::Node & node)
   : BagStreamBase<nav_msgs::msg::Odometry>(topic_name),
     frame_id_(frame_id),
     tf_broadcaster_(std::make_unique<tf2_ros::TransformBroadcaster>(node))
@@ -45,8 +46,8 @@ public:
   auto reset() -> void { index_ = 0; }
 
 protected:
-  auto pushMessage(
-    double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data) -> void override;
+  auto pushMessage(double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data)
+    -> void override;
 
 private:
   const std::string frame_id_;
