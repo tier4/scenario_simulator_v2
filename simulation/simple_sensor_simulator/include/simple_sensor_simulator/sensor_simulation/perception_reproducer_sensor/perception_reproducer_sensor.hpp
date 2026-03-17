@@ -20,9 +20,11 @@
 #include <autoware_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <limits>
 #include <memory>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/bag_stream.hpp>
 #include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/traffic_light_bag_stream.hpp>
@@ -47,6 +49,30 @@ public:
 
   auto broadcastTf(double time_s, const rclcpp::Time & ros_time) -> geometry_msgs::msg::Pose;
 
+  auto findNearestIndex(const geometry_msgs::msg::Pose & ego_pose) const -> size_t
+  {
+    double min_dist_sq = std::numeric_limits<double>::max();
+    size_t nearest = 0;
+    for (size_t i = 0; i < data_.size(); ++i) {
+      const auto & pos = data_[i].second.pose.pose.position;
+      const double dx = pos.x - ego_pose.position.x;
+      const double dy = pos.y - ego_pose.position.y;
+      const double dist_sq = dx * dx + dy * dy;
+      if (dist_sq < min_dist_sq) {
+        min_dist_sq = dist_sq;
+        nearest = i;
+      }
+    }
+    return nearest;
+  }
+
+  auto getTimeAt(size_t idx) const -> double { return data_[idx].first; }
+
+  auto getPoseAt(size_t idx) const -> const geometry_msgs::msg::Pose &
+  {
+    return data_[idx].second.pose.pose;
+  }
+
   auto reset() -> void { index_ = 0; }
 
 protected:
@@ -68,11 +94,19 @@ class PerceptionReproducerSensor
   using OccupancyGrid = nav_msgs::msg::OccupancyGrid;
 
 public:
-  PerceptionReproducerSensor(
-    const std::string & bag_path, double start_time_s,
-    rclcpp::Publisher<DetectedObjects>::SharedPtr publisher, rclcpp::Node & node);
+  struct ReplayConfig
+  {
+    // Use position-based data selection instead of time-sequential replay
+    bool use_position_based_replay = false;
+  };
 
-  auto update(double current_scenario_time, const rclcpp::Time & current_ros_time) -> void;
+  PerceptionReproducerSensor(
+    const std::string & bag_path, double start_time_s, const ReplayConfig & config,
+    rclcpp::Node & node);
+
+  auto update(
+    double current_scenario_time, const rclcpp::Time & current_ros_time,
+    const std::optional<geometry_msgs::msg::Pose> & ego_pose) -> void;
 
   auto reset() -> void;
 
@@ -91,10 +125,18 @@ private:
 
   auto loadAllBagData(const std::string & bag_path, double start_time_s) -> void;
 
+  auto updateTimeBased(double current_scenario_time, const rclcpp::Time & current_ros_time) -> void;
+
+  auto updatePositionBased(
+    const geometry_msgs::msg::Pose & ego_pose, double current_scenario_time,
+    const rclcpp::Time & current_ros_time) -> void;
+
   auto publishVehicleMarker(
     const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time) const -> void;
 
   rclcpp::Logger logger_;
+
+  ReplayConfig config_;
 
   BagStream<DetectedObjects> detected_objects_stream_;
 

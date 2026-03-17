@@ -120,12 +120,11 @@ public:
   }
 
   auto attachPerceptionReproducerSensor(
-    const std::string & bag_path, double start_time_s, rclcpp::Node & node) -> void
+    const std::string & bag_path, double start_time_s,
+    const PerceptionReproducerSensor::ReplayConfig & config, rclcpp::Node & node) -> void
   {
-    using Message = autoware_perception_msgs::msg::DetectedObjects;
-    perception_reproducer_sensors_.push_back(std::make_unique<PerceptionReproducerSensor>(
-      bag_path, start_time_s,
-      node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1), node));
+    perception_reproducer_sensors_.push_back(
+      std::make_unique<PerceptionReproducerSensor>(bag_path, start_time_s, config, node));
   }
 
   auto resetPerceptionReproducerSensors() const -> void

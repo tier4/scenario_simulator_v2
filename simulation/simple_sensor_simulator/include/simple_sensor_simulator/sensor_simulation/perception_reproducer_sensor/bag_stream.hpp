@@ -15,6 +15,7 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PERCEPTION_REPRODUCER_SENSOR__BAG_STREAM_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PERCEPTION_REPRODUCER_SENSOR__BAG_STREAM_HPP_
 
+#include <algorithm>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/serialization.hpp>
 #include <rosbag2_storage/serialized_bag_message.hpp>
@@ -59,6 +60,23 @@ protected:
   virtual auto pushMessage(double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data)
     -> void = 0;
 
+  auto nearestIndex(double target_time_s) const -> size_t
+  {
+    const auto it = std::lower_bound(
+      data_.begin(), data_.end(), target_time_s,
+      [](const std::pair<double, T> & elem, double val) { return elem.first < val; });
+    if (it == data_.end()) {
+      return data_.size() - 1;
+    }
+    if (it == data_.begin()) {
+      return 0;
+    }
+    const auto prev = std::prev(it);
+    const size_t prev_idx = static_cast<size_t>(prev - data_.begin());
+    const size_t curr_idx = static_cast<size_t>(it - data_.begin());
+    return (target_time_s - prev->first <= it->first - target_time_s) ? prev_idx : curr_idx;
+  }
+
   const std::string topic_name_;
 
   std::vector<std::pair<double, T>> data_;
@@ -81,6 +99,17 @@ public:
       publisher_->publish(message);
       ++index_;
     }
+  }
+
+  auto publishNearest(double target_time_s, const rclcpp::Time & ros_time) -> void
+  {
+    if (this->data_.empty()) {
+      return;
+    }
+    const size_t idx = this->nearestIndex(target_time_s);
+    auto message = this->data_[idx].second;
+    message.header.stamp = ros_time;
+    publisher_->publish(message);
   }
 
   auto reset() -> void { index_ = 0; }

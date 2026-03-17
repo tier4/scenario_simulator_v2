@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cmath>
+#include <geometry/quaternion/normalize.hpp>
 #include <geometry/quaternion/slerp.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -32,7 +32,9 @@ inline namespace experimental
 auto TFStreamFromOdometry::pushMessage(
   double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data) -> void
 {
-  data_.emplace_back(time_s, deserialize(data));
+  auto odometry = deserialize(data);
+  odometry.pose.pose.orientation = math::geometry::normalize(odometry.pose.pose.orientation);
+  data_.emplace_back(time_s, odometry);
 }
 
 auto TFStreamFromOdometry::broadcastTf(double time_s, const rclcpp::Time & ros_time)
@@ -78,10 +80,13 @@ auto TFStreamFromOdometry::broadcastTf(double time_s, const rclcpp::Time & ros_t
 }
 
 PerceptionReproducerSensor::PerceptionReproducerSensor(
-  const std::string & bag_path, double start_time_s,
-  rclcpp::Publisher<DetectedObjects>::SharedPtr publisher, rclcpp::Node & node)
+  const std::string & bag_path, double start_time_s, const ReplayConfig & config,
+  rclcpp::Node & node)
 : logger_(node.get_logger()),
-  detected_objects_stream_(detected_objects_topic_, publisher),
+  config_(config),
+  detected_objects_stream_(
+    detected_objects_topic_,
+    node.create_publisher<DetectedObjects>(detected_objects_topic_, 1)),
   trajectory_stream_(
     trajectory_topic_, node.create_publisher<Trajectory>("/simulation/replay/trajectory", 1)),
   odometry_stream_(odometry_topic_, "replay_base_link", node),
@@ -101,8 +106,8 @@ PerceptionReproducerSensor::PerceptionReproducerSensor(
   loadAllBagData(bag_path, start_time_s);
 }
 
-auto PerceptionReproducerSensor::loadAllBagData(const std::string & bag_path, double start_time_s)
-  -> void
+auto PerceptionReproducerSensor::loadAllBagData(
+  const std::string & bag_path, double start_time_s) -> void
 {
   RCLCPP_INFO(logger_, "Loading bag: %s (start_time: %.3f s)", bag_path.c_str(), start_time_s);
 
@@ -141,6 +146,60 @@ auto PerceptionReproducerSensor::loadAllBagData(const std::string & bag_path, do
       RCLCPP_ERROR(logger_, "Error reading message: %s", e.what());
     }
   }
+}
+
+auto PerceptionReproducerSensor::updateTimeBased(
+  double current_scenario_time, const rclcpp::Time & current_ros_time) -> void
+{
+  if (detected_objects_stream_.done() && trajectory_stream_.done()) {
+    return;
+  }
+
+  if (!odometry_stream_.empty()) {
+    const auto pose = odometry_stream_.broadcastTf(current_scenario_time, current_ros_time);
+    publishVehicleMarker(pose, current_ros_time);
+  }
+
+  detected_objects_stream_.publishUpTo(current_scenario_time, current_ros_time);
+
+  trajectory_stream_.publishUpTo(current_scenario_time, current_ros_time);
+
+  if (!occupancy_grid_stream_.empty()) {
+    occupancy_grid_stream_.publishNearest(current_scenario_time, current_ros_time);
+  }
+
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  if (traffic_light_stream_) {
+    traffic_light_stream_->publishUpTo(current_scenario_time, current_ros_time);
+  }
+#endif
+}
+
+auto PerceptionReproducerSensor::updatePositionBased(
+  const geometry_msgs::msg::Pose & ego_pose, double current_scenario_time,
+  const rclcpp::Time & current_ros_time) -> void
+{
+  if (odometry_stream_.empty()) {
+    return;
+  }
+
+  const size_t nearest_idx = odometry_stream_.findNearestIndex(ego_pose);
+  const double target_time_s = odometry_stream_.getTimeAt(nearest_idx);
+
+  publishVehicleMarker(odometry_stream_.getPoseAt(nearest_idx), current_ros_time);
+  odometry_stream_.broadcastTf(current_scenario_time, current_ros_time);
+
+  detected_objects_stream_.publishNearest(target_time_s, current_ros_time);
+
+  if (!occupancy_grid_stream_.empty()) {
+    occupancy_grid_stream_.publishNearest(target_time_s, current_ros_time);
+  }
+
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  if (traffic_light_stream_) {
+    traffic_light_stream_->publishNearest(target_time_s, current_ros_time);
+  }
+#endif
 }
 
 auto PerceptionReproducerSensor::publishVehicleMarker(
@@ -192,23 +251,20 @@ auto PerceptionReproducerSensor::publishVehicleMarker(
 }
 
 auto PerceptionReproducerSensor::update(
-  double current_scenario_time, const rclcpp::Time & current_ros_time) -> void
+  double current_scenario_time, const rclcpp::Time & current_ros_time,
+  const std::optional<geometry_msgs::msg::Pose> & ego_pose) -> void
 {
   if (std::isnan(current_scenario_time) || current_scenario_time < 0.0) {
     return;
   }
 
-  if (detected_objects_stream_.done() && trajectory_stream_.done()) {
-    return;
+  if (config_.use_position_based_replay) {
+    if (ego_pose) {
+      updatePositionBased(ego_pose.value(), current_scenario_time, current_ros_time);
+    }
+  } else {
+    updateTimeBased(current_scenario_time, current_ros_time);
   }
-
-  if (not odometry_stream_.empty()) {
-    const auto pose = odometry_stream_.broadcastTf(current_scenario_time, current_ros_time);
-    publishVehicleMarker(pose, current_ros_time);
-  }
-
-  detected_objects_stream_.publishUpTo(current_scenario_time, current_ros_time);
-  trajectory_stream_.publishUpTo(current_scenario_time, current_ros_time);
 }
 
 auto PerceptionReproducerSensor::reset() -> void

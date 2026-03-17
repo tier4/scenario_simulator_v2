@@ -53,6 +53,7 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/sensor_simulation/primitives/primitive.cpp
   src/sensor_simulation/primitives/primitive.cpp
   src/sensor_simulation/perception_reproducer_sensor/bag_stream.cpp
+  src/sensor_simulation/perception_reproducer_sensor/traffic_light_bag_stream.cpp
   src/sensor_simulation/perception_reproducer_sensor/perception_reproducer_sensor.cpp
   src/sensor_simulation/sensor_simulation.cpp
   src/simple_sensor_simulator.cpp

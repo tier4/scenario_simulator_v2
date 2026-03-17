@@ -54,7 +54,11 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
   if (not replay_bag_path.empty()) {
     const auto replay_start_time =
       common::getParameter<double>(get_node_parameters_interface(), "replay_start_time", 0.0);
-    sensor_sim_.attachPerceptionReproducerSensor(replay_bag_path, replay_start_time, *this);
+    PerceptionReproducerSensor::ReplayConfig replay_config;
+    replay_config.use_position_based_replay = common::getParameter<bool>(
+      get_node_parameters_interface(), "replay_use_position_based", false);
+    sensor_sim_.attachPerceptionReproducerSensor(
+      replay_bag_path, replay_start_time, replay_config, *this);
     sensor_sim_.setSuppressDetectionSensor(true);
   }
 }
