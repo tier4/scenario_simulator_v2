@@ -24,6 +24,8 @@
 
 namespace simple_sensor_simulator
 {
+inline namespace experimental
+{
 
 template <typename T>
 class BagStreamBase
@@ -95,6 +97,7 @@ private:
   size_t index_ = 0;
 };
 
+}  // namespace experimental
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PERCEPTION_REPRODUCER_SENSOR__BAG_STREAM_HPP_

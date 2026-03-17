@@ -26,6 +26,8 @@
 
 namespace simple_sensor_simulator
 {
+inline namespace experimental
+{
 
 auto TFStreamFromOdometry::pushMessage(
   double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data) -> void
@@ -198,4 +200,5 @@ auto PerceptionReproducerSensor::reset() -> void
   odometry_stream_.reset();
 }
 
+}  // namespace experimental
 }  // namespace simple_sensor_simulator

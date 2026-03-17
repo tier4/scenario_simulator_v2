@@ -29,6 +29,8 @@
 
 namespace simple_sensor_simulator
 {
+inline namespace experimental
+{
 
 class TFStreamFromOdometry : public BagStreamBase<nav_msgs::msg::Odometry>
 {
@@ -95,6 +97,7 @@ private:
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr vehicle_marker_pub_;
 };
 
+}  // namespace experimental
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PERCEPTION_REPRODUCER_SENSOR__PERCEPTION_REPRODUCER_SENSOR_HPP_

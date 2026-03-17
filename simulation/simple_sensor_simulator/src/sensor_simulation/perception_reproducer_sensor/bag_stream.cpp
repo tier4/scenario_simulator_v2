@@ -18,6 +18,8 @@
 
 namespace simple_sensor_simulator
 {
+inline namespace experimental
+{
 
 template <typename T>
 auto BagStream<T>::pushMessage(double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data)
@@ -33,4 +35,5 @@ auto BagStream<T>::pushMessage(double time_s, const std::shared_ptr<rcutils_uint
 template class BagStream<autoware_perception_msgs::msg::DetectedObjects>;
 template class BagStream<autoware_planning_msgs::msg::Trajectory>;
 
+}  // namespace experimental
 }  // namespace simple_sensor_simulator
