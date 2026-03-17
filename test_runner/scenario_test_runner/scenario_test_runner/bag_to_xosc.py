@@ -34,9 +34,7 @@ KINEMATIC_STATE_TOPIC = "/localization/kinematic_state"
 
 
 def _quaternion_to_yaw(x: float, y: float, z: float, w: float) -> float:
-    siny_cosp = 2.0 * (w * z + x * y)
-    cosy_cosp = 1.0 - 2.0 * (y * y + z * z)
-    return math.atan2(siny_cosp, cosy_cosp)
+    return math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z))
 
 
 @dataclass
