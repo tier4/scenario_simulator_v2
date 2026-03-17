@@ -46,14 +46,14 @@ class OdomPose:
 
 
 def _odom_bytes_to_pose(data: bytes) -> OdomPose:
-    msg = rclpy.serialization.deserialize_message(data, Odometry)
-    pos = msg.pose.pose.position
-    ori = msg.pose.pose.orientation
+    message = rclpy.serialization.deserialize_message(data, Odometry)
+    position = message.pose.pose.position
+    orientation = message.pose.pose.orientation
     return OdomPose(
-        x=pos.x,
-        y=pos.y,
-        z=pos.z,
-        yaw=_quaternion_to_yaw(ori.x, ori.y, ori.z, ori.w),
+        x=position.x,
+        y=position.y,
+        z=position.z,
+        yaw=_quaternion_to_yaw(orientation.x, orientation.y, orientation.z, orientation.w),
     )
 
 
