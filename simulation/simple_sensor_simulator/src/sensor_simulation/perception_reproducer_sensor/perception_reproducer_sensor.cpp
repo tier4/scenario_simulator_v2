@@ -126,7 +126,7 @@ auto PerceptionReproducerSensor::loadAllBagData(const std::string & bag_path, do
 }
 
 auto PerceptionReproducerSensor::publishVehicleMarker(
-  const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time) -> void
+  const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time) const -> void
 {
   const auto make_marker = [&](int id, int type) {
     visualization_msgs::msg::Marker m;

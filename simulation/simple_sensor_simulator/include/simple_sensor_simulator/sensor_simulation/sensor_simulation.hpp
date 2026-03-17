@@ -128,9 +128,9 @@ public:
       node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1), node));
   }
 
-  auto resetPerceptionReproducerSensors() -> void
+  auto resetPerceptionReproducerSensors() const -> void
   {
-    for (auto & sensor : perception_reproducer_sensors_) {
+    for (const auto & sensor : perception_reproducer_sensors_) {
       sensor->reset();
     }
   }

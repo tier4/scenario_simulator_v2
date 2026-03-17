@@ -83,8 +83,8 @@ private:
 
   auto loadAllBagData(const std::string & bag_path, double start_time_s) -> void;
 
-  auto publishVehicleMarker(const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time)
-    -> void;
+  auto publishVehicleMarker(
+    const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time) const -> void;
 
   rclcpp::Logger logger_;
 

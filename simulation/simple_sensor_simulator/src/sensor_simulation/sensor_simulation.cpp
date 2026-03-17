@@ -53,7 +53,7 @@ auto SensorSimulation::updateSensorFrame(
     sensor->updateFrame(current_ros_time, update_traffic_lights_request);
   }
 
-  for (auto & sensor : perception_reproducer_sensors_) {
+  for (const auto & sensor : perception_reproducer_sensors_) {
     sensor->update(current_scenario_time, current_ros_time);
   }
 }
