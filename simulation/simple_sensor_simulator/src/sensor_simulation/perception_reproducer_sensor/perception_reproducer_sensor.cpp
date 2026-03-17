@@ -85,9 +85,19 @@ PerceptionReproducerSensor::PerceptionReproducerSensor(
   trajectory_stream_(
     trajectory_topic_, node.create_publisher<Trajectory>("/simulation/replay/trajectory", 1)),
   odometry_stream_(odometry_topic_, "replay_base_link", node),
+  occupancy_grid_stream_(
+    occupancy_grid_topic_,
+    node.create_publisher<OccupancyGrid>(occupancy_grid_topic_, rclcpp::QoS(1).transient_local())),
   vehicle_marker_pub_(node.create_publisher<visualization_msgs::msg::MarkerArray>(
     "/simulation/replay/vehicle_marker", 1))
 {
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  using TrafficLightGroupArray = autoware_perception_msgs::msg::TrafficLightGroupArray;
+  traffic_light_stream_ = std::make_unique<TrafficLightBagStream>(
+    traffic_light_topic_,
+    node.create_publisher<TrafficLightGroupArray>(traffic_light_topic_, 1));
+#endif
+
   loadAllBagData(bag_path, start_time_s);
 }
 
@@ -106,7 +116,9 @@ auto PerceptionReproducerSensor::loadAllBagData(const std::string & bag_path, do
     reader->get_metadata().starting_time.time_since_epoch().count(), RCL_ROS_TIME);
 
   rosbag2_storage::StorageFilter filter;
-  filter.topics = {detected_objects_topic_, trajectory_topic_, odometry_topic_};
+  filter.topics = {
+    detected_objects_topic_, trajectory_topic_, odometry_topic_, occupancy_grid_topic_,
+    traffic_light_topic_};
   reader->set_filter(filter);
 
   while (reader->has_next()) {
@@ -119,6 +131,12 @@ auto PerceptionReproducerSensor::loadAllBagData(const std::string & bag_path, do
       detected_objects_stream_.tryPushMessage(bag_message, shifted_time_s);
       trajectory_stream_.tryPushMessage(bag_message, shifted_time_s);
       odometry_stream_.tryPushMessage(bag_message, shifted_time_s);
+      occupancy_grid_stream_.tryPushMessage(bag_message, shifted_time_s);
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+      if (traffic_light_stream_) {
+        traffic_light_stream_->tryPushMessage(bag_message, shifted_time_s);
+      }
+#endif
     } catch (const std::exception & e) {
       RCLCPP_ERROR(logger_, "Error reading message: %s", e.what());
     }
@@ -198,6 +216,10 @@ auto PerceptionReproducerSensor::reset() -> void
   detected_objects_stream_.reset();
   trajectory_stream_.reset();
   odometry_stream_.reset();
+  occupancy_grid_stream_.reset();
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  if (traffic_light_stream_) traffic_light_stream_->reset();
+#endif
 }
 
 }  // namespace experimental

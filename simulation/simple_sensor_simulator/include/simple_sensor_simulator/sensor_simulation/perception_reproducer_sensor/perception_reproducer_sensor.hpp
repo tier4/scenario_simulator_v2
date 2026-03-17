@@ -21,9 +21,11 @@
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <memory>
+#include <nav_msgs/msg/occupancy_grid.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/bag_stream.hpp>
+#include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/traffic_light_bag_stream.hpp>
 #include <string>
 #include <visualization_msgs/msg/marker_array.hpp>
 
@@ -63,6 +65,7 @@ class PerceptionReproducerSensor
 {
   using DetectedObjects = autoware_perception_msgs::msg::DetectedObjects;
   using Trajectory = autoware_planning_msgs::msg::Trajectory;
+  using OccupancyGrid = nav_msgs::msg::OccupancyGrid;
 
 public:
   PerceptionReproducerSensor(
@@ -81,6 +84,11 @@ private:
 
   static constexpr const char * trajectory_topic_ = "/planning/trajectory";
 
+  static constexpr const char * occupancy_grid_topic_ = "/perception/occupancy_grid_map/map";
+
+  static constexpr const char * traffic_light_topic_ =
+    "/perception/traffic_light_recognition/traffic_signals";
+
   auto loadAllBagData(const std::string & bag_path, double start_time_s) -> void;
 
   auto publishVehicleMarker(
@@ -93,6 +101,12 @@ private:
   BagStream<Trajectory> trajectory_stream_;
 
   TFStreamFromOdometry odometry_stream_;
+
+  BagStream<OccupancyGrid> occupancy_grid_stream_;
+
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  std::unique_ptr<TrafficLightBagStream> traffic_light_stream_;
+#endif
 
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr vehicle_marker_pub_;
 };
