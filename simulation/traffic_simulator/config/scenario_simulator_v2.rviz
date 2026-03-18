@@ -4489,6 +4489,72 @@ Visualization Manager:
               Value: false
           Enabled: true
           Name: Simple Sensor Simulator
+        - Class: rviz_common/Group
+          Displays:
+            - Class: rviz_default_plugins/MarkerArray
+              Enabled: true
+              Name: VehicleMarker
+              Namespaces:
+                {}
+              Topic:
+                Depth: 5
+                Durability Policy: Volatile
+                History Policy: Keep Last
+                Reliability Policy: Reliable
+                Value: /simulation/replay/vehicle_marker
+              Value: true
+            - Class: rviz_plugins/Trajectory
+              Color Border Vel Max: 3
+              Enabled: true
+              Name: Trajectory
+              Topic:
+                Depth: 5
+                Durability Policy: Volatile
+                Filter size: 10
+                History Policy: Keep Last
+                Reliability Policy: Reliable
+                Value: /simulation/replay/trajectory
+              Value: true
+              View Footprint:
+                Alpha: 1
+                Color: 230; 230; 50
+                Offset from BaseLink: 0
+                Rear Overhang: 1.5257899761199951
+                Value: false
+                Vehicle Length: 7.2368998527526855
+                Vehicle Width: 2.291559934616089
+              View Path:
+                Alpha: 1
+                Constant Width: false
+                Fade Out Distance: 0
+                Max Velocity Color: 255; 0; 0
+                Mid Velocity Color: 255; 170; 0
+                Min Velocity Color: 255; 255; 127
+                Value: true
+                Width: 2
+              View Point:
+                Alpha: 1
+                Color: 0; 60; 255
+                Offset: 0
+                Radius: 0.10000000149011612
+                Value: false
+              View Text Slope:
+                Scale: 0.30000001192092896
+                Value: false
+              View Text Time:
+                Scale: 0.30000001192092896
+                Value: false
+              View Text Velocity:
+                Scale: 0.30000001192092896
+                Value: false
+              View Velocity:
+                Alpha: 1
+                Color: 0; 0; 0
+                Constant Color: false
+                Scale: 0.30000001192092896
+                Value: true
+          Enabled: false
+          Name: Replay Vehicle
       Enabled: true
       Name: Simulation
   Enabled: true

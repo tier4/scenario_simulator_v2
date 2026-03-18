@@ -54,7 +54,7 @@ auto SensorSimulation::updateSensorFrame(
   }
 
   for (const auto & sensor : perception_reproducer_sensors_) {
-    sensor->update(current_scenario_time, current_ros_time);
+    sensor->update(current_scenario_time, current_ros_time, entities);
   }
 }
 }  // namespace simple_sensor_simulator

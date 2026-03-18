@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <cmath>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/slerp.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -22,6 +24,7 @@
 #include <rosbag2_storage/storage_filter.hpp>
 #include <rosbag2_storage/storage_options.hpp>
 #include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/perception_reproducer_sensor.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <stdexcept>
 
 namespace simple_sensor_simulator
@@ -126,7 +129,8 @@ auto PerceptionReproducerSensor::loadAllBagData(const std::string & bag_path, do
 }
 
 auto PerceptionReproducerSensor::publishVehicleMarker(
-  const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time) const -> void
+  const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time,
+  const traffic_simulator_msgs::BoundingBox & bounding_box) const -> void
 {
   const auto make_marker = [&](int id, int type) {
     visualization_msgs::msg::Marker m;
@@ -142,16 +146,26 @@ auto PerceptionReproducerSensor::publishVehicleMarker(
   };
 
   auto cube = make_marker(0, visualization_msgs::msg::Marker::CUBE);
-  cube.scale.x = 4.5;
-  cube.scale.y = 1.8;
-  cube.scale.z = 1.5;
+  {
+    geometry_msgs::msg::Point center_point;
+    simulation_interface::toMsg(bounding_box.center(), center_point);
+    const Eigen::Vector3d center = math::geometry::getRotationMatrix(pose.orientation) *
+                                   Eigen::Vector3d(center_point.x, center_point.y, center_point.z);
+    // shift base_link to bounding box center
+    cube.pose.position.x += center.x();
+    cube.pose.position.y += center.y();
+    cube.pose.position.z += center.z();
+  }
+  cube.scale.x = bounding_box.dimensions().x();
+  cube.scale.y = bounding_box.dimensions().y();
+  cube.scale.z = bounding_box.dimensions().z();
   cube.color.r = 1.0f;
   cube.color.g = 0.5f;
   cube.color.b = 0.0f;
   cube.color.a = 0.5f;
 
   auto arrow = make_marker(1, visualization_msgs::msg::Marker::ARROW);
-  arrow.scale.x = 3.0;
+  arrow.scale.x = bounding_box.dimensions().x() * 2.0 / 3.0;
   arrow.scale.y = 0.3;
   arrow.scale.z = 0.3;
   arrow.color.r = 1.0f;
@@ -160,7 +174,7 @@ auto PerceptionReproducerSensor::publishVehicleMarker(
   arrow.color.a = 0.8f;
 
   auto text = make_marker(2, visualization_msgs::msg::Marker::TEXT_VIEW_FACING);
-  text.pose.position.z += 2.0;
+  text.pose.position.z += bounding_box.dimensions().z() + 0.5;
   text.scale.z = 0.8;
   text.color.r = 1.0f;
   text.color.g = 1.0f;
@@ -174,7 +188,8 @@ auto PerceptionReproducerSensor::publishVehicleMarker(
 }
 
 auto PerceptionReproducerSensor::update(
-  double current_scenario_time, const rclcpp::Time & current_ros_time) -> void
+  double current_scenario_time, const rclcpp::Time & current_ros_time,
+  const std::vector<traffic_simulator_msgs::EntityStatus> & entities) -> void
 {
   if (std::isnan(current_scenario_time) || current_scenario_time < 0.0) {
     return;
@@ -186,7 +201,15 @@ auto PerceptionReproducerSensor::update(
 
   if (not odometry_stream_.empty()) {
     const auto pose = odometry_stream_.broadcastTf(current_scenario_time, current_ros_time);
-    publishVehicleMarker(pose, current_ros_time);
+
+    if (const auto ego = std::find_if(
+          entities.begin(), entities.end(),
+          [](const auto & e) {
+            return e.type().type() == traffic_simulator_msgs::EntityType::EGO;
+          });
+        ego != entities.end()) {
+      publishVehicleMarker(pose, current_ros_time, ego->bounding_box());
+    }
   }
 
   detected_objects_stream_.publishUpTo(current_scenario_time, current_ros_time);

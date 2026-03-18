@@ -15,6 +15,7 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PERCEPTION_REPRODUCER_SENSOR__PERCEPTION_REPRODUCER_SENSOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PERCEPTION_REPRODUCER_SENSOR__PERCEPTION_REPRODUCER_SENSOR_HPP_
 
+#include <simulation_interface/simulation_api_schema.pb.h>
 #include <tf2_ros/transform_broadcaster.h>
 
 #include <autoware_perception_msgs/msg/detected_objects.hpp>
@@ -25,6 +26,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/bag_stream.hpp>
 #include <string>
+#include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 namespace simple_sensor_simulator
@@ -69,7 +71,9 @@ public:
     const std::string & bag_path, double start_time_s,
     rclcpp::Publisher<DetectedObjects>::SharedPtr publisher, rclcpp::Node & node);
 
-  auto update(double current_scenario_time, const rclcpp::Time & current_ros_time) -> void;
+  auto update(
+    double current_scenario_time, const rclcpp::Time & current_ros_time,
+    const std::vector<traffic_simulator_msgs::EntityStatus> & entities) -> void;
 
   auto reset() -> void;
 
@@ -84,7 +88,8 @@ private:
   auto loadAllBagData(const std::string & bag_path, double start_time_s) -> void;
 
   auto publishVehicleMarker(
-    const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time) const -> void;
+    const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time,
+    const traffic_simulator_msgs::BoundingBox & bounding_box) const -> void;
 
   rclcpp::Logger logger_;
 
