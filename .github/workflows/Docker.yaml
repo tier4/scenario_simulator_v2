@@ -30,24 +30,24 @@ jobs:
     timeout-minutes: 720
     strategy:
       matrix:
-        rosdistro: [humble]
-        runs-on: [ubuntu-22.04, ubuntu-22.04-arm]
-        dockerfile: [Dockerfile]
-        image_tag: [humble]
         include:
           - runs-on: ubuntu-22.04
+            rosdistro: humble
             platform: linux/amd64
             dockerfile: Dockerfile
             image_tag: humble
           - runs-on: ubuntu-22.04-arm
+            rosdistro: humble
             platform: linux/arm64
             dockerfile: Dockerfile
             image_tag: humble
           - runs-on: ubuntu-22.04
+            rosdistro: humble
             platform: linux/amd64
             dockerfile: Dockerfile.traffic_simulator
             image_tag: traffic_simulator_humble
           - runs-on: ubuntu-22.04-arm
+            rosdistro: humble
             platform: linux/arm64
             dockerfile: Dockerfile.traffic_simulator
             image_tag: traffic_simulator_humble
