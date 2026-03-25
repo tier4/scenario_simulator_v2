@@ -85,8 +85,24 @@ jobs:
         with:
           images: ${{ env.IMAGE_BASE }}
 
-      - name: Build and push by digest
-        id: build
+      - name: Build development stage
+        id: build_development
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          platforms: linux/${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: ${{ matrix.dockerfile }}
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: development
+          build-args: |
+            ROS_DISTRO=${{ matrix.rosdistro }}
+
+      - name: Build desktop stage
+        id: build_desktop
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -99,18 +115,30 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             ROS_DISTRO=${{ matrix.rosdistro }}
-
+          target: desktop
       - name: Export digest
         run: |
-          mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
-          touch "/tmp/digests/${digest#sha256:}"
+          mkdir -p /tmp/desktop/digests
+          digest="${{ steps.build_desktop.outputs.digest }}"
+          touch "/tmp/desktop/digests/${digest#sha256:}"
 
-      - name: Upload digest
+          mkdir -p /tmp/development/digests
+          digest="${{ steps.build_development.outputs.digest }}"
+          touch "/tmp/development/digests/${digest#sha256:}"
+
+      - name: Upload digest (desktop)
         uses: actions/upload-artifact@v7
         with:
-          name: digests-${{ matrix.image_tag }}-${{ matrix.platform }}
-          path: /tmp/digests/*
+          name: digests-desktop-${{ matrix.image_tag }}-${{ matrix.platform }}
+          path: /tmp/desktop/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload digest (development)
+        uses: actions/upload-artifact@v7
+        with:
+          name: digests-development-${{ matrix.image_tag }}-${{ matrix.platform }}
+          path: /tmp/development/digests/*
           if-no-files-found: error
           retention-days: 1
 
@@ -123,13 +151,19 @@ jobs:
       matrix:
         include:
           - image_tag: humble
+            variant: desktop
+          - image_tag: humble-devel
+            variant: development
           - image_tag: traffic_simulator_humble
+            variant: desktop
+          - image_tag: traffic_simulator_humble-devel
+            variant: development
     steps:
       - name: Download digests
         uses: actions/download-artifact@v7
         with:
           path: /tmp/digests
-          pattern: digests-${{ matrix.image_tag }}-*
+          pattern: digests-${{ matrix.variant }}-${{ matrix.image_tag }}-*
           merge-multiple: true
 
       - name: Install catkin-pkg
