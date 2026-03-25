@@ -1,5 +1,8 @@
 ARG ROS_DISTRO="humble"
-FROM docker.io/library/ros:${ROS_DISTRO} AS build-stage
+# ===================================================================
+# Development Stage: Build the full workspace with all tools for development
+# ===================================================================
+FROM docker.io/library/ros:${ROS_DISTRO} AS development
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
@@ -74,9 +77,9 @@ RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=build-stage /home/ubuntu/Desktop/scenario_simulator_ws/install/ /home/ubuntu/Desktop/scenario_simulator_ws/install/
-COPY --from=build-stage /home/ubuntu/Desktop/scenario_simulator_ws/log/ /home/ubuntu/Desktop/scenario_simulator_ws/log/
-COPY --from=build-stage /home/ubuntu/Desktop/scenario_simulator_ws/src/ /home/ubuntu/Desktop/scenario_simulator_ws/src/
+COPY --from=development /home/ubuntu/Desktop/scenario_simulator_ws/install/ /home/ubuntu/Desktop/scenario_simulator_ws/install/
+COPY --from=development /home/ubuntu/Desktop/scenario_simulator_ws/log/ /home/ubuntu/Desktop/scenario_simulator_ws/log/
+COPY --from=development /home/ubuntu/Desktop/scenario_simulator_ws/src/ /home/ubuntu/Desktop/scenario_simulator_ws/src/
 
 # Remove unnecessary development files from the copied artifacts
 RUN find /home/ubuntu/Desktop/scenario_simulator_ws/install -name cmake -type d -exec rm -rf {} + && \
@@ -89,9 +92,9 @@ RUN chmod a+x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # ===================================================================  
-# Development Stage: Inherit from runtime and add dev tools like rviz  
+# Desktop Stage: Inherit from runtime and add desktop tools like rviz  
 # ===================================================================  
-FROM runtime AS development  
+FROM runtime AS desktop  
 
 # Install ros2 desktop packages and rviz2  
 RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=locked \  
