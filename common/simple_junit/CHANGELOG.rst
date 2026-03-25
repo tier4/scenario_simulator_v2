@@ -2,6 +2,14 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.14 (2026-03-25)
+--------------------
+* Merge branch 'master' into dependabot/github_actions/mshick/add-pr-comment-3
+* Contributors: Kotaro Yoshimoto
+
+25.0.13 (2026-03-25)
+--------------------
+
 25.0.12 (2026-03-11)
 --------------------
 * Merge branch 'master' into dependabot/github_actions/lycheeverse/lychee-action-2.8.0

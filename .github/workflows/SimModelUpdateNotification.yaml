@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add comment
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message: "This PR edits vehicle model that is copied from [simple_planning_simulator](https://github.com/autowarefoundation/autoware.universe/tree/main/simulator/simple_planning_simulator). Please consider making changes to the original code to avoid confusion or consult developers (@hakuturu583, @yamacir-kit and @HansRobo )."
           message-id: "vehicle-model-update-notification"
