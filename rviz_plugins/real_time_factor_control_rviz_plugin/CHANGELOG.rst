@@ -2,6 +2,11 @@
 Changelog for package real_time_factor_control_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.14 (2026-03-25)
+--------------------
+* Merge branch 'master' into dependabot/github_actions/mshick/add-pr-comment-3
+* Contributors: Kotaro Yoshimoto
+
 25.0.13 (2026-03-25)
 --------------------
 
