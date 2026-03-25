@@ -35,22 +35,22 @@ jobs:
         include:
           - runs-on: ubuntu-22.04
             rosdistro: humble
-            platform: linux/amd64
+            platform: amd64
             dockerfile: Dockerfile
             image_tag: humble
           - runs-on: ubuntu-22.04-arm
             rosdistro: humble
-            platform: linux/arm64
+            platform: arm64
             dockerfile: Dockerfile
             image_tag: humble
           - runs-on: ubuntu-22.04
             rosdistro: humble
-            platform: linux/amd64
+            platform: amd64
             dockerfile: Dockerfile.traffic_simulator
             image_tag: traffic_simulator_humble
           - runs-on: ubuntu-22.04-arm
             rosdistro: humble
-            platform: linux/arm64
+            platform: arm64
             dockerfile: Dockerfile.traffic_simulator
             image_tag: traffic_simulator_humble
 
@@ -91,10 +91,10 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-          platforms: ${{ matrix.platform }}
+          platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           file: ${{ matrix.dockerfile }}
-          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -153,12 +153,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE_BASE }}
 
       - name: Create manifest list and push
         working-directory: /tmp/digests
