@@ -2,6 +2,36 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.12 (2026-03-11)
+--------------------
+* Merge branch 'master' into dependabot/github_actions/lycheeverse/lychee-action-2.8.0
+* Contributors: Kotaro Yoshimoto
+
+25.0.11 (2026-03-11)
+--------------------
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-7
+* Merge branch 'master' into dependabot/github_actions/actions/upload-artifact-7
+* Contributors: Kotaro Yoshimoto
+
+25.0.10 (2026-03-11)
+--------------------
+* Merge branch 'master' into feature/minimal-containers
+* Merge branch 'master' into feature/minimal-containers
+* Merge branch 'master' into feature/minimal-containers
+* Merge remote-tracking branch 'origin/master' into feature/minimal-containers
+* Revert "fix bug in boolean conversion from scenario YAML i.e. "selectTriggeringEntities: false" in test_runner/scenario_test_runner/scenario/all-in-one.yaml; currently causing XML validation error "Error: failed validating 'False' with XsdPatternFacets(['[$][{][ A-Za-z0-9\_\\+\\-\\*/%$\\(\\)\\.,]*[\\}]'])""
+  This reverts commit e5b34a5f10b4e50a8887f528d5d7b053f58cbed7.
+* fix bug in boolean conversion from scenario YAML i.e. "selectTriggeringEntities: false" in test_runner/scenario_test_runner/scenario/all-in-one.yaml; currently causing XML validation error "Error: failed validating 'False' with XsdPatternFacets(['[$][{][ A-Za-z0-9\_\\+\\-\\*/%$\\(\\)\\.,]*[\\}]'])"
+* Contributors: Dustin Black, Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
+25.0.9 (2026-03-10)
+-------------------
+* Merge branch 'master' into fix/labeler
+* Contributors: Kotaro Yoshimoto
+
+25.0.8 (2026-03-10)
+-------------------
+
 25.0.7 (2026-03-10)
 -------------------
 * Merge branch 'master' into dependabot/github_actions/actions/download-artifact-8
