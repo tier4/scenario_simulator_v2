@@ -3,7 +3,7 @@ group "default" {
     "full_development",
     "full_runtime",
     "full_desktop",
-    "traffic_simulator_devel",
+    "traffic_simulator_development",
     "traffic_simulator_runtime",
     "traffic_simulator_desktop"
   ]
@@ -58,7 +58,7 @@ target "full_desktop" {
   tags = ["ghcr.io/tier4/scenario_simulator_v2:humble-desktop"]
 }
 
-target "traffic_simulator_devel" {
+target "traffic_simulator_development" {
   inherits = ["development", "traffic_simulator"]
   tags = ["ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_humble-devel"]
 }
