@@ -64,7 +64,7 @@ jobs:
         run: sudo apt update && sudo apt install -y python3-catkin-pkg git curl
 
       - name: Install docker for ubuntu runner
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - uses: actions/checkout@v6
 
