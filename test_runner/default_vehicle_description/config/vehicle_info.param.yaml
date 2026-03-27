@@ -1,0 +1,13 @@
+/**:
+  ros__parameters:
+    # NOTE: all parameters in this file are not used for now. The parameters in scenario are used instead.
+    wheel_radius: 0.0
+    wheel_width: 0.0
+    wheel_base: 0.0
+    wheel_tread: 0.0
+    front_overhang: 0.0
+    rear_overhang: 0.0
+    left_overhang: 0.0
+    right_overhang: 0.0
+    vehicle_height: 0.0
+    max_steer_angle: 0.0
