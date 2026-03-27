@@ -1,35 +1,74 @@
 group "default" {
-  targets = ["humble"]
+  targets = [
+    "full_development",
+    "full_runtime",
+    "full_desktop",
+    "traffic_simulator_development",
+    "traffic_simulator_runtime",
+    "traffic_simulator_desktop"
+  ]
 }
 
-target "base_amd64" {
-  target = "build-stage"
-  dockerfile = "Dockerfile"
-  platforms = ["linux/amd64"]
-}
-
-target "base_arm64" {
-  target = "build-stage"
-  dockerfile = "Dockerfile.arm64"
-  platforms = ["linux/arm64/v8"]
-}
-
-target "humble" {
-  inherits = [base]
-  name = "humble_${base}"
-  tags = ["ghcr.io/tier4/scenario_simulator_v2:humble"]
+target "base" {
   args = {"ROS_DISTRO" : "humble"}
-  group = ["humble"]
-  matrix = {
-    base = ["base_amd64", "base_arm64"]
-  }
+  platforms = [
+    "linux/amd64",
+    "linux/arm64"
+  ]
+}
+
+# Each stage
+target "development" {
+  inherits = ["base"]
+  target = "development"
+}
+
+target "runtime" {
+  inherits = ["base"]
+  target = "runtime"
+}
+
+target "desktop" {
+  inherits = ["base"]
+  target = "desktop"
+}
+
+# Each product
+target "full" {
+  dockerfile = "Dockerfile"
 }
 
 target "traffic_simulator" {
-  name = "traffic_simulator_humble"
-  tags = ["ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_humble"]
-  args = {"ROS_DISTRO" : "humble"}
-  group = ["humble"]
-  matrix = {}
   dockerfile = "Dockerfile.traffic_simulator"
+}
+
+# Each output
+target "full_development" {
+  inherits = ["development", "full"]
+  tags = ["ghcr.io/tier4/scenario_simulator_v2:humble-devel"]
+}
+
+target "full_runtime" {
+  inherits = ["runtime", "full"]
+  tags = ["ghcr.io/tier4/scenario_simulator_v2:humble"]
+}
+
+target "full_desktop" {
+  inherits = ["desktop", "full"]
+  tags = ["ghcr.io/tier4/scenario_simulator_v2:humble-desktop"]
+}
+
+target "traffic_simulator_development" {
+  inherits = ["development", "traffic_simulator"]
+  tags = ["ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_humble-devel"]
+}
+
+target "traffic_simulator_runtime" {
+  inherits = ["runtime", "traffic_simulator"]
+  tags = ["ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_humble"]
+}
+
+target "traffic_simulator_desktop" {
+  inherits = ["desktop", "traffic_simulator"]
+  tags = ["ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_humble-desktop"]
 }
