@@ -37,6 +37,7 @@
   <exec_depend>tf2</exec_depend>
 
   <depend>autoware_perception_msgs</depend>
+  <depend>autoware_planning_msgs</depend>
   <depend>boost</depend>
   <depend>eigen</depend>
   <depend>embree_vendor</depend>
@@ -52,6 +53,8 @@
   <depend>geographic_msgs</depend>
   <depend>traffic_simulator</depend>
   <depend>agnocast_wrapper</depend>
+  <depend>rosbag2_cpp</depend>
+  <depend>rosbag2_storage</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>
