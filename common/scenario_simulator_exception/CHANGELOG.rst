@@ -2,6 +2,9 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.17 (2026-03-27)
+--------------------
+
 25.0.16 (2026-03-27)
 --------------------
 * Merge branch 'master' into feature/arm-docker
