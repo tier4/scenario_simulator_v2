@@ -20,7 +20,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Add comment
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message: "This PR may breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364"
           message-id: "interface-breaking-notification"

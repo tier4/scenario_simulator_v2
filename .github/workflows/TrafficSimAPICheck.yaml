@@ -134,7 +134,7 @@ jobs:
 
       - name: Upload abidiff log
         if: steps.abidiff.outputs.exit_code != '0' && github.event_name == 'workflow_run'
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message: |
             The public API of `traffic_simulator::API` has changed. Please check logs.
