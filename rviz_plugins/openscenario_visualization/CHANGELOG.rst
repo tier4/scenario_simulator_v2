@@ -2,6 +2,14 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.15 (2026-03-27)
+--------------------
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
 25.0.14 (2026-03-25)
 --------------------
 * Merge branch 'master' into dependabot/github_actions/mshick/add-pr-comment-3

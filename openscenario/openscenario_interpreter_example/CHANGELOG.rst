@@ -2,6 +2,16 @@
 Changelog for package openscenario_interpreter_example
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.15 (2026-03-27)
+--------------------
+* Merge pull request `#1786 <https://github.com/tier4/scenario_simulator_v2/issues/1786>`_ from tier4/refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* replace cout in examples
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
 25.0.14 (2026-03-25)
 --------------------
 * Merge branch 'master' into dependabot/github_actions/mshick/add-pr-comment-3
