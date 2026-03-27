@@ -27,6 +27,7 @@
 #include <concealer/execute.hpp>
 #include <cstdlib>
 #include <iostream>
+#include <rclcpp/logging.hpp>
 #include <string>
 #include <vector>
 
@@ -56,7 +57,8 @@ inline auto start(const std::vector<std::string> & args) -> pid_t
       }
 #endif
       if (concealer::execute(command) < 0) {
-        std::cerr << std::system_error(errno, std::system_category()).what() << std::endl;
+        RCLCPP_ERROR_STREAM(
+          rclcpp::get_logger("record"), std::system_error(errno, std::system_category()).what());
         std::exit(EXIT_FAILURE);
       }
       return 0;
