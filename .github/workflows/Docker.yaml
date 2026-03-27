@@ -23,14 +23,26 @@ on:
         description: version of the scenario_simulator_v2
         required: true
 
+env:
+  IMAGE_BASE: ghcr.io/tier4/scenario_simulator_v2
 jobs:
-  push_traffic_sim_docker:
-    name: Push Docker Image for traffic_simulator
-    runs-on: ubuntu-22.04
+  build:
+    name: Build Docker Image
+    runs-on: ${{ matrix.runs-on }}
     timeout-minutes: 720
     strategy:
       matrix:
-        rosdistro: [humble]
+        include:
+          - runs-on: ubuntu-22.04
+            rosdistro: humble
+            platform: amd64
+            dockerfile: Dockerfile
+            image_tag: humble
+          - runs-on: ubuntu-22.04-arm
+            rosdistro: humble
+            platform: arm64
+            dockerfile: Dockerfile
+            image_tag: humble
 
     steps:
       - name: Free Disk Space (Ubuntu)
@@ -42,7 +54,7 @@ jobs:
         run: sudo apt update && sudo apt install -y python3-catkin-pkg git curl
 
       - name: Install docker for ubuntu runner
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - uses: actions/checkout@v6
 
@@ -57,105 +69,118 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build
-        if: github.event_name == 'pull_request'
-        uses: docker/bake-action@v7.0.0
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
         with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-          push: false
-          targets: |
-            traffic_simulator_${{ matrix.rosdistro }}
+          images: ${{ env.IMAGE_BASE }}
 
-      - name: Build and push
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: docker/bake-action@v7.0.0
+      - name: Build development stage
+        id: build_development
+        uses: docker/build-push-action@v7
         with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator_${{ matrix.rosdistro }}-${{ github.event.inputs.version || steps.version.outputs.version }}
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:traffic_simulator-latest
-          push: true
-          targets: |
-            traffic_simulator_${{ matrix.rosdistro }}
+          context: .
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          platforms: linux/${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: ${{ matrix.dockerfile }}
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: development
+          build-args: |
+            ROS_DISTRO=${{ matrix.rosdistro }}
 
-  push_docker:
-    name: Push Docker Image
-    runs-on: ubuntu-22.04
-    timeout-minutes: 720
-    strategy:
-      matrix:
-        rosdistro: [humble]
-        arch: [amd64, arm64]
-
-    steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
+      - name: Build desktop stage
+        id: build_desktop
+        uses: docker/build-push-action@v7
         with:
-          tool-cache: false
-
-      - name: Install catkin-pkg
-        run: sudo apt update && sudo apt install -y python3-catkin-pkg git curl
-
-      - name: Install docker for ubuntu runner
-        uses: docker/setup-buildx-action@v3
-
-      - name: Install QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - uses: actions/checkout@v6
-
-      - name: Get version
-        id: version
-        run: echo "version=$(catkin_package_version)" >> $GITHUB_OUTPUT
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker Qemu Setup
+          context: .
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          platforms: linux/${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: ${{ matrix.dockerfile }}
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            ROS_DISTRO=${{ matrix.rosdistro }}
+          target: desktop
+      - name: Export digest
         run: |
-          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-          docker buildx create --use
-          docker buildx inspect --bootstrap
+          mkdir -p /tmp/desktop/digests
+          digest="${{ steps.build_desktop.outputs.digest }}"
+          touch "/tmp/desktop/digests/${digest#sha256:}"
 
-      - name: Build (${{ matrix.arch }})
-        if: github.event_name == 'pull_request'
-        uses: docker/bake-action@v7.0.0
-        with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-          push: false
-          targets: |
-            ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
+          mkdir -p /tmp/development/digests
+          digest="${{ steps.build_development.outputs.digest }}"
+          touch "/tmp/development/digests/${digest#sha256:}"
 
-      - name: Build and push (${{ matrix.arch }})
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: docker/bake-action@v7.0.0
+      - name: Upload digest (desktop)
+        uses: actions/upload-artifact@v7
         with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          set: |
-            *.cache-to=type=gha,mode=max
-            *.cache-from=type=gha
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-${{ github.event.inputs.version || steps.version.outputs.version }}
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble-latest
-          push: true
-          targets: |
-            ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
+          name: digests-desktop-${{ matrix.image_tag }}-${{ matrix.platform }}
+          path: /tmp/desktop/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Upload digest (development)
+        uses: actions/upload-artifact@v7
+        with:
+          name: digests-development-${{ matrix.image_tag }}-${{ matrix.platform }}
+          path: /tmp/development/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    strategy:
+      matrix:
+        include:
+          - image_tag: humble
+            variant: desktop
+          - image_tag: humble
+            variant: development
+            image_suffix: -devel
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v7
+        with:
+          path: /tmp/digests
+          pattern: digests-${{ matrix.variant }}-${{ matrix.image_tag }}-*
+          merge-multiple: true
+
+      - name: Install catkin-pkg
+        run: sudo apt update && sudo apt install -y python3-catkin-pkg git curl
+
+      - uses: actions/checkout@v6
+
+      - name: Get version
+        id: version
+        run: echo "version=$(catkin_package_version)" >> $GITHUB_OUTPUT
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Create image tag
+        id: image_tag
+        run: echo "image_tag=${{ env.IMAGE_BASE }}:${{ matrix.image_tag }}-${{ github.event.inputs.version || steps.version.outputs.version }}${{ matrix.image_suffix }}" >> $GITHUB_OUTPUT
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create -t ${{ steps.image_tag.outputs.image_tag }} $(printf '${{ steps.image_tag.outputs.image_tag }}@sha256:%s ' *)
+
+      - name: Add latest tag
+        if: github.ref == 'refs/heads/master' && matrix.image_suffix == 'desktop'
+        run: |
+          docker buildx imagetools create -t ${{ env.IMAGE_BASE }}:${{ matrix.image_tag }}-latest ${{ steps.image_tag.outputs.image_tag }}

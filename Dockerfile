@@ -1,10 +1,13 @@
 ARG ROS_DISTRO="humble"
-FROM docker.io/library/ros:${ROS_DISTRO} AS build-stage
+# ===================================================================
+# Development Stage: Build the full workspace with all tools for development
+# ===================================================================
+FROM docker.io/library/ros:${ROS_DISTRO} AS development
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-${TARGETARCH},target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get install -y --no-install-recommends \
         python3-pip \
@@ -31,8 +34,8 @@ RUN git clone --depth 1 https://github.com/autowarefoundation/autoware_launch.gi
     mkdir -p external && \
     vcs import external < dependency_${ROS_DISTRO}.repos
 
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-${TARGETARCH},target=/var/lib/apt,sharing=locked \
     bash -c "source /opt/ros/${ROS_DISTRO}/setup.bash && \
     apt-get update && \
     rosdep install -iy --from-paths . --rosdistro ${ROS_DISTRO}"
@@ -56,8 +59,8 @@ FROM docker.io/library/ros:${ROS_DISTRO}-ros-base AS runtime
 
 # cspell: ignore libtbb libprotobuf
 # Install runtime dependencies in a single layer and clean up
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-${TARGETARCH},target=/var/lib/apt,sharing=locked \
     apt-get update && \
     apt-get install -y --no-install-recommends \
     software-properties-common python3-pip && \
@@ -68,14 +71,15 @@ RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
     libpugixml1v5 libtbb12 libboost-filesystem1.74.0 ros-humble-lanelet2-matching \
     ros-humble-lanelet2-io ros-humble-lanelet2-routing libgeographic19 \
     ros-humble-behaviortree-cpp-v3 ros-humble-geographic-msgs && \
+    pip install xmlschema && \
     apt-get remove --purge -y software-properties-common python3-pip && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=build-stage /home/ubuntu/Desktop/scenario_simulator_ws/install/ /home/ubuntu/Desktop/scenario_simulator_ws/install/
-COPY --from=build-stage /home/ubuntu/Desktop/scenario_simulator_ws/log/ /home/ubuntu/Desktop/scenario_simulator_ws/log/
-COPY --from=build-stage /home/ubuntu/Desktop/scenario_simulator_ws/src/ /home/ubuntu/Desktop/scenario_simulator_ws/src/
+COPY --from=development /home/ubuntu/Desktop/scenario_simulator_ws/install/ /home/ubuntu/Desktop/scenario_simulator_ws/install/
+COPY --from=development /home/ubuntu/Desktop/scenario_simulator_ws/log/ /home/ubuntu/Desktop/scenario_simulator_ws/log/
+COPY --from=development /home/ubuntu/Desktop/scenario_simulator_ws/src/ /home/ubuntu/Desktop/scenario_simulator_ws/src/
 
 # Remove unnecessary development files from the copied artifacts
 RUN find /home/ubuntu/Desktop/scenario_simulator_ws/install -name cmake -type d -exec rm -rf {} + && \
@@ -88,13 +92,13 @@ RUN chmod a+x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # ===================================================================  
-# Development Stage: Inherit from runtime and add dev tools like rviz  
+# Desktop Stage: Inherit from runtime and add desktop tools like rviz  
 # ===================================================================  
-FROM runtime AS development  
+FROM runtime AS desktop  
 
 # Install ros2 desktop packages and rviz2  
-RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \  
-    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \  
+RUN --mount=type=cache,id=apt-cache-${TARGETARCH},target=/var/cache/apt,sharing=locked \  
+    --mount=type=cache,id=apt-lib-${TARGETARCH},target=/var/lib/apt,sharing=locked \  
     apt-get update && \  
     apt-get install -y --no-install-recommends \  
         ros-${ROS_DISTRO}-desktop \  
