@@ -106,7 +106,7 @@ def launch_setup(context, *args, **kwargs):
     use_custom_centerline                       = LaunchConfiguration("use_custom_centerline",                       default=True)
     use_sim_time                                = LaunchConfiguration("use_sim_time",                                default=False)
     use_trajectory_based_front_entity_detection = LaunchConfiguration("use_trajectory_based_front_entity_detection", default=False)
-    vehicle_model                               = LaunchConfiguration("vehicle_model",                               default="")
+    vehicle_model                               = LaunchConfiguration("vehicle_model",                               default="default_vehicle")
     vehicle_id                                  = LaunchConfiguration("vehicle_id",                                  default="default")
     # fmt: on
 
@@ -184,17 +184,14 @@ def launch_setup(context, *args, **kwargs):
         ]
 
         def collect_vehicle_parameters():
-            if vehicle_model_name := vehicle_model.perform(context):
-                description = get_package_share_directory(vehicle_model_name + "_description")
-                return [
-                    description + "/config/vehicle_info.param.yaml",
-                    description + "/config/simulator_model.param.yaml",
-                ]
-            else:
-                return []
+            vehicle_model_name = vehicle_model.perform(context)
+            description = Path(get_package_share_directory(vehicle_model_name + "_description"))
+            return [
+                str(description / "config" / "vehicle_info.param.yaml"),
+                str(description / "config" / "simulator_model.param.yaml"),
+            ]
 
-        if (it := collect_vehicle_parameters()) != []:
-            parameters += it
+        parameters += collect_vehicle_parameters()
 
         def collect_prefixed_parameters():
             return [item[0][9:] + ':=' + item[1] for item in context.launch_configurations.items() if item[0][:9] == 'autoware.']
