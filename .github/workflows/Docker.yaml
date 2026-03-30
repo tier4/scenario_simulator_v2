@@ -179,7 +179,7 @@ jobs:
             image_suffix: -runtime
     steps:
       - name: Download digests
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           pattern: digests-${{ matrix.variant }}-${{ matrix.image_tag }}-*
