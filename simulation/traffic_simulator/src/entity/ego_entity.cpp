@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
+#include <iomanip>
+#include <sstream>
 #include <concealer/field_operator_application.hpp>
 #include <concealer/launch.hpp>
 #include <functional>
@@ -20,6 +22,7 @@
 #include <optional>
 #include <string>
 #include <system_error>
+#include <tf2/utils.h>
 #include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -81,6 +84,11 @@ EgoEntity::EgoEntity(
     }
   }())
 {
+  stuck_jump_distance_ =
+    common::getParameter<double>(node_parameters, "stuck_jump_distance", 0.1);
+  stuck_timeout_ = common::getParameter<double>(node_parameters, "stuck_jump_timeout", 10.0);
+  stuck_jump_marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>(
+    "/simulation/debug_marker", rclcpp::QoS(100));
 }
 
 auto EgoEntity::engage() -> void { FieldOperatorApplication::engage(); }
@@ -177,6 +185,142 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 auto EgoEntity::updateFieldOperatorApplication() -> void { spinSome(); }
 
+auto EgoEntity::isTeleportRequested() const -> bool { return teleport_requested_; }
+
+auto EgoEntity::checkAndTriggerStuckJump() -> void
+{
+  teleport_requested_ = false;
+
+  if (!isStopped()) {
+    has_jumped_ = false;
+    return;
+  }
+
+  if (
+    getLegacyAutowareState().value == concealer::LegacyAutowareState::driving &&
+    getStandStillDuration() >= stuck_timeout_ && !has_jumped_) {
+    const auto & current_pose = status_->getMapPose();
+    const double stand_still_duration = getStandStillDuration();
+    const double yaw = tf2::getYaw(current_pose.orientation);
+
+    auto new_pose = current_pose;
+    new_pose.position.x += stuck_jump_distance_ * std::cos(yaw);
+    new_pose.position.y += stuck_jump_distance_ * std::sin(yaw);
+    setMapPose(new_pose);
+
+    teleport_requested_ = true;
+    // has_jumped_ is reset only when the vehicle moves (isStopped() == false),
+    // preventing repeated jumps during a single stuck event.
+    has_jumped_ = true;
+    ++jump_count_;
+
+    const auto logger = rclcpp::get_logger(status_->getName());
+    RCLCPP_WARN(logger, "==============================================");
+    RCLCPP_WARN(logger, "  [STUCK JUMP] Ego stopped %.1f s in DRIVING", stand_still_duration);
+    RCLCPP_WARN(logger, "  Jumping %.2f m forward from (%.2f, %.2f)",
+      stuck_jump_distance_, current_pose.position.x, current_pose.position.y);
+    RCLCPP_WARN(logger, "==============================================");
+
+    // Publish markers to /simulation/debug_marker.
+    // Delete previous jump markers first to avoid accumulation across runs.
+    visualization_msgs::msg::MarkerArray marker_array;
+    {
+      visualization_msgs::msg::Marker del;
+      del.header.frame_id = "map";
+      del.header.stamp = now();
+      del.ns = "stuck_jump";
+      del.action = visualization_msgs::msg::Marker::DELETEALL;
+      marker_array.markers.push_back(del);
+    }
+    const auto stamp = now();
+    const auto mk = [&](int offset) {
+      visualization_msgs::msg::Marker m;
+      m.header.frame_id = "map";
+      m.header.stamp = stamp;
+      m.ns = "stuck_jump";
+      m.id = offset;
+      m.action = visualization_msgs::msg::Marker::ADD;
+      m.pose = new_pose;
+      m.lifetime = rclcpp::Duration(0, 0);
+      return m;
+    };
+
+    // Ground disc — inner bright cyan
+    {
+      auto disc = mk(0);
+      disc.type = visualization_msgs::msg::Marker::CYLINDER;
+      disc.pose.position.z = 0.5;
+      disc.scale.x = disc.scale.y = 3.0;
+      disc.scale.z = 0.1;
+      disc.color.r = 0.0f; disc.color.g = 1.0f; disc.color.b = 1.0f;
+      disc.color.a = 0.6f;
+      marker_array.markers.push_back(disc);
+    }
+    // Ground halo — outer electric blue
+    {
+      auto halo = mk(1);
+      halo.type = visualization_msgs::msg::Marker::CYLINDER;
+      halo.pose.position.z = 0.3;
+      halo.scale.x = halo.scale.y = 6.0;
+      halo.scale.z = 0.1;
+      halo.color.r = 0.0f; halo.color.g = 0.4f; halo.color.b = 1.0f;
+      halo.color.a = 0.3f;
+      marker_array.markers.push_back(halo);
+    }
+    // Vertical pillar — outer semi-transparent
+    {
+      auto beam = mk(2);
+      beam.type = visualization_msgs::msg::Marker::CYLINDER;
+      beam.pose.position.z = 6.0;
+      beam.scale.x = beam.scale.y = 0.3;
+      beam.scale.z = 12.0;
+      beam.color.r = 0.0f; beam.color.g = 1.0f; beam.color.b = 1.0f;
+      beam.color.a = 0.25f;
+      marker_array.markers.push_back(beam);
+    }
+    // Pillar core — bright thin inner beam
+    {
+      auto core = mk(3);
+      core.type = visualization_msgs::msg::Marker::CYLINDER;
+      core.pose.position.z = 6.0;
+      core.scale.x = core.scale.y = 0.08;
+      core.scale.z = 12.0;
+      core.color.r = 1.0f; core.color.g = 1.0f; core.color.b = 1.0f;
+      core.color.a = 0.8f;
+      marker_array.markers.push_back(core);
+    }
+    // Direction arrow — orange
+    {
+      auto arrow = mk(4);
+      arrow.type = visualization_msgs::msg::Marker::ARROW;
+      arrow.pose.position.z = 1.5;
+      arrow.pose.orientation = current_pose.orientation;
+      arrow.scale.x = 4.0;
+      arrow.scale.y = 0.2;
+      arrow.scale.z = 0.35;
+      arrow.color.r = 1.0f; arrow.color.g = 0.5f; arrow.color.b = 0.0f;
+      arrow.color.a = 0.9f;
+      marker_array.markers.push_back(arrow);
+    }
+    // Text label
+    {
+      auto text = mk(5);
+      text.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
+      text.pose.position.z = 6.5;
+      text.scale.z = 1.0;
+      text.color.r = 0.0f; text.color.g = 1.0f; text.color.b = 0.8f;
+      text.color.a = 1.0f;
+      std::ostringstream oss;
+      oss << "[ STUCK JUMP #" << jump_count_ << " ]\n"
+          << std::fixed << std::setprecision(1)
+          << "(" << new_pose.position.x << ", " << new_pose.position.y << ")";
+      text.text = oss.str();
+      marker_array.markers.push_back(text);
+    }
+    stuck_jump_marker_pub_->publish(marker_array);
+  }
+}
+
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
@@ -196,6 +340,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     }
   } else {
     updateEntityStatusTimestamp(current_time + step_time);
+    checkAndTriggerStuckJump();
   }
 
   updateFieldOperatorApplication();
