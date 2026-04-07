@@ -26,6 +26,7 @@
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {
@@ -37,6 +38,14 @@ class EgoEntity : public VehicleEntity, private concealer::FieldOperatorApplicat
   std::optional<double> target_speed_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
   std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_;
+
+  double stuck_jump_distance_{0.1};
+  double stuck_timeout_{10.0};
+  bool has_jumped_{false};
+  bool teleport_requested_{false};
+  int jump_count_{0};
+
+  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr stuck_jump_marker_pub_;
 
 public:
   explicit EgoEntity() = delete;
@@ -77,6 +86,10 @@ public:
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto updateFieldOperatorApplication() -> void;
+
+  auto checkAndTriggerStuckJump() -> void;
+
+  auto isTeleportRequested() const -> bool override;
 
   void onUpdate(double current_time, double step_time) override;
 

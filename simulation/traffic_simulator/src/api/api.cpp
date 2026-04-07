@@ -88,7 +88,8 @@ auto API::updateEntitiesStatusInSim() -> bool
     const auto entity_status = static_cast<EntityStatus>(entity.getCanonicalizedStatus());
     simulation_interface::toProto(entity_status, *req.add_status());
     if (entity.is<entity::EgoEntity>()) {
-      req.set_overwrite_ego_status(entity.isControlledBySimulator());
+      req.set_overwrite_ego_status(
+        entity.isControlledBySimulator() || entity.isTeleportRequested());
     }
   }
 

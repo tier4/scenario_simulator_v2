@@ -138,6 +138,8 @@ public:
 
   /*   */ auto isStopped() const -> bool;
 
+  virtual auto isTeleportRequested() const -> bool { return false; }
+
   /*   */ auto isNearbyPosition(const geometry_msgs::msg::Pose & pose, const double tolerance) const
     -> bool;
 
