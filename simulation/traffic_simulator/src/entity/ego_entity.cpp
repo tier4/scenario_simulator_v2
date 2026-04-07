@@ -87,6 +87,8 @@ EgoEntity::EgoEntity(
   stuck_jump_distance_ =
     common::getParameter<double>(node_parameters, "stuck_jump_distance", 0.1);
   stuck_timeout_ = common::getParameter<double>(node_parameters, "stuck_jump_timeout", 10.0);
+  stuck_speed_threshold_ =
+    common::getParameter<double>(node_parameters, "stuck_speed_threshold", 0.1);
   stuck_jump_marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>(
     "/simulation/debug_marker", rclcpp::QoS(100));
 }
@@ -191,17 +193,19 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
 {
   teleport_requested_ = false;
 
-  if (!isStopped()) {
+  if (std::abs(getCurrentTwist().linear.x) >= stuck_speed_threshold_) {
+    slow_duration_ = 0.0;
     has_jumped_ = false;
     return;
   }
+  slow_duration_ += step_time_;
 
   if (
     getLegacyAutowareState().value == concealer::LegacyAutowareState::driving &&
     status_->getTime() >= stuck_timeout_ + 3.0 &&
-    getStandStillDuration() >= stuck_timeout_ && !has_jumped_) {
+    slow_duration_ >= stuck_timeout_ && !has_jumped_) {
     const auto & current_pose = status_->getMapPose();
-    const double stand_still_duration = getStandStillDuration();
+    const double stand_still_duration = slow_duration_;
     const double yaw = tf2::getYaw(current_pose.orientation);
 
     auto new_pose = current_pose;
