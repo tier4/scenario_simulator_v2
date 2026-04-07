@@ -86,7 +86,7 @@ EgoEntity::EgoEntity(
 {
   stuck_jump_distance_ =
     common::getParameter<double>(node_parameters, "stuck_jump_distance", 0.1);
-  stuck_timeout_ = common::getParameter<double>(node_parameters, "stuck_jump_timeout", 10.0);
+  stuck_timeout_ = common::getParameter<double>(node_parameters, "stuck_jump_timeout", 7.0);
   stuck_speed_threshold_ =
     common::getParameter<double>(node_parameters, "stuck_speed_threshold", 0.1);
   stuck_jump_marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>(
