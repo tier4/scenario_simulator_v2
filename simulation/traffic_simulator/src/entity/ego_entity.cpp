@@ -198,6 +198,7 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
 
   if (
     getLegacyAutowareState().value == concealer::LegacyAutowareState::driving &&
+    status_->getTime() >= stuck_timeout_ + 3.0 &&
     getStandStillDuration() >= stuck_timeout_ && !has_jumped_) {
     const auto & current_pose = status_->getMapPose();
     const double stand_still_duration = getStandStillDuration();
