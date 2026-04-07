@@ -41,6 +41,8 @@ class EgoEntity : public VehicleEntity, private concealer::FieldOperatorApplicat
 
   double stuck_jump_distance_{0.1};
   double stuck_timeout_{10.0};
+  double stuck_speed_threshold_{0.1};
+  double slow_duration_{0.0};
   bool has_jumped_{false};
   bool teleport_requested_{false};
   int jump_count_{0};
