@@ -39,6 +39,7 @@ class EgoEntity : public VehicleEntity, private concealer::FieldOperatorApplicat
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
   std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_;
 
+  bool enable_stuck_jump_{false};
   double stuck_jump_distance_{0.1};
   double stuck_timeout_{7.0};
   double stuck_speed_threshold_{0.1};

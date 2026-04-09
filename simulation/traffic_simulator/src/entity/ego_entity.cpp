@@ -84,6 +84,7 @@ EgoEntity::EgoEntity(
     }
   }())
 {
+  enable_stuck_jump_ = common::getParameter<bool>(node_parameters, "enable_stuck_jump", false);
   stuck_jump_distance_ =
     common::getParameter<double>(node_parameters, "stuck_jump_distance", 0.1);
   stuck_timeout_ = common::getParameter<double>(node_parameters, "stuck_jump_timeout", 7.0);
@@ -192,6 +193,10 @@ auto EgoEntity::isTeleportRequested() const -> bool { return teleport_requested_
 auto EgoEntity::checkAndTriggerStuckJump() -> void
 {
   teleport_requested_ = false;
+
+  if (!enable_stuck_jump_) {
+    return;
+  }
 
   if (std::abs(getCurrentTwist().linear.x) >= stuck_speed_threshold_) {
     slow_duration_ = 0.0;
