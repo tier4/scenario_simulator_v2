@@ -56,6 +56,8 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/simple_sensor_simulator.cpp
   src/vehicle_simulation/ego_entity_simulation.cpp
   src/vehicle_simulation/vehicle_model/csv_loader.cpp
+  src/vehicle_simulation/vehicle_model/mechanical_controller.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_actuation_cmd.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.cpp

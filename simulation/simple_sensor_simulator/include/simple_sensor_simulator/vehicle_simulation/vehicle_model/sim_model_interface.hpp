@@ -17,6 +17,8 @@
 
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <eigen3/Eigen/Core>
+#include <optional>
+#include <tier4_vehicle_msgs/msg/actuation_status_stamped.hpp>
 
 /**
  * @class SimModelInterface
@@ -24,6 +26,9 @@
  */
 class SimModelInterface
 {
+public:
+  using ActuationStatusStamped = tier4_vehicle_msgs::msg::ActuationStatusStamped;
+
 protected:
   const int dim_x_;        //!< @brief dimension of state x
   const int dim_u_;        //!< @brief dimension of input u
@@ -158,6 +163,16 @@ public:
    */
   virtual Eigen::VectorXd calcModel(
     const Eigen::VectorXd & state, const Eigen::VectorXd & input) = 0;
+
+  /**
+   * @brief check if actuation status should be published
+   */
+  virtual bool shouldPublishActuationStatus() const { return false; }
+
+  /**
+   * @brief get actuation status
+   */
+  virtual std::optional<ActuationStatusStamped> getActuationStatus() const { return std::nullopt; }
 };
 
 #endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_INTERFACE_HPP_

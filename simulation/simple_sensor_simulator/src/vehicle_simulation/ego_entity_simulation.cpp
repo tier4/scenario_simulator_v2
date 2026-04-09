@@ -53,6 +53,10 @@ auto toString(const VehicleModelType datum) -> std::string
     return #IDENTIFIER
 
   switch (datum) {
+    BOILERPLATE(ACTUATION_CMD);
+    BOILERPLATE(ACTUATION_CMD_MECHANICAL);
+    BOILERPLATE(ACTUATION_CMD_STEER_MAP);
+    BOILERPLATE(ACTUATION_CMD_VGR);
     BOILERPLATE(DELAY_STEER_ACC);
     BOILERPLATE(DELAY_STEER_ACC_GEARED);
     BOILERPLATE(DELAY_STEER_ACC_GEARED_WO_FALL_GUARD);
@@ -74,6 +78,10 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
     common::getParameter<std::string>("vehicle_model_type", "IDEAL_STEER_VEL");
 
   static const std::unordered_map<std::string, VehicleModelType> table{
+    {"ACTUATION_CMD", VehicleModelType::ACTUATION_CMD},
+    {"ACTUATION_CMD_MECHANICAL", VehicleModelType::ACTUATION_CMD_MECHANICAL},
+    {"ACTUATION_CMD_STEER_MAP", VehicleModelType::ACTUATION_CMD_STEER_MAP},
+    {"ACTUATION_CMD_VGR", VehicleModelType::ACTUATION_CMD_VGR},
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
     {"DELAY_STEER_ACC_GEARED", VehicleModelType::DELAY_STEER_ACC_GEARED},
     {"DELAY_STEER_ACC_GEARED_WO_FALL_GUARD",
@@ -103,11 +111,17 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto acc_time_constant          = common::getParameter("acc_time_constant",          0.1);
   const auto acc_time_delay             = common::getParameter("acc_time_delay",             0.1);
   const auto acceleration_map_path      = common::getParameter("acceleration_map_path",      std::string(""));
+  const auto brake_map_path             = common::getParameter("brake_map_path",             std::string(""));
+  const auto brake_time_constant        = common::getParameter("brake_time_constant",        0.1);
+  const auto brake_time_delay           = common::getParameter("brake_time_delay",           0.1);
+  const auto convert_accel_cmd          = common::getParameter("convert_accel_cmd",          false);
+  const auto convert_brake_cmd          = common::getParameter("convert_brake_cmd",          false);
   const auto debug_acc_scaling_factor   = common::getParameter("debug_acc_scaling_factor",   1.0);
   const auto debug_steer_scaling_factor = common::getParameter("debug_steer_scaling_factor", 1.0);
   const auto steer_bias                 = common::getParameter("steer_bias",                 0.0);
   const auto steer_dead_band            = common::getParameter("steer_dead_band",            0.0);
   const auto steer_lim                  = common::getParameter("steer_lim",                  parameters.axles.front_axle.max_steering);  // 1.0
+  const auto steer_map_path             = common::getParameter("steer_map_path",             std::string(""));
   const auto steer_rate_lim             = common::getParameter("steer_rate_lim",             5.0);
   const auto steer_time_constant        = common::getParameter("steer_time_constant",        0.27);
   const auto steer_time_delay           = common::getParameter("steer_time_delay",           0.24);
@@ -116,9 +130,71 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto vel_time_constant          = common::getParameter("vel_time_constant",          0.1);  /// @note 0.5 is default value on simple_planning_simulator
   const auto vel_time_delay             = common::getParameter("vel_time_delay",             0.1);  /// @note 0.25 is default value on simple_planning_simulator
   const auto wheel_base                 = common::getParameter("wheel_base",                 parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
+  const auto vgr_coef_a                 = common::getParameter("vgr_coef_a",                 15.713);
+  const auto vgr_coef_b                 = common::getParameter("vgr_coef_b",                 0.053);
+  const auto vgr_coef_c                 = common::getParameter("vgr_coef_c",                 0.042);
   // clang-format on
 
   switch (vehicle_model_type) {
+    case VehicleModelType::ACTUATION_CMD:
+      return std::make_shared<SimModelActuationCmd>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, brake_time_delay, brake_time_constant, steer_time_delay,
+        steer_time_constant, steer_bias, convert_accel_cmd, convert_brake_cmd,
+        acceleration_map_path, brake_map_path);
+
+    case VehicleModelType::ACTUATION_CMD_STEER_MAP:
+      if (steer_map_path.empty()) {
+        throw std::runtime_error(
+          "`steer_map_path` parameter is necessary for `ACTUATION_CMD_STEER_MAP` simulator model");
+      }
+      return std::make_shared<SimModelActuationCmdSteerMap>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, brake_time_delay, brake_time_constant, steer_time_delay,
+        steer_time_constant, steer_bias, convert_accel_cmd, convert_brake_cmd,
+        acceleration_map_path, brake_map_path, steer_map_path);
+
+    case VehicleModelType::ACTUATION_CMD_VGR:
+      return std::make_shared<SimModelActuationCmdVGR>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, brake_time_delay, brake_time_constant, steer_time_delay,
+        steer_time_constant, steer_bias, convert_accel_cmd, convert_brake_cmd,
+        acceleration_map_path, brake_map_path, vgr_coef_a, vgr_coef_b, vgr_coef_c);
+
+    case VehicleModelType::ACTUATION_CMD_MECHANICAL: {
+      // clang-format off
+      MechanicalParams mechanical_params;
+      mechanical_params.kp                    = common::getParameter("mechanical_kp",                     1.0);
+      mechanical_params.ki                    = common::getParameter("mechanical_ki",                     0.0);
+      mechanical_params.kd                    = common::getParameter("mechanical_kd",                     0.0);
+      mechanical_params.ff_gain               = common::getParameter("mechanical_ff_gain",                0.0);
+      mechanical_params.dead_zone_threshold   = common::getParameter("mechanical_dead_zone_threshold",    0.0);
+      mechanical_params.poly_a                = common::getParameter("mechanical_poly_a",                 1.0);
+      mechanical_params.poly_b                = common::getParameter("mechanical_poly_b",                 0.0);
+      mechanical_params.poly_c                = common::getParameter("mechanical_poly_c",                 0.0);
+      mechanical_params.poly_d                = common::getParameter("mechanical_poly_d",                 0.0);
+      mechanical_params.poly_e                = common::getParameter("mechanical_poly_e",                 0.0);
+      mechanical_params.poly_f                = common::getParameter("mechanical_poly_f",                 0.0);
+      mechanical_params.poly_g                = common::getParameter("mechanical_poly_g",                 0.0);
+      mechanical_params.poly_h                = common::getParameter("mechanical_poly_h",                 0.0);
+      mechanical_params.inertia               = common::getParameter("mechanical_inertia",                0.1);
+      mechanical_params.damping               = common::getParameter("mechanical_damping",                0.1);
+      mechanical_params.stiffness             = common::getParameter("mechanical_stiffness",              0.0);
+      mechanical_params.friction              = common::getParameter("mechanical_friction",               0.0);
+      mechanical_params.delay_time            = common::getParameter("mechanical_delay_time",             0.0);
+      mechanical_params.angle_limit           = common::getParameter("mechanical_angle_limit",            steer_lim);
+      mechanical_params.rate_limit            = common::getParameter("mechanical_rate_limit",             steer_rate_lim);
+      mechanical_params.steering_torque_limit = common::getParameter("mechanical_steering_torque_limit",  100.0);
+      mechanical_params.torque_delay_time     = common::getParameter("mechanical_torque_delay_time",      0.0);
+      // clang-format on
+      return std::make_shared<SimModelActuationCmdMechanical>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, brake_time_delay, brake_time_constant, steer_time_delay,
+        steer_time_constant, steer_bias, convert_accel_cmd, convert_brake_cmd,
+        acceleration_map_path, brake_map_path, vgr_coef_a, vgr_coef_b, vgr_coef_c,
+        mechanical_params);
+    }
+
     case VehicleModelType::DELAY_STEER_ACC:
       return std::make_shared<SimModelDelaySteerAcc>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
@@ -188,6 +264,10 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   Eigen::VectorXd v(vehicle_model_ptr_->getDimX());
 
   switch (vehicle_model_type_) {
+    case VehicleModelType::ACTUATION_CMD:
+    case VehicleModelType::ACTUATION_CMD_STEER_MAP:
+    case VehicleModelType::ACTUATION_CMD_VGR:
+    case VehicleModelType::ACTUATION_CMD_MECHANICAL:
     case VehicleModelType::DELAY_STEER_ACC:
     case VehicleModelType::DELAY_STEER_ACC_GEARED:
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
@@ -254,6 +334,10 @@ auto EgoEntitySimulation::overwrite(
     }();
 
     switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
+      case VehicleModelType::ACTUATION_CMD:
+      case VehicleModelType::ACTUATION_CMD_STEER_MAP:
+      case VehicleModelType::ACTUATION_CMD_VGR:
+      case VehicleModelType::ACTUATION_CMD_MECHANICAL:
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
@@ -321,6 +405,19 @@ void EgoEntitySimulation::update(
       autoware->getVehicleCommand();
 
     switch (vehicle_model_type_) {
+      case VehicleModelType::ACTUATION_CMD:
+      case VehicleModelType::ACTUATION_CMD_STEER_MAP:
+      case VehicleModelType::ACTUATION_CMD_VGR:
+      case VehicleModelType::ACTUATION_CMD_MECHANICAL: {
+        const auto actuation_command = autoware->getActuationCommand();
+        input(0) = actuation_command.actuation.accel_cmd;
+        input(1) = actuation_command.actuation.brake_cmd;
+        input(2) = acceleration_by_slope;
+        input(3) = actuation_command.actuation.steer_cmd;
+        input(4) = autoware->getGearCommand().command;
+        break;
+      }
+
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
