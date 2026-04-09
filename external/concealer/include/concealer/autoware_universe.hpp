@@ -17,6 +17,7 @@
 
 #include <atomic>
 #include <autoware_control_msgs/msg/control.hpp>
+#include <tier4_vehicle_msgs/msg/actuation_command_stamped.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/gear_report.hpp>
@@ -44,6 +45,7 @@ class AutowareUniverse : public rclcpp::Node,
 public:
   // clang-format off
   using AccelWithCovarianceStamped  = geometry_msgs::msg::AccelWithCovarianceStamped;
+  using ActuationCommandStamped     = tier4_vehicle_msgs::msg::ActuationCommandStamped;
   using Control                     = autoware_control_msgs::msg::Control;
   using ControlModeCommand          = autoware_vehicle_msgs::srv::ControlModeCommand;
   using ControlModeReport           = autoware_vehicle_msgs::msg::ControlModeReport;
@@ -56,6 +58,7 @@ public:
   using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport              = autoware_vehicle_msgs::msg::VelocityReport;
 
+  Subscriber<ActuationCommandStamped>  getActuationCommand;
   Subscriber<Control>                  getCommand;
   Subscriber<GearCommand>              getGearCommand;
   Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
