@@ -77,6 +77,7 @@ def launch_setup(context, *args, **kwargs):
     consider_acceleration_by_road_slope         = LaunchConfiguration("consider_acceleration_by_road_slope",         default=False)
     consider_pose_by_road_slope                 = LaunchConfiguration("consider_pose_by_road_slope",                 default=True)
     enable_perf                                 = LaunchConfiguration("enable_perf",                                 default=False)
+    enable_stuck_jump                           = LaunchConfiguration("enable_stuck_jump",                           default=True)
     global_frame_rate                           = LaunchConfiguration("global_frame_rate",                           default=30.0)
     global_real_time_factor                     = LaunchConfiguration("global_real_time_factor",                     default=1.0)
     global_timeout                              = LaunchConfiguration("global_timeout",                              default=180)
@@ -102,6 +103,9 @@ def launch_setup(context, *args, **kwargs):
     simulate_localization                       = LaunchConfiguration("simulate_localization",                       default=True)
     speed_condition                             = LaunchConfiguration("speed_condition",                             default="legacy")
     status_monitor_threshold                    = LaunchConfiguration("status_monitor_threshold",                    default=10)
+    stuck_jump_distance                         = LaunchConfiguration("stuck_jump_distance",                         default=0.1)
+    stuck_jump_timeout                          = LaunchConfiguration("stuck_jump_timeout",                          default=7.0)
+    stuck_speed_threshold                       = LaunchConfiguration("stuck_speed_threshold",                       default=0.1)
     trajectory_based_detection_offset           = LaunchConfiguration("trajectory_based_detection_offset",           default=0.0)
     use_custom_centerline                       = LaunchConfiguration("use_custom_centerline",                       default=True)
     use_sim_time                                = LaunchConfiguration("use_sim_time",                                default=False)
@@ -116,6 +120,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"consider_acceleration_by_road_slope         := {consider_acceleration_by_road_slope.perform(context)}")
     print(f"consider_pose_by_road_slope                 := {consider_pose_by_road_slope.perform(context)}")
     print(f"enable_perf                                 := {enable_perf.perform(context)}")
+    print(f"enable_stuck_jump                           := {enable_stuck_jump.perform(context)}")
     print(f"global_frame_rate                           := {global_frame_rate.perform(context)}")
     print(f"global_real_time_factor                     := {global_real_time_factor.perform(context)}")
     print(f"global_timeout                              := {global_timeout.perform(context)}")
@@ -140,6 +145,9 @@ def launch_setup(context, *args, **kwargs):
     print(f"simulate_localization                       := {simulate_localization.perform(context)}")
     print(f"speed_condition                             := {speed_condition.perform(context)}")
     print(f"status_monitor_threshold                    := {status_monitor_threshold.perform(context)}")
+    print(f"stuck_jump_distance                         := {stuck_jump_distance.perform(context)}")
+    print(f"stuck_jump_timeout                          := {stuck_jump_timeout.perform(context)}")
+    print(f"stuck_speed_threshold                       := {stuck_speed_threshold.perform(context)}")
     print(f"trajectory_based_detection_offset           := {trajectory_based_detection_offset.perform(context)}")
     print(f"use_custom_centerline                       := {use_custom_centerline.perform(context)}")
     print(f"use_sim_time                                := {use_sim_time.perform(context)}")
@@ -160,6 +168,7 @@ def launch_setup(context, *args, **kwargs):
             {"autoware_launch_package": autoware_launch_package},
             {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
+            {"enable_stuck_jump": enable_stuck_jump},
             {"initialize_duration": initialize_duration},
             {"initialize_localization": initialize_localization},
             {"launch_autoware": launch_autoware},
@@ -175,6 +184,9 @@ def launch_setup(context, *args, **kwargs):
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
             {"status_monitor_threshold": status_monitor_threshold},
+            {"stuck_jump_distance": stuck_jump_distance},
+            {"stuck_jump_timeout": stuck_jump_timeout},
+            {"stuck_speed_threshold": stuck_speed_threshold},
             {"trajectory_based_detection_offset": trajectory_based_detection_offset},
             {"use_custom_centerline": use_custom_centerline},
             {"use_sim_time": use_sim_time},
@@ -230,6 +242,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("consider_acceleration_by_road_slope",         default_value=consider_acceleration_by_road_slope        ),
         DeclareLaunchArgument("consider_pose_by_road_slope",                 default_value=consider_pose_by_road_slope                ),
         DeclareLaunchArgument("enable_perf",                                 default_value=enable_perf                                ),
+        DeclareLaunchArgument("enable_stuck_jump",                           default_value=enable_stuck_jump                          ),
         DeclareLaunchArgument("global_frame_rate",                           default_value=global_frame_rate                          ),
         DeclareLaunchArgument("global_real_time_factor",                     default_value=global_real_time_factor                    ),
         DeclareLaunchArgument("global_timeout",                              default_value=global_timeout                             ),
@@ -248,6 +261,9 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("simulate_localization",                       default_value=simulate_localization                      ),
         DeclareLaunchArgument("speed_condition",                             default_value=speed_condition                            ),
         DeclareLaunchArgument("status_monitor_threshold",                    default_value=status_monitor_threshold                   ),
+        DeclareLaunchArgument("stuck_jump_distance",                         default_value=stuck_jump_distance                        ),
+        DeclareLaunchArgument("stuck_jump_timeout",                          default_value=stuck_jump_timeout                         ),
+        DeclareLaunchArgument("stuck_speed_threshold",                       default_value=stuck_speed_threshold                      ),
         DeclareLaunchArgument("trajectory_based_detection_offset",           default_value=trajectory_based_detection_offset          ),
         DeclareLaunchArgument("use_custom_centerline",                       default_value=use_custom_centerline                      ),
         DeclareLaunchArgument("use_sim_time",                                default_value=use_sim_time                               ),
