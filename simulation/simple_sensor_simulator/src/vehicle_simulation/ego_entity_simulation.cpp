@@ -320,6 +320,13 @@ void EgoEntitySimulation::update(
     const auto [speed, acceleration, tire_angle, gear_sign, gear_command] =
       autoware->getVehicleCommand();
 
+    if (acceleration < 0.0) {
+      RCLCPP_WARN_STREAM_THROTTLE(
+        rclcpp::get_logger("ego_entity_simulation"), *autoware->get_clock(), 1000,
+        "Negative acceleration received from Autoware: "
+          << acceleration << " [m/s^2]. This may cause the vehicle to not move as expected.");
+    }
+
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
