@@ -11,6 +11,7 @@
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>protobuf-dev</depend>
+  <depend>libzmq3-dev</depend>
   <depend>protobuf</depend>
   <depend>rclcpp</depend>
 

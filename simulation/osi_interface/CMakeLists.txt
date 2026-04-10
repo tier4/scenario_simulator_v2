@@ -11,6 +11,7 @@ endif()
 
 find_package(ament_cmake_auto REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(cppzmq QUIET)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
@@ -69,6 +70,8 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/ground_truth_builder.cpp
   src/traffic_update_builder.cpp
   src/osi_ground_truth_handler.cpp
+  src/osi_zmq_client.cpp
+  src/osi_zmq_server.cpp
   ${OSI_PROTO_SRCS}
 )
 
@@ -79,6 +82,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_libraries(${PROJECT_NAME}
   ${PROTOBUF_LIBRARY}
+  zmq
+  $<TARGET_NAME_IF_EXISTS:cppzmq>
 )
 
 # --- Install -----------------------------------------------------------------
@@ -116,6 +121,8 @@ if(BUILD_TESTING)
   target_link_libraries(test_traffic_update_builder ${PROJECT_NAME})
   ament_add_gtest(test_osi_ground_truth_handler test/test_osi_ground_truth_handler.cpp)
   target_link_libraries(test_osi_ground_truth_handler ${PROJECT_NAME})
+  ament_add_gtest(test_osi_zmq_communication test/test_osi_zmq_communication.cpp)
+  target_link_libraries(test_osi_zmq_communication ${PROJECT_NAME})
 endif()
 
 ament_auto_package()
