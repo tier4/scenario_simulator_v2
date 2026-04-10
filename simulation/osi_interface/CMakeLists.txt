@@ -66,6 +66,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/orientation_conversion.cpp
   src/osi_entity_conversions.cpp
   src/osi_traffic_light_conversions.cpp
+  src/ground_truth_builder.cpp
   ${OSI_PROTO_SRCS}
 )
 
@@ -107,6 +108,8 @@ if(BUILD_TESTING)
   target_link_libraries(test_osi_entity_conversions ${PROJECT_NAME})
   ament_add_gtest(test_osi_traffic_light_conversions test/test_osi_traffic_light_conversions.cpp)
   target_link_libraries(test_osi_traffic_light_conversions ${PROJECT_NAME})
+  ament_add_gtest(test_ground_truth_builder test/test_ground_truth_builder.cpp)
+  target_link_libraries(test_ground_truth_builder ${PROJECT_NAME})
 endif()
 
 ament_auto_package()
