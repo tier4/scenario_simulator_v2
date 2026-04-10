@@ -23,6 +23,8 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <map>
 #include <memory>
+#include <osi_interface/osi_ground_truth_handler.hpp>
+#include <osi_interface/osi_zmq_server.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
@@ -138,7 +140,20 @@ private:
     -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse;
 
   int getSocketPort();
+  int getOsiPort();
 
+  // --- OSI communication path ---
+  auto processGroundTruth(const osi3::GroundTruth & gt) -> osi3::TrafficUpdate;
+  auto handleOsiSpawn(const osi_interface::GroundTruthFrame & frame) -> void;
+  auto handleOsiDespawn(const osi_interface::GroundTruthFrame & frame) -> void;
+
+  osi_interface::OsiGroundTruthHandler osi_handler_;
+  std::unique_ptr<osi_interface::OsiZmqServer> osi_server_;
+  bool use_osi_protocol_{false};
+  bool osi_initialized_{false};
+  bool npc_logic_started_{false};
+
+  // --- Legacy + shared state ---
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
   std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians_;

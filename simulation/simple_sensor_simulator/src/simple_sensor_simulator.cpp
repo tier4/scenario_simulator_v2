@@ -19,6 +19,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <simple_sensor_simulator/exception.hpp>
+#include <simple_sensor_simulator/osi_bridge.hpp>
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
@@ -49,9 +50,23 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     },
     [this](auto &&... xs) { return updateStepTime(std::forward<decltype(xs)>(xs)...); })
 {
+  // OSI protocol support
+  use_osi_protocol_ =
+    common::getParameter<bool>(get_node_parameters_interface(), "use_osi_protocol", false);
+  if (use_osi_protocol_) {
+    osi_server_ = std::make_unique<osi_interface::OsiZmqServer>(
+      getOsiPort(), [this](const osi3::GroundTruth & gt) { return processGroundTruth(gt); });
+    osi_server_->start();
+    RCLCPP_INFO(get_logger(), "OSI ZMQ server started on port %d", getOsiPort());
+  }
 }
 
-ScenarioSimulator::~ScenarioSimulator() {}
+ScenarioSimulator::~ScenarioSimulator()
+{
+  if (osi_server_) {
+    osi_server_->stop();
+  }
+}
 
 int ScenarioSimulator::getSocketPort()
 {
@@ -374,6 +389,150 @@ bool ScenarioSimulator::isEgo(const std::string & name)
 bool ScenarioSimulator::isEntityExists(const std::string & name)
 {
   return entity_status_.find(name) != entity_status_.end();
+}
+
+int ScenarioSimulator::getOsiPort()
+{
+  return common::getParameter<int>(get_node_parameters_interface(), "osi_port", 5556);
+}
+
+auto ScenarioSimulator::processGroundTruth(const osi3::GroundTruth & gt) -> osi3::TrafficUpdate
+{
+  auto frame = osi_handler_.parseGroundTruth(gt);
+
+  // First-frame initialization
+  if (!osi_initialized_) {
+    if (gt.has_map_reference() && !gt.map_reference().empty()) {
+      traffic_simulator::lanelet_map::activate(gt.map_reference());
+    }
+    step_time_ = common::getParameter<double>(get_node_parameters_interface(), "step_time", 0.02);
+    traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
+      common::getParameter<bool>(
+        get_node_parameters_interface(), "consider_pose_by_road_slope", false));
+    osi_initialized_ = true;
+  }
+
+  // Update simulation time from GroundTruth timestamp
+  current_simulation_time_ = frame.simulation_time;
+  current_scenario_time_ = frame.simulation_time;
+
+  // Handle spawn/despawn
+  handleOsiSpawn(frame);
+  handleOsiDespawn(frame);
+
+  // Update all entity states
+  for (const auto & entity : frame.moving_entities) {
+    auto proto_status = osi_bridge::toProtoEntityStatus(entity);
+    entity_status_[entity.name] = proto_status;
+  }
+
+  // Update traffic lights
+  if (!frame.traffic_signals.empty()) {
+    traffic_signals_states_ = osi_bridge::toProtoTrafficLightsRequest(frame.traffic_signals);
+  }
+
+  // Process ego vehicle (TPM pattern)
+  osi_interface::EntityData ego_result;
+  bool ego_updated = false;
+
+  if (!frame.ego_name.empty() && ego_entity_simulation_) {
+    npc_logic_started_ =
+      common::getParameter<bool>(get_node_parameters_interface(), "npc_logic_started", false);
+
+    // Find ego entity in the frame
+    for (const auto & entity : frame.moving_entities) {
+      if (entity.name == frame.ego_name) {
+        auto ego_msg = osi_bridge::toRosMsgEntityStatus(entity);
+
+        // Check control mode
+        if (
+          ego_entity_simulation_->autoware->getControlModeReport().mode ==
+          autoware_vehicle_msgs::msg::ControlModeReport::MANUAL) {
+          ego_entity_simulation_->autoware->setManualMode();
+          ego_entity_simulation_->overwrite(
+            ego_msg, current_scenario_time_ + step_time_, step_time_, npc_logic_started_);
+        } else {
+          ego_entity_simulation_->update(
+            current_scenario_time_ + step_time_, step_time_, npc_logic_started_);
+        }
+
+        // Get updated ego status
+        auto updated_ego_msg = ego_entity_simulation_->getStatus();
+        ego_result = osi_bridge::fromRosMsgEntityStatus(updated_ego_msg);
+        ego_result.type = osi_interface::EntityType::EGO;
+        ego_result.subtype = osi_interface::EntitySubtype::CAR;
+
+        // Update entity_status_ with ego result
+        simulation_api_schema::EntityStatus ego_proto;
+        simulation_interface::toProto(updated_ego_msg, ego_proto);
+        entity_status_[frame.ego_name] = ego_proto;
+
+        ego_updated = true;
+        break;
+      }
+    }
+  }
+
+  // Sensor simulation (same as updateFrame)
+  std::vector<traffic_simulator_msgs::EntityStatus> entity_status_for_sensor;
+  std::transform(
+    entity_status_.begin(), entity_status_.end(), std::back_inserter(entity_status_for_sensor),
+    [this](const auto & map_element) {
+      traffic_simulator_msgs::EntityStatus status;
+      *status.mutable_pose() = map_element.second.pose();
+      *status.mutable_action_status() = map_element.second.action_status();
+      *status.mutable_name() = map_element.second.name();
+      *status.mutable_type() = map_element.second.type();
+      *status.mutable_subtype() = map_element.second.subtype();
+      if (isEntityExists(status.name())) {
+        *status.mutable_bounding_box() = getBoundingBox(status.name());
+      }
+      return status;
+    });
+  sensor_sim_.updateSensorFrame(
+    current_simulation_time_, current_ros_time_, entity_status_for_sensor, traffic_signals_states_);
+
+  // Build TrafficUpdate
+  if (ego_updated) {
+    return osi_handler_.buildTrafficUpdate(frame.simulation_time, ego_result);
+  }
+  // No ego update — return empty TrafficUpdate with timestamp
+  osi3::TrafficUpdate tu;
+  *tu.mutable_timestamp() = osi_interface::toOsiTimestamp(frame.simulation_time);
+  return tu;
+}
+
+auto ScenarioSimulator::handleOsiSpawn(const osi_interface::GroundTruthFrame & frame) -> void
+{
+  for (const auto & entity : frame.spawned_moving) {
+    if (entity.type == osi_interface::EntityType::EGO && !ego_entity_simulation_) {
+      // Create EgoEntitySimulation with default parameters
+      auto params = osi_bridge::makeDefaultVehicleParameters(entity);
+      auto initial_status = osi_bridge::toRosMsgEntityStatus(entity);
+      initial_status.bounding_box = params.bounding_box;
+      ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
+        initial_status, params, step_time_,
+        get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
+        common::getParameter<bool>(
+          get_node_parameters_interface(), "consider_acceleration_by_road_slope", false));
+    }
+  }
+}
+
+auto ScenarioSimulator::handleOsiDespawn(const osi_interface::GroundTruthFrame & frame) -> void
+{
+  for (const auto & name : frame.despawned_names) {
+    if (isEgo(name)) {
+      ego_entity_simulation_.reset();
+      auto it = std::find_if(ego_vehicles_.begin(), ego_vehicles_.end(), [&name](const auto & v) {
+        return v.name() == name;
+      });
+      if (it != ego_vehicles_.end()) {
+        ego_vehicles_.erase(it);
+      }
+    }
+    entity_status_.erase(name);
+  }
 }
 }  // namespace simple_sensor_simulator
 
