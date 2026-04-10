@@ -123,6 +123,8 @@ if(BUILD_TESTING)
   target_link_libraries(test_osi_ground_truth_handler ${PROJECT_NAME})
   ament_add_gtest(test_osi_zmq_communication test/test_osi_zmq_communication.cpp)
   target_link_libraries(test_osi_zmq_communication ${PROJECT_NAME})
+  ament_add_gtest(test_osi_legacy_equivalence test/test_osi_legacy_equivalence.cpp)
+  target_link_libraries(test_osi_legacy_equivalence ${PROJECT_NAME})
 endif()
 
 ament_auto_package()
