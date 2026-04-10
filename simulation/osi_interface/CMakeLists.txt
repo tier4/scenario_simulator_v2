@@ -68,6 +68,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/osi_traffic_light_conversions.cpp
   src/ground_truth_builder.cpp
   src/traffic_update_builder.cpp
+  src/osi_ground_truth_handler.cpp
   ${OSI_PROTO_SRCS}
 )
 
@@ -113,6 +114,8 @@ if(BUILD_TESTING)
   target_link_libraries(test_ground_truth_builder ${PROJECT_NAME})
   ament_add_gtest(test_traffic_update_builder test/test_traffic_update_builder.cpp)
   target_link_libraries(test_traffic_update_builder ${PROJECT_NAME})
+  ament_add_gtest(test_osi_ground_truth_handler test/test_osi_ground_truth_handler.cpp)
+  target_link_libraries(test_osi_ground_truth_handler ${PROJECT_NAME})
 endif()
 
 ament_auto_package()
