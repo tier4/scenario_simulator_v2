@@ -32,6 +32,7 @@
   <depend>rclcpp_components</depend>
   <depend>rosgraph_msgs</depend>
   <depend>rviz2</depend>
+  <depend>osi_interface</depend>
   <depend>simulation_interface</depend>
   <depend>std_msgs</depend>
   <depend>tf2_geometry_msgs</depend>

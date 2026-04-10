@@ -17,6 +17,8 @@
 
 #include <simulation_interface/simulation_api_schema.pb.h>
 
+#include <osi_interface/ground_truth_builder.hpp>
+#include <osi_interface/osi_zmq_client.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <std_msgs/msg/float64.hpp>
@@ -87,7 +89,16 @@ public:
   {
     entity_manager_ptr_->setVerbose(configuration_.verbose);
     entity_manager_ptr_->setTrafficLights(traffic_lights_ptr_);
-    if (not init()) {
+
+    // OSI protocol initialization
+    use_osi_protocol_ = common::getParameter<bool>(node_parameters_, "use_osi_protocol", false);
+    if (use_osi_protocol_) {
+      const auto osi_port = common::getParameter<int>(node_parameters_, "osi_port", 5556);
+      osi_client_ =
+        std::make_unique<osi_interface::OsiZmqClient>(configuration.simulator_host, osi_port);
+    }
+
+    if (not use_osi_protocol_ && not init()) {
       throw common::SimulationError("Failed to initialize simulator by InitializeRequest");
     }
   }
@@ -294,6 +305,11 @@ private:
 
   auto updateTrafficLightsInSim() -> bool;
 
+  // OSI communication path
+  auto updateFrameOsi() -> bool;
+  auto buildGroundTruth() -> osi3::GroundTruth;
+  auto applyTrafficUpdate(const osi3::TrafficUpdate & tu) -> void;
+
   const Configuration configuration_;
 
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
@@ -305,6 +321,11 @@ private:
   SimulationClock clock_;
 
   zeromq::MultiClient zeromq_client_;
+
+  // OSI communication
+  std::unique_ptr<osi_interface::OsiZmqClient> osi_client_;
+  osi_interface::EntityIdRegistry entity_id_registry_;
+  bool use_osi_protocol_{false};
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
 

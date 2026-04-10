@@ -13,6 +13,8 @@
 // limitations under the License.
 
 #include <geometry/intersection/collision.hpp>
+#include <osi_interface/osi_entity_conversions.hpp>
+#include <osi_interface/osi_traffic_light_conversions.hpp>
 #include <traffic_simulator/api/api.hpp>
 
 namespace traffic_simulator
@@ -129,14 +131,20 @@ auto API::updateFrame() -> bool
     THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
   }
 
-  if (!updateEntitiesStatusInSim()) {
-    return false;
+  if (use_osi_protocol_) {
+    if (!updateFrameOsi()) {
+      return false;
+    }
+  } else {
+    if (!updateEntitiesStatusInSim()) {
+      return false;
+    }
   }
 
   entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute(getCurrentTime(), clock_.getStepTime());
 
-  if (not configuration_.standalone_mode) {
+  if (not configuration_.standalone_mode && not use_osi_protocol_) {
     if (!updateTrafficLightsInSim() || !updateTimeInSim()) {
       return false;
     }
@@ -148,6 +156,137 @@ auto API::updateFrame() -> bool
   debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
   debug_marker_pub_->publish(traffic_controller_ptr_->makeDebugMarker());
   return true;
+}
+
+auto API::buildGroundTruth() -> osi3::GroundTruth
+{
+  std::vector<osi_interface::EntityData> moving_entities;
+  std::vector<osi_interface::EntityData> stationary_entities;
+  std::string ego_name;
+
+  for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
+    const auto & entity = entity_manager_ptr_->getEntity(entity_name);
+    const auto entity_status = static_cast<EntityStatus>(entity.getCanonicalizedStatus());
+
+    osi_interface::EntityData data;
+    data.name = entity_name;
+    data.pose = {entity_status.pose.position.x,    entity_status.pose.position.y,
+                 entity_status.pose.position.z,    entity_status.pose.orientation.x,
+                 entity_status.pose.orientation.y, entity_status.pose.orientation.z,
+                 entity_status.pose.orientation.w};
+    data.twist = {
+      entity_status.action_status.twist.linear.x,  entity_status.action_status.twist.linear.y,
+      entity_status.action_status.twist.linear.z,  entity_status.action_status.twist.angular.x,
+      entity_status.action_status.twist.angular.y, entity_status.action_status.twist.angular.z};
+    data.accel = {
+      entity_status.action_status.accel.linear.x,  entity_status.action_status.accel.linear.y,
+      entity_status.action_status.accel.linear.z,  entity_status.action_status.accel.angular.x,
+      entity_status.action_status.accel.angular.y, entity_status.action_status.accel.angular.z};
+    const auto & bb = entity.getBoundingBox();
+    data.bounding_box = {bb.center.x,     bb.center.y,     bb.center.z,
+                         bb.dimensions.x, bb.dimensions.y, bb.dimensions.z};
+
+    if (entity.is<entity::EgoEntity>()) {
+      data.type = osi_interface::EntityType::EGO;
+      data.subtype = osi_interface::EntitySubtype::CAR;
+      ego_name = entity_name;
+      moving_entities.push_back(data);
+    } else if (entity.is<entity::VehicleEntity>()) {
+      data.type = osi_interface::EntityType::VEHICLE;
+      data.subtype = osi_interface::EntitySubtype::CAR;
+      moving_entities.push_back(data);
+    } else if (entity.is<entity::PedestrianEntity>()) {
+      data.type = osi_interface::EntityType::PEDESTRIAN;
+      data.subtype = osi_interface::EntitySubtype::PEDESTRIAN;
+      moving_entities.push_back(data);
+    } else {
+      data.type = osi_interface::EntityType::MISC_OBJECT;
+      stationary_entities.push_back(data);
+    }
+  }
+
+  // Traffic lights
+  std::vector<osi_interface::TrafficSignalGroup> traffic_signals;
+  if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
+    const auto request = traffic_lights_ptr_->generateConventionalUpdateRequest();
+    for (const auto & state : request.states()) {
+      osi_interface::TrafficSignalGroup signal;
+      signal.lanelet_id = state.id();
+      for (const auto & rel_id : state.relation_ids()) {
+        signal.relation_ids.push_back(rel_id);
+      }
+      for (const auto & tl : state.traffic_light_status()) {
+        osi_interface::TrafficLightBulb bulb;
+        bulb.color = static_cast<osi_interface::TrafficLightBulb::Color>(tl.color());
+        bulb.shape = static_cast<osi_interface::TrafficLightBulb::Shape>(tl.shape());
+        bulb.status = static_cast<osi_interface::TrafficLightBulb::Status>(tl.status());
+        bulb.confidence = tl.confidence();
+        signal.bulbs.push_back(bulb);
+      }
+      traffic_signals.push_back(signal);
+    }
+  }
+
+  return osi_interface::GroundTruthBuilder(entity_id_registry_)
+    .setTimestamp(clock_.getCurrentSimulationTime())
+    .setHostVehicle(ego_name)
+    .setMapReference(configuration_.lanelet2_map_path().string())
+    .setMovingEntities(moving_entities)
+    .setStationaryEntities(stationary_entities)
+    .setTrafficSignals(traffic_signals)
+    .build();
+}
+
+auto API::updateFrameOsi() -> bool
+{
+  auto gt = buildGroundTruth();
+  auto tu = osi_client_->sendGroundTruth(gt);
+  applyTrafficUpdate(tu);
+  return true;
+}
+
+auto API::applyTrafficUpdate(const osi3::TrafficUpdate & tu) -> void
+{
+  for (int i = 0; i < tu.update_size(); ++i) {
+    const auto & obj = tu.update(i);
+    auto name_opt = entity_id_registry_.reverseLookup(obj.id().value());
+    if (!name_opt.has_value()) {
+      continue;
+    }
+    const auto & name = *name_opt;
+    if (!entity_manager_ptr_->isEntityExist(name)) {
+      continue;
+    }
+
+    auto & entity = entity_manager_ptr_->getEntity(name);
+
+    // Apply only for ego entities (TPM controls ego dynamics)
+    if (entity.is<entity::EgoEntity>() && !entity.isControlledBySimulator()) {
+      auto entity_data = osi_interface::fromOsiMovingObject(obj, entity_id_registry_);
+
+      geometry_msgs::msg::Pose pose;
+      pose.position.x = entity_data.pose.x;
+      pose.position.y = entity_data.pose.y;
+      pose.position.z = entity_data.pose.z;
+      pose.orientation.x = entity_data.pose.qx;
+      pose.orientation.y = entity_data.pose.qy;
+      pose.orientation.z = entity_data.pose.qz;
+      pose.orientation.w = entity_data.pose.qw;
+      entity.setMapPose(pose);
+
+      geometry_msgs::msg::Twist twist;
+      twist.linear.x = entity_data.twist.linear_x;
+      twist.linear.y = entity_data.twist.linear_y;
+      twist.linear.z = entity_data.twist.linear_z;
+      entity.setTwist(twist);
+
+      geometry_msgs::msg::Accel accel;
+      accel.linear.x = entity_data.accel.linear_x;
+      accel.linear.y = entity_data.accel.linear_y;
+      accel.linear.z = entity_data.accel.linear_z;
+      entity.setAcceleration(accel);
+    }
+  }
 }
 
 // sensors - attach
