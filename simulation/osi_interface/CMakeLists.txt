@@ -64,6 +64,7 @@ include_directories(
 ament_auto_add_library(${PROJECT_NAME} SHARED
   src/entity_id_registry.cpp
   src/orientation_conversion.cpp
+  src/osi_entity_conversions.cpp
   ${OSI_PROTO_SRCS}
 )
 
@@ -101,6 +102,8 @@ if(BUILD_TESTING)
   target_link_libraries(test_entity_id_registry ${PROJECT_NAME})
   ament_add_gtest(test_orientation_conversion test/test_orientation_conversion.cpp)
   target_link_libraries(test_orientation_conversion ${PROJECT_NAME})
+  ament_add_gtest(test_osi_entity_conversions test/test_osi_entity_conversions.cpp)
+  target_link_libraries(test_osi_entity_conversions ${PROJECT_NAME})
 endif()
 
 ament_auto_package()
