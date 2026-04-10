@@ -62,6 +62,7 @@ include_directories(
 )
 
 ament_auto_add_library(${PROJECT_NAME} SHARED
+  src/entity_id_registry.cpp
   ${OSI_PROTO_SRCS}
 )
 
@@ -94,6 +95,9 @@ install(
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_entity_id_registry test/test_entity_id_registry.cpp)
+  target_link_libraries(test_entity_id_registry ${PROJECT_NAME})
 endif()
 
 ament_auto_package()
