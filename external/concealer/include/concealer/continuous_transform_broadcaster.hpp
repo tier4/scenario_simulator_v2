@@ -21,6 +21,7 @@
 
 #include <chrono>
 #include <geometry_msgs/msg/pose.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 namespace concealer
@@ -38,14 +39,20 @@ class ContinuousTransformBroadcaster
 
   const rclcpp::TimerBase::SharedPtr timer;
 
+  bool enabled_;
+
   void updateTransform()
   {
-    if (
-      not current_transform.header.frame_id.empty() and
-      not current_transform.child_frame_id.empty())  //
-    {
-      current_transform.header.stamp = static_cast<Node &>(*this).get_clock()->now();
-      return transform_broadcaster.sendTransform(current_transform);
+    if (not enabled_) {
+      return;
+    } else {
+      if (
+        not current_transform.header.frame_id.empty() and
+        not current_transform.child_frame_id.empty())  //
+      {
+        current_transform.header.stamp = static_cast<Node &>(*this).get_clock()->now();
+        return transform_broadcaster.sendTransform(current_transform);
+      }
     }
   }
 
@@ -68,7 +75,9 @@ public:
     transform_buffer(static_cast<Node &>(*this).get_clock()),
     transform_broadcaster(static_cast<Node *>(this)),
     timer(static_cast<Node &>(*this).create_wall_timer(
-      std::chrono::milliseconds(5), [this]() { return updateTransform(); }))
+      std::chrono::milliseconds(5), [this]() { return updateTransform(); })),
+    enabled_(common::getParameter<bool>(
+      static_cast<Node &>(*this).get_node_parameters_interface(), "tf.enabled", true))
   {
   }
 };

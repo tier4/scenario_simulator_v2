@@ -195,20 +195,27 @@ class Publisher
 
   Randomizer<Message> randomize;
 
+  bool enabled_;
+
 public:
   template <typename Node>
   explicit Publisher(const std::string & topic, Node & node)
   : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable())),
-    randomize(node.get_node_parameters_interface(), topic)
+    randomize(node.get_node_parameters_interface(), topic),
+    enabled_(
+      common::getParameter<bool>(node.get_node_parameters_interface(), topic + ".enabled", true))
   {
   }
 
   template <typename... Ts>
-  auto operator()(Ts &&... xs) -> decltype(auto)
+  auto operator()(Ts &&... xs) -> void
   {
-    return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
+    if (enabled_) {
+      publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
+    }
   }
 
+  auto isEnabled() const noexcept -> bool { return enabled_; }
   auto getRandomizer() const noexcept -> const Randomizer<Message> & { return randomize; }
   auto getRandomizer() noexcept -> Randomizer<Message> & { return randomize; }
 };
