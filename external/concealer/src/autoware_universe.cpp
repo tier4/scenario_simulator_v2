@@ -48,8 +48,8 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
   setControlModeReport("/vehicle/status/control_mode", *this),
   setVelocityReport("/vehicle/status/velocity_status", *this),
   setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
-  control_mode_request_server(create_service<ControlModeCommand>(
-    "/control/control_mode_request",
+  control_mode_request_server(
+    "/control/control_mode_request", *this,
     [this](
       const ControlModeCommand::Request::SharedPtr request,
       ControlModeCommand::Response::SharedPtr response) {
@@ -70,7 +70,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
           response->success = false;
           break;
       }
-    })),
+    }),
   localization_update_timer(rclcpp::create_timer(
     this, get_clock(),
     std::chrono::milliseconds(

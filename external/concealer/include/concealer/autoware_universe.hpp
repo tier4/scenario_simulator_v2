@@ -28,6 +28,7 @@
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/path_with_lane_id.hpp>
 #include <concealer/publisher.hpp>
+#include <concealer/service_server.hpp>
 #include <concealer/subscriber.hpp>
 #include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
@@ -76,7 +77,7 @@ public:
   // clang-format on
 
 private:
-  rclcpp::Service<ControlModeCommand>::SharedPtr control_mode_request_server;
+  ServiceServer<ControlModeCommand> control_mode_request_server;
 
   const rclcpp::TimerBase::SharedPtr localization_update_timer;
 
