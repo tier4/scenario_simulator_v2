@@ -32,6 +32,7 @@ enum class VehicleModelType {
   DELAY_STEER_ACC_GEARED_WO_FALL_GUARD,
   DELAY_STEER_MAP_ACC_GEARED,
   DELAY_STEER_VEL,
+  EXTERNAL,
   IDEAL_STEER_ACC,
   IDEAL_STEER_ACC_GEARED,
   IDEAL_STEER_VEL,
@@ -74,6 +75,7 @@ public:
   auto calculateAccelerationBySlope() const -> double;
 
 private:
+  SimModelExternal * external_model_ = nullptr;
   auto getCurrentPose(const double pitch_angle = 0.0) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;

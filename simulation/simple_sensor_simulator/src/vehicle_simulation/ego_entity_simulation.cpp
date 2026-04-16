@@ -58,6 +58,7 @@ auto toString(const VehicleModelType datum) -> std::string
     BOILERPLATE(DELAY_STEER_ACC_GEARED_WO_FALL_GUARD);
     BOILERPLATE(DELAY_STEER_MAP_ACC_GEARED);
     BOILERPLATE(DELAY_STEER_VEL);
+    BOILERPLATE(EXTERNAL);
     BOILERPLATE(IDEAL_STEER_ACC);
     BOILERPLATE(IDEAL_STEER_ACC_GEARED);
     BOILERPLATE(IDEAL_STEER_VEL);
@@ -80,6 +81,7 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
      VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD},
     {"DELAY_STEER_MAP_ACC_GEARED", VehicleModelType::DELAY_STEER_MAP_ACC_GEARED},
     {"DELAY_STEER_VEL", VehicleModelType::DELAY_STEER_VEL},
+    {"EXTERNAL", VehicleModelType::EXTERNAL},
     {"IDEAL_STEER_ACC", VehicleModelType::IDEAL_STEER_ACC},
     {"IDEAL_STEER_ACC_GEARED", VehicleModelType::IDEAL_STEER_ACC_GEARED},
     {"IDEAL_STEER_VEL", VehicleModelType::IDEAL_STEER_VEL},
@@ -160,6 +162,9 @@ auto EgoEntitySimulation::makeSimulationModel(
     case VehicleModelType::IDEAL_STEER_ACC_GEARED:
       return std::make_shared<SimModelIdealSteerAccGeared>(wheel_base);
 
+    case VehicleModelType::EXTERNAL:
+      return std::make_shared<SimModelExternal>();
+
     case VehicleModelType::IDEAL_STEER_VEL:
       return std::make_shared<SimModelIdealSteerVel>(wheel_base);
 
@@ -210,6 +215,10 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     case VehicleModelType::DELAY_STEER_VEL:
       v << 0, 0, 0, value, 0;
       break;
+
+    case VehicleModelType::EXTERNAL:
+      // Speed is controlled by the external simulator; initial speed setting is ignored.
+      return;
 
     default:
       THROW_SEMANTIC_ERROR(
@@ -283,6 +292,13 @@ auto EgoEntitySimulation::overwrite(
         state(1) = world_relative_position_.y();
         state(2) = yaw;
         vehicle_model_ptr_->setState(state);
+        break;
+
+      case VehicleModelType::EXTERNAL:
+        external_model_->setExternalState(
+          world_relative_position_.x(), world_relative_position_.y(), yaw,
+          status.action_status.twist.linear.x, status.action_status.twist.linear.y,
+          status.action_status.accel.linear.x, status.action_status.twist.angular.z, 0.0);
         break;
 
       default:
