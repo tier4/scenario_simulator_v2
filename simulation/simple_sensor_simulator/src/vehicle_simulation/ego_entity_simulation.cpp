@@ -329,51 +329,56 @@ void EgoEntitySimulation::update(
                                status_.getMapPose().position.z - initial_pose_.position.z);
 
   if (is_npc_logic_started) {
-    auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
+    if (vehicle_model_type_ == VehicleModelType::EXTERNAL) {
+      // State is updated by the external simulator via ROS 2 subscription callbacks.
+      // No Autoware command reading or vehicle model stepping required here.
+    } else {
+      auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
-    auto acceleration_by_slope = calculateAccelerationBySlope();
+      auto acceleration_by_slope = calculateAccelerationBySlope();
 
-    const auto [speed, acceleration, tire_angle, gear_sign, gear_command] =
-      autoware->getVehicleCommand();
+      const auto [speed, acceleration, tire_angle, gear_sign, gear_command] =
+        autoware->getVehicleCommand();
 
-    if (acceleration < 0.0) {
-      RCLCPP_WARN_STREAM_THROTTLE(
-        rclcpp::get_logger("ego_entity_simulation"), *autoware->get_clock(), 1000,
-        "Negative acceleration received from Autoware: "
-          << acceleration << " [m/s^2]. This may cause the vehicle to not move as expected.");
+      if (acceleration < 0.0) {
+        RCLCPP_WARN_STREAM_THROTTLE(
+          rclcpp::get_logger("ego_entity_simulation"), *autoware->get_clock(), 1000,
+          "Negative acceleration received from Autoware: "
+            << acceleration << " [m/s^2]. This may cause the vehicle to not move as expected.");
+      }
+
+      switch (vehicle_model_type_) {
+        case VehicleModelType::DELAY_STEER_ACC:
+        case VehicleModelType::DELAY_STEER_ACC_GEARED:
+        case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
+        case VehicleModelType::IDEAL_STEER_ACC:
+        case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+          input(0) = gear_sign * acceleration + acceleration_by_slope;
+          input(1) = tire_angle;
+          break;
+
+        case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+          input(0) = acceleration;
+          input(1) = autoware->getGearCommand().command;
+          input(2) = acceleration_by_slope;
+          input(3) = tire_angle;
+          break;
+
+        case VehicleModelType::DELAY_STEER_VEL:
+        case VehicleModelType::IDEAL_STEER_VEL:
+          input(0) = speed;
+          input(1) = tire_angle;
+          break;
+
+        default:
+          THROW_SEMANTIC_ERROR(
+            "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
+      }
+
+      vehicle_model_ptr_->setGear(gear_command);
+      vehicle_model_ptr_->setInput(input);
+      vehicle_model_ptr_->update(step_time);
     }
-
-    switch (vehicle_model_type_) {
-      case VehicleModelType::DELAY_STEER_ACC:
-      case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
-      case VehicleModelType::IDEAL_STEER_ACC:
-      case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input(0) = gear_sign * acceleration + acceleration_by_slope;
-        input(1) = tire_angle;
-        break;
-
-      case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
-        input(0) = acceleration;
-        input(1) = autoware->getGearCommand().command;
-        input(2) = acceleration_by_slope;
-        input(3) = tire_angle;
-        break;
-
-      case VehicleModelType::DELAY_STEER_VEL:
-      case VehicleModelType::IDEAL_STEER_VEL:
-        input(0) = speed;
-        input(1) = tire_angle;
-        break;
-
-      default:
-        THROW_SEMANTIC_ERROR(
-          "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
-    }
-
-    vehicle_model_ptr_->setGear(gear_command);
-    vehicle_model_ptr_->setInput(input);
-    vehicle_model_ptr_->update(step_time);
   }
   // only the position in the Oz axis is left unchanged, the rest is taken from SimModelInterface
   world_relative_position_.x() = vehicle_model_ptr_->getX();
