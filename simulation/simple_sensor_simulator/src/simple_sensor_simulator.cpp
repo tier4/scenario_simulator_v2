@@ -96,6 +96,7 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   pedestrians_.clear();
   misc_objects_.clear();
   entity_status_.clear();
+  osi_bb_cache_.clear();
   return res;
 }
 
@@ -376,6 +377,11 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
     }
   }
 
+  // OSI path: spawn lists are empty; use bounding boxes cached from GroundTruth messages
+  if (auto it = osi_bb_cache_.find(name); it != osi_bb_cache_.end()) {
+    return it->second;
+  }
+
   THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
 }
 
@@ -422,8 +428,8 @@ auto ScenarioSimulator::processGroundTruth(const osi3::GroundTruth & gt) -> osi3
 
   // Update all entity states
   for (const auto & entity : frame.moving_entities) {
-    auto proto_status = osi_bridge::toProtoEntityStatus(entity);
-    entity_status_[entity.name] = proto_status;
+    if (entity.name.empty()) continue;
+    entity_status_[entity.name] = osi_bridge::toProtoEntityStatus(entity);
   }
 
   // Update traffic lights
@@ -484,9 +490,7 @@ auto ScenarioSimulator::processGroundTruth(const osi3::GroundTruth & gt) -> osi3
       *status.mutable_name() = map_element.second.name();
       *status.mutable_type() = map_element.second.type();
       *status.mutable_subtype() = map_element.second.subtype();
-      if (isEntityExists(status.name())) {
-        *status.mutable_bounding_box() = getBoundingBox(status.name());
-      }
+      *status.mutable_bounding_box() = getBoundingBox(status.name());
       return status;
     });
   sensor_sim_.updateSensorFrame(
@@ -505,8 +509,8 @@ auto ScenarioSimulator::processGroundTruth(const osi3::GroundTruth & gt) -> osi3
 auto ScenarioSimulator::handleOsiSpawn(const osi_interface::GroundTruthFrame & frame) -> void
 {
   for (const auto & entity : frame.spawned_moving) {
+    if (entity.name.empty()) continue;
     if (entity.type == osi_interface::EntityType::EGO && !ego_entity_simulation_) {
-      // Create EgoEntitySimulation with default parameters
       auto params = osi_bridge::makeDefaultVehicleParameters(entity);
       auto initial_status = osi_bridge::toRosMsgEntityStatus(entity);
       initial_status.bounding_box = params.bounding_box;
@@ -515,6 +519,10 @@ auto ScenarioSimulator::handleOsiSpawn(const osi_interface::GroundTruthFrame & f
         get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
         common::getParameter<bool>(
           get_node_parameters_interface(), "consider_acceleration_by_road_slope", false));
+      simulation_interface::toProto(initial_status.bounding_box, osi_bb_cache_[entity.name]);
+    } else {
+      simulation_interface::toProto(
+        osi_bridge::toRosMsgEntityStatus(entity).bounding_box, osi_bb_cache_[entity.name]);
     }
   }
 }
@@ -532,6 +540,7 @@ auto ScenarioSimulator::handleOsiDespawn(const osi_interface::GroundTruthFrame &
       }
     }
     entity_status_.erase(name);
+    osi_bb_cache_.erase(name);
   }
 }
 }  // namespace simple_sensor_simulator

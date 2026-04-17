@@ -165,6 +165,7 @@ private:
   rclcpp::Time current_ros_time_;
   bool initialized_;
   std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
+  std::map<std::string, traffic_simulator_msgs::BoundingBox> osi_bb_cache_;
   simulation_api_schema::UpdateTrafficLightsRequest traffic_signals_states_;
   traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string & name);
   zeromq::MultiServer server_;

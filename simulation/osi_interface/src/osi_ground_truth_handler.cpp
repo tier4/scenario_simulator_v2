@@ -23,6 +23,29 @@ auto OsiGroundTruthHandler::parseGroundTruth(const osi3::GroundTruth & gt) -> Gr
 {
   GroundTruthFrame frame;
 
+  // Pre-populate registry from source_reference so that fromOsiMovingObject can resolve names.
+  // The client embeds the entity name in source_reference[0].identifier[0] via toOsiMovingObject,
+  // but the server-side registry starts empty and must be seeded from the incoming message.
+  auto registerFromSourceRef = [this](uint64_t id, const auto & source_refs) {
+    if (registry_.reverseLookup(id).has_value()) return;
+    for (const auto & ref : source_refs) {
+      for (const auto & identifier : ref.identifier()) {
+        if (!identifier.empty()) {
+          registry_.insertMapping(identifier, id);
+          return;
+        }
+      }
+    }
+  };
+  for (int i = 0; i < gt.moving_object_size(); ++i) {
+    const auto & obj = gt.moving_object(i);
+    if (obj.has_id()) registerFromSourceRef(obj.id().value(), obj.source_reference());
+  }
+  for (int i = 0; i < gt.stationary_object_size(); ++i) {
+    const auto & obj = gt.stationary_object(i);
+    if (obj.has_id()) registerFromSourceRef(obj.id().value(), obj.source_reference());
+  }
+
   // Timestamp
   if (gt.has_timestamp()) {
     frame.simulation_time = fromOsiTimestamp(gt.timestamp());

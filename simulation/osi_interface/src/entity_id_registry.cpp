@@ -33,6 +33,15 @@ auto EntityIdRegistry::assign(const std::string & name) -> osi3::Identifier
   return id;
 }
 
+auto EntityIdRegistry::insertMapping(const std::string & name, uint64_t id) -> void
+{
+  name_to_id_[name] = id;
+  id_to_name_[id] = name;
+  if (id >= next_id_) {
+    next_id_ = id + 1;
+  }
+}
+
 auto EntityIdRegistry::lookup(const std::string & name) const -> std::optional<osi3::Identifier>
 {
   if (auto it = name_to_id_.find(name); it != name_to_id_.end()) {

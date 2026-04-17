@@ -31,6 +31,9 @@ public:
 
   auto assign(const std::string & name) -> osi3::Identifier;
 
+  // Register a name with a specific ID received from an external source (e.g., OSI message).
+  auto insertMapping(const std::string & name, uint64_t id) -> void;
+
   auto lookup(const std::string & name) const -> std::optional<osi3::Identifier>;
 
   auto reverseLookup(uint64_t id) const -> std::optional<std::string>;
