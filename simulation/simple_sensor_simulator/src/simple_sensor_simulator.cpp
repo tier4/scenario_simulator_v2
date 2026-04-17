@@ -167,11 +167,9 @@ auto ScenarioSimulator::updateEntityStatus(
           traffic_simulator_msgs::msg::EntityStatus ego_status_msg;
           simulation_interface::toMsg(status, ego_status_msg);
           ego_entity_simulation_->overwrite(
-            ego_status_msg, current_scenario_time_ + step_time_, step_time_,
-            req.npc_logic_started());
+            ego_status_msg, current_scenario_time_ + step_time_, step_time_);
         } else {
-          ego_entity_simulation_->update(
-            current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
+          ego_entity_simulation_->update(current_scenario_time_ + step_time_, step_time_);
         }
         simulation_api_schema::EntityStatus ego_status;
         simulation_interface::toProto(ego_entity_simulation_->getStatus(), ego_status);
@@ -442,9 +440,6 @@ auto ScenarioSimulator::processGroundTruth(const osi3::GroundTruth & gt) -> osi3
   bool ego_updated = false;
 
   if (!frame.ego_name.empty() && ego_entity_simulation_) {
-    npc_logic_started_ =
-      common::getParameter<bool>(get_node_parameters_interface(), "npc_logic_started", false);
-
     // Find ego entity in the frame
     for (const auto & entity : frame.moving_entities) {
       if (entity.name == frame.ego_name) {
@@ -456,10 +451,9 @@ auto ScenarioSimulator::processGroundTruth(const osi3::GroundTruth & gt) -> osi3
           autoware_vehicle_msgs::msg::ControlModeReport::MANUAL) {
           ego_entity_simulation_->autoware->setManualMode();
           ego_entity_simulation_->overwrite(
-            ego_msg, current_scenario_time_ + step_time_, step_time_, npc_logic_started_);
+            ego_msg, current_scenario_time_ + step_time_, step_time_);
         } else {
-          ego_entity_simulation_->update(
-            current_scenario_time_ + step_time_, step_time_, npc_logic_started_);
+          ego_entity_simulation_->update(current_scenario_time_ + step_time_, step_time_);
         }
 
         // Get updated ego status

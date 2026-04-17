@@ -94,10 +94,9 @@ public:
 
   auto overwrite(
     const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
-    const double step_time, bool is_npc_logic_started) -> void;
+    const double step_time) -> void;
 
-  auto update(const double current_time, const double step_time, const bool is_npc_logic_started)
-    -> void;
+  auto update(const double current_time, const double step_time) -> void;
 
   auto requestSpeedChange(double value) -> void;
 

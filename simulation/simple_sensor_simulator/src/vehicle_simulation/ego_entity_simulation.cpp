@@ -23,6 +23,25 @@
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
+namespace
+{
+auto isMotionAllowedGear(const int gear_command) -> bool
+{
+  using GearCommand = autoware_vehicle_msgs::msg::GearCommand;
+  return gear_command == GearCommand::DRIVE || gear_command == GearCommand::DRIVE_2 ||
+         gear_command == GearCommand::DRIVE_3 || gear_command == GearCommand::DRIVE_4 ||
+         gear_command == GearCommand::DRIVE_5 || gear_command == GearCommand::DRIVE_6 ||
+         gear_command == GearCommand::DRIVE_7 || gear_command == GearCommand::DRIVE_8 ||
+         gear_command == GearCommand::DRIVE_9 || gear_command == GearCommand::DRIVE_10 ||
+         gear_command == GearCommand::DRIVE_11 || gear_command == GearCommand::DRIVE_12 ||
+         gear_command == GearCommand::DRIVE_13 || gear_command == GearCommand::DRIVE_14 ||
+         gear_command == GearCommand::DRIVE_15 || gear_command == GearCommand::DRIVE_16 ||
+         gear_command == GearCommand::DRIVE_17 || gear_command == GearCommand::DRIVE_18 ||
+         gear_command == GearCommand::LOW || gear_command == GearCommand::LOW_2 ||
+         gear_command == GearCommand::REVERSE || gear_command == GearCommand::REVERSE_2;
+}
+}  // namespace
+
 namespace vehicle_simulation
 {
 EgoEntitySimulation::EgoEntitySimulation(
@@ -221,7 +240,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
 
 auto EgoEntitySimulation::overwrite(
   const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
-  const double step_time, const bool is_npc_logic_started) -> void
+  const double step_time) -> void
 {
   using math::geometry::convertQuaternionToEulerAngle;
   using math::geometry::getRotationMatrix;
@@ -241,7 +260,7 @@ auto EgoEntitySimulation::overwrite(
                                              status.pose.position.y - initial_pose_.position.y,
                                              status.pose.position.z - initial_pose_.position.z);
 
-  if (is_npc_logic_started) {
+  {
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
         initial_rotation_matrix_.transpose() * getRotationMatrix(status.pose.orientation));
@@ -294,8 +313,7 @@ auto EgoEntitySimulation::overwrite(
   updatePreviousValues();
 }
 
-void EgoEntitySimulation::update(
-  const double current_time, const double step_time, const bool is_npc_logic_started)
+void EgoEntitySimulation::update(const double current_time, const double step_time)
 {
   using math::geometry::getRotationMatrix;
 
@@ -312,13 +330,13 @@ void EgoEntitySimulation::update(
                                status_.getMapPose().position.y - initial_pose_.position.y,
                                status_.getMapPose().position.z - initial_pose_.position.z);
 
-  if (is_npc_logic_started) {
+  const auto [speed, acceleration, tire_angle, gear_sign, gear_command] =
+    autoware->getVehicleCommand();
+
+  if (isMotionAllowedGear(gear_command)) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
     auto acceleration_by_slope = calculateAccelerationBySlope();
-
-    const auto [speed, acceleration, tire_angle, gear_sign, gear_command] =
-      autoware->getVehicleCommand();
 
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:

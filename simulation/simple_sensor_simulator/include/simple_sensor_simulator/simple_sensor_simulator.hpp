@@ -151,7 +151,6 @@ private:
   std::unique_ptr<osi_interface::OsiZmqServer> osi_server_;
   bool use_osi_protocol_{false};
   bool osi_initialized_{false};
-  bool npc_logic_started_{false};
 
   // --- Legacy + shared state ---
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
