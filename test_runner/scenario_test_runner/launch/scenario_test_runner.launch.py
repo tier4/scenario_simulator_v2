@@ -232,10 +232,30 @@ def launch_setup(context, *args, **kwargs):
         if (it := collect_vehicle_parameters()) != []:
             parameters += it
 
-        def collect_prefixed_parameters():
-            return [item[0][9:] + ':=' + item[1] for item in context.launch_configurations.items() if item[0][:9] == 'autoware.']
+        def collect_prefixed_launch_configurations(prefix):
+            return [
+                (key[len(prefix):], value)
+                for key, value in context.launch_configurations.items()
+                if key.startswith(prefix)
+            ]
+
+        def to_typed_scalar(value):
+            if value.lower() == "true":
+                return True
+            if value.lower() == "false":
+                return False
+            for convert in (int, float):
+                try:
+                    return convert(value)
+                except ValueError:
+                    pass
+            return value
 
         if (it := collect_prefixed_parameters()) != []:
+        def format_autoware_parameters(items):
+            return [key + ":=" + value for key, value in items]
+
+        if (it := format_autoware_parameters(collect_prefixed_launch_configurations("autoware."))) != []:
             parameters += [{"autoware.": it}]
 
         path = Path(parameter_file_path.perform(context))
