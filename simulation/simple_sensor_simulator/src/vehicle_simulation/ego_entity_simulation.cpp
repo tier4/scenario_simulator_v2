@@ -28,17 +28,8 @@ namespace
 auto isMotionAllowedGear(const int gear_command) -> bool
 {
   using GearCommand = autoware_vehicle_msgs::msg::GearCommand;
-  return gear_command == GearCommand::DRIVE || gear_command == GearCommand::DRIVE_2 ||
-         gear_command == GearCommand::DRIVE_3 || gear_command == GearCommand::DRIVE_4 ||
-         gear_command == GearCommand::DRIVE_5 || gear_command == GearCommand::DRIVE_6 ||
-         gear_command == GearCommand::DRIVE_7 || gear_command == GearCommand::DRIVE_8 ||
-         gear_command == GearCommand::DRIVE_9 || gear_command == GearCommand::DRIVE_10 ||
-         gear_command == GearCommand::DRIVE_11 || gear_command == GearCommand::DRIVE_12 ||
-         gear_command == GearCommand::DRIVE_13 || gear_command == GearCommand::DRIVE_14 ||
-         gear_command == GearCommand::DRIVE_15 || gear_command == GearCommand::DRIVE_16 ||
-         gear_command == GearCommand::DRIVE_17 || gear_command == GearCommand::DRIVE_18 ||
-         gear_command == GearCommand::LOW || gear_command == GearCommand::LOW_2 ||
-         gear_command == GearCommand::REVERSE || gear_command == GearCommand::REVERSE_2;
+  return gear_command != GearCommand::NONE && gear_command != GearCommand::NEUTRAL &&
+         gear_command != GearCommand::PARK;
 }
 }  // namespace
 
@@ -260,19 +251,18 @@ auto EgoEntitySimulation::overwrite(
                                              status.pose.position.y - initial_pose_.position.y,
                                              status.pose.position.z - initial_pose_.position.z);
 
-  {
-    const auto yaw = [&]() {
-      const auto q = Eigen::Quaterniond(
-        initial_rotation_matrix_.transpose() * getRotationMatrix(status.pose.orientation));
-      geometry_msgs::msg::Quaternion relative_orientation;
-      relative_orientation.x = q.x();
-      relative_orientation.y = q.y();
-      relative_orientation.z = q.z();
-      relative_orientation.w = q.w();
-      return convertQuaternionToEulerAngle(relative_orientation).z;
-    }();
+  const auto yaw = [&]() {
+    const auto q = Eigen::Quaterniond(
+      initial_rotation_matrix_.transpose() * getRotationMatrix(status.pose.orientation));
+    geometry_msgs::msg::Quaternion relative_orientation;
+    relative_orientation.x = q.x();
+    relative_orientation.y = q.y();
+    relative_orientation.z = q.z();
+    relative_orientation.w = q.w();
+    return convertQuaternionToEulerAngle(relative_orientation).z;
+  }();
 
-    switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
+  switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
@@ -308,7 +298,6 @@ auto EgoEntitySimulation::overwrite(
         THROW_SEMANTIC_ERROR(
           "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
     }
-  }
   updateStatus(current_time, step_time);
   updatePreviousValues();
 }
