@@ -15,8 +15,13 @@
 #ifndef TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 #define TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 
+#include <atomic>
+#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <concealer/autoware_universe.hpp>
+#include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <memory>
+#include <nav_msgs/msg/odometry.hpp>
+#include <tf2_msgs/msg/tf_message.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
@@ -76,6 +81,27 @@ public:
 
 private:
   SimModelExternal * external_model_ = nullptr;
+
+  std::optional<concealer::Subscriber<nav_msgs::msg::Odometry>> ego_odometry_sub_;
+
+  std::optional<concealer::Subscriber<geometry_msgs::msg::AccelWithCovarianceStamped>>
+    ego_accel_sub_;
+
+  rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
+    external_initial_pose_pub_;
+
+  rclcpp::Publisher<autoware_vehicle_msgs::msg::Engage>::SharedPtr engage_pub_;
+
+  // For EXTERNAL mode: delay /initialpose3d until map->viewer TF arrives via /tf
+  rclcpp::Subscription<tf2_msgs::msg::TFMessage>::SharedPtr tf_viewer_sub_;
+  geometry_msgs::msg::PoseWithCovarianceStamped external_initial_pose_msg_;
+  std::atomic<bool> map_viewer_tf_received_{false};
+  rclcpp::TimerBase::SharedPtr post_tf_timer_;
+
+  // For EXTERNAL mode: gear bootstrap to break shift_decider PARK deadlock
+  rclcpp::Publisher<autoware_vehicle_msgs::msg::GearCommand>::SharedPtr gear_cmd_bootstrap_pub_;
+  rclcpp::TimerBase::SharedPtr gear_bootstrap_timer_;
+
   auto getCurrentPose(const double pitch_angle = 0.0) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;

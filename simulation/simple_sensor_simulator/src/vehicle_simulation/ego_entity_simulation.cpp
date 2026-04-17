@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <autoware_vehicle_msgs/msg/engage.hpp>
 #include <concealer/autoware_universe.hpp>
+#include <concealer/service.hpp>
 #include <filesystem>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
+#include <geometry/transform.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
@@ -44,6 +47,145 @@ EgoEntitySimulation::EgoEntitySimulation(
 {
   setStatus(initial_status);
   autoware->set_parameter(use_sim_time);
+
+  if (vehicle_model_type_ == VehicleModelType::EXTERNAL) {
+    external_model_ = dynamic_cast<SimModelExternal *>(vehicle_model_ptr_.get());
+
+    ego_accel_sub_.emplace("/localization/acceleration", rclcpp::QoS(1), *autoware);
+
+    ego_odometry_sub_.emplace(
+      "/localization/kinematic_state", rclcpp::QoS(1), *autoware,
+      [this, count = std::make_shared<int>(0)](const nav_msgs::msg::Odometry & msg) {
+        const double z = msg.pose.pose.position.z;
+        // Log first 10 messages and any large z-drops (potential falling)
+        if (*count < 10 || z < initial_pose_.position.z - 1.0) {
+          const auto gear_cmd = autoware->getGearCommand().command;
+          RCLCPP_INFO(
+            autoware->get_logger(),
+            "[GODOT_DEBUG] /kinematic_state #%d: z=%.3f (diff=%.3f) gear_cmd=%u "
+            "(0=NONE 1=NEUTRAL 2=DRIVE 20=REVERSE 22=PARK)",
+            *count, z, z - initial_pose_.position.z,
+            gear_cmd);
+        }
+        ++(*count);
+
+        const auto relative = math::geometry::getRelativePose(initial_pose_, msg.pose.pose);
+        const double relative_yaw =
+          math::geometry::convertQuaternionToEulerAngle(relative.orientation).z;
+
+        const double latest_ax = (*ego_accel_sub_)().accel.accel.linear.x;
+        external_model_->setExternalState(
+          relative.position.x, relative.position.y, relative_yaw, msg.twist.twist.linear.x,
+          msg.twist.twist.linear.y, latest_ax, msg.twist.twist.angular.z, 0.0);
+      });
+
+    // Request AUTONOMOUS control mode so that Godot simulator can drive the ego vehicle
+    {
+      concealer::Service<autoware_vehicle_msgs::srv::ControlModeCommand> request_control_mode(
+        "/control/control_mode_request", *autoware);
+      auto request =
+        std::make_shared<autoware_vehicle_msgs::srv::ControlModeCommand::Request>();
+      request->mode = autoware_vehicle_msgs::srv::ControlModeCommand::Request::AUTONOMOUS;
+      request_control_mode(request, 5);
+    }
+
+    external_initial_pose_pub_ =
+      autoware->create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>(
+        "/initialpose3d", rclcpp::QoS(1).transient_local().reliable());
+
+    engage_pub_ = autoware->create_publisher<autoware_vehicle_msgs::msg::Engage>(
+      "/vehicle/engage", rclcpp::QoS(1).transient_local());
+
+    // Prepare the initial pose message (published after map->viewer TF arrives)
+    external_initial_pose_msg_.header.stamp = autoware->get_clock()->now();
+    external_initial_pose_msg_.header.frame_id = "map";
+    external_initial_pose_msg_.pose.pose = initial_pose_;
+
+    // Delay /initialpose3d until map->viewer TF is relayed to /tf.
+    // Godot uses map->viewer to set viewer_offset before spawning the ego vehicle.
+    // Publishing before viewer_offset is set causes the vehicle to spawn at z=0 and fall.
+    RCLCPP_INFO(
+      autoware->get_logger(),
+      "[GODOT_DEBUG] Waiting for map->viewer TF on /tf before publishing /initialpose3d "
+      "(initial_pose: x=%.3f y=%.3f z=%.3f)",
+      initial_pose_.position.x, initial_pose_.position.y, initial_pose_.position.z);
+
+    tf_viewer_sub_ = autoware->create_subscription<tf2_msgs::msg::TFMessage>(
+      "/tf", rclcpp::QoS(100),
+      [this](const tf2_msgs::msg::TFMessage::ConstSharedPtr & tf_msg) {
+        if (map_viewer_tf_received_.load()) {
+          return;
+        }
+        for (const auto & tf : tf_msg->transforms) {
+          if (tf.header.frame_id == "map" && tf.child_frame_id == "viewer") {
+            if (map_viewer_tf_received_.exchange(true)) {
+              return;  // another callback beat us to it
+            }
+            RCLCPP_INFO(
+              autoware->get_logger(),
+              "[GODOT_DEBUG] map->viewer TF received via /tf "
+              "(t=(%.3f, %.3f, %.3f)), will publish /initialpose3d in 2 seconds",
+              tf.transform.translation.x, tf.transform.translation.y,
+              tf.transform.translation.z);
+            // Delay publishing to let Godot process the viewer_offset update first.
+            // /tf and /initialpose3d arrive at Godot almost simultaneously otherwise,
+            // causing spawn before viewer_offset is applied.
+            post_tf_timer_ = rclcpp::create_timer(
+              autoware.get(), autoware->get_clock(), std::chrono::seconds(2),
+              [this]() {
+                post_tf_timer_->cancel();
+
+                // 1) Publish /vehicle/engage=true so Godot switches to AUTONOMOUS control mode.
+                //    Without this, Godot stays in MANUAL mode, _apply_autoware_control() is
+                //    never called, and the gear remains at the initial PARK value.
+                autoware_vehicle_msgs::msg::Engage engage_msg;
+                engage_msg.stamp = autoware->get_clock()->now();
+                engage_msg.engage = true;
+                engage_pub_->publish(engage_msg);
+                RCLCPP_INFO(autoware->get_logger(), "[GODOT_DEBUG] Published /vehicle/engage: true");
+
+                // 2) Publish /initialpose3d now that viewer_offset and engage are ready.
+                RCLCPP_INFO(
+                  autoware->get_logger(),
+                  "[GODOT_DEBUG] Publishing /initialpose3d (2s after map->viewer TF)");
+                external_initial_pose_pub_->publish(external_initial_pose_msg_);
+
+                // 3) Gear bootstrap: publish DRIVE gear_cmd to break shift_decider PARK deadlock.
+                //    autoware_simple_planning_simulator initializes gear to DRIVE, but Godot starts
+                //    at PARK. vehicle_cmd_gate publishes PARK (pre-engage default), overriding
+                //    Godot's default _auto_gear_cmd=DRIVE before Godot can apply it.
+                //    Publish DRIVE at ~100Hz (competing with vehicle_cmd_gate's ~30Hz PARK) until
+                //    the vehicle starts moving (velocity > 0.1 m/s), confirming the deadlock
+                //    is resolved. Higher publish rate makes DRIVE the statistically last message
+                //    Godot receives before each physics frame.
+                using GearCommand = autoware_vehicle_msgs::msg::GearCommand;
+
+                gear_cmd_bootstrap_pub_ =
+                  autoware->create_publisher<GearCommand>("/control/command/gear_cmd", rclcpp::QoS(1));
+
+                gear_bootstrap_timer_ = rclcpp::create_timer(
+                  autoware.get(), autoware->get_clock(), std::chrono::milliseconds(10),
+                  [this]() {
+                    if (vehicle_model_ptr_->getVx() > 0.1) {
+                      RCLCPP_INFO(
+                        autoware->get_logger(),
+                        "Gear bootstrap complete: vehicle moving (vx=%.2f m/s)",
+                        vehicle_model_ptr_->getVx());
+                      gear_bootstrap_timer_->cancel();
+                      gear_cmd_bootstrap_pub_.reset();
+                      return;
+                    }
+                    GearCommand msg;
+                    msg.stamp = autoware->get_clock()->now();
+                    msg.command = GearCommand::DRIVE;
+                    gear_cmd_bootstrap_pub_->publish(msg);
+                  });
+              });
+            break;
+          }
+        }
+      });
+  }
 }
 
 auto toString(const VehicleModelType datum) -> std::string

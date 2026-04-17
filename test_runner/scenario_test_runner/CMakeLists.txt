@@ -12,6 +12,7 @@ install(
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/result_checker.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/lifecycle_controller.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/scenario.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/lanelet_bridge_node.py
   DESTINATION lib/${PROJECT_NAME})
 
 install(
