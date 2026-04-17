@@ -431,6 +431,7 @@ def launch_setup(context, *args, **kwargs):
             ExecuteProcess(
                 cmd=[
                     godot_executable_path,
+                    "--headless",
                     "--vehicle-params",
                     str(
                         Path(get_package_share_directory("scenario_test_runner"))
