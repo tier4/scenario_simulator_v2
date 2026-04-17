@@ -133,11 +133,12 @@ def launch_setup(context, *args, **kwargs):
         if godot_executable_path.is_absolute() or godot_executable_path.parent != Path("."):
             if godot_executable_path.is_file():
                 godot_executable_path = str(godot_executable_path)
-            raise FileNotFoundError(f'Executable "{godot_executable_path}" does not exist.')
-
-        if resolved := shutil.which(godot_executable_path):
+            else:
+                raise FileNotFoundError(f'Executable "{godot_executable_path}" does not exist.')
+        elif resolved := shutil.which(godot_executable_path):
             godot_executable_path = resolved
-        raise FileNotFoundError(f'Executable "{godot_executable_path}" could not be resolved from PATH.')
+        else:
+            raise FileNotFoundError(f'Executable "{godot_executable_path}" could not be resolved from PATH.')
 
     print(f"architecture_type                           := {architecture_type.perform(context)}")
     print(f"autoware_launch_file                        := {autoware_launch_file.perform(context)}")
@@ -427,7 +428,17 @@ def launch_setup(context, *args, **kwargs):
                 output="screen",
                 on_exit=ShutdownOnce(),
             ),
-            ExecuteProcess(cmd=[godot_executable_path], output="screen"),
+            ExecuteProcess(
+                cmd=[
+                    godot_executable_path,
+                    "--vehicle-params",
+                    str(
+                        Path(get_package_share_directory("scenario_test_runner"))
+                        / "config/sakoda_vehicle_params.json"
+                    ),
+                ],
+                output="screen",
+            ),
         ]
         if use_godot_sim
         else []

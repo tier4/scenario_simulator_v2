@@ -1,0 +1,70 @@
+{
+  "common": {
+    "wheel_base": 4.76,
+    "rear_overhang": 1.0,
+    "front_overhang": 1.23,
+    "tread": 1.72,
+    "vehicle_weight": 8000.0,
+    "wheel_radius_param": 0.373,
+    "body_height": 2.2,
+    "body_width_margin": 0.36,
+    "max_engine_force": 15000.0,
+    "max_brake_force": 70.0,
+    "max_steer_angle": 0.61,
+    "reverse_power_ratio": 0.3,
+    "steer_speed_threshold": 30.0,
+    "steer_high_speed_ratio": 0.15,
+    "creep_force": 1500.0,
+    "creep_max_speed": 8.0,
+    "rolling_resistance_coeff": 0.003,
+    "drag_coefficient": 0.45,
+    "frontal_area": 5.4,
+    "air_density": 1.225,
+    "engine_braking_force": 20.0,
+    "understeer_gradient": 0.1,
+    "drivetrain_efficiency": 1.0,
+    "suspension_rest_length_val": 0.4,
+    "suspension_stiffness_val": 50.0,
+    "suspension_travel_val": 0.3,
+    "suspension_max_force_val": 100000.0,
+    "damping_compression_val": 4.0,
+    "damping_relaxation_val": 6.0,
+    "wheel_friction_slip": 20.0,
+    "body_bounce": 0.0,
+    "body_friction": 0.5,
+    "center_of_mass_y": 0.8,
+    "respawn_below_y": -100.0,
+    "flip_respawn_time": 3.0
+  },
+  "input_source": {
+    "preferred_input_source": "control_cmd"
+  },
+  "control_cmd": {
+    "control_accel_response_delay": 0.11039,
+    "control_brake_response_delay": 0.327273,
+    "control_steering_response_delay": 0.0,
+    "control_accel_time_constant": 0.147532,
+    "control_brake_time_constant": 0.5,
+    "control_steering_time_constant": 0.208831,
+    "control_full_brake_decel": 0.939935,
+    "control_cmd_timeout_sec": 0.5
+  },
+  "actuation_cmd": {
+    "actuation_accel_response_delay": 0.363636,
+    "actuation_brake_response_delay": 0.327273,
+    "actuation_steering_response_delay": 0.0,
+    "actuation_accel_time_constant": 0.090909,
+    "actuation_brake_time_constant": 0.5,
+    "actuation_steering_time_constant": 0.208831,
+    "actuation_full_brake_decel": 0.939935,
+    "actuation_accel_full_scale": 286.295905,
+    "actuation_cmd_timeout_sec": 0.5
+  },
+  "sensor_delay": {
+    "tf_delay": 0.0,
+    "odom_delay": 0.0,
+    "velocity_delay": 0.0,
+    "steering_delay": 0.0,
+    "accel_delay": 0.0
+  }
+}
