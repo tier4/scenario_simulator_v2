@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import os
+import shutil
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -112,7 +113,30 @@ def launch_setup(context, *args, **kwargs):
     use_trajectory_based_front_entity_detection = LaunchConfiguration("use_trajectory_based_front_entity_detection", default=False)
     vehicle_model                               = LaunchConfiguration("vehicle_model",                               default="")
     vehicle_id                                  = LaunchConfiguration("vehicle_id",                                  default="default")
+    # Godot simulator options
+    godot_executable                            = LaunchConfiguration("godot_executable",                            default="/home/kotaroyoshimoto/Downloads/godot_autoware_simulator.x86_64")
     # fmt: on
+    vehicle_model_name = vehicle_model.perform(context)
+    use_godot_sim = vehicle_model_name.endswith("_godot")
+    if use_godot_sim:
+        vehicle_model_name = vehicle_model_name[: -len("_godot")]
+    godot_executable_path = ""
+    if use_godot_sim:
+        executable_str = godot_executable.perform(context)
+        if not executable_str:
+            raise ValueError(
+                "godot_executable must be specified when vehicle_model ends with '_godot'. "
+                "Pass godot_executable:=/path/to/godot_autoware_simulator.x86_64"
+            )
+        godot_executable_path = Path(executable_str)
+        if godot_executable_path.is_absolute() or godot_executable_path.parent != Path("."):
+            if godot_executable_path.is_file():
+                godot_executable_path = str(godot_executable_path)
+            raise FileNotFoundError(f'Executable "{godot_executable_path}" does not exist.')
+
+        if resolved := shutil.which(godot_executable_path):
+            godot_executable_path = resolved
+        raise FileNotFoundError(f'Executable "{godot_executable_path}" could not be resolved from PATH.')
 
     print(f"architecture_type                           := {architecture_type.perform(context)}")
     print(f"autoware_launch_file                        := {autoware_launch_file.perform(context)}")
@@ -152,7 +176,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"use_custom_centerline                       := {use_custom_centerline.perform(context)}")
     print(f"use_sim_time                                := {use_sim_time.perform(context)}")
     print(f"use_trajectory_based_front_entity_detection := {use_trajectory_based_front_entity_detection.perform(context)}")
-    print(f"vehicle_model                               := {vehicle_model.perform(context)}")
+    print(f"vehicle_model                               := {vehicle_model_name}")
     print(f"vehicle_id                                  := {vehicle_id.perform(context)}")
 
     def make_launch_prefix():
@@ -191,7 +215,7 @@ def launch_setup(context, *args, **kwargs):
             {"use_custom_centerline": use_custom_centerline},
             {"use_sim_time": use_sim_time},
             {"use_trajectory_based_front_entity_detection": use_trajectory_based_front_entity_detection},
-            {"vehicle_model": vehicle_model},
+            {"vehicle_model": vehicle_model_name},
             {"vehicle_id": vehicle_id},
         ]
 
