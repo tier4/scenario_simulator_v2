@@ -67,18 +67,6 @@ public:
     external_state_.steer = steer;
   }
 
-  /**
-   * @brief Update only the longitudinal acceleration from the external simulator.
-   * Called from the acceleration topic subscription callback.
-   * Thread-safe via mutex.
-   * @param ax  longitudinal acceleration [m/s^2]
-   */
-  void updateAcceleration(double ax)
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    external_state_.ax = ax;
-  }
-
   double getX() override
   {
     std::lock_guard<std::mutex> lock(mutex_);
