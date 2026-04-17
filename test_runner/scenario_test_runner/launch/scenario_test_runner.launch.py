@@ -86,6 +86,7 @@ def launch_setup(context, *args, **kwargs):
     launch_rviz                                 = LaunchConfiguration("launch_rviz",                                 default=False)
     launch_simple_sensor_simulator              = LaunchConfiguration("launch_simple_sensor_simulator",              default=True)
     launch_visualization                        = LaunchConfiguration("launch_visualization",                        default=True)
+    osi_port                                    = LaunchConfiguration("osi_port",                                    default=5556)
     output_directory                            = LaunchConfiguration("output_directory",                            default=Path("/tmp"))
     override_parameters                         = LaunchConfiguration("override_parameters",                         default="")
     parameter_file_path                         = LaunchConfiguration("parameter_file_path",                         default=Path(get_package_share_directory("scenario_test_runner")) / "config/parameters.yaml")
@@ -104,6 +105,7 @@ def launch_setup(context, *args, **kwargs):
     status_monitor_threshold                    = LaunchConfiguration("status_monitor_threshold",                    default=10)
     trajectory_based_detection_offset           = LaunchConfiguration("trajectory_based_detection_offset",           default=0.0)
     use_custom_centerline                       = LaunchConfiguration("use_custom_centerline",                       default=True)
+    use_osi_protocol                            = LaunchConfiguration("use_osi_protocol",                            default=False)
     use_sim_time                                = LaunchConfiguration("use_sim_time",                                default=False)
     use_trajectory_based_front_entity_detection = LaunchConfiguration("use_trajectory_based_front_entity_detection", default=False)
     vehicle_model                               = LaunchConfiguration("vehicle_model",                               default="")
@@ -124,6 +126,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"launch_autoware                             := {launch_autoware.perform(context)}")
     print(f"launch_rviz                                 := {launch_rviz.perform(context)}")
     print(f"launch_visualization                        := {launch_visualization.perform(context)}")
+    print(f"osi_port                                    := {osi_port.perform(context)}")
     print(f"output_directory                            := {output_directory.perform(context)}")
     print(f"override_parameters                         := {override_parameters.perform(context)}")
     print(f"parameter_file_path                         := {parameter_file_path.perform(context)}")
@@ -142,6 +145,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"status_monitor_threshold                    := {status_monitor_threshold.perform(context)}")
     print(f"trajectory_based_detection_offset           := {trajectory_based_detection_offset.perform(context)}")
     print(f"use_custom_centerline                       := {use_custom_centerline.perform(context)}")
+    print(f"use_osi_protocol                            := {use_osi_protocol.perform(context)}")
     print(f"use_sim_time                                := {use_sim_time.perform(context)}")
     print(f"use_trajectory_based_front_entity_detection := {use_trajectory_based_front_entity_detection.perform(context)}")
     print(f"vehicle_model                               := {vehicle_model.perform(context)}")
@@ -163,6 +167,7 @@ def launch_setup(context, *args, **kwargs):
             {"initialize_duration": initialize_duration},
             {"initialize_localization": initialize_localization},
             {"launch_autoware": launch_autoware},
+            {"osi_port": osi_port},
             {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
@@ -177,6 +182,7 @@ def launch_setup(context, *args, **kwargs):
             {"status_monitor_threshold": status_monitor_threshold},
             {"trajectory_based_detection_offset": trajectory_based_detection_offset},
             {"use_custom_centerline": use_custom_centerline},
+            {"use_osi_protocol": use_osi_protocol},
             {"use_sim_time": use_sim_time},
             {"use_trajectory_based_front_entity_detection": use_trajectory_based_front_entity_detection},
             {"vehicle_model": vehicle_model},
@@ -236,6 +242,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("initialize_localization",                     default_value=initialize_localization                    ),
         DeclareLaunchArgument("launch_autoware",                             default_value=launch_autoware                            ),
         DeclareLaunchArgument("launch_rviz",                                 default_value=launch_rviz                                ),
+        DeclareLaunchArgument("osi_port",                                    default_value=osi_port                                   ),
         DeclareLaunchArgument("output_directory",                            default_value=output_directory                           ),
         DeclareLaunchArgument("parameter_file_path",                         default_value=parameter_file_path                        ),
         DeclareLaunchArgument("pedestrian_ignore_see_around",                default_value=pedestrian_ignore_see_around               ),
@@ -250,6 +257,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("status_monitor_threshold",                    default_value=status_monitor_threshold                   ),
         DeclareLaunchArgument("trajectory_based_detection_offset",           default_value=trajectory_based_detection_offset          ),
         DeclareLaunchArgument("use_custom_centerline",                       default_value=use_custom_centerline                      ),
+        DeclareLaunchArgument("use_osi_protocol",                            default_value=use_osi_protocol                           ),
         DeclareLaunchArgument("use_sim_time",                                default_value=use_sim_time                               ),
         DeclareLaunchArgument("use_trajectory_based_front_entity_detection", default_value=use_trajectory_based_front_entity_detection),
         DeclareLaunchArgument("vehicle_model",                               default_value=vehicle_model                              ),
