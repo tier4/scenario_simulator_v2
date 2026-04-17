@@ -3,7 +3,7 @@
 <package format="3">
   <name>osi_interface</name>
   <version>0.1.0</version>
-  <description>OSI (Open Simulation Interface) 3.8.0 integration for scenario_simulator</description>
+  <description>OSI (Open Simulation Interface) integration for scenario_simulator (tracks upstream master)</description>
   <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
   <license>Apache License 2.0</license>
 

@@ -15,9 +15,22 @@ find_package(cppzmq QUIET)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
-# --- OSI proto compilation ---------------------------------------------------
+# --- OSI source fetch --------------------------------------------------------
 
-set(OSI_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../../osi/open-simulation-interface")
+include(FetchContent)
+FetchContent_Declare(
+  open_simulation_interface
+  GIT_REPOSITORY https://github.com/OpenSimulationInterface/open-simulation-interface.git
+  GIT_TAG        master
+  GIT_SHALLOW    TRUE
+)
+FetchContent_GetProperties(open_simulation_interface)
+if(NOT open_simulation_interface_POPULATED)
+  FetchContent_Populate(open_simulation_interface)
+endif()
+set(OSI_SOURCE_DIR "${open_simulation_interface_SOURCE_DIR}")
+
+# --- OSI proto compilation ---------------------------------------------------
 
 # Read VERSION file and generate osi_version.proto
 file(STRINGS "${OSI_SOURCE_DIR}/VERSION" OSI_VERSION_CONTENTS)
@@ -77,7 +90,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 
 target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/generated/>
-  $<INSTALL_INTERFACE:include/>
+  $<INSTALL_INTERFACE:include/osi_interface/>
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -93,12 +106,12 @@ install(TARGETS ${PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
+  INCLUDES DESTINATION include/osi_interface
 )
 
 install(
   DIRECTORY ${CMAKE_BINARY_DIR}/generated/
-  DESTINATION include/
+  DESTINATION include/osi_interface/
 )
 
 # --- Testing -----------------------------------------------------------------
@@ -127,4 +140,4 @@ if(BUILD_TESTING)
   target_link_libraries(test_osi_legacy_equivalence ${PROJECT_NAME})
 endif()
 
-ament_auto_package()
+ament_auto_package(USE_SCOPED_HEADER_INSTALL_DIR)
