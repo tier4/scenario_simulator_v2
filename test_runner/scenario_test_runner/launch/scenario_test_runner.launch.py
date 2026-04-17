@@ -243,12 +243,33 @@ def launch_setup(context, *args, **kwargs):
         ]
 
         def collect_vehicle_parameters():
-            if vehicle_model_name := vehicle_model.perform(context):
+            if vehicle_model_name:
                 description = get_package_share_directory(vehicle_model_name + "_description")
-                return [
-                    description + "/config/vehicle_info.param.yaml",
-                    description + "/config/simulator_model.param.yaml",
-                ]
+                if use_godot_sim:
+                    return [
+                        description + "/config/vehicle_info.param.yaml",
+                        {"vehicle_model_type": "EXTERNAL"},
+                        # Disable all concealer publishers (replaces group-level publish_localization / publish_vehicle_state)
+                        # Localization publishers (simulate_localization=True topics)
+                        {"/localization/acceleration.enabled": False},
+                        {"/localization/kinematic_state.enabled": False},
+                        {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
+                        # Vehicle state publishers
+                        {"/vehicle/status/steering_status.enabled": False},
+                        {"/vehicle/status/gear_status.enabled": False},
+                        {"/vehicle/status/control_mode.enabled": False},
+                        {"/vehicle/status/velocity_status.enabled": False},
+                        {"/vehicle/status/turn_indicators_status.enabled": False},
+                        # TF broadcaster
+                        {"tf.enabled": False},
+                        # Service servers (Godot advertises these via rosbridge instead)
+                        {"/control/control_mode_request.enabled": False},
+                    ]
+                else:
+                    return [
+                        description + "/config/vehicle_info.param.yaml",
+                        description + "/config/simulator_model.param.yaml",
+                    ]
             else:
                 return []
 
@@ -316,6 +337,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("use_sim_time",                                default_value=use_sim_time                               ),
         DeclareLaunchArgument("use_trajectory_based_front_entity_detection", default_value=use_trajectory_based_front_entity_detection),
         DeclareLaunchArgument("vehicle_model",                               default_value=vehicle_model                              ),
+        DeclareLaunchArgument("godot_executable",                            default_value=godot_executable                           ),
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -382,7 +404,34 @@ def launch_setup(context, *args, **kwargs):
             condition=IfCondition(launch_rviz),
             arguments=["-d", str(default_rviz_config_file())],
         ),
-    ]
+    ] + (
+        [
+            IncludeLaunchDescription(
+                FrontendLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("rosbridge_server"),
+                        "launch",
+                        "rosbridge_websocket_launch.xml",
+                    )
+                ),
+                launch_arguments={
+                    "port": "9090",
+                    "max_message_size": "50000000",
+                    "call_services_in_new_thread": "true",
+                }.items(),
+            ),
+            Node(
+                package="scenario_test_runner",
+                executable="lanelet_bridge_node.py",
+                name="lanelet_bridge_node",
+                output="screen",
+                on_exit=ShutdownOnce(),
+            ),
+            ExecuteProcess(cmd=[godot_executable_path], output="screen"),
+        ]
+        if use_godot_sim
+        else []
+    )
 
 
 def generate_launch_description():
