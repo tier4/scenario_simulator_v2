@@ -22,9 +22,10 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, OpaqueFunction
 
 from launch.conditions import IfCondition, UnlessCondition
+from launch.launch_description_sources import FrontendLaunchDescriptionSource
 
 from launch.substitutions import LaunchConfiguration
 
@@ -185,6 +186,28 @@ def launch_setup(context, *args, **kwargs):
         else:
             return ""
 
+    def collect_prefixed_launch_configurations(prefix):
+        return [
+            (key[len(prefix):], value)
+            for key, value in context.launch_configurations.items()
+            if key.startswith(prefix)
+        ]
+
+    def to_typed_scalar(value):
+        if value.lower() == "true":
+            return True
+        if value.lower() == "false":
+            return False
+        for convert in (int, float):
+            try:
+                return convert(value)
+            except ValueError:
+                pass
+        return value
+
+    def make_simple_sensor_simulator_parameters():
+        return [{key: to_typed_scalar(value)} for key, value in collect_prefixed_launch_configurations("simple_sensor_simulator.")]
+
     def make_parameters():
         parameters = [
             {"architecture_type": architecture_type},
@@ -232,26 +255,6 @@ def launch_setup(context, *args, **kwargs):
         if (it := collect_vehicle_parameters()) != []:
             parameters += it
 
-        def collect_prefixed_launch_configurations(prefix):
-            return [
-                (key[len(prefix):], value)
-                for key, value in context.launch_configurations.items()
-                if key.startswith(prefix)
-            ]
-
-        def to_typed_scalar(value):
-            if value.lower() == "true":
-                return True
-            if value.lower() == "false":
-                return False
-            for convert in (int, float):
-                try:
-                    return convert(value)
-                except ValueError:
-                    pass
-            return value
-
-        if (it := collect_prefixed_parameters()) != []:
         def format_autoware_parameters(items):
             return [key + ":=" + value for key, value in items]
 
@@ -338,7 +341,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=make_parameters(),
+            parameters=make_parameters() + make_simple_sensor_simulator_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
             additional_env=make_agnocast_additional_environment(),
         ),
