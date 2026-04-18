@@ -79,7 +79,7 @@ def launch_setup(context, *args, **kwargs):
     consider_acceleration_by_road_slope         = LaunchConfiguration("consider_acceleration_by_road_slope",         default=False)
     consider_pose_by_road_slope                 = LaunchConfiguration("consider_pose_by_road_slope",                 default=True)
     enable_perf                                 = LaunchConfiguration("enable_perf",                                 default=False)
-    enable_stuck_jump                           = LaunchConfiguration("enable_stuck_jump",                           default=True)
+    enable_stuck_jump                           = LaunchConfiguration("enable_stuck_jump",                           default=False)
     global_frame_rate                           = LaunchConfiguration("global_frame_rate",                           default=30.0)
     global_real_time_factor                     = LaunchConfiguration("global_real_time_factor",                     default=1.0)
     global_timeout                              = LaunchConfiguration("global_timeout",                              default=180)
