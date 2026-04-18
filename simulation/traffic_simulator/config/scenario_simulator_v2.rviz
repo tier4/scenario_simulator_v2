@@ -4599,10 +4599,10 @@ Visualization Manager:
       Name: Current View
       Near Clip Distance: 0.009999999776482582
       Scale: 10
-      Target Frame: entities
+      Target Frame: base_link
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 66.42724609375
-      Y: -19.859375
+      X: 0
+      Y: 0
     Saved:
       - Class: rviz_default_plugins/ThirdPersonFollower
         Distance: 18
