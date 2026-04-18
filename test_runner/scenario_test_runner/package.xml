@@ -26,6 +26,7 @@
   <depend>geometry_msgs</depend>
   <depend>rclpy</depend>
   <depend>rosbridge_server</depend>
+  <exec_depend>topic_tools</exec_depend>
   <depend>tf2_ros</depend>
   <depend>simple_sensor_simulator</depend>
   <depend>std_srvs</depend>
