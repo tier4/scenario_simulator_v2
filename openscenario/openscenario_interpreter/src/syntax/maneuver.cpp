@@ -39,7 +39,28 @@ auto Maneuver::run() -> void
       event.evaluate();
       ++index;
     } catch (const SpecialAction<EXIT_FAILURE> & action) {
-      throw SpecialAction<EXIT_FAILURE>(name, "Event", index, action);
+      std::string supplemental;
+      for (auto && other : elements) {
+        const auto & ev = other.as<Event>();
+        if (ev.hasExitSuccessAction()) {
+          const auto unmet = ev.unmetStartTriggerConditions();
+          if (!unmet.empty()) {
+            supplemental += "\nUnmet success conditions:";
+            for (const auto & [cond_name, cond_desc] : unmet) {
+              supplemental += "\n  - ";
+              if (!cond_name.empty()) {
+                supplemental += "\"" + cond_name + "\": ";
+              }
+              supplemental += cond_desc;
+            }
+          }
+        }
+      }
+      if (!supplemental.empty()) {
+        throw SpecialAction<EXIT_FAILURE>(name, "Event", index, action, supplemental);
+      } else {
+        throw SpecialAction<EXIT_FAILURE>(name, "Event", index, action);
+      }
     }
   }
 }

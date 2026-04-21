@@ -51,6 +51,8 @@ struct Trigger : public std::list<ConditionGroup>
 
   auto activeConditionGroupDescription() const -> std::vector<std::pair<std::string, std::string>>;
 
+  auto unmetConditionDescriptions() const -> std::vector<std::pair<std::string, std::string>>;
+
   auto evaluate() -> Object;
 
   // Utility function for some default triggers that are always evaluated to be true

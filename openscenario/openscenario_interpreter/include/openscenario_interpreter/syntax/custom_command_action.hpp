@@ -160,6 +160,22 @@ public:
   {
   }
 
+  // Constructor with inner object and supplemental message appended after the primary message
+  explicit SpecialAction(
+    const std::string & source_name, const std::string & element_name, int element_index,
+    SpecialAction const & inner, const std::string & supplemental_message)
+  : SpecialAction{
+      [inner_fn = inner.make_message, supplemental_message](const std::string & trigger_path) {
+        return inner_fn(trigger_path) + supplemental_message;
+      },
+      source_name,
+      concatenate(
+        '.', element_name, '[',
+        (inner.source_name.empty() ? std::to_string(element_index) : '"' + inner.source_name + '"'),
+        ']', inner.path)}
+  {
+  }
+
   // Constructor with inner but without current source -- last object
   explicit SpecialAction(const std::string & element_name, const SpecialAction & inner)
   : SpecialAction{

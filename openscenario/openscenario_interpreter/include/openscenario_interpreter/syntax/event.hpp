@@ -53,6 +53,10 @@ struct Event : private Scope, public StoryboardElement
 
   auto evaluate() -> Object override;
 
+  auto hasExitSuccessAction() const -> bool;
+
+  auto unmetStartTriggerConditions() const -> std::vector<std::pair<std::string, std::string>>;
+
   friend auto operator<<(boost::json::object &, const Event &) -> boost::json::object &;
 
 private:

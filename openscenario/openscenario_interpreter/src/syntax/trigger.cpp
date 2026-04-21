@@ -65,6 +65,19 @@ auto Trigger::activeConditionGroupDescription() const
   return name_description_vec;
 }
 
+auto Trigger::unmetConditionDescriptions() const -> std::vector<std::pair<std::string, std::string>>
+{
+  std::vector<std::pair<std::string, std::string>> result;
+  for (const auto & group : *this) {
+    for (const auto & condition : group) {
+      if (!condition.current_value) {
+        result.emplace_back(condition.name, condition.description());
+      }
+    }
+  }
+  return result;
+}
+
 auto operator<<(boost::json::object & json, const Trigger & datum) -> boost::json::object &
 {
   json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));

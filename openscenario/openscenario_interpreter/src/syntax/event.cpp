@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
+#include <openscenario_interpreter/syntax/user_defined_action.hpp>
 
 namespace openscenario_interpreter
 {
@@ -54,6 +55,38 @@ auto Event::start() -> void
     assert(element.template is_also<StoryboardElement>());
     element.template as<StoryboardElement>().transitionTo(start_transition);
   }
+}
+
+auto Event::hasExitSuccessAction() const -> bool
+{
+  for (const auto & element : elements) {
+    const auto found = apply<bool>(
+      [](const auto & inner) -> bool {
+        using T = std::decay_t<decltype(inner)>;
+        if constexpr (std::is_same_v<T, UserDefinedAction>) {
+          return apply<bool>(
+            [](const auto & cmd) -> bool {
+              using U = std::decay_t<decltype(cmd)>;
+              if constexpr (std::is_same_v<U, CustomCommandAction>) {
+                return cmd.type == "exitSuccess";
+              }
+              return false;
+            },
+            inner);
+        }
+        return false;
+      },
+      element.template as<Action>());
+    if (found) {
+      return true;
+    }
+  }
+  return false;
+}
+
+auto Event::unmetStartTriggerConditions() const -> std::vector<std::pair<std::string, std::string>>
+{
+  return start_trigger.unmetConditionDescriptions();
 }
 
 auto Event::evaluate() -> Object
