@@ -36,6 +36,7 @@ auto operator>>(std::istream & is, ParameterType & datum) -> std::istream &
   }                                          \
   static_assert(true, "")
 
+  BOILERPLATE("int", INTEGER);
   BOILERPLATE("integer", INTEGER);
   BOILERPLATE("double", DOUBLE);
   BOILERPLATE("string", STRING);
@@ -56,7 +57,7 @@ auto operator<<(std::ostream & os, const ParameterType & datum) -> std::ostream 
     return os << NAME;
 
   switch (datum) {
-    BOILERPLATE("integer", INTEGER);
+    BOILERPLATE("int", INTEGER);
     BOILERPLATE("double", DOUBLE);
     BOILERPLATE("string", STRING);
     BOILERPLATE("unsignedInt", UNSIGNED_INT);
