@@ -281,21 +281,23 @@ Visualization Manager:
               Width: 550
           Enabled: true
           Name: Vehicle
-        - Class: rviz_plugins/MrmSummaryOverlayDisplay
+        - Class: autoware_string_stamped_rviz_plugin/StringStampedOverlayDisplay
           Enabled: false
-          Font Size: 10
-          Left: 512
-          Max Letter Num: 100
-          Name: MRM Summary
-          Text Color: 25; 255; 240
-          Top: 64
+          Font Size: 11
+          Left: 10
+          Max Letter Num: 70
+          Name: Error Diag Graph
+          Text Color: 51; 201; 220
+          Time To Erase Last Diag: 2
+          Time To Keep Last Diag: 1
+          Top: 100
           Topic:
-            Depth: 5
+            Depth: 1
             Durability Policy: Volatile
             History Policy: Keep Last
             Reliability Policy: Reliable
-            Value: /system/emergency/hazard_status
-          Value: false
+            Value: /logging_diag_graph/debug/error_graph_text
+          Value: true
           Value height offset: 0
       Enabled: true
       Name: System
