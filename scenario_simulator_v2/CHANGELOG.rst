@@ -2,6 +2,11 @@
 Changelog for package scenario_simulator_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.19 (2026-04-30)
+--------------------
+* Merge branch 'master' into fix/rviz-config
+* Contributors: Kotaro Yoshimoto
+
 25.0.18 (2026-04-30)
 --------------------
 

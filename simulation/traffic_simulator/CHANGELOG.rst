@@ -2,6 +2,14 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.19 (2026-04-30)
+--------------------
+* Merge pull request `#1837 <https://github.com/tier4/scenario_simulator_v2/issues/1837>`_ from mitsudome-r/fix/rviz-config
+  fix: remove deleted MrmSummaryOverlayDisplay
+* Merge branch 'master' into fix/rviz-config
+* fix: remove deleted MrmSummaryOverlayDisplay
+* Contributors: Kotaro Yoshimoto, Ryohsuke Mitsudome
+
 25.0.18 (2026-04-30)
 --------------------
 * Merge pull request `#1838 <https://github.com/tier4/scenario_simulator_v2/issues/1838>`_ from mitsudome-r/feat/support-jazzy-docker
