@@ -2,6 +2,13 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.18 (2026-04-30)
+--------------------
+* Merge pull request `#1838 <https://github.com/tier4/scenario_simulator_v2/issues/1838>`_ from mitsudome-r/feat/support-jazzy-docker
+  feat: add jazzy support for docker image
+* ignore overloaded-virtual for arm64
+* Contributors: Kotaro Yoshimoto, Ryohsuke Mitsudome
+
 25.0.17 (2026-03-27)
 --------------------
 
