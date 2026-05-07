@@ -57,7 +57,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.cmake_build_type }} \
             -DBUILD_CPP_MOCK_SCENARIOS=ON \
             -DBUILD_TESTING=true \
-            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess -Wno-unused-local-typedefs -Wno-error=redundant-move -Wno-error=pessimizing-move' \
+            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage' \
             -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
         shell: bash
 
