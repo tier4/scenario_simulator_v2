@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>default_vehicle_description</name>
+  <version>25.0.14</version>
+  <description>Default vehicle description for scenario_simulator_v2 (used as fallback when no vehicle model is specified)</description>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <license>Apache License 2.0</license>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
