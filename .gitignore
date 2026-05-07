@@ -23,3 +23,6 @@ scenario_simulator.tar
 site
 *.pyc
 build
+
+# workspace configuration
+ros_workspace.txt
