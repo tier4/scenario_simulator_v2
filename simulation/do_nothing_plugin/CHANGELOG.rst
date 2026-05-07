@@ -2,6 +2,9 @@
 Changelog for package do_nothing_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.20 (2026-05-07)
+--------------------
+
 25.0.19 (2026-04-30)
 --------------------
 * Merge branch 'master' into fix/rviz-config
