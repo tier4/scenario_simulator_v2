@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(traffic_simulator)
 
-add_compile_options(-Wno-error=class-memaccess)
+add_compile_options(-Wno-error=class-memaccess -Wno-error=unused-local-typedefs)
 
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
