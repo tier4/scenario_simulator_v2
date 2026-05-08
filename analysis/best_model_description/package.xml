@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>best_model_description</name>
+  <version>0.1.0</version>
+  <description>The j6_gen2_description package</description>
+
+  <maintainer email="tomohito.ando@tier4.jp">Tomohito Ando</maintainer>
+  <license>Apache2</license>
+
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

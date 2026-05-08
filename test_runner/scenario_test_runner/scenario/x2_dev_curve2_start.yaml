@@ -1,0 +1,259 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 1
+    date: "2026-05-08T00:00:00.000Z"
+    description: "x2_dev/2231 カーブ②上流スポーン→信号停車→発進（DiffusionPlanner接近コンテキスト付き）"
+    author: Kotaro Yoshimoto
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: RoutingAction__use_lane_ids_for_routing
+        parameterType: boolean
+        value: true
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: /home/kotaroyoshimoto/.webauto/simulation/data/map/x2_dev/2231/2231-20260331083910239532/lanelet2_map.osm
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: "autoware_participant_model/Ego"
+            Properties:
+              Property: []
+  Storyboard:
+    Init:
+      Actions:
+        GlobalAction:
+          - InfrastructureAction:
+              TrafficSignalAction:
+                TrafficSignalStateAction:
+                  name: "10583"
+                  state: "red solidOn circle"
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position: &INITIAL_POSITION
+                    WorldPosition:
+                      x: 89436.3283
+                      y: 43222.8647
+                      z: 6.0364
+                      h: -0.990080
+              - RoutingAction:
+                  AssignRouteAction:
+                    Route:
+                      name: ""
+                      closed: false
+                      Waypoint:
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1501"
+                              s: 1
+                              Orientation: &DEFAULT_ORIENTATION
+                                type: relative
+                                h: 0
+                                p: 0
+                                r: 0
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1527"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1505"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1004"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "162"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "164"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "166"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "168"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1128"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "74"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position: &DESTINATION
+                            LanePosition:
+                              roadId: ""
+                              laneId: "76"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+    Story:
+      - name: ""
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ""
+                                            laneId: "1527"
+                                            s: 1
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        tolerance: 15
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 180
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: act_traffic_light
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: act_traffic_light
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: switch_signal_10583_to_green
+                        priority: parallel
+                        Action:
+                          - name: ""
+                            GlobalAction:
+                              InfrastructureAction:
+                                TrafficSignalAction:
+                                  TrafficSignalStateAction:
+                                    name: "10583"
+                                    state: "green solidOn circle"
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: wait_ego_at_signal
+                                  delay: 15
+                                  conditionEdge: rising
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ""
+                                            laneId: "176193"
+                                            s: 20
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        tolerance: 8
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

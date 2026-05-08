@@ -1,0 +1,378 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 1
+    date: "2026-04-22T00:00:00.000Z"
+    description: "x2_dev/2231 テレポート駅→日本科学未来館"
+    author: Kotaro Yoshimoto
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: RoutingAction__use_lane_ids_for_routing
+        parameterType: boolean
+        value: true
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: /home/kotaroyoshimoto/.webauto/simulation/data/map/x2_dev/2231/2231-20260331083910239532/lanelet2_map.osm
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: "autoware_participant_model/Ego"
+            Properties:
+              Property: []
+  Storyboard:
+    Init:
+      Actions:
+        GlobalAction:
+          - InfrastructureAction:
+              TrafficSignalAction:
+                TrafficSignalStateAction:
+                  name: "10583"
+                  state: "red solidOn circle"
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position: &INITIAL_POSITION
+                    WorldPosition:
+                      x: 89437.62156113786
+                      y: 43220.88020597574
+                      z: 6.070793748963217
+                      h: -0.980303
+                      p: 0
+                      r: 0
+              - RoutingAction:
+                  AssignRouteAction:
+                    Route:
+                      name: ""
+                      closed: false
+                      Waypoint:
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "2314486"
+                              s: 1
+                              Orientation: &DEFAULT_ORIENTATION
+                                type: relative
+                                h: 0
+                                p: 0
+                                r: 0
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "2224586"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "2224585"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "2304202"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "2304203"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "176191"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "176193"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "190336"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1501"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1527"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1505"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1004"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "162"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "164"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "166"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "168"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1128"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "74"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "76"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "79"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1115"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "1272"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "178766"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "177585"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position:
+                            LanePosition:
+                              roadId: ""
+                              laneId: "179452"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+                        - Position: &DESTINATION
+                            LanePosition:
+                              roadId: ""
+                              laneId: "179280"
+                              s: 1
+                              Orientation: *DEFAULT_ORIENTATION
+                          routeStrategy: shortest
+    Story:
+      - name: ""
+        Act:
+          - name: act_traffic_light
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: act_traffic_light
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: switch_signal_10583_to_green
+                        priority: parallel
+                        Action:
+                          - name: ""
+                            GlobalAction:
+                              InfrastructureAction:
+                                TrafficSignalAction:
+                                  TrafficSignalStateAction:
+                                    name: "10583"
+                                    state: "green solidOn circle"
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ego_reached_stop_line_2583
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ""
+                                            laneId: "190336"
+                                            s: 0
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        tolerance: 10
+                                - name: ego_is_stopped
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      SpeedCondition:
+                                        rule: lessThan
+                                        value: 0.1
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ""
+                                            laneId: "164"
+                                            s: 1
+                                            Orientation: *DEFAULT_ORIENTATION
+                                        tolerance: 15
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 600
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

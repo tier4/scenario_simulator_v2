@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <arg name="is_main_ecu" default="true"/>
+  <arg name="is_redundant" default="false"/>
+  <arg name="main_vcu_can_device" default="fintekcan0"/>
+  <arg name="sub_vcu_can_device" default="peakcan0"/>
+  <arg name="brake_can_device" default="peakcan1"/>
+  <arg name="vehicle_id" default="$(env VEHICLE_ID default)"/>
+  <arg name="accel_brake_map_calib_param" default="$(find-pkg-share j6_gen2_launch)/config/accel_brake_map_calibrator.param.yaml"/>
+  <arg name="steer_offset_estimator_param" default="$(find-pkg-share j6_gen2_launch)/config/steer_offset_estimator.param.yaml"/>
+  <arg name="csv_accel_brake_map_path" default="$(find-pkg-share individual_params)/config/$(var vehicle_id)/vehicle"/>
+  <arg name="USE_ACCEL_BREAK_MAP_FROM_FMS" default="$(env USE_ACCEL_BREAK_MAP_FROM_FMS false)"/>
+
+  <group>
+    <push-ros-namespace namespace="j6"/>
+    <!-- j6 can interface -->
+    <include file="$(find-pkg-share j6_can_interface)/launch/j6_can_interface.launch.xml">
+      <arg name="is_main_ecu" value="$(var is_main_ecu)"/>
+      <arg name="main_vcu_can_device" value="$(var main_vcu_can_device)"/>
+      <arg name="sub_vcu_can_device" value="$(var sub_vcu_can_device)"/>
+      <arg name="brake_can_device" value="$(var brake_can_device)"/>
+    </include>
+    <!-- j6 interface -->
+    <include file="$(find-pkg-share j6_interface)/launch/j6_interface.launch.xml">
+      <arg name="is_redundant" value="$(var is_redundant)"/>
+      <arg name="velocity_collection_param_path" value="$(find-pkg-share individual_params)/config/$(var vehicle_id)/vehicle/velocity_collection.param.yaml"/>
+      <arg name="steering_collection_param_path" value="$(find-pkg-share individual_params)/config/$(var vehicle_id)/vehicle/steering_collection.param.yaml"/>
+    </include>
+    <!-- j6 interface metrics msg converter -->
+    <include file="$(find-pkg-share j6_interface_metrics_msg_converter)/launch/j6_interface_metrics_msg_converter.launch.xml"/>
+  </group>
+
+  <group>
+    <include file="$(find-pkg-share max_speed_selector)/launch/max_speed_selector.launch.xml"/>
+  </group>
+
+  <group>
+    <push-ros-namespace namespace="main"/>
+    <include file="$(find-pkg-share autoware_raw_vehicle_cmd_converter)/launch/raw_vehicle_converter.launch.xml">
+      <arg name="config_file" value="$(find-pkg-share j6_gen2_launch)/config/raw_vehicle_cmd_converter.param.yaml"/>
+    </include>
+  </group>
+  <group>
+    <push-ros-namespace namespace="sub"/>
+    <include file="$(find-pkg-share autoware_raw_vehicle_cmd_converter)/launch/raw_vehicle_converter.launch.xml">
+      <arg name="config_file" value="$(find-pkg-share j6_gen2_launch)/config/raw_vehicle_cmd_converter.sub.param.yaml"/>
+      <arg name="output_actuation_cmd" value="/control/command/sub_actuation_cmd"/>
+    </include>
+  </group>
+  <group>
+    <push-ros-namespace namespace="regeneration"/>
+    <include file="$(find-pkg-share autoware_raw_vehicle_cmd_converter)/launch/raw_vehicle_converter.launch.xml">
+      <arg name="config_file" value="$(find-pkg-share j6_gen2_launch)/config/raw_vehicle_cmd_converter.regeneration.param.yaml"/>
+      <arg name="output_actuation_cmd" value="/control/command/regeneration_actuation_cmd"/>
+    </include>
+  </group>
+
+  <!-- accel brake map calibrator -->
+  <group>
+    <push-ros-namespace namespace="vehicle/calibration/"/>
+    <!-- conditionally set csv_default_map_dir based on USE_ACCEL_BREAK_MAP_FROM_FMS -->
+    <let name="csv_default_map_dir" value="/opt/autoware/calibration_parameters/vehicle/" if="$(eval &quot;'$(var USE_ACCEL_BREAK_MAP_FROM_FMS)' == 'true'&quot;)"/>
+    <let name="csv_default_map_dir" value="$(var csv_accel_brake_map_path)/" unless="$(eval &quot;'$(var USE_ACCEL_BREAK_MAP_FROM_FMS)' == 'true'&quot;)"/>
+
+    <include file="$(find-pkg-share autoware_accel_brake_map_calibrator)/launch/accel_brake_map_calibrator.launch.xml">
+      <arg name="csv_default_map_dir" value="$(var csv_default_map_dir)"/>
+      <arg name="accel_brake_map_calib_param" value="$(var accel_brake_map_calib_param)"/>
+      <arg name="rviz" value="false"/>
+    </include>
+
+    <!-- steer offset estimator -->
+    <include file="$(find-pkg-share autoware_steer_offset_estimator)/launch/steer_offset_estimator.launch.xml">
+      <arg name="config_file" value="$(var steer_offset_estimator_param)"/>
+      <arg name="initial_steer_offset_param_path" value="$(find-pkg-share individual_params)/config/$(var vehicle_id)/vehicle/steering_collection.param.yaml"/>
+      <arg name="initial_steer_offset_param_name" value="steering_angle_collection_offset"/>
+    </include>
+  </group>
+</launch>

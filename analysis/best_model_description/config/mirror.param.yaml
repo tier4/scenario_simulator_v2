@@ -1,0 +1,16 @@
+/**:
+  ros__parameters:
+    right:
+      min_longitudinal_offset: 4.8
+      max_longitudinal_offset: 5.3
+      min_lateral_offset: -1.3
+      max_lateral_offset: -1.05
+      min_height_offset: 1.85
+      max_height_offset: 2.59
+    left:
+      min_longitudinal_offset: 4.83
+      max_longitudinal_offset: 6.0
+      min_lateral_offset: 0.95
+      max_lateral_offset: 1.28
+      min_height_offset: 1.95
+      max_height_offset: 2.6

@@ -1,0 +1,26 @@
+/**:
+  ros__parameters:
+    simulated_frame_id: "base_link"
+    origin_frame_id: "map"
+    vehicle_model_type: "DELAY_STEER_ACC_GEARED_WO_FALL_GUARD"
+    initialize_source: "INITIAL_POSE_TOPIC"
+    timer_sampling_time_ms: 25
+    add_measurement_noise: False
+    enable_road_slope_simulation: True
+    vel_lim: 50.0
+    vel_rate_lim: 7.0
+    steer_lim: 1.0
+    steer_rate_lim: 5.0
+    acc_time_delay: 0.101
+    acc_time_constant: 0.2589
+    brake_delay: 0.0685
+    brake_time_constant: 0.15
+    departure_vx_threshold: 1.0
+    steer_time_delay: 0.0315
+    steer_time_constant: 0.4983
+    steer_dead_band: 0.0
+    steer_bias: 0.01
+    debug_acc_scaling_factor: 1.0
+    debug_steer_scaling_factor: 1.0
+    x_stddev: 0.0001
+    y_stddev: 0.0001
