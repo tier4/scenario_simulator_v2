@@ -76,7 +76,8 @@ report_curve2:
 	@test -f $(LITE_DIR)/sim_curve2.lite.mcap || \
 	    { echo "[ERROR] lite/sim_curve2.lite.mcap がありません。'make sim_curve2' を実行してください"; exit 1; }
 	cd $(ANALYSIS_DIR) && python3 analyze_real_curve2.py && \
-	    python3 compare_curve2.py
+	    python3 compare_curve2.py && \
+	    python3 analyze_curve2_per_step.py
 
 report:
 	@test -f $(LITE_DIR)/real.lite.mcap || \

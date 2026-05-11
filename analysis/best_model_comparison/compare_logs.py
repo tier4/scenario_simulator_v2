@@ -463,6 +463,25 @@ def _find_curve2_launch(df_vel: pd.DataFrame) -> float | None:
     return float(min(candidates))
 
 
+def _find_curve2_exit(df_kinematic: pd.DataFrame, t_launch: float, radius: float = 30.0) -> float | None:
+    """カーブ②領域（中心 cx=89301, cy=43085 から radius m 以内）を抜け出す時刻 [s] を返す。
+    t_launch 以降の軌跡を走査し、領域に入った後で最初に外に出たタイミングを採用。
+    """
+    cx, cy = CURVE_CENTERS[1]["cx"], CURVE_CENTERS[1]["cy"]
+    df_after = df_kinematic[df_kinematic["t"] >= t_launch]
+    if df_after.empty:
+        return None
+    dist = np.sqrt((df_after["x"].values - cx) ** 2 + (df_after["y"].values - cy) ** 2)
+    t_vals = df_after["t"].values
+    entered = False
+    for ins, t in zip(dist < radius, t_vals):
+        if ins:
+            entered = True
+        elif entered:
+            return float(t)
+    return None
+
+
 def plot_curve2_analysis(data: dict, map_ways: list | None):
     """カーブ②（左折）の一時停止発進からの挙動を軌跡＋時系列で比較。
 
@@ -493,8 +512,8 @@ def plot_curve2_analysis(data: dict, map_ways: list | None):
     ax_acc  = fig.add_subplot(gs[1, 1])   # 下段中: 加速度
     ax_str  = fig.add_subplot(gs[1, 2])   # 下段右: ステアリング
 
-    # 表示時間範囲（発進前2s ～ 発進後25s）
-    T_PRE, T_POST = -2.0, 25.0
+    # 表示時間範囲（発進前2s ～ カーブ②退出後2s）
+    T_PRE = -2.0
 
     # カーブ②表示範囲
     c2 = CURVE_CENTERS[1]
@@ -512,9 +531,11 @@ def plot_curve2_analysis(data: dict, map_ways: list | None):
         if label not in launch_t:
             continue
         t_l = launch_t[label]
+        t_exit = _find_curve2_exit(d["kinematic"], t_l)
+        t_post = (t_exit - t_l + 2.0) if t_exit is not None else 25.0
         df_k = d["kinematic"]
-        # 発進前2s〜発進後25s の軌跡
-        seg = df_k[(df_k["t"] >= t_l + T_PRE) & (df_k["t"] <= t_l + T_POST)]
+        # 発進前2s〜カーブ②退出後2s の軌跡
+        seg = df_k[(df_k["t"] >= t_l + T_PRE) & (df_k["t"] <= t_l + t_post)]
         if seg.empty:
             continue
         _traj_plot(ax_map, seg, d, label, markevery=8)
@@ -530,7 +551,7 @@ def plot_curve2_analysis(data: dict, map_ways: list | None):
     ax_map.set_xlabel("x [m]")
     ax_map.set_ylabel("y [m]")
     ax_map.grid(True, lw=0.5, alpha=0.5)
-    ax_map.set_title("軌跡（★=発進点、表示範囲: 発進前2s〜発進後25s）", fontsize=10)
+    ax_map.set_title("軌跡（★=発進点、表示範囲: 発進前2s〜カーブ②退出後2s）", fontsize=10)
     ax_map.legend(fontsize=10, loc="best")
 
     # ---- 時系列プロット（発進をt=0に揃える）----
@@ -538,11 +559,13 @@ def plot_curve2_analysis(data: dict, map_ways: list | None):
         if label not in launch_t:
             continue
         t_l = launch_t[label]
+        t_exit = _find_curve2_exit(d["kinematic"], t_l)
+        t_post = (t_exit - t_l + 2.0) if t_exit is not None else 25.0
 
-        def clip(df, col):
-            mask = (df["t"] >= t_l + T_PRE) & (df["t"] <= t_l + T_POST)
+        def clip(df, col, _t_l=t_l, _t_post=t_post):
+            mask = (df["t"] >= _t_l + T_PRE) & (df["t"] <= _t_l + _t_post)
             sub = df[mask].copy()
-            sub["tr"] = sub["t"] - t_l   # 相対時刻
+            sub["tr"] = sub["t"] - _t_l   # 相対時刻
             return sub
 
         vel = clip(d["velocity"], "lon_vel")
@@ -611,7 +634,7 @@ def plot_curve2_steering_detail(data: dict, map_ways: list | None):
         warnings.warn("発進時刻を検出できないため plot_curve2_steering_detail をスキップ")
         return
 
-    T_PRE, T_POST = -2.0, 25.0
+    T_PRE = -2.0
 
     fig = plt.figure(figsize=(16, 14))
     fig.suptitle(f"{SCENARIO_NAME}\nカーブ②（左折）ステアリング詳細分析　─　一時停止発進 t=0", fontsize=12)
@@ -637,8 +660,10 @@ def plot_curve2_steering_detail(data: dict, map_ways: list | None):
         if label not in launch_t:
             continue
         t_l = launch_t[label]
+        t_exit = _find_curve2_exit(d["kinematic"], t_l)
+        t_post = (t_exit - t_l + 2.0) if t_exit is not None else 25.0
         df_k = d["kinematic"]
-        seg = df_k[(df_k["t"] >= t_l + T_PRE) & (df_k["t"] <= t_l + T_POST)]
+        seg = df_k[(df_k["t"] >= t_l + T_PRE) & (df_k["t"] <= t_l + t_post)]
         if not seg.empty:
             _traj_plot(ax_map, seg, d, label, markevery=8)
         lr = df_k.iloc[(df_k["t"] - t_l).abs().argsort().iloc[0]]
@@ -658,11 +683,13 @@ def plot_curve2_steering_detail(data: dict, map_ways: list | None):
         if label not in launch_t:
             continue
         t_l = launch_t[label]
+        t_exit = _find_curve2_exit(d["kinematic"], t_l)
+        t_post = (t_exit - t_l + 2.0) if t_exit is not None else 25.0
         steer_df = d["steering"]
         cmd_df   = d["cmd"]
 
-        mask_s = (steer_df["t"] >= t_l + T_PRE) & (steer_df["t"] <= t_l + T_POST)
-        mask_c = (cmd_df["t"]   >= t_l + T_PRE) & (cmd_df["t"]   <= t_l + T_POST)
+        mask_s = (steer_df["t"] >= t_l + T_PRE) & (steer_df["t"] <= t_l + t_post)
+        mask_c = (cmd_df["t"]   >= t_l + T_PRE) & (cmd_df["t"]   <= t_l + t_post)
         s = steer_df[mask_s].copy(); s["tr"] = s["t"] - t_l
         c = cmd_df[mask_c].copy();   c["tr"] = c["t"] - t_l
 
@@ -747,7 +774,7 @@ def plot_curve2_yaw_steer(data: dict):
     if not launch_t:
         return
 
-    T_PRE, T_POST = -2.0, 25.0
+    T_PRE = -2.0
 
     fig, axes = plt.subplots(4, 1, figsize=(13, 16), sharex=True)
     fig.suptitle(
@@ -760,12 +787,14 @@ def plot_curve2_yaw_steer(data: dict):
         if label not in launch_t:
             continue
         t_l = launch_t[label]
+        t_exit = _find_curve2_exit(d["kinematic"], t_l)
+        t_post = (t_exit - t_l + 2.0) if t_exit is not None else 25.0
 
         # ---- 時系列データを発進t=0で切り出し ----
-        def clip(df):
-            m = (df["t"] >= t_l + T_PRE) & (df["t"] <= t_l + T_POST)
+        def clip(df, _t_l=t_l, _t_post=t_post):
+            m = (df["t"] >= _t_l + T_PRE) & (df["t"] <= _t_l + _t_post)
             sub = df[m].copy()
-            sub["tr"] = sub["t"] - t_l
+            sub["tr"] = sub["t"] - _t_l
             return sub
 
         kin   = clip(d["kinematic"])
