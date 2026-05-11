@@ -19,6 +19,7 @@
 
 import ctypes
 import math
+import subprocess
 from pathlib import Path
 
 import matplotlib
@@ -62,15 +63,32 @@ SUB_DT = 1.0 / 30.0   # 積分ステップ幅 [s]（FMU_DT 相当）
 # DELAY_STEER_ACC_GEARED_WO_FALL_GUARD の C++ ctypes ラッパー
 # ---------------------------------------------------------------------------
 
+def _build_lib(so: Path) -> None:
+    cpp = BASE / "vehicle_model_c_wrapper.cpp"
+    if not cpp.exists():
+        raise FileNotFoundError(f"{cpp} が見つかりません")
+    print(f"  [build] {cpp.name} → {so.name} ...")
+    result = subprocess.run(
+        [
+            "g++", "-shared", "-fPIC", "-O2", "-std=c++17",
+            "-I/usr/include/eigen3",
+            "-o", str(so), str(cpp),
+        ],
+        capture_output=True, text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"コンパイル失敗:\n{result.stderr}"
+        )
+    print(f"  [build] 完了")
+
+
 def _load_lib() -> ctypes.CDLL:
     so = BASE / "libvehicle_model_wrapper.so"
-    if not so.exists():
-        raise FileNotFoundError(
-            f"{so} が見つかりません。\n"
-            "以下のコマンドでコンパイルしてください:\n"
-            "  g++ -shared -fPIC -O2 -std=c++17 -I/usr/include/eigen3 \\\n"
-            "      -o libvehicle_model_wrapper.so vehicle_model_c_wrapper.cpp"
-        )
+    cpp = BASE / "vehicle_model_c_wrapper.cpp"
+    # .so が存在しない、または .cpp より古い場合は自動再コンパイル
+    if not so.exists() or (cpp.exists() and cpp.stat().st_mtime > so.stat().st_mtime):
+        _build_lib(so)
     lib = ctypes.CDLL(str(so))
 
     c_double = ctypes.c_double
