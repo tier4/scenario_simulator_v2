@@ -252,7 +252,7 @@ OpenSCENARIO:
                                     EntityCondition:
                                       SpeedCondition:
                                         rule: lessThan
-                                        value: 0.1
+                                        value: 0.001
             StartTrigger:
               ConditionGroup:
                 - Condition:
