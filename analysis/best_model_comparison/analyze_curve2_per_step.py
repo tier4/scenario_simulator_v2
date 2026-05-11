@@ -422,6 +422,7 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
         sim_ds_long  =  sim_dx  * cos_y + sim_dy  * sin_y
         sim_ds_lat   = -sim_dx  * sin_y + sim_dy  * cos_y
 
+        sim_steer_kp1 = model.steer_state + params["steer_bias"]
         records.append({
             "timestamp":  t_cmd[k],
             "tr":         t_cmd[k] - t_launch,
@@ -431,9 +432,10 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
             "pos_x":       gt_x[k],
             "pos_y":       gt_y[k],
             "real_vx":     gt_vx[k],
-            "real_steer":  gt_steer[k],
-            "sim_steer":   model.steer_state + params["steer_bias"],  # steer_state = internal, +bias for display
-            "err_steer":   gt_steer[k] - (model.steer_state + params["steer_bias"]),  # gt - predicted
+            "real_steer_k":   gt_steer[k],       # t_k の実機ステア（リセット時の初期値）
+            "real_steer_kp1": gt_steer[k + 1],   # t_{k+1} の実機ステア（予測の比較対象）
+            "sim_steer_kp1":  sim_steer_kp1,     # モデルが予測した t_{k+1} のステア
+            "err_steer":  gt_steer[k + 1] - sim_steer_kp1,  # 予測誤差 [rad]
             "real_ax":     gt_ax[k],
             "sim_vx":      model.vx,
             "real_ds_long": real_ds_long,
@@ -565,6 +567,76 @@ def plot_error_vs_speed(df: pd.DataFrame) -> None:
     _save(fig, "error_vs_speed")
 
 
+def plot_steering_analysis(df: pd.DataFrame) -> None:
+    """ステア 1ステップ予測の詳細分析（4パネル）."""
+    rad2deg = 180.0 / math.pi
+    tr      = df["tr"].values
+    window  = max(1, len(df) // 30)
+
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
+    # --- (0,0) ステア角の時系列: 実機 t_{k+1} vs モデル予測 t_{k+1} vs 指令 ---
+    ax = axes[0, 0]
+    ax.plot(tr, df["real_steer_kp1"].values * rad2deg, color="blue",   lw=1.2, label="実機 steer[k+1]")
+    ax.plot(tr, df["sim_steer_kp1"].values  * rad2deg, color="red",    lw=1.0, ls="--", label="予測 steer[k+1]")
+    ax.plot(tr, df["steer_des"].values       * rad2deg, color="gray",   lw=0.7, ls=":",  label="指令 steer_des[k]")
+    ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8, label="発進")
+    ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("ステア角 [deg]")
+    ax.set_title("ステア角: 実機[k+1] vs モデル予測[k+1] vs 指令[k]")
+    ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
+
+    # --- (0,1) ステア追従誤差（指令 vs 実機）: 実機のステア制御性能 ---
+    ax = axes[0, 1]
+    steer_follow_err = (df["real_steer_kp1"].values - df["steer_des"].values) * rad2deg
+    ma_f = pd.Series(steer_follow_err).rolling(window, center=True, min_periods=1).mean().values
+    ax.plot(tr, steer_follow_err, color="gray", lw=0.4, alpha=0.4, label="raw")
+    ax.plot(tr, ma_f,             color="blue", lw=1.5, label=f"移動平均(w={window})")
+    ax.axhline(0, color="black", lw=0.8)
+    ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8)
+    ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("追従誤差 [deg]")
+    ax.set_title("実機ステア追従誤差 (actual[k+1] − cmd[k])")
+    ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
+
+    # --- (1,0) ステア予測誤差の時系列 ---
+    ax = axes[1, 0]
+    err_deg = df["err_steer"].values * rad2deg
+    ma_e    = pd.Series(err_deg).rolling(window, center=True, min_periods=1).mean().values
+    ax.plot(tr, err_deg, color="gray", lw=0.4, alpha=0.4, label="raw")
+    ax.plot(tr, ma_e,    color="red",  lw=1.5, label=f"移動平均(w={window})")
+    ax.axhline(0, color="black", lw=0.8)
+    ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8, label="発進")
+    rmse_deg = float(np.sqrt(np.mean(err_deg ** 2)))
+    ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("予測誤差 [deg]")
+    ax.set_title(f"1ステップ ステア予測誤差 (actual[k+1] − pred[k+1])  RMSE={rmse_deg:.4f}°")
+    ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
+
+    # --- (1,1) ステア予測誤差 vs 指令ステア角（大入力時の精度確認）---
+    ax = axes[1, 1]
+    cmd_deg = df["steer_des"].values * rad2deg
+    speed_bins = [0.0, 2.0, 5.0, 8.0, 50.0]
+    colors     = ["#4472C4", "#ED7D31", "#A9D18E", "#FF0000"]
+    vx = df["real_vx"].values
+    for i, (lo, hi) in enumerate(zip(speed_bins[:-1], speed_bins[1:])):
+        mask = (vx >= lo) & (vx < hi)
+        if mask.sum() == 0:
+            continue
+        lbl = f"v={lo:.0f}–{hi:.0f} m/s" if hi < 50 else f"v≥{lo:.0f} m/s"
+        ax.scatter(cmd_deg[mask], err_deg[mask], s=4, alpha=0.5,
+                   color=colors[i % len(colors)], label=lbl)
+    ax.axhline(0, color="black", lw=0.8)
+    ax.set_xlabel("指令ステア角 [deg]"); ax.set_ylabel("予測誤差 [deg]")
+    ax.set_title("ステア予測誤差 vs 指令ステア角（色=速度域）")
+    ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
+
+    fig.suptitle(
+        "カーブ② per-step ステアリング分析\n"
+        "(1ステップ予測誤差: actual[k+1] − model_pred[k+1])",
+        fontsize=11,
+    )
+    fig.tight_layout()
+    _save(fig, "steering_analysis")
+
+
 def _load_map_ways(map_dir: Path) -> list[np.ndarray] | None:
     from lxml import etree
     candidates = sorted(map_dir.glob("*/lanelet2_map.osm"))
@@ -629,20 +701,33 @@ def plot_map_distribution(df: pd.DataFrame) -> None:
 
 
 def save_summary(df: pd.DataFrame) -> None:
+    rad2deg = 180.0 / math.pi
     tr = df["tr"].values
 
     def rmse_cm(col, mask=None):
         v = df[col].values if mask is None else df[col].values[mask]
         return float(np.sqrt(np.mean(v ** 2))) * 100
 
+    def rmse_deg(col, mask=None):
+        v = df[col].values if mask is None else df[col].values[mask]
+        return float(np.sqrt(np.mean(v ** 2))) * rad2deg
+
+    def mean_deg(col, mask=None):
+        v = df[col].values if mask is None else df[col].values[mask]
+        return float(np.mean(v)) * rad2deg
+
     lines = [
         "=== カーブ② per-step delta 分析 サマリ ===",
         f"有効ステップ数: {len(df)}",
         f"解析窓: tr={tr[0]:.1f}〜{tr[-1]:.1f}s",
         "",
-        "--- 全区間 ---",
+        "--- 全区間: 位置 ---",
         f"縦方向 RMSE: {rmse_cm('err_ds_long'):.3f} cm",
         f"横方向 RMSE: {rmse_cm('err_ds_lat'):.3f} cm",
+        "",
+        "--- 全区間: ステア予測 (actual[k+1] − pred[k+1]) ---",
+        f"ステア予測 RMSE: {rmse_deg('err_steer'):.4f} deg",
+        f"ステア予測 平均誤差: {mean_deg('err_steer'):.4f} deg  (正=実機が指令より大/負=小)",
         "",
         "--- 発進後時間帯別 (縦方向 RMSE) ---",
     ]
@@ -655,6 +740,16 @@ def save_summary(df: pd.DataFrame) -> None:
         if mask.sum() > 0:
             lines.append(f"  {lbl}: {rmse_cm('err_ds_long', mask):.3f} cm  (n={mask.sum()})")
 
+    lines += ["", "--- 発進後時間帯別 (ステア予測 RMSE) ---"]
+    for lbl, lo, hi in [
+        ("t=0〜5s  (発進直後)",  0.0,  5.0),
+        ("t=5〜15s (カーブ進入)", 5.0, 15.0),
+        ("t=15〜35s (カーブ奥)", 15.0, 35.0),
+    ]:
+        mask = (tr >= lo) & (tr < hi)
+        if mask.sum() > 0:
+            lines.append(f"  {lbl}: {rmse_deg('err_steer', mask):.4f} deg  (n={mask.sum()})")
+
     lines += ["", "--- 速度域別 ---"]
     for lo, hi in [(0, 2), (2, 5), (5, 8), (8, 100)]:
         lbl = f"v={lo}〜{hi} m/s" if hi < 100 else f"v≥{lo} m/s"
@@ -662,7 +757,8 @@ def save_summary(df: pd.DataFrame) -> None:
         if mask.sum() > 0:
             lines.append(
                 f"  {lbl:22s}: 縦={rmse_cm('err_ds_long', mask):.3f} cm, "
-                f"横={rmse_cm('err_ds_lat', mask):.3f} cm  (n={mask.sum()})"
+                f"横={rmse_cm('err_ds_lat', mask):.3f} cm, "
+                f"ステア={rmse_deg('err_steer', mask):.4f} deg  (n={mask.sum()})"
             )
 
     text = "\n".join(lines)
@@ -710,6 +806,7 @@ def main() -> None:
     plot_overview(df)
     plot_error_timeseries(df)
     plot_error_vs_speed(df)
+    plot_steering_analysis(df)
     plot_map_distribution(df)
 
     print(f"\n完了。出力先: {OUT_DIR}")
