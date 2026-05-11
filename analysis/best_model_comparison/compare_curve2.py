@@ -23,6 +23,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 matplotlib.rcParams["font.family"] = "Noto Sans CJK JP"
 import numpy as np
+from _params_utils import add_params_annotation
 import pandas as pd
 from mcap.reader import make_reader
 from mcap_ros2.decoder import DecoderFactory
@@ -209,6 +210,7 @@ def _clip(df, t_launch):
 
 def _save(fig, name):
     FIGS_DIR.mkdir(parents=True, exist_ok=True)
+    add_params_annotation(fig)
     for ext in ("png", "pdf"):
         p = FIGS_DIR / f"{name}.{ext}"
         fig.savefig(str(p), dpi=150, bbox_inches="tight")

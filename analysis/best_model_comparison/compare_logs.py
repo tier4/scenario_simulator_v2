@@ -21,6 +21,7 @@ import pandas as pd
 from lxml import etree
 from mcap.reader import make_reader
 from mcap_ros2.decoder import DecoderFactory
+from _params_utils import add_params_annotation
 
 # ---------------------------------------------------------------------------
 # 設定
@@ -246,6 +247,7 @@ def _setup_fig(title: str, nrows=1, ncols=1, figsize=(12, 5)):
 
 def _save(fig, name: str):
     FIGS_DIR.mkdir(parents=True, exist_ok=True)
+    add_params_annotation(fig)
     for ext in ("png", "pdf"):
         path = FIGS_DIR / f"{name}.{ext}"
         fig.savefig(path, dpi=150, bbox_inches="tight")

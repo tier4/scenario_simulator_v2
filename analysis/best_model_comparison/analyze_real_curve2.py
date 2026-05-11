@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 from mcap.reader import make_reader
 from mcap_ros2.decoder import DecoderFactory
+from _params_utils import add_params_annotation
 
 BASE = Path(__file__).parent
 LITE_DIR = BASE / "lite"
@@ -347,6 +348,7 @@ ax_cumul.text(0.02, 0.95, f"合計={total_cumul:.2f}°·s",
               bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.7))
 
 FIGS_DIR.mkdir(parents=True, exist_ok=True)
+add_params_annotation(fig)
 for ext in ("png", "pdf"):
     p = FIGS_DIR / f"real_curve2_detail.{ext}"
     fig.savefig(str(p), dpi=150, bbox_inches="tight")

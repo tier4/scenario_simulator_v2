@@ -30,6 +30,7 @@ import numpy as np
 import pandas as pd
 from mcap.reader import make_reader
 from mcap_ros2.decoder import DecoderFactory
+from _params_utils import add_params_annotation
 
 BASE      = Path(__file__).parent
 LITE_DIR  = BASE / "lite"
@@ -54,9 +55,10 @@ PARAMS = {
     "steer_time_constant": 0.4983,
     "steer_dead_band":     0.0,
     "steer_bias":          0.01,
+    "sub_dt":              1.0 / 30.0,
 }
 
-SUB_DT = 1.0 / 30.0   # 積分ステップ幅 [s]（FMU_DT 相当）
+SUB_DT = PARAMS["sub_dt"]   # 積分ステップ幅 [s]（FMU_DT 相当）
 
 
 # ---------------------------------------------------------------------------
@@ -358,6 +360,16 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
     gt_ax  = np.interp(t_cmd, t_acc,   df_acc["ax"].values)   if not df_acc.empty   else np.zeros_like(t_cmd)
     gt_steer = np.interp(t_cmd, t_steer, df_steer["steer"].values) if not df_steer.empty else np.zeros_like(t_cmd)
 
+    # 運動学ステア: ego_entity_simulation.cpp と同じ初期化方式
+    # state(4) = atan(wz * wb / vx)。低速では sensor 値にフォールバック。
+    _wb = params["wheelbase"]
+    _vx_thresh = 0.5  # [m/s]
+    gt_steer_kinematic = np.where(
+        gt_vx > _vx_thresh,
+        np.arctan(gt_wz * _wb / np.where(gt_vx > _vx_thresh, gt_vx, 1.0)),
+        gt_steer,
+    )
+
     # 過去コマンド補間用（queue 分の過去を含む全区間）
     t_cmd_full       = df_cmd_full["t"].values
     accel_des_full   = df_cmd_full["accel_des"].values
@@ -398,9 +410,11 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
         ]
 
         # -- モデルを t_k の実機状態にリセット（過去履歴を delay queue にセット） --
+        # ego_entity_simulation.cpp と同じ: state(4) = atan(wz*wb/vx) をキネマティック初期値として使用。
+        # vm_reset_state 内: state(4) = steer_actual - steer_bias → steer_actual = steer_kinematic + steer_bias
         model.reset_with_history(
             x=gt_x[k], y=gt_y[k], yaw=gt_yaw[k], vx=gt_vx[k],
-            steer_actual=gt_steer[k], ax=gt_ax[k],
+            steer_actual=float(gt_steer_kinematic[k]) + params["steer_bias"], ax=gt_ax[k],
             acc_history=acc_history, steer_history=steer_history,
         )
 
@@ -463,7 +477,8 @@ def _save(fig: plt.Figure, name: str) -> None:
     print(f"  Saved: {path}")
 
 
-def plot_overview(df: pd.DataFrame) -> None:
+
+def plot_overview(df: pd.DataFrame, params: dict) -> None:
     fig, axes = plt.subplots(2, 2, figsize=(14, 9))
     tr = df["tr"].values
     window = max(1, len(df) // 30)
@@ -512,10 +527,11 @@ def plot_overview(df: pd.DataFrame) -> None:
         fontsize=11,
     )
     fig.tight_layout()
+    add_params_annotation(fig, params)
     _save(fig, "overview")
 
 
-def plot_error_timeseries(df: pd.DataFrame) -> None:
+def plot_error_timeseries(df: pd.DataFrame, params: dict) -> None:
     rad2deg = 180.0 / math.pi
     fig, axes = plt.subplots(3, 1, figsize=(12, 11), sharex=True)
     tr = df["tr"].values
@@ -537,10 +553,11 @@ def plot_error_timeseries(df: pd.DataFrame) -> None:
     axes[2].set_xlabel("発進からの時刻 [s]")
     fig.suptitle("カーブ② per-step delta 誤差時系列", fontsize=11)
     fig.tight_layout()
+    add_params_annotation(fig, params)
     _save(fig, "error_timeseries")
 
 
-def plot_error_vs_speed(df: pd.DataFrame) -> None:
+def plot_error_vs_speed(df: pd.DataFrame, params: dict) -> None:
     rad2deg = 180.0 / math.pi
     fig, axes = plt.subplots(1, 3, figsize=(17, 5))
     vx = df["real_vx"].values
@@ -566,10 +583,11 @@ def plot_error_vs_speed(df: pd.DataFrame) -> None:
 
     fig.suptitle("カーブ② per-step delta: 速度依存性", fontsize=11)
     fig.tight_layout()
+    add_params_annotation(fig, params)
     _save(fig, "error_vs_speed")
 
 
-def plot_steering_analysis(df: pd.DataFrame) -> None:
+def plot_steering_analysis(df: pd.DataFrame, params: dict) -> None:
     """ステア 1ステップ予測の詳細分析（4パネル）."""
     rad2deg = 180.0 / math.pi
     tr      = df["tr"].values
@@ -636,6 +654,7 @@ def plot_steering_analysis(df: pd.DataFrame) -> None:
         fontsize=11,
     )
     fig.tight_layout()
+    add_params_annotation(fig, params)
     _save(fig, "steering_analysis")
 
 
@@ -668,7 +687,7 @@ def _load_map_ways(map_dir: Path) -> list[np.ndarray] | None:
     return ways if ways else None
 
 
-def plot_map_distribution(df: pd.DataFrame) -> None:
+def plot_map_distribution(df: pd.DataFrame, params: dict) -> None:
     rad2deg = 180.0 / math.pi
     map_ways = _load_map_ways(MAP_DIR)
 
@@ -700,6 +719,7 @@ def plot_map_distribution(df: pd.DataFrame) -> None:
 
     fig.suptitle("カーブ② per-step delta: 地図上の誤差分布", fontsize=11)
     fig.tight_layout()
+    add_params_annotation(fig, params)
     _save(fig, "map_distribution")
 
 
@@ -806,11 +826,11 @@ def main() -> None:
     print(f"  Saved: {OUT_DIR / 'per_step_delta.csv'}")
 
     save_summary(df)
-    plot_overview(df)
-    plot_error_timeseries(df)
-    plot_error_vs_speed(df)
-    plot_steering_analysis(df)
-    plot_map_distribution(df)
+    plot_overview(df, PARAMS)
+    plot_error_timeseries(df, PARAMS)
+    plot_error_vs_speed(df, PARAMS)
+    plot_steering_analysis(df, PARAMS)
+    plot_map_distribution(df, PARAMS)
 
     print(f"\n完了。出力先: {OUT_DIR}")
 

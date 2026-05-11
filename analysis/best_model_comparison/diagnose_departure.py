@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 from mcap.reader import make_reader
 from mcap_ros2.decoder import DecoderFactory
+from _params_utils import add_params_annotation, load_sim_params
 
 BASE = Path(__file__).parent
 LITE_DIR = BASE / "lite"
@@ -278,6 +279,11 @@ def main():
 
     fig.tight_layout()
     fig2.tight_layout()
+
+    # params_base に YAML の共通パラメータをマージしてアノテーションを付与する
+    _anno_params = {**load_sim_params(), **params_base}
+    add_params_annotation(fig,  _anno_params)
+    add_params_annotation(fig2, _anno_params)
 
     out1 = OUT_DIR / "departure_brake_tc_sensitivity.png"
     out2 = OUT_DIR / "real_cmd_acc_departure.png"

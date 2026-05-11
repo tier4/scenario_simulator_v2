@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from mcap.reader import make_reader
 from mcap_ros2.decoder import DecoderFactory
+from _params_utils import add_params_annotation
 
 BASE     = Path(__file__).parent
 LITE_DIR = BASE / "lite"
@@ -322,6 +323,7 @@ def plot_detailed(loaded):
     ax.axvline(0, color="gray", lw=0.8, ls="--", alpha=0.6)
 
     fig.tight_layout()
+    add_params_annotation(fig)
     out = OUT_DIR / "c2_diagnosis.png"
     fig.savefig(str(out), dpi=150, bbox_inches="tight")
     plt.close(fig)
