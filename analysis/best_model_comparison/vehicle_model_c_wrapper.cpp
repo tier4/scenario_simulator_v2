@@ -235,6 +235,35 @@ void vm_set_input(SimModel * m, double accel_des, double steer_des)
 
 void vm_step(SimModel * m) { m->update(m->sub_dt_); }
 
+// Reset state only — queues are NOT touched.
+// Call vm_set_queues() afterward to supply actual past command history.
+void vm_reset_state(SimModel * m,
+                    double x, double y, double yaw, double vx,
+                    double steer_actual, double ax)
+{
+    double steer_state = steer_actual - m->steer_bias_;
+    Eigen::VectorXd s(7);
+    s << x, y, yaw, vx, steer_state, ax, ax;
+    m->setState(s);
+    m->setGear(GEAR_DRIVE);
+}
+
+// Overwrite delay queue contents with actual past command history.
+// acc_q[0..n_acc-1]   : accel commands oldest→newest (n_acc == acc_q_size)
+// steer_q[0..n_steer-1]: steer commands oldest→newest (n_steer == steer_q_size)
+void vm_set_queues(SimModel * m,
+                   const double * acc_q,   int n_acc,
+                   const double * steer_q, int n_steer)
+{
+    m->acc_q_.clear();
+    for (int i = 0; i < n_acc;   ++i) m->acc_q_.push_back(acc_q[i]);
+    m->steer_q_.clear();
+    for (int i = 0; i < n_steer; ++i) m->steer_q_.push_back(steer_q[i]);
+}
+
+int vm_get_acc_q_size(SimModel * m)   { return m->acc_q_size_; }
+int vm_get_steer_q_size(SimModel * m) { return m->steer_q_size_; }
+
 double vm_get_x(SimModel * m)     { return m->getX(); }
 double vm_get_y(SimModel * m)     { return m->getY(); }
 double vm_get_yaw(SimModel * m)   { return m->getYaw(); }

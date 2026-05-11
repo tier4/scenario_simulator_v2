@@ -100,6 +100,22 @@ def _load_lib() -> ctypes.CDLL:
     lib.vm_reset_full.restype  = None
     lib.vm_reset_full.argtypes = [c_void_p] + [c_double] * 6
 
+    # State-only reset (queues untouched) + explicit queue setter
+    lib.vm_reset_state.restype  = None
+    lib.vm_reset_state.argtypes = [c_void_p] + [c_double] * 6
+
+    lib.vm_set_queues.restype  = None
+    lib.vm_set_queues.argtypes = [
+        c_void_p,
+        ctypes.POINTER(c_double), ctypes.c_int,
+        ctypes.POINTER(c_double), ctypes.c_int,
+    ]
+
+    lib.vm_get_acc_q_size.restype  = ctypes.c_int
+    lib.vm_get_acc_q_size.argtypes = [c_void_p]
+    lib.vm_get_steer_q_size.restype  = ctypes.c_int
+    lib.vm_get_steer_q_size.argtypes = [c_void_p]
+
     lib.vm_set_input.restype  = None
     lib.vm_set_input.argtypes = [c_void_p, c_double, c_double]
 
@@ -154,11 +170,35 @@ class VehicleModel:
             self._lib.vm_destroy(self._ptr)
             self._ptr = None
 
-    def reset(self, x: float, y: float, yaw: float, vx: float,
-              steer_actual: float, ax: float,
-              acc_cmd_init: float = 0.0, steer_cmd_init: float = 0.0) -> None:
-        """t_k の実機状態にリセット（delay queue は warmup で初期化）。"""
-        self._lib.vm_reset_full(self._ptr, x, y, yaw, vx, steer_actual, ax)
+    @property
+    def acc_q_size(self) -> int:
+        return self._lib.vm_get_acc_q_size(self._ptr)
+
+    @property
+    def steer_q_size(self) -> int:
+        return self._lib.vm_get_steer_q_size(self._ptr)
+
+    def reset_with_history(self,
+                           x: float, y: float, yaw: float, vx: float,
+                           steer_actual: float, ax: float,
+                           acc_history: list[float],
+                           steer_history: list[float]) -> None:
+        """状態と delay queue を実際の過去コマンド履歴でリセット。
+
+        acc_history   : accel_des [oldest→newest], len == acc_q_size
+        steer_history : steer_des [oldest→newest], len == steer_q_size
+        """
+        self._lib.vm_reset_state(self._ptr, x, y, yaw, vx, steer_actual, ax)
+
+        n_acc   = len(acc_history)
+        n_steer = len(steer_history)
+        ArrAcc   = (ctypes.c_double * n_acc)(*acc_history)
+        ArrSteer = (ctypes.c_double * n_steer)(*steer_history)
+        self._lib.vm_set_queues(
+            self._ptr,
+            ArrAcc,   ctypes.c_int(n_acc),
+            ArrSteer, ctypes.c_int(n_steer),
+        )
 
     def step(self, accel_des: float, steer_des: float) -> None:
         """Euler 1 ステップ積分（sub_dt 秒）。"""
@@ -291,7 +331,10 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
     t_lo = t_launch - T_PRE
     t_hi = t_launch + T_POST
 
-    df_cmd   = df_cmd[(df_cmd["t"] >= t_lo)   & (df_cmd["t"] <= t_hi)].reset_index(drop=True)
+    # delay queue 分だけ過去コマンドも取得できるよう cmd 窓を広げる
+    max_delay_sec = max(params["acc_time_delay"], params["steer_time_delay"]) + SUB_DT
+    df_cmd_full = df_cmd[(df_cmd["t"] >= t_lo - max_delay_sec) & (df_cmd["t"] <= t_hi)].reset_index(drop=True)
+    df_cmd      = df_cmd[(df_cmd["t"] >= t_lo) & (df_cmd["t"] <= t_hi)].reset_index(drop=True)
     df_kin   = df_kin[(df_kin["t"] >= t_lo - 1) & (df_kin["t"] <= t_hi + 1)].reset_index(drop=True)
     df_acc   = df_acc[(df_acc["t"] >= t_lo - 1) & (df_acc["t"] <= t_hi + 1)].reset_index(drop=True)
     df_steer = df_steer[(df_steer["t"] >= t_lo - 1) & (df_steer["t"] <= t_hi + 1)].reset_index(drop=True)
@@ -315,7 +358,14 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
     gt_ax  = np.interp(t_cmd, t_acc,   df_acc["ax"].values)   if not df_acc.empty   else np.zeros_like(t_cmd)
     gt_steer = np.interp(t_cmd, t_steer, df_steer["steer"].values) if not df_steer.empty else np.zeros_like(t_cmd)
 
+    # 過去コマンド補間用（queue 分の過去を含む全区間）
+    t_cmd_full       = df_cmd_full["t"].values
+    accel_des_full   = df_cmd_full["accel_des"].values
+    steer_des_full   = df_cmd_full["steer_des"].values
+
     model = VehicleModel(params, SUB_DT)
+    acc_q_size   = model.acc_q_size    # = round(acc_time_delay / SUB_DT)
+    steer_q_size = model.steer_q_size  # = round(steer_time_delay / SUB_DT)
 
     records = []
     n = len(t_cmd)
@@ -327,11 +377,31 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
         accel_des = float(df_cmd["accel_des"].iloc[k])
         steer_des = float(df_cmd["steer_des"].iloc[k])
 
-        # -- モデルを t_k の実機状態にリセット --
-        model.reset(
+        # -- delay queue に実際の過去コマンド履歴を設定 --
+        # acc_q[i] = accel_des at t_k - (acc_q_size - i) * SUB_DT  (oldest→newest)
+        # update() はこの oldest を delayed として消費する
+        acc_history = [
+            float(np.interp(
+                t_cmd[k] - (acc_q_size - i) * SUB_DT,
+                t_cmd_full, accel_des_full,
+                left=accel_des_full[0], right=accel_des_full[-1],
+            ))
+            for i in range(acc_q_size)
+        ]
+        steer_history = [
+            float(np.interp(
+                t_cmd[k] - (steer_q_size - i) * SUB_DT,
+                t_cmd_full, steer_des_full,
+                left=steer_des_full[0], right=steer_des_full[-1],
+            ))
+            for i in range(steer_q_size)
+        ]
+
+        # -- モデルを t_k の実機状態にリセット（過去履歴を delay queue にセット） --
+        model.reset_with_history(
             x=gt_x[k], y=gt_y[k], yaw=gt_yaw[k], vx=gt_vx[k],
             steer_actual=gt_steer[k], ax=gt_ax[k],
-            acc_cmd_init=accel_des, steer_cmd_init=steer_des,
+            acc_history=acc_history, steer_history=steer_history,
         )
 
         # -- interval 分だけ積分 --
