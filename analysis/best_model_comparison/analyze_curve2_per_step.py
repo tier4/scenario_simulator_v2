@@ -669,14 +669,16 @@ def _load_map_ways(map_dir: Path) -> list[np.ndarray] | None:
 
 
 def plot_map_distribution(df: pd.DataFrame) -> None:
+    rad2deg = 180.0 / math.pi
     map_ways = _load_map_ways(MAP_DIR)
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 7))
+    fig, axes = plt.subplots(1, 3, figsize=(20, 7))
     cx, cy = 89301, 43085
 
-    for ax, col, title in [
-        (axes[0], "err_ds_long", "縦方向誤差 [cm]"),
-        (axes[1], "err_ds_lat",  "横方向誤差 [cm]"),
+    for ax, vals, label, unit in [
+        (axes[0], df["err_ds_long"].values * 100,    "縦方向誤差",    "cm"),
+        (axes[1], df["err_ds_lat"].values  * 100,    "横方向誤差",    "cm"),
+        (axes[2], df["err_steer"].values   * rad2deg, "ステア予測誤差", "deg"),
     ]:
         if map_ways:
             for pts in map_ways:
@@ -685,16 +687,15 @@ def plot_map_distribution(df: pd.DataFrame) -> None:
                 if wy.max() < cy - 80 or wy.min() > cy + 80: continue
                 ax.plot(wx, wy, color="#cccccc", lw=0.5, zorder=1)
 
-        err_cm = df[col].values * 100
-        vmax   = max(abs(err_cm).max(), 1.0)
-        sc = ax.scatter(df["pos_x"], df["pos_y"], c=err_cm, cmap="RdBu_r",
+        vmax = max(abs(vals).max(), 1.0)
+        sc = ax.scatter(df["pos_x"], df["pos_y"], c=vals, cmap="RdBu_r",
                         vmin=-vmax, vmax=vmax, s=8, zorder=3)
-        plt.colorbar(sc, ax=ax, label="cm")
+        plt.colorbar(sc, ax=ax, label=unit)
         ax.set_xlim(cx - 80, cx + 80)
         ax.set_ylim(cy - 80, cy + 80)
         ax.set_aspect("equal")
         ax.set_xlabel("x [m]"); ax.set_ylabel("y [m]")
-        ax.set_title(f"地図上の誤差分布: {title}")
+        ax.set_title(f"地図上の誤差分布: {label} [{unit}]")
         ax.grid(True, lw=0.5, alpha=0.5)
 
     fig.suptitle("カーブ② per-step delta: 地図上の誤差分布", fontsize=11)
