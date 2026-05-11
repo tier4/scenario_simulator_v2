@@ -27,9 +27,11 @@ OpenSCENARIO:
           entryName: sample_vehicle
         ObjectController:
           Controller:
-            name: "autoware_participant_model/Ego"
+            name: ""
             Properties:
-              Property: []
+              Property:
+                - name: isEgo
+                  value: 'true'
   Storyboard:
     Init:
       Actions:
