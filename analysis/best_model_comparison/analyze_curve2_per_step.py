@@ -516,46 +516,48 @@ def plot_overview(df: pd.DataFrame) -> None:
 
 
 def plot_error_timeseries(df: pd.DataFrame) -> None:
-    fig, axes = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+    rad2deg = 180.0 / math.pi
+    fig, axes = plt.subplots(3, 1, figsize=(12, 11), sharex=True)
     tr = df["tr"].values
     window = max(1, len(df) // 30)
 
-    for ax, col, ylabel, title in [
-        (axes[0], "err_ds_long", "縦方向誤差 [cm]", "1ステップ縦方向位置誤差 (実機 − モデル)"),
-        (axes[1], "err_ds_lat",  "横方向誤差 [cm]", "1ステップ横方向位置誤差 (実機 − モデル)"),
+    for ax, vals, ylabel, title, color in [
+        (axes[0], df["err_ds_long"].values * 100,   "縦方向誤差 [cm]",   "1ステップ縦方向位置誤差 (実機 − モデル)", "red"),
+        (axes[1], df["err_ds_lat"].values  * 100,   "横方向誤差 [cm]",   "1ステップ横方向位置誤差 (実機 − モデル)", "red"),
+        (axes[2], df["err_steer"].values   * rad2deg, "ステア予測誤差 [deg]", "1ステップステア予測誤差 (actual[k+1] − pred[k+1])", "purple"),
     ]:
-        err_cm = (df[col] * 100)
-        ma     = err_cm.rolling(window, center=True, min_periods=1).mean().values
-        ax.plot(tr, err_cm.values, color="gray", lw=0.4, alpha=0.4, label="raw")
-        ax.plot(tr, ma,            color="red",  lw=1.5,             label=f"移動平均(w={window})")
+        ma = pd.Series(vals).rolling(window, center=True, min_periods=1).mean().values
+        ax.plot(tr, vals, color="gray", lw=0.4, alpha=0.4, label="raw")
+        ax.plot(tr, ma,   color=color,  lw=1.5,             label=f"移動平均(w={window})")
         ax.axhline(0, color="black", lw=0.8)
         ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8, label="発進")
         ax.set_ylabel(ylabel); ax.set_title(title)
         ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
-    axes[1].set_xlabel("発進からの時刻 [s]")
+    axes[2].set_xlabel("発進からの時刻 [s]")
     fig.suptitle("カーブ② per-step delta 誤差時系列", fontsize=11)
     fig.tight_layout()
     _save(fig, "error_timeseries")
 
 
 def plot_error_vs_speed(df: pd.DataFrame) -> None:
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    rad2deg = 180.0 / math.pi
+    fig, axes = plt.subplots(1, 3, figsize=(17, 5))
     vx = df["real_vx"].values
     speed_bins = [0.0, 2.0, 5.0, 8.0, 50.0]
     colors = ["#4472C4", "#ED7D31", "#A9D18E", "#FF0000"]
 
-    for ax, col, ylabel in [
-        (axes[0], "err_ds_long", "縦方向誤差 [cm]"),
-        (axes[1], "err_ds_lat",  "横方向誤差 [cm]"),
+    for ax, vals, ylabel in [
+        (axes[0], df["err_ds_long"].values * 100,    "縦方向誤差 [cm]"),
+        (axes[1], df["err_ds_lat"].values  * 100,    "横方向誤差 [cm]"),
+        (axes[2], df["err_steer"].values   * rad2deg, "ステア予測誤差 [deg]"),
     ]:
-        err_cm = df[col].values * 100
         for i, (lo, hi) in enumerate(zip(speed_bins[:-1], speed_bins[1:])):
             mask = (vx >= lo) & (vx < hi)
             if mask.sum() == 0:
                 continue
             lbl = f"v={lo:.0f}–{hi:.0f} m/s" if hi < 50 else f"v≥{lo:.0f} m/s"
-            ax.scatter(vx[mask], err_cm[mask], s=4, alpha=0.5,
+            ax.scatter(vx[mask], vals[mask], s=4, alpha=0.5,
                        color=colors[i % len(colors)], label=lbl)
         ax.axhline(0, color="black", lw=0.8)
         ax.set_xlabel("速度 [m/s]"); ax.set_ylabel(ylabel)
