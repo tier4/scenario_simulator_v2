@@ -74,6 +74,7 @@ public:
   std::atomic<geometry_msgs::msg::Accel> current_acceleration;
   std::atomic<geometry_msgs::msg::Pose>  current_pose;
   std::atomic<geometry_msgs::msg::Twist> current_twist;
+  std::atomic<double>                    current_steering_tire_angle{0.0};
   // clang-format on
 
 private:
