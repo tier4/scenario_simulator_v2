@@ -207,6 +207,12 @@ class VehicleModel:
         self._lib.vm_set_input(self._ptr, accel_des, steer_des)
         self._lib.vm_step(self._ptr)
 
+    def step_dt(self, accel_des: float, steer_des: float, dt: float) -> None:
+        """Euler 1 ステップ積分（任意 dt 秒）。delay queue は sub_dt 単位で設計されているため
+        端数補正にのみ使用し、dt は SUB_DT より十分小さい範囲で呼ぶこと。"""
+        self._lib.vm_set_input(self._ptr, accel_des, steer_des)
+        self._lib.vm_step_dt(self._ptr, ctypes.c_double(dt))
+
     @property
     def x(self) -> float:     return self._lib.vm_get_x(self._ptr)
     @property
@@ -418,10 +424,15 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
             acc_history=acc_history, steer_history=steer_history,
         )
 
-        # -- interval 分だけ積分 --
-        n_sub = max(1, round(interval / SUB_DT))
-        for i in range(n_sub):
+        # -- interval 分だけ正確に積分 --
+        # n_full 回 SUB_DT ステップ + 余り時間を端数ステップで補正し、
+        # モデル積分時間が実際の elapsed time と一致するようにする。
+        n_full = int(interval / SUB_DT)
+        for i in range(n_full):
             model.step(accel_des, steer_des)
+        remainder = interval - n_full * SUB_DT
+        if remainder > 1e-6:
+            model.step_dt(accel_des, steer_des, remainder)
 
         # -- delta 計算 --
         real_dx = gt_x[k + 1] - gt_x[k]
