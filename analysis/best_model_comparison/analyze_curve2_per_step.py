@@ -125,9 +125,13 @@ def _load_lib() -> ctypes.CDLL:
     lib.vm_step.argtypes = [c_void_p]
 
     for fn in ("vm_get_x", "vm_get_y", "vm_get_yaw",
-               "vm_get_vx", "vm_get_steer", "vm_get_ax"):
+               "vm_get_vx", "vm_get_steer", "vm_get_ax",
+               "vm_get_wz", "vm_get_vy", "vm_get_ay"):
         getattr(lib, fn).restype  = c_double
         getattr(lib, fn).argtypes = [c_void_p]
+
+    lib.vm_step_dt.restype  = None
+    lib.vm_step_dt.argtypes = [c_void_p, c_double]
 
     lib.vm_destroy.restype  = None
     lib.vm_destroy.argtypes = [c_void_p]
@@ -222,6 +226,12 @@ class VehicleModel:
     @property
     def vx(self) -> float:    return self._lib.vm_get_vx(self._ptr)
     @property
+    def wz(self) -> float:    return self._lib.vm_get_wz(self._ptr)
+    @property
+    def vy(self) -> float:    return self._lib.vm_get_vy(self._ptr)
+    @property
+    def ay(self) -> float:    return self._lib.vm_get_ay(self._ptr)
+    @property
     def steer_state(self) -> float:
         return self._lib.vm_get_steer(self._ptr) - self._steer_bias
 
@@ -269,10 +279,15 @@ def load_real_bag(path: Path) -> dict[str, pd.DataFrame]:
             rows_kin.append({
                 "t_ns": t_ns, "x": p.x, "y": p.y, "yaw": yaw,
                 "vx": ros.twist.twist.linear.x,
+                "vy": ros.twist.twist.linear.y,
                 "wz": ros.twist.twist.angular.z,
             })
         elif topic == "/sub/localization/acceleration":
-            rows_acc.append({"t_ns": t_ns, "ax": ros.accel.accel.linear.x})
+            rows_acc.append({
+                "t_ns": t_ns,
+                "ax": ros.accel.accel.linear.x,
+                "ay": ros.accel.accel.linear.y,
+            })
         elif topic == "/sub/control/command/control_cmd":
             rows_cmd.append({
                 "t_ns": t_ns,
@@ -363,8 +378,13 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
     gt_yaw = np.interp(t_cmd, t_kin,   np.unwrap(df_kin["yaw"].values))
     gt_vx  = np.interp(t_cmd, t_kin,   df_kin["vx"].values)
     gt_wz  = np.interp(t_cmd, t_kin,   df_kin["wz"].values)
-    gt_ax  = np.interp(t_cmd, t_acc,   df_acc["ax"].values)   if not df_acc.empty   else np.zeros_like(t_cmd)
+    gt_vy  = np.interp(t_cmd, t_kin,   df_kin["vy"].values)  if "vy" in df_kin.columns else np.zeros_like(t_cmd)
+    gt_ax  = np.interp(t_cmd, t_acc,   df_acc["ax"].values)  if not df_acc.empty else np.zeros_like(t_cmd)
+    gt_ay  = np.interp(t_cmd, t_acc,   df_acc["ay"].values)  if (not df_acc.empty and "ay" in df_acc.columns) else np.zeros_like(t_cmd)
     gt_steer = np.interp(t_cmd, t_steer, df_steer["steer"].values) if not df_steer.empty else np.zeros_like(t_cmd)
+
+    # 角加速度: wz の時間微分
+    gt_dwz = np.gradient(gt_wz, t_cmd)
 
     # 運動学ステア: ego_entity_simulation.cpp と同じ初期化方式
     # state(4) = atan(wz * wb / vx)。低速では sensor 値にフォールバック。
@@ -448,6 +468,9 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
         sim_ds_lat   = -sim_dx  * sin_y + sim_dy  * cos_y
 
         sim_steer_kp1 = model.steer_state + params["steer_bias"]
+        sim_wz = model.wz
+        sim_vy = model.vy
+        sim_ay = model.ay
         records.append({
             "timestamp":  t_cmd[k],
             "tr":         t_cmd[k] - t_launch,
@@ -462,7 +485,20 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
             "sim_steer_kp1":  sim_steer_kp1,     # モデルが予測した t_{k+1} のステア
             "err_steer":  gt_steer[k + 1] - sim_steer_kp1,  # 予測誤差 [rad]
             "real_ax":     gt_ax[k],
+            "real_ay":     gt_ay[k + 1],   # t_{k+1} — err_steer 規約に統一
+            "real_vy":     gt_vy[k + 1],
+            "real_wz":     gt_wz[k + 1],
+            "real_dwz":    gt_dwz[k + 1],
+            "real_wz_k":   gt_wz[k],       # t_k — 散布図の Y 軸（ステア角と同時刻）
+            "real_ay_k":   gt_ay[k],
+            "real_vy_k":   gt_vy[k],
             "sim_vx":      model.vx,
+            "sim_ay":      sim_ay,
+            "sim_vy":      sim_vy,
+            "sim_wz":      sim_wz,
+            "err_ay":      gt_ay[k + 1] - sim_ay,
+            "err_vy":      gt_vy[k + 1] - sim_vy,
+            "err_wz":      gt_wz[k + 1] - sim_wz,
             "real_ds_long": real_ds_long,
             "real_ds_lat":  real_ds_lat,
             "sim_ds_long":  sim_ds_long,
