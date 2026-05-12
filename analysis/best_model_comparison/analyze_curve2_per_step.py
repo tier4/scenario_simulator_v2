@@ -815,6 +815,200 @@ def plot_map_distribution(df: pd.DataFrame, params: dict) -> None:
     _save(fig, "map_distribution")
 
 
+def plot_lateral_dynamics_timeseries(df: pd.DataFrame, params: dict) -> None:
+    """横方向諸量の時系列: ay / vy / wz / dwz の実機 vs モデル."""
+    tr     = df["tr"].values
+    window = max(1, len(df) // 30)
+
+    rows = [
+        ("real_ay", "sim_ay", "横加速度 ay [m/s²]",  "横加速度 ay: 実機 vs モデル",
+         "実機: acceleration/accel.linear.y  モデル: vx·wz (求心加速度)"),
+        ("real_vy", "sim_vy", "横速度 vy [m/s]",      "横速度 vy: 実機 vs モデル (シム≈0)",
+         "実機: kinematic_state/twist.linear.y  モデル: 0.0 (キネマティック)"),
+        ("real_wz", "sim_wz", "角速度 wz [rad/s]",    "角速度 wz: 実機 vs モデル",
+         "実機: kinematic_state/twist.angular.z  モデル: vx·tan(δ)/wb"),
+        ("real_dwz", None,    "角加速度 dwz [rad/s²]", "角加速度 dwz: 実機",
+         "実機: d/dt(kinematic_state/twist.angular.z)  np.gradient"),
+    ]
+    fig, axes = plt.subplots(4, 1, figsize=(13, 16), sharex=True)
+
+    for ax, (real_col, sim_col, ylabel, title, source) in zip(axes, rows):
+        real_vals = df[real_col].values
+        ma_real = pd.Series(real_vals).rolling(window, center=True, min_periods=1).mean().values
+        ax.plot(tr, real_vals, color="#aaaaaa", lw=0.4, alpha=0.5, label="実機 raw")
+        ax.plot(tr, ma_real,   color="black",   lw=1.5, label="実機 MA")
+        if sim_col:
+            sim_vals = df[sim_col].values
+            ma_sim = pd.Series(sim_vals).rolling(window, center=True, min_periods=1).mean().values
+            ax.plot(tr, sim_vals, color="#ffaaaa", lw=0.4, alpha=0.5)
+            ax.plot(tr, ma_sim,   color="red",     lw=1.5, ls="--", label="モデル MA")
+        ax.axhline(0, color="black", lw=0.6, ls=":")
+        ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8, label="発進")
+        ax.set_ylabel(ylabel)
+        _set_title(ax, title, source)
+        ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
+
+    axes[-1].set_xlabel("発進からの時刻 [s]")
+    fig.suptitle("カーブ② per-step delta: 横方向諸量 時系列\n(各ステップで実機状態にリセット)", fontsize=11)
+    fig.tight_layout()
+    add_params_annotation(fig, params)
+    _save(fig, "lateral_dynamics_timeseries")
+
+
+def plot_steer_vs_lateral_scatter(df: pd.DataFrame, params: dict) -> None:
+    """横軸ステア角 × 縦軸横方向諸量の散布図（速度域別・1次フィッティング付き）."""
+    rad2deg    = 180.0 / math.pi
+    steer_deg  = df["real_steer_k"].values * rad2deg
+    vx         = df["real_vx"].values
+    speed_bins = [0.0, 2.0, 5.0, 8.0, 50.0]
+    colors     = ["#4472C4", "#ED7D31", "#A9D18E", "#FF0000"]
+
+    cols = [
+        ("real_ay", "sim_ay", "横加速度 ay [m/s²]",
+         "横軸: steering_status/tire_angle(t_k)  縦軸: acceleration/accel.linear.y / vx·wz"),
+        ("real_vy", "sim_vy", "横速度 vy [m/s]",
+         "横軸: steering_status/tire_angle(t_k)  縦軸: kinematic_state/twist.linear.y / 0.0"),
+        ("real_wz", "sim_wz", "角速度 wz [rad/s]",
+         "横軸: steering_status/tire_angle(t_k)  縦軸: kinematic_state/twist.angular.z / vx·tan(δ)/wb"),
+    ]
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    for ax, (real_col, sim_col, ylabel, source) in zip(axes, cols):
+        real_vals = df[real_col].values
+        sim_vals  = df[sim_col].values if sim_col else None
+
+        for i, (lo, hi) in enumerate(zip(speed_bins[:-1], speed_bins[1:])):
+            mask = (vx >= lo) & (vx < hi)
+            if mask.sum() == 0:
+                continue
+            lbl = f"v={lo:.0f}–{hi:.0f} m/s" if hi < 50 else f"v≥{lo:.0f} m/s"
+            ax.scatter(steer_deg[mask], real_vals[mask], s=4, alpha=0.5,
+                       color=colors[i % len(colors)], label=lbl)
+
+        # 1次フィッティング（実機全点）
+        x_fit = np.linspace(steer_deg.min(), steer_deg.max(), 100)
+        valid = np.isfinite(steer_deg) & np.isfinite(real_vals)
+        if valid.sum() >= 2:
+            coeffs = np.polyfit(steer_deg[valid], real_vals[valid], 1)
+            ax.plot(x_fit, np.polyval(coeffs, x_fit), color="black", lw=2,
+                    label=f"実機 fit: {coeffs[0]:.4f}·θ + {coeffs[1]:.4f}")
+
+        # シムの1次フィッティング
+        if sim_vals is not None:
+            valid_s = np.isfinite(steer_deg) & np.isfinite(sim_vals)
+            if valid_s.sum() >= 2:
+                coeffs_s = np.polyfit(steer_deg[valid_s], sim_vals[valid_s], 1)
+                ax.plot(x_fit, np.polyval(coeffs_s, x_fit), color="red", lw=1.5, ls="--",
+                        label=f"モデル fit: {coeffs_s[0]:.4f}·θ")
+
+        ax.axhline(0, color="black", lw=0.6)
+        ax.axvline(0, color="black", lw=0.6)
+        ax.set_xlabel("ステア角 [deg]"); ax.set_ylabel(ylabel)
+        _set_title(ax, f"ステア角 vs {ylabel}", source)
+        ax.legend(fontsize=7); ax.grid(True, alpha=0.3)
+
+    fig.suptitle("カーブ② per-step delta: ステア角 vs 横方向諸量 散布図\n"
+                 "(スケール誤差・バイアス確認)", fontsize=11)
+    fig.tight_layout()
+    add_params_annotation(fig, params)
+    _save(fig, "steer_vs_lateral_scatter")
+
+
+def plot_cascade_error(df: pd.DataFrame, params: dict) -> None:
+    """段階的誤差プロット: ステア指示→ステア応答→ay→vy→横位置の連鎖."""
+    rad2deg = 180.0 / math.pi
+    tr      = df["tr"].values
+    window  = max(1, len(df) // 30)
+
+    def _ma(vals):
+        return pd.Series(vals).rolling(window, center=True, min_periods=1).mean().values
+
+    rows = [
+        # (real_vals, sim_vals, err_vals, ylabel, title, source)
+        (
+            df["real_steer_kp1"].values * rad2deg,
+            df["sim_steer_kp1"].values  * rad2deg,
+            df["err_steer"].values      * rad2deg,
+            "ステア角 [deg]",
+            "① ステア応答 (cmd→actual): 実機 vs モデル",
+            "実機: steering_status/tire_angle  モデル: state_[4]+steer_bias",
+        ),
+        (
+            df["real_ay"].values,
+            df["sim_ay"].values,
+            df["err_ay"].values,
+            "横加速度 ay [m/s²]",
+            "② 横加速度 ay: 実機 vs モデル",
+            "実機: acceleration/accel.linear.y  モデル: vx·wz",
+        ),
+        (
+            df["real_vy"].values,
+            df["sim_vy"].values,
+            df["err_vy"].values,
+            "横速度 vy [m/s]",
+            "③ 横速度 vy: 実機 vs モデル",
+            "実機: kinematic_state/twist.linear.y  モデル: 0.0",
+        ),
+        (
+            df["real_wz"].values,
+            df["sim_wz"].values,
+            df["err_wz"].values,
+            "角速度 wz [rad/s]",
+            "④ 角速度 wz: 実機 vs モデル",
+            "実機: kinematic_state/twist.angular.z  モデル: vx·tan(δ)/wb",
+        ),
+        (
+            df["real_ds_lat"].values * 100,
+            df["sim_ds_lat"].values  * 100,
+            df["err_ds_lat"].values  * 100,
+            "横方向 Δpos [cm]",
+            "⑤ 横方向 1ステップ変位: 実機 vs モデル",
+            "実機: kinematic_state/pose.position  モデル: state_[0,1]",
+        ),
+    ]
+
+    fig, axes = plt.subplots(5, 2, figsize=(16, 20),
+                              gridspec_kw={"width_ratios": [3, 1]})
+
+    for row_idx, (real_v, sim_v, err_v, ylabel, title, source) in enumerate(rows):
+        ax_ts  = axes[row_idx, 0]
+        ax_err = axes[row_idx, 1]
+
+        # 時系列パネル
+        ax_ts.plot(tr, real_v, color="#aaaaaa", lw=0.4, alpha=0.4)
+        ax_ts.plot(tr, _ma(real_v), color="black", lw=1.5, label="実機 MA")
+        ax_ts.plot(tr, sim_v,       color="#ffaaaa", lw=0.4, alpha=0.4)
+        ax_ts.plot(tr, _ma(sim_v),  color="red",   lw=1.5, ls="--", label="モデル MA")
+        ax_ts.axhline(0, color="black", lw=0.5, ls=":")
+        ax_ts.axvline(0, color="green", lw=0.8, ls=":", alpha=0.8)
+        ax_ts.set_ylabel(ylabel)
+        _set_title(ax_ts, title, source)
+        ax_ts.legend(fontsize=8); ax_ts.grid(True, alpha=0.3)
+
+        # 誤差時系列パネル（右）
+        rmse = float(np.sqrt(np.nanmean(err_v ** 2)))
+        ax_err.plot(tr, err_v, color="#aaaaaa", lw=0.4, alpha=0.4)
+        ax_err.plot(tr, _ma(err_v), color="purple", lw=1.5,
+                    label=f"誤差 MA\nRMSE={rmse:.4g}")
+        ax_err.axhline(0, color="black", lw=0.8)
+        ax_err.axvline(0, color="green", lw=0.8, ls=":", alpha=0.8)
+        ax_err.set_ylabel(f"誤差 [{ylabel.split('[')[1]}")
+        _set_title(ax_err, "誤差 (実機 − モデル)", source)
+        ax_err.legend(fontsize=8); ax_err.grid(True, alpha=0.3)
+
+    for col in range(2):
+        axes[-1, col].set_xlabel("発進からの時刻 [s]")
+
+    fig.suptitle(
+        "カーブ② per-step delta: 段階的誤差プロット\n"
+        "ステア指示 → ステア応答 → ay → vy → 横位置",
+        fontsize=12,
+    )
+    fig.tight_layout()
+    add_params_annotation(fig, params)
+    _save(fig, "cascade_error")
+
+
 def save_summary(df: pd.DataFrame) -> None:
     rad2deg = 180.0 / math.pi
     tr = df["tr"].values
@@ -923,6 +1117,9 @@ def main() -> None:
     plot_error_vs_speed(df, PARAMS)
     plot_steering_analysis(df, PARAMS)
     plot_map_distribution(df, PARAMS)
+    plot_lateral_dynamics_timeseries(df, PARAMS)
+    plot_steer_vs_lateral_scatter(df, PARAMS)
+    plot_cascade_error(df, PARAMS)
 
     print(f"\n完了。出力先: {OUT_DIR}")
 
