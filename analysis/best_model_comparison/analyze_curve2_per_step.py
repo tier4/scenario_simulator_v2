@@ -524,6 +524,18 @@ def _save(fig: plt.Figure, name: str) -> None:
     print(f"  Saved: {path}")
 
 
+def _set_title(ax: plt.Axes, title: str, source: str,
+               title_fs: int = 9, source_fs: float = 6.5) -> None:
+    """サブプロットタイトルとデータソース注を別フォントサイズで表示する。
+
+    source は小フォント・グレーでタイトル直下に配置する。
+    """
+    ax.set_title(title, fontsize=title_fs, pad=18)
+    ax.text(0.5, 1.0, source,
+            transform=ax.transAxes, fontsize=source_fs,
+            ha="center", va="bottom", color="#888888",
+            clip_on=False)
+
 
 def plot_overview(df: pd.DataFrame, params: dict) -> None:
     fig, axes = plt.subplots(2, 2, figsize=(14, 9))
@@ -536,7 +548,9 @@ def plot_overview(df: pd.DataFrame, params: dict) -> None:
     ax.plot(tr, df["sim_vx"].values,  color="red",   lw=1.0, ls="--", label="モデル vx")
     ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8, label="発進")
     ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("速度 [m/s]")
-    ax.set_title("速度: 実機 vs モデル"); ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
+    _set_title(ax, "速度: 実機 vs モデル",
+               "実機: kinematic_state/twist.linear.x  モデル: state_[3]")
+    ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     # 加速度指令 vs 実機 ax
     ax = axes[0, 1]
@@ -544,7 +558,9 @@ def plot_overview(df: pd.DataFrame, params: dict) -> None:
     ax.plot(tr, df["real_ax"].values,   color="blue", lw=1.0, label="実機 ax")
     ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8)
     ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("加速度 [m/s²]")
-    ax.set_title("加速度: 指令 vs 実機"); ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
+    _set_title(ax, "加速度: 指令 vs 実機",
+               "指令: control_cmd/longitudinal.acceleration  実機: acceleration/accel.linear.x")
+    ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     # 縦方向誤差
     ax = axes[1, 0]
@@ -555,7 +571,9 @@ def plot_overview(df: pd.DataFrame, params: dict) -> None:
     ax.axhline(0, color="black", lw=0.8)
     ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8)
     ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("縦方向誤差 [cm]")
-    ax.set_title("1ステップ縦方向誤差"); ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
+    _set_title(ax, "1ステップ縦方向誤差",
+               "実機: kinematic_state/pose.position  モデル: state_[0,1]")
+    ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     # 横方向誤差
     ax = axes[1, 1]
@@ -566,7 +584,9 @@ def plot_overview(df: pd.DataFrame, params: dict) -> None:
     ax.axhline(0, color="black", lw=0.8)
     ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8)
     ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("横方向誤差 [cm]")
-    ax.set_title("1ステップ横方向誤差"); ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
+    _set_title(ax, "1ステップ横方向誤差",
+               "実機: kinematic_state/pose.position  モデル: state_[0,1]")
+    ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     fig.suptitle(
         "カーブ② per-step delta 分析\n"
@@ -584,17 +604,24 @@ def plot_error_timeseries(df: pd.DataFrame, params: dict) -> None:
     tr = df["tr"].values
     window = max(1, len(df) // 30)
 
-    for ax, vals, ylabel, title, color in [
-        (axes[0], df["err_ds_long"].values * 100,   "縦方向誤差 [cm]",   "1ステップ縦方向位置誤差 (実機 − モデル)", "red"),
-        (axes[1], df["err_ds_lat"].values  * 100,   "横方向誤差 [cm]",   "1ステップ横方向位置誤差 (実機 − モデル)", "red"),
-        (axes[2], df["err_steer"].values   * rad2deg, "ステア予測誤差 [deg]", "1ステップステア予測誤差 (actual[k+1] − pred[k+1])", "purple"),
+    for ax, vals, ylabel, title, color, source in [
+        (axes[0], df["err_ds_long"].values * 100,   "縦方向誤差 [cm]",
+         "1ステップ縦方向位置誤差 (実機 − モデル)", "red",
+         "実機: kinematic_state/pose.position  モデル: state_[0,1]"),
+        (axes[1], df["err_ds_lat"].values  * 100,   "横方向誤差 [cm]",
+         "1ステップ横方向位置誤差 (実機 − モデル)", "red",
+         "実機: kinematic_state/pose.position  モデル: state_[0,1]"),
+        (axes[2], df["err_steer"].values   * rad2deg, "ステア予測誤差 [deg]",
+         "1ステップステア予測誤差 (actual[k+1] − pred[k+1])", "purple",
+         "実機: steering_status/tire_angle  モデル: state_[4]+steer_bias"),
     ]:
         ma = pd.Series(vals).rolling(window, center=True, min_periods=1).mean().values
         ax.plot(tr, vals, color="gray", lw=0.4, alpha=0.4, label="raw")
         ax.plot(tr, ma,   color=color,  lw=1.5,             label=f"移動平均(w={window})")
         ax.axhline(0, color="black", lw=0.8)
         ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8, label="発進")
-        ax.set_ylabel(ylabel); ax.set_title(title)
+        ax.set_ylabel(ylabel)
+        _set_title(ax, title, source)
         ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     axes[2].set_xlabel("発進からの時刻 [s]")
@@ -611,10 +638,13 @@ def plot_error_vs_speed(df: pd.DataFrame, params: dict) -> None:
     speed_bins = [0.0, 2.0, 5.0, 8.0, 50.0]
     colors = ["#4472C4", "#ED7D31", "#A9D18E", "#FF0000"]
 
-    for ax, vals, ylabel in [
-        (axes[0], df["err_ds_long"].values * 100,    "縦方向誤差 [cm]"),
-        (axes[1], df["err_ds_lat"].values  * 100,    "横方向誤差 [cm]"),
-        (axes[2], df["err_steer"].values   * rad2deg, "ステア予測誤差 [deg]"),
+    for ax, vals, ylabel, source in [
+        (axes[0], df["err_ds_long"].values * 100,    "縦方向誤差 [cm]",
+         "実機: kinematic_state/pose.position  モデル: state_[0,1]  速度: twist.linear.x"),
+        (axes[1], df["err_ds_lat"].values  * 100,    "横方向誤差 [cm]",
+         "実機: kinematic_state/pose.position  モデル: state_[0,1]  速度: twist.linear.x"),
+        (axes[2], df["err_steer"].values   * rad2deg, "ステア予測誤差 [deg]",
+         "実機: steering_status/tire_angle  モデル: state_[4]+steer_bias  速度: twist.linear.x"),
     ]:
         for i, (lo, hi) in enumerate(zip(speed_bins[:-1], speed_bins[1:])):
             mask = (vx >= lo) & (vx < hi)
@@ -625,7 +655,7 @@ def plot_error_vs_speed(df: pd.DataFrame, params: dict) -> None:
                        color=colors[i % len(colors)], label=lbl)
         ax.axhline(0, color="black", lw=0.8)
         ax.set_xlabel("速度 [m/s]"); ax.set_ylabel(ylabel)
-        ax.set_title(f"{ylabel} vs 速度")
+        _set_title(ax, f"{ylabel} vs 速度", source)
         ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     fig.suptitle("カーブ② per-step delta: 速度依存性", fontsize=11)
@@ -649,7 +679,8 @@ def plot_steering_analysis(df: pd.DataFrame, params: dict) -> None:
     ax.plot(tr, df["steer_des"].values       * rad2deg, color="gray",   lw=0.7, ls=":",  label="指令 steer_des[k]")
     ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8, label="発進")
     ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("ステア角 [deg]")
-    ax.set_title("ステア角: 実機[k+1] vs モデル予測[k+1] vs 指令[k]")
+    _set_title(ax, "ステア角: 実機[k+1] vs モデル予測[k+1] vs 指令[k]",
+               "実機: steering_status/tire_angle  モデル: state_[4]+bias  指令: control_cmd/lat.tire_angle")
     ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     # --- (0,1) ステア追従誤差（指令 vs 実機）: 実機のステア制御性能 ---
@@ -661,7 +692,8 @@ def plot_steering_analysis(df: pd.DataFrame, params: dict) -> None:
     ax.axhline(0, color="black", lw=0.8)
     ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8)
     ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("追従誤差 [deg]")
-    ax.set_title("実機ステア追従誤差 (actual[k+1] − cmd[k])")
+    _set_title(ax, "実機ステア追従誤差 (actual[k+1] − cmd[k])",
+               "実機: steering_status/tire_angle  指令: control_cmd/lat.tire_angle")
     ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     # --- (1,0) ステア予測誤差の時系列 ---
@@ -674,7 +706,8 @@ def plot_steering_analysis(df: pd.DataFrame, params: dict) -> None:
     ax.axvline(0, color="green", lw=1.0, ls=":", alpha=0.8, label="発進")
     rmse_deg = float(np.sqrt(np.mean(err_deg ** 2)))
     ax.set_xlabel("発進からの時刻 [s]"); ax.set_ylabel("予測誤差 [deg]")
-    ax.set_title(f"1ステップ ステア予測誤差 (actual[k+1] − pred[k+1])  RMSE={rmse_deg:.4f}°")
+    _set_title(ax, f"1ステップ ステア予測誤差 (actual[k+1] − pred[k+1])  RMSE={rmse_deg:.4f}°",
+               "実機: steering_status/tire_angle  モデル: state_[4]+steer_bias")
     ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     # --- (1,1) ステア予測誤差 vs 指令ステア角（大入力時の精度確認）---
@@ -692,7 +725,8 @@ def plot_steering_analysis(df: pd.DataFrame, params: dict) -> None:
                    color=colors[i % len(colors)], label=lbl)
     ax.axhline(0, color="black", lw=0.8)
     ax.set_xlabel("指令ステア角 [deg]"); ax.set_ylabel("予測誤差 [deg]")
-    ax.set_title("ステア予測誤差 vs 指令ステア角（色=速度域）")
+    _set_title(ax, "ステア予測誤差 vs 指令ステア角（色=速度域）",
+               "誤差: steering_status/tire_angle − state_[4]+bias  指令: control_cmd/lat.tire_angle")
     ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     fig.suptitle(
@@ -738,14 +772,25 @@ def plot_map_distribution(df: pd.DataFrame, params: dict) -> None:
     rad2deg = 180.0 / math.pi
     map_ways = _load_map_ways(MAP_DIR)
 
-    fig, axes = plt.subplots(1, 3, figsize=(20, 7))
+    columns = [
+        (df["err_ds_long"].values * 100,    "縦方向誤差",    "cm",
+         "kinematic_state/pose.position vs state_[0,1]"),
+        (df["err_ds_lat"].values  * 100,    "横方向誤差",    "cm",
+         "kinematic_state/pose.position vs state_[0,1]"),
+        (df["err_steer"].values   * rad2deg, "ステア予測誤差", "deg",
+         "steering_status/tire_angle vs state_[4]+bias"),
+        (df["err_ay"].values,                "横加速度誤差",  "m/s²",
+         "acceleration/accel.linear.y vs vx·wz"),
+        (df["err_vy"].values,                "横速度誤差",    "m/s",
+         "kinematic_state/twist.linear.y vs 0.0"),
+        (df["err_wz"].values,                "角速度誤差",    "rad/s",
+         "kinematic_state/twist.angular.z vs vx·tan(δ)/wb"),
+    ]
+
+    fig, axes = plt.subplots(1, 6, figsize=(36, 6))
     cx, cy = 89301, 43085
 
-    for ax, vals, label, unit in [
-        (axes[0], df["err_ds_long"].values * 100,    "縦方向誤差",    "cm"),
-        (axes[1], df["err_ds_lat"].values  * 100,    "横方向誤差",    "cm"),
-        (axes[2], df["err_steer"].values   * rad2deg, "ステア予測誤差", "deg"),
-    ]:
+    for ax, (vals, label, unit, source) in zip(axes, columns):
         if map_ways:
             for pts in map_ways:
                 wx, wy = pts[:, 0], pts[:, 1]
@@ -753,7 +798,7 @@ def plot_map_distribution(df: pd.DataFrame, params: dict) -> None:
                 if wy.max() < cy - 80 or wy.min() > cy + 80: continue
                 ax.plot(wx, wy, color="#cccccc", lw=0.5, zorder=1)
 
-        vmax = max(abs(vals).max(), 1.0)
+        vmax = max(abs(vals).max(), 1e-6)
         sc = ax.scatter(df["pos_x"], df["pos_y"], c=vals, cmap="RdBu_r",
                         vmin=-vmax, vmax=vmax, s=8, zorder=3)
         plt.colorbar(sc, ax=ax, label=unit)
@@ -761,10 +806,10 @@ def plot_map_distribution(df: pd.DataFrame, params: dict) -> None:
         ax.set_ylim(cy - 80, cy + 80)
         ax.set_aspect("equal")
         ax.set_xlabel("x [m]"); ax.set_ylabel("y [m]")
-        ax.set_title(f"地図上の誤差分布: {label} [{unit}]")
+        _set_title(ax, f"{label} [{unit}]", source)
         ax.grid(True, lw=0.5, alpha=0.5)
 
-    fig.suptitle("カーブ② per-step delta: 地図上の誤差分布", fontsize=11)
+    fig.suptitle("カーブ② per-step delta: 地図上の誤差分布 (実機 − モデル)", fontsize=11)
     fig.tight_layout()
     add_params_annotation(fig, params)
     _save(fig, "map_distribution")
