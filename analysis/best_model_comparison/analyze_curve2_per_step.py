@@ -367,6 +367,24 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
     if df_kin.empty:
         raise RuntimeError("運動学状態が空です")
 
+    # -- 位置微分による body frame 横速度・横加速度の計算 --
+    # EKF の vy/ay は no-slip 拘束によりほぼゼロになるため、
+    # pose position を微分して body frame に変換する。
+    _t_kin_raw  = df_kin["t"].values
+    _yaw_raw    = np.unwrap(df_kin["yaw"].values)
+    _vx_map     = np.gradient(df_kin["x"].values, _t_kin_raw)
+    _vy_map     = np.gradient(df_kin["y"].values, _t_kin_raw)
+    _vy_body    = -_vx_map * np.sin(_yaw_raw) + _vy_map * np.cos(_yaw_raw)
+    _dt_mean    = float(np.mean(np.diff(_t_kin_raw)))
+    _half_win   = max(3, int(round(0.3 / _dt_mean)))   # 片側約 0.3s
+    _win        = 2 * _half_win + 1
+    _vy_smooth  = pd.Series(_vy_body).rolling(_win, center=True, min_periods=1).mean().values
+    _ay_body    = np.gradient(_vy_smooth, _t_kin_raw)
+    _ay_smooth  = pd.Series(_ay_body).rolling(_win, center=True, min_periods=1).mean().values
+    df_kin = df_kin.copy()
+    df_kin["vy_pos"] = _vy_smooth
+    df_kin["ay_pos"] = _ay_smooth
+
     # -- GT を cmd タイムスタンプに線形補間 --
     t_cmd   = df_cmd["t"].values
     t_kin   = df_kin["t"].values
@@ -378,9 +396,9 @@ def run_per_step(data: dict, t0_ns: int, t_launch: float, params: dict) -> pd.Da
     gt_yaw = np.interp(t_cmd, t_kin,   np.unwrap(df_kin["yaw"].values))
     gt_vx  = np.interp(t_cmd, t_kin,   df_kin["vx"].values)
     gt_wz  = np.interp(t_cmd, t_kin,   df_kin["wz"].values)
-    gt_vy  = np.interp(t_cmd, t_kin,   df_kin["vy"].values)  if "vy" in df_kin.columns else np.zeros_like(t_cmd)
+    gt_vy  = np.interp(t_cmd, t_kin,   df_kin["vy_pos"].values)
     gt_ax  = np.interp(t_cmd, t_acc,   df_acc["ax"].values)  if not df_acc.empty else np.zeros_like(t_cmd)
-    gt_ay  = np.interp(t_cmd, t_acc,   df_acc["ay"].values)  if (not df_acc.empty and "ay" in df_acc.columns) else np.zeros_like(t_cmd)
+    gt_ay  = np.interp(t_cmd, t_kin,   df_kin["ay_pos"].values)
     gt_steer = np.interp(t_cmd, t_steer, df_steer["steer"].values) if not df_steer.empty else np.zeros_like(t_cmd)
 
     # 角加速度: wz の時間微分
@@ -822,9 +840,9 @@ def plot_lateral_dynamics_timeseries(df: pd.DataFrame, params: dict) -> None:
 
     rows = [
         ("real_ay", "sim_ay", "横加速度 ay [m/s²]",  "横加速度 ay: 実機 vs モデル",
-         "実機: acceleration/accel.linear.y  モデル: vx·wz (求心加速度)"),
-        ("real_vy", "sim_vy", "横速度 vy [m/s]",      "横速度 vy: 実機 vs モデル (シム≈0)",
-         "実機: kinematic_state/twist.linear.y  モデル: 0.0 (キネマティック)"),
+         "実機: 位置微分(2階)→移動平均スムージング  モデル: vx·wz (求心加速度)"),
+        ("real_vy", "sim_vy", "横速度 vy [m/s]",      "横速度 vy: 実機 vs モデル",
+         "実機: 位置微分→body frame変換→移動平均スムージング  モデル: vy状態変数"),
         ("real_wz", "sim_wz", "角速度 wz [rad/s]",    "角速度 wz: 実機 vs モデル",
          "実機: kinematic_state/twist.angular.z  モデル: vx·tan(δ)/wb"),
         ("real_dwz", None,    "角加速度 dwz [rad/s²]", "角加速度 dwz: 実機",
@@ -865,9 +883,9 @@ def plot_steer_vs_lateral_scatter(df: pd.DataFrame, params: dict) -> None:
 
     cols = [
         ("real_ay", "sim_ay", "横加速度 ay [m/s²]",
-         "横軸: steering_status/tire_angle(t_k)  縦軸: acceleration/accel.linear.y / vx·wz"),
+         "横軸: steering_status/tire_angle(t_k)  縦軸: 位置微分(2階) / vx·wz"),
         ("real_vy", "sim_vy", "横速度 vy [m/s]",
-         "横軸: steering_status/tire_angle(t_k)  縦軸: kinematic_state/twist.linear.y / 0.0"),
+         "横軸: steering_status/tire_angle(t_k)  縦軸: 位置微分body frame / vy状態変数"),
         ("real_wz", "sim_wz", "角速度 wz [rad/s]",
          "横軸: steering_status/tire_angle(t_k)  縦軸: kinematic_state/twist.angular.z / vx·tan(δ)/wb"),
     ]
