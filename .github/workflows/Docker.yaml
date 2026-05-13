@@ -43,16 +43,6 @@ jobs:
             platform: arm64
             dockerfile: Dockerfile
             image_tag: humble
-          - runs-on: ubuntu-24.04
-            rosdistro: jazzy
-            platform: amd64
-            dockerfile: Dockerfile
-            image_tag: jazzy
-          - runs-on: ubuntu-24.04-arm
-            rosdistro: jazzy
-            platform: arm64
-            dockerfile: Dockerfile
-            image_tag: jazzy
 
     steps:
       - name: Free Disk Space (Ubuntu)
@@ -185,14 +175,6 @@ jobs:
             variant: development
             image_suffix: -devel
           - image_tag: humble
-            variant: runtime
-            image_suffix: -runtime
-          - image_tag: jazzy
-            variant: desktop
-          - image_tag: jazzy
-            variant: development
-            image_suffix: -devel
-          - image_tag: jazzy
             variant: runtime
             image_suffix: -runtime
     steps:
