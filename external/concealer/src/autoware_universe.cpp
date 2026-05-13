@@ -33,6 +33,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
   getPathWithLaneId(
     "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1),
     *this),
+  getTrajectory("/planning/trajectory", rclcpp::QoS(1), *this),
   setAcceleration(
     simulate_localization ? "/localization/acceleration"
                           : "/simulation/debug/localization/acceleration",
