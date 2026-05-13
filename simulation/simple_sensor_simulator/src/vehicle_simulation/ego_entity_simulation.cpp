@@ -48,7 +48,16 @@ EgoEntitySimulation::EgoEntitySimulation(
 
   if (vehicle_model_type_ == VehicleModelType::EXTERNAL) {
     initializeExternalMode();
+  } else if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER) {
+    initializePerfectTrajectoryFollowerMode();
   }
+}
+
+void EgoEntitySimulation::initializePerfectTrajectoryFollowerMode()
+{
+  perfect_tracker_model_ =
+    dynamic_cast<SimModelPerfectTrajectoryTracker *>(vehicle_model_ptr_.get());
+  perfect_tracker_model_->setInitialReference(initial_pose_, initial_rotation_matrix_);
 }
 
 void EgoEntitySimulation::initializeExternalMode()
@@ -116,6 +125,7 @@ auto toString(const VehicleModelType datum) -> std::string
     BOILERPLATE(IDEAL_STEER_ACC);
     BOILERPLATE(IDEAL_STEER_ACC_GEARED);
     BOILERPLATE(IDEAL_STEER_VEL);
+    BOILERPLATE(PERFECT_TRAJECTORY_TRACKER);
   }
 
 #undef BOILERPLATE
@@ -139,6 +149,7 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
     {"IDEAL_STEER_ACC", VehicleModelType::IDEAL_STEER_ACC},
     {"IDEAL_STEER_ACC_GEARED", VehicleModelType::IDEAL_STEER_ACC_GEARED},
     {"IDEAL_STEER_VEL", VehicleModelType::IDEAL_STEER_VEL},
+    {"PERFECT_TRAJECTORY_TRACKER", VehicleModelType::PERFECT_TRAJECTORY_TRACKER},
   };
 
   const auto iter = table.find(vehicle_model_type);
@@ -222,6 +233,12 @@ auto EgoEntitySimulation::makeSimulationModel(
     case VehicleModelType::IDEAL_STEER_VEL:
       return std::make_shared<SimModelIdealSteerVel>(wheel_base);
 
+    case VehicleModelType::PERFECT_TRAJECTORY_TRACKER: {
+      const auto delay_time_sec =
+        common::getParameter("perfect_tracker_delay_time_sec", 0.0);
+      return std::make_shared<SimModelPerfectTrajectoryTracker>(delay_time_sec);
+    }
+
     default:
       THROW_SEMANTIC_ERROR(
         "Unsupported vehicle_model_type ", toString(vehicle_model_type), " specified");
@@ -274,6 +291,10 @@ void EgoEntitySimulation::requestSpeedChange(double value)
 
     case VehicleModelType::EXTERNAL:
       // Speed is controlled by the external simulator; initial speed setting is ignored.
+      return;
+
+    case VehicleModelType::PERFECT_TRAJECTORY_TRACKER:
+      // Speed is derived from the trajectory; initial speed setting is ignored.
       return;
 
     default:
@@ -357,6 +378,11 @@ auto EgoEntitySimulation::overwrite(
           status.action_status.accel.linear.x, status.action_status.twist.angular.z, 0.0);
         break;
 
+      case VehicleModelType::PERFECT_TRAJECTORY_TRACKER:
+        // Trajectory drives state updates; external pose overwrite is intentionally ignored
+        // to preserve trajectory-based consistency.
+        break;
+
       default:
         THROW_SEMANTIC_ERROR(
           "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
@@ -388,6 +414,15 @@ void EgoEntitySimulation::update(
     if (vehicle_model_type_ == VehicleModelType::EXTERNAL) {
       // State is updated by the external simulator via ROS 2 subscription callbacks.
       // No Autoware command reading or vehicle model stepping required here.
+    } else if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER) {
+      // Inject the latest trajectory from Autoware and step the model.
+      // The model selects the appropriate delayed trajectory internally.
+      const auto traj = autoware->getTrajectory();
+      const rclcpp::Time stamp(traj.header.stamp);
+      if (stamp.nanoseconds() > 0) {
+        perfect_tracker_model_->setTrajectory(stamp, traj);
+      }
+      vehicle_model_ptr_->update(step_time);
     } else {
       auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
@@ -439,12 +474,21 @@ void EgoEntitySimulation::update(
   // only the position in the Oz axis is left unchanged, the rest is taken from SimModelInterface
   world_relative_position_.x() = vehicle_model_ptr_->getX();
   world_relative_position_.y() = vehicle_model_ptr_->getY();
+  if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER) {
+    // Override z with trajectory-interpolated altitude (map-frame absolute → relative)
+    world_relative_position_.z() =
+      perfect_tracker_model_->getZ() - initial_pose_.position.z;
+  }
   updateStatus(current_time, step_time);
   updatePreviousValues();
 }
 
 auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
+  if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER) {
+    // Slope acceleration is already embedded in trajectory acceleration_mps2.
+    return 0.0;
+  }
   if (consider_acceleration_by_road_slope_ && status_.isInLanelet()) {
     constexpr double gravity_acceleration = -9.81;
     /// @todo why there is a need to recalculate orientation using getLaneletPose?
@@ -546,7 +590,11 @@ auto EgoEntitySimulation::updateStatus(const double current_time, const double s
 {
   auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status_);
   status.time = std::isnan(current_time) ? 0 : current_time;
-  status.pose = getCurrentPose();
+  const double pitch_angle =
+    (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER)
+      ? perfect_tracker_model_->getPitch()
+      : 0.0;
+  status.pose = getCurrentPose(pitch_angle);
   status.action_status.twist = getCurrentTwist();
   status.action_status.accel = getCurrentAccel(step_time);
   status.action_status.linear_jerk = getLinearJerk(step_time);

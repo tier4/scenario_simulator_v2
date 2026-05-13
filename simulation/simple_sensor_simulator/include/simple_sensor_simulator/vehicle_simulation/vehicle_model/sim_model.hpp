@@ -21,6 +21,7 @@
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_map_acc_geared.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_vel.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_external.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_perfect_trajectory_tracker.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc_geared.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_vel.hpp>

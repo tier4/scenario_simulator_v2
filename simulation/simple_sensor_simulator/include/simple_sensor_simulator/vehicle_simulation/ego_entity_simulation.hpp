@@ -39,6 +39,7 @@ enum class VehicleModelType {
   IDEAL_STEER_ACC,
   IDEAL_STEER_ACC_GEARED,
   IDEAL_STEER_VEL,
+  PERFECT_TRAJECTORY_TRACKER,
 };
 
 class EgoEntitySimulation
@@ -79,6 +80,10 @@ public:
 
 private:
   SimModelExternal * external_model_ = nullptr;
+
+  SimModelPerfectTrajectoryTracker * perfect_tracker_model_ = nullptr;
+
+  auto initializePerfectTrajectoryFollowerMode() -> void;
 
   std::optional<concealer::Subscriber<nav_msgs::msg::Odometry>> ego_odometry_sub_;
 

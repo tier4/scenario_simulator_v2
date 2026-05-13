@@ -64,6 +64,7 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
   src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_perfect_trajectory_tracker.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
   glog

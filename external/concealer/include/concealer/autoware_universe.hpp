@@ -17,6 +17,7 @@
 
 #include <atomic>
 #include <autoware_control_msgs/msg/control.hpp>
+#include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/gear_report.hpp>
@@ -55,12 +56,14 @@ public:
   using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
   using TurnIndicatorsCommand       = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
   using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
+  using Trajectory                  = autoware_planning_msgs::msg::Trajectory;
   using VelocityReport              = autoware_vehicle_msgs::msg::VelocityReport;
 
   Subscriber<Control>                  getCommand;
   Subscriber<GearCommand>              getGearCommand;
   Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
   Subscriber<priority::PathWithLaneId> getPathWithLaneId;
+  Subscriber<Trajectory>               getTrajectory;
 
   Publisher<AccelWithCovarianceStamped>                    setAcceleration;
   Publisher<Odometry, NormalDistribution>                  setOdometry;
