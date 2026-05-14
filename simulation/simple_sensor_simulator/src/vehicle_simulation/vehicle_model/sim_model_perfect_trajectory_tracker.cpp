@@ -18,6 +18,7 @@
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -180,8 +181,27 @@ void SimModelPerfectTrajectoryTracker::update(const double & dt)
 
   const auto & target = trajectory->points[closest_idx];
 
-  // 4. Copy trajectory kinematics; steer is used as-is (typically 0 for diffusion planner)
-  const double v = target.longitudinal_velocity_mps;
+  // 4. Copy trajectory kinematics, then clamp velocity to the direction allowed by the
+  // current gear command. The trajectory's velocity sign is not always consistent with the
+  // gear command (e.g. a stale trajectory may carry negative velocity after the planner
+  // shifts to DRIVE), so the gear is treated as the source of truth for direction.
+  double v = target.longitudinal_velocity_mps;
+  switch (gear_) {
+    case autoware_vehicle_msgs::msg::GearCommand::REVERSE:
+    case autoware_vehicle_msgs::msg::GearCommand::REVERSE_2:
+      v = std::min(v, 0.0);  // REVERSE: forbid forward motion
+      break;
+    case autoware_vehicle_msgs::msg::GearCommand::PARK:
+    case autoware_vehicle_msgs::msg::GearCommand::NEUTRAL:
+    case autoware_vehicle_msgs::msg::GearCommand::NONE:
+      v = 0.0;               // PARK/NEUTRAL/NONE: no motion
+      break;
+    default:
+      v = std::max(v, 0.0);  // DRIVE / DRIVE_2..20 / LOW / LOW_2: forbid reverse
+      break;
+  }
+  // Acceleration and steer are independent of gear direction (e.g. ax<0 is
+  // valid during braking in DRIVE), so they are copied from the trajectory as-is.
   current_ax_ = target.acceleration_mps2;
   current_steer_ = target.front_wheel_angle_rad;
 
