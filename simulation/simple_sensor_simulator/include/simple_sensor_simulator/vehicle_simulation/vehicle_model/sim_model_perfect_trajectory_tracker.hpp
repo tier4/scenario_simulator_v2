@@ -16,14 +16,12 @@
 #define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_PERFECT_TRAJECTORY_TRACKER_HPP_
 
 #include <autoware_planning_msgs/msg/trajectory.hpp>
+#include <deque>
+#include <eigen3/Eigen/Core>
 #include <geometry_msgs/msg/pose.hpp>
+#include <mutex>
 #include <rclcpp/time.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
-
-#include <eigen3/Eigen/Core>
-
-#include <deque>
-#include <mutex>
 
 /**
  * @class SimModelPerfectTrajectoryTracker
@@ -51,8 +49,7 @@ public:
    *        Must be called once before the first update().
    */
   void setInitialReference(
-    const geometry_msgs::msg::Pose & initial_pose,
-    const Eigen::Matrix3d & initial_rotation_matrix);
+    const geometry_msgs::msg::Pose & initial_pose, const Eigen::Matrix3d & initial_rotation_matrix);
 
   /**
    * @brief Inject a new trajectory into the delay queue.
@@ -60,8 +57,7 @@ public:
    *        Duplicate stamps are silently dropped.
    */
   void setTrajectory(
-    const rclcpp::Time & stamp,
-    const autoware_planning_msgs::msg::Trajectory & msg);
+    const rclcpp::Time & stamp, const autoware_planning_msgs::msg::Trajectory & msg);
 
   // Extended getters (z/pitch not available in SimModelInterface)
   double getZ() const;
@@ -78,20 +74,20 @@ public:
   double getWz() override;
   double getSteer() override;
   void update(const double & dt) override;
-  Eigen::VectorXd calcModel(
-    const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
+  Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
 
 private:
   enum IDX { X = 0, Y, YAW, VX };
 
-  struct StampedTrajectory {
+  struct StampedTrajectory
+  {
     rclcpp::Time stamp;
     autoware_planning_msgs::msg::Trajectory msg;
   };
 
   double interpolateZ(
-    const autoware_planning_msgs::msg::Trajectory & traj,
-    double x, double y, double fallback_z) const;
+    const autoware_planning_msgs::msg::Trajectory & traj, std::size_t hint_idx, double x, double y,
+    double fallback_z) const;
 
   double calculatePitchFromLanelet(double x, double y, double yaw) const;
 
@@ -112,6 +108,10 @@ private:
   double current_steer_{0.0};
   double current_z_map_{0.0};
   double current_pitch_{0.0};
+
+  // z-component of position in initial frame, updated each cycle to maintain exact R^T/R roundtrip.
+  // Using z=0 in the roundtrip introduces a per-step decay of sin²(pitch)*state_X in map-frame x.
+  double state_z_initial_frame_{0.0};
 };
 
 #endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_PERFECT_TRAJECTORY_TRACKER_HPP_

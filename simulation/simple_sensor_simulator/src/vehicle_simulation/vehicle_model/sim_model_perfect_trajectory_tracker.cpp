@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_perfect_trajectory_tracker.hpp>
-#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
-#include <rclcpp/duration.hpp>
-
 #include <lanelet2_core/geometry/Lanelet.h>
 
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <rclcpp/duration.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_perfect_trajectory_tracker.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace
 {
 
 double normalizeAngle(double angle)
 {
-  while (angle >  M_PI) angle -= 2.0 * M_PI;
+  while (angle > M_PI) angle -= 2.0 * M_PI;
   while (angle < -M_PI) angle += 2.0 * M_PI;
   return angle;
 }
@@ -40,31 +39,15 @@ double quatToYaw(const geometry_msgs::msg::Quaternion & q)
   return std::atan2(siny_cosp, cosy_cosp);
 }
 
-std::vector<geometry_msgs::msg::Point> centerlineToPoints(const lanelet::ConstLanelet & lanelet)
-{
-  std::vector<geometry_msgs::msg::Point> center_points;
-  center_points.reserve(lanelet.centerline().size());
-  for (const auto & centerline_point : lanelet.centerline()) {
-    geometry_msgs::msg::Point point;
-    point.x = centerline_point.basicPoint().x();
-    point.y = centerline_point.basicPoint().y();
-    point.z = centerline_point.basicPoint().z();
-    center_points.push_back(point);
-  }
-  return center_points;
-}
-
 }  // namespace
 
 SimModelPerfectTrajectoryTracker::SimModelPerfectTrajectoryTracker(double delay_time_sec)
-: SimModelInterface(4 /* dim_x: x, y, yaw, vx */, 0 /* dim_u */),
-  delay_time_sec_(delay_time_sec)
+: SimModelInterface(4 /* dim_x: x, y, yaw, vx */, 0 /* dim_u */), delay_time_sec_(delay_time_sec)
 {
 }
 
 void SimModelPerfectTrajectoryTracker::setInitialReference(
-  const geometry_msgs::msg::Pose & initial_pose,
-  const Eigen::Matrix3d & initial_rotation_matrix)
+  const geometry_msgs::msg::Pose & initial_pose, const Eigen::Matrix3d & initial_rotation_matrix)
 {
   std::lock_guard<std::mutex> lock(mutex_);
   initial_pose_ = initial_pose;
@@ -75,8 +58,7 @@ void SimModelPerfectTrajectoryTracker::setInitialReference(
 }
 
 void SimModelPerfectTrajectoryTracker::setTrajectory(
-  const rclcpp::Time & stamp,
-  const autoware_planning_msgs::msg::Trajectory & message)
+  const rclcpp::Time & stamp, const autoware_planning_msgs::msg::Trajectory & message)
 {
   if (message.points.empty()) return;
   std::lock_guard<std::mutex> lock(mutex_);
@@ -162,17 +144,21 @@ void SimModelPerfectTrajectoryTracker::update(const double & dt)
   if (trajectory->points.empty()) return;
 
   // 2. Restore map-frame position from model-relative state
-  const Eigen::Vector3d p_world = initial_rotation_matrix_ * Eigen::Vector3d(state_(X), state_(Y), 0.0);
+  const Eigen::Vector3d p_world =
+    initial_rotation_matrix_ * Eigen::Vector3d(state_(X), state_(Y), state_z_initial_frame_);
   double cx = initial_pose_.position.x + p_world.x();
   double cy = initial_pose_.position.y + p_world.y();
   const double cyaw_map = initial_yaw_ + state_(YAW);
 
   // 3. Find closest trajectory point (O(N) linear scan, same as perfect_tracker)
+  const std::size_t traj_size = trajectory->points.size();
   double min_dist_sq = std::numeric_limits<double>::max();
   std::size_t closest_idx = 0;
-  for (std::size_t i = 0; i < trajectory->points.size(); ++i) {
+  for (std::size_t i = 0; i < traj_size; ++i) {
     const auto & p = trajectory->points[i];
-    const double d2 = std::hypot(cx - p.pose.position.x, cy - p.pose.position.y);
+    const double dx = cx - p.pose.position.x;
+    const double dy = cy - p.pose.position.y;
+    const double d2 = dx * dx + dy * dy;
     if (d2 < min_dist_sq) {
       min_dist_sq = d2;
       closest_idx = i;
@@ -194,7 +180,7 @@ void SimModelPerfectTrajectoryTracker::update(const double & dt)
     case autoware_vehicle_msgs::msg::GearCommand::PARK:
     case autoware_vehicle_msgs::msg::GearCommand::NEUTRAL:
     case autoware_vehicle_msgs::msg::GearCommand::NONE:
-      v = 0.0;               // PARK/NEUTRAL/NONE: no motion
+      v = 0.0;  // PARK/NEUTRAL/NONE: no motion
       break;
     default:
       v = std::max(v, 0.0);  // DRIVE / DRIVE_2..20 / LOW / LOW_2: forbid reverse
@@ -207,37 +193,37 @@ void SimModelPerfectTrajectoryTracker::update(const double & dt)
 
   // Compute wz from consecutive yaw difference (heading_rate_rps is 0 in diffusion planner output)
   {
-    const std::size_t n = trajectory->points.size();
     const std::size_t j =
-      (closest_idx + 1 < n) ? closest_idx + 1 : (closest_idx > 0 ? closest_idx - 1 : 0);
+      (closest_idx + 1 < traj_size) ? closest_idx + 1 : (closest_idx > 0 ? closest_idx - 1 : 0);
     if (j != closest_idx) {
       const double yaw_i = quatToYaw(trajectory->points[closest_idx].pose.orientation);
       const double yaw_j = quatToYaw(trajectory->points[j].pose.orientation);
-      const double dt_traj =
-        (rclcpp::Duration(trajectory->points[j].time_from_start) -
-         rclcpp::Duration(trajectory->points[closest_idx].time_from_start))
-          .seconds();
+      const double dt_traj = (rclcpp::Duration(trajectory->points[j].time_from_start) -
+                              rclcpp::Duration(trajectory->points[closest_idx].time_from_start))
+                               .seconds();
       current_wz_ = (std::abs(dt_traj) > 1e-6) ? normalizeAngle(yaw_j - yaw_i) / dt_traj : 0.0;
     } else {
       current_wz_ = 0.0;
     }
   }
 
-  // 5. Euler integration in map frame; yaw snapped to trajectory orientation
+  // 5. Euler-integrate in map frame; yaw snapped to trajectory orientation.
+  const double cyaw_map_next = quatToYaw(target.pose.orientation);
   cx += v * std::cos(cyaw_map) * dt;
   cy += v * std::sin(cyaw_map) * dt;
-  const double cyaw_map_next = quatToYaw(target.pose.orientation);
 
   // 6. Interpolate Z from trajectory; compute pitch from lanelet centerline
-  current_z_map_ = interpolateZ(*trajectory, cx, cy, current_z_map_);
+  current_z_map_ = interpolateZ(*trajectory, closest_idx, cx, cy, current_z_map_);
   current_pitch_ = calculatePitchFromLanelet(cx, cy, cyaw_map_next);
 
   // 7. Write back to model-relative state
   const Eigen::Vector3d p_world_new(
-    cx - initial_pose_.position.x, cy - initial_pose_.position.y, 0.0);
+    cx - initial_pose_.position.x, cy - initial_pose_.position.y,
+    current_z_map_ - initial_pose_.position.z);
   const Eigen::Vector3d p_rel_new = initial_rotation_matrix_.transpose() * p_world_new;
   state_(X) = p_rel_new.x();
   state_(Y) = p_rel_new.y();
+  state_z_initial_frame_ = p_rel_new.z();
   state_(YAW) = normalizeAngle(cyaw_map_next - initial_yaw_);
   state_(VX) = v;
 }
@@ -249,23 +235,14 @@ Eigen::VectorXd SimModelPerfectTrajectoryTracker::calcModel(
 }
 
 double SimModelPerfectTrajectoryTracker::interpolateZ(
-  const autoware_planning_msgs::msg::Trajectory & trajectory,
-  double x, double y, double fallback_z) const
+  const autoware_planning_msgs::msg::Trajectory & trajectory, std::size_t hint_idx, double x,
+  double y, double fallback_z) const
 {
   if (trajectory.points.size() < 2) return fallback_z;
 
-  // Find closest point
-  double min_dist_sq = std::numeric_limits<double>::max();
-  std::size_t closest_idx = 0;
-  for (std::size_t i = 0; i < trajectory.points.size(); ++i) {
-    const auto & p = trajectory.points[i];
-    const double dx = p.pose.position.x - x;
-    const double dy = p.pose.position.y - y;
-    if (const double d2 = dx * dx + dy * dy; d2 < min_dist_sq) {
-      min_dist_sq = d2;
-      closest_idx = i;
-    }
-  }
+  // hint_idx is the closest index found at pre-integration position; after one Euler step
+  // the vehicle moves at most ~0.3 m, so hint_idx is still the correct closest point.
+  const std::size_t closest_idx = std::min(hint_idx, trajectory.points.size() - 1);
 
   // Identify segment for interpolation (same logic as perfect_tracker)
   std::size_t prev_idx = closest_idx;
@@ -309,38 +286,37 @@ double SimModelPerfectTrajectoryTracker::calculatePitchFromLanelet(
     const auto map = traffic_simulator::lanelet_wrapper::LaneletWrapper::map();
     if (!map) return 0.0;
 
-    const auto nearest = lanelet::geometry::findNearest(
-      map->laneletLayer, lanelet::BasicPoint2d(x, y), 1);
+    const auto nearest =
+      lanelet::geometry::findNearest(map->laneletLayer, lanelet::BasicPoint2d(x, y), 1);
     if (nearest.empty()) return 0.0;
 
-    const auto centerline_pts = centerlineToPoints(nearest[0].second);
-    if (centerline_pts.size() < 2) return 0.0;
+    const auto & cl = nearest[0].second.centerline();
+    if (cl.size() < 2) return 0.0;
 
-    // Find nearest segment index (linear scan, no external dependency)
+    // Find nearest segment index (iterate centerline directly, no vector copy)
     double min_d = std::numeric_limits<double>::max();
     std::size_t seg_idx = 0;
-    for (std::size_t i = 0; i + 1 < centerline_pts.size(); ++i) {
-      const double dx = centerline_pts[i].x - x;
-      const double dy = centerline_pts[i].y - y;
+    for (std::size_t i = 0; i + 1 < cl.size(); ++i) {
+      const double dx = cl[i].basicPoint().x() - x;
+      const double dy = cl[i].basicPoint().y() - y;
       if (const double d = dx * dx + dy * dy; d < min_d) {
         min_d = d;
         seg_idx = i;
       }
     }
 
-    const auto & prev_pt = centerline_pts[seg_idx];
-    const auto & next_pt = centerline_pts[seg_idx + 1];
-
     // Exact math from SimplePlanningSimulator / perfect_tracker
-    const double road_yaw = std::atan2(next_pt.y - prev_pt.y, next_pt.x - prev_pt.x);
+    const auto & prev_pt = cl[seg_idx].basicPoint();
+    const auto & next_pt = cl[seg_idx + 1].basicPoint();
+    const double road_yaw = std::atan2(next_pt.y() - prev_pt.y(), next_pt.x() - prev_pt.x());
     const double yaw_diff = yaw - road_yaw;
-    const double diff_z = next_pt.z - prev_pt.z;
-    const double diff_xy = std::hypot(next_pt.x - prev_pt.x, next_pt.y - prev_pt.y);
+    const double diff_z = next_pt.z() - prev_pt.z();
+    const double diff_xy = std::hypot(next_pt.x() - prev_pt.x(), next_pt.y() - prev_pt.y());
     const double cos_yd = std::cos(yaw_diff);
     if (std::abs(cos_yd) < 1e-6) return 0.0;
     const double projected_run = diff_xy / cos_yd;
     return (cos_yd < 0.0) ? -std::atan2(-diff_z, -projected_run)
-                           : -std::atan2(diff_z, projected_run);
+                          : -std::atan2(diff_z, projected_run);
   } catch (...) {
     return 0.0;
   }
