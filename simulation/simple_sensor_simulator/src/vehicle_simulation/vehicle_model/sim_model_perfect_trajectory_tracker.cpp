@@ -39,18 +39,18 @@ double quatToYaw(const geometry_msgs::msg::Quaternion & q)
   return std::atan2(siny_cosp, cosy_cosp);
 }
 
-std::vector<geometry_msgs::msg::Point> centerlineToPoints(const lanelet::ConstLanelet & ll)
+std::vector<geometry_msgs::msg::Point> centerlineToPoints(const lanelet::ConstLanelet & lanelet)
 {
-  std::vector<geometry_msgs::msg::Point> pts;
-  pts.reserve(ll.centerline().size());
-  for (const auto & p : ll.centerline()) {
-    geometry_msgs::msg::Point gp;
-    gp.x = p.basicPoint().x();
-    gp.y = p.basicPoint().y();
-    gp.z = p.basicPoint().z();
-    pts.push_back(gp);
+  std::vector<geometry_msgs::msg::Point> center_points;
+  center_points.reserve(lanelet.centerline().size());
+  for (const auto & centerline_point : lanelet.centerline()) {
+    geometry_msgs::msg::Point point;
+    point.x = centerline_point.basicPoint().x();
+    point.y = centerline_point.basicPoint().y();
+    point.z = centerline_point.basicPoint().z();
+    center_points.push_back(point);
   }
-  return pts;
+  return center_points;
 }
 
 }  // namespace
@@ -75,12 +75,12 @@ void SimModelPerfectTrajectoryTracker::setInitialReference(
 
 void SimModelPerfectTrajectoryTracker::setTrajectory(
   const rclcpp::Time & stamp,
-  const autoware_planning_msgs::msg::Trajectory & msg)
+  const autoware_planning_msgs::msg::Trajectory & message)
 {
-  if (msg.points.empty()) return;
+  if (message.points.empty()) return;
   std::lock_guard<std::mutex> lock(mutex_);
   if (!trajectory_queue_.empty() && trajectory_queue_.front().stamp == stamp) return;
-  trajectory_queue_.push_front({stamp, msg});
+  trajectory_queue_.push_front({stamp, message});
   while (trajectory_queue_.size() > kQueueMax) {
     trajectory_queue_.pop_back();
   }
@@ -150,15 +150,15 @@ void SimModelPerfectTrajectoryTracker::update(const double & dt)
   const rclcpp::Time latest_stamp = trajectory_queue_.front().stamp;
   const rclcpp::Time target_stamp = latest_stamp - rclcpp::Duration::from_seconds(delay_time_sec_);
 
-  const autoware_planning_msgs::msg::Trajectory * traj_ptr = &trajectory_queue_.back().msg;
+  const autoware_planning_msgs::msg::Trajectory * trajectory = &trajectory_queue_.back().msg;
   for (const auto & entry : trajectory_queue_) {
     if (entry.stamp <= target_stamp) {
-      traj_ptr = &entry.msg;
+      trajectory = &entry.msg;
       break;
     }
   }
-  const auto & traj = *traj_ptr;
-  if (traj.points.empty()) return;
+
+  if (trajectory->points.empty()) return;
 
   // 2. Restore map-frame position from model-relative state
   const Eigen::Vector3d p_world = initial_rotation_matrix_ * Eigen::Vector3d(state_(X), state_(Y), 0.0);
@@ -169,18 +169,16 @@ void SimModelPerfectTrajectoryTracker::update(const double & dt)
   // 3. Find closest trajectory point (O(N) linear scan, same as perfect_tracker)
   double min_dist_sq = std::numeric_limits<double>::max();
   std::size_t closest_idx = 0;
-  for (std::size_t i = 0; i < traj.points.size(); ++i) {
-    const auto & p = traj.points[i];
-    const double dx = cx - p.pose.position.x;
-    const double dy = cy - p.pose.position.y;
-    const double d2 = dx * dx + dy * dy;
+  for (std::size_t i = 0; i < trajectory->points.size(); ++i) {
+    const auto & p = trajectory->points[i];
+    const double d2 = std::hypot(cx - p.pose.position.x, cy - p.pose.position.y);
     if (d2 < min_dist_sq) {
       min_dist_sq = d2;
       closest_idx = i;
     }
   }
 
-  const auto & target = traj.points[closest_idx];
+  const auto & target = trajectory->points[closest_idx];
 
   // 4. Copy trajectory kinematics; steer is used as-is (typically 0 for diffusion planner)
   const double v = target.longitudinal_velocity_mps;
@@ -189,15 +187,15 @@ void SimModelPerfectTrajectoryTracker::update(const double & dt)
 
   // Compute wz from consecutive yaw difference (heading_rate_rps is 0 in diffusion planner output)
   {
-    const std::size_t n = traj.points.size();
+    const std::size_t n = trajectory->points.size();
     const std::size_t j =
       (closest_idx + 1 < n) ? closest_idx + 1 : (closest_idx > 0 ? closest_idx - 1 : 0);
     if (j != closest_idx) {
-      const double yaw_i = quatToYaw(traj.points[closest_idx].pose.orientation);
-      const double yaw_j = quatToYaw(traj.points[j].pose.orientation);
+      const double yaw_i = quatToYaw(trajectory->points[closest_idx].pose.orientation);
+      const double yaw_j = quatToYaw(trajectory->points[j].pose.orientation);
       const double dt_traj =
-        (rclcpp::Duration(traj.points[j].time_from_start) -
-         rclcpp::Duration(traj.points[closest_idx].time_from_start))
+        (rclcpp::Duration(trajectory->points[j].time_from_start) -
+         rclcpp::Duration(trajectory->points[closest_idx].time_from_start))
           .seconds();
       current_wz_ = (std::abs(dt_traj) > 1e-6) ? normalizeAngle(yaw_j - yaw_i) / dt_traj : 0.0;
     } else {
@@ -211,7 +209,7 @@ void SimModelPerfectTrajectoryTracker::update(const double & dt)
   const double cyaw_map_next = quatToYaw(target.pose.orientation);
 
   // 6. Interpolate Z from trajectory; compute pitch from lanelet centerline
-  current_z_map_ = interpolateZ(traj, cx, cy, current_z_map_);
+  current_z_map_ = interpolateZ(*trajectory, cx, cy, current_z_map_);
   current_pitch_ = calculatePitchFromLanelet(cx, cy, cyaw_map_next);
 
   // 7. Write back to model-relative state
@@ -231,16 +229,16 @@ Eigen::VectorXd SimModelPerfectTrajectoryTracker::calcModel(
 }
 
 double SimModelPerfectTrajectoryTracker::interpolateZ(
-  const autoware_planning_msgs::msg::Trajectory & traj,
+  const autoware_planning_msgs::msg::Trajectory & trajectory,
   double x, double y, double fallback_z) const
 {
-  if (traj.points.size() < 2) return fallback_z;
+  if (trajectory.points.size() < 2) return fallback_z;
 
   // Find closest point
   double min_dist_sq = std::numeric_limits<double>::max();
   std::size_t closest_idx = 0;
-  for (std::size_t i = 0; i < traj.points.size(); ++i) {
-    const auto & p = traj.points[i];
+  for (std::size_t i = 0; i < trajectory.points.size(); ++i) {
+    const auto & p = trajectory.points[i];
     const double dx = p.pose.position.x - x;
     const double dy = p.pose.position.y - y;
     if (const double d2 = dx * dx + dy * dy; d2 < min_dist_sq) {
@@ -253,12 +251,12 @@ double SimModelPerfectTrajectoryTracker::interpolateZ(
   std::size_t prev_idx = closest_idx;
   std::size_t next_idx = closest_idx + 1;
 
-  if (next_idx >= traj.points.size()) {
+  if (next_idx >= trajectory.points.size()) {
     next_idx = closest_idx;
     prev_idx = (closest_idx > 0) ? closest_idx - 1 : 0;
   } else if (closest_idx > 0) {
-    const auto & pc = traj.points[closest_idx];
-    const auto & pn = traj.points[next_idx];
+    const auto & pc = trajectory.points[closest_idx];
+    const auto & pn = trajectory.points[next_idx];
     const double dx = pn.pose.position.x - pc.pose.position.x;
     const double dy = pn.pose.position.y - pc.pose.position.y;
     const double vx = x - pc.pose.position.x;
@@ -269,8 +267,8 @@ double SimModelPerfectTrajectoryTracker::interpolateZ(
     }
   }
 
-  const auto & p1 = traj.points[prev_idx];
-  const auto & p2 = traj.points[next_idx];
+  const auto & p1 = trajectory.points[prev_idx];
+  const auto & p2 = trajectory.points[next_idx];
   const double dx = p2.pose.position.x - p1.pose.position.x;
   const double dy = p2.pose.position.y - p1.pose.position.y;
   const double dz = p2.pose.position.z - p1.pose.position.z;
