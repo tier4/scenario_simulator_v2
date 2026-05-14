@@ -121,6 +121,12 @@ def launch_setup(context, *args, **kwargs):
     use_godot_sim = vehicle_model_name.endswith("_godot")
     if use_godot_sim:
         vehicle_model_name = vehicle_model_name[: -len("_godot")]
+    use_external_perfect_tracker_sim = vehicle_model_name.endswith("_external_perfect_tracker")
+    if use_external_perfect_tracker_sim:
+        vehicle_model_name = vehicle_model_name[: -len("_external_perfect_tracker")]
+    use_perfect_tracker_sim = vehicle_model_name.endswith("_perfect_tracker")
+    if use_perfect_tracker_sim:
+        vehicle_model_name = vehicle_model_name[: -len("_perfect_tracker")]
     godot_executable_path = ""
     if use_godot_sim:
         executable_str = godot_executable.perform(context)
@@ -265,6 +271,29 @@ def launch_setup(context, *args, **kwargs):
                         {"tf.enabled": False},
                         # Service servers (Godot advertises these via rosbridge instead)
                         {"/control/control_mode_request.enabled": False},
+                    ]
+                elif use_external_perfect_tracker_sim:
+                    return [
+                        description + "/config/vehicle_info.param.yaml",
+                        {"vehicle_model_type": "EXTERNAL_PERFECT_TRAJECTORY_TRACKER"},
+                        # Disable concealer publishers; autoware_perfect_tracker publishes
+                        # these topics directly to avoid duplicate publishers.
+                        {"/localization/acceleration.enabled": False},
+                        {"/localization/kinematic_state.enabled": False},
+                        {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
+                        {"/vehicle/status/steering_status.enabled": False},
+                        {"/vehicle/status/gear_status.enabled": False},
+                        {"/vehicle/status/control_mode.enabled": False},
+                        {"/vehicle/status/velocity_status.enabled": False},
+                        {"/vehicle/status/turn_indicators_status.enabled": False},
+                        {"tf.enabled": False},
+                        {"/control/control_mode_request.enabled": False},
+                    ]
+                elif use_perfect_tracker_sim:
+                    return [
+                        description + "/config/vehicle_info.param.yaml",
+                        description + "/config/simulator_model.param.yaml",
+                        {"vehicle_model_type": "PERFECT_TRAJECTORY_TRACKER"},
                     ]
                 else:
                     return [
@@ -449,6 +478,20 @@ def launch_setup(context, *args, **kwargs):
             ),
         ]
         if use_godot_sim
+        else []
+    ) + (
+        [
+            IncludeLaunchDescription(
+                FrontendLaunchDescriptionSource(
+                    os.path.join(
+                        get_package_share_directory("autoware_perfect_tracker"),
+                        "launch",
+                        "perfect_tracker.launch.xml",
+                    )
+                ),
+            ),
+        ]
+        if use_external_perfect_tracker_sim
         else []
     )
 
