@@ -116,6 +116,33 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto vel_time_constant          = common::getParameter("vel_time_constant",          0.1);  /// @note 0.5 is default value on simple_planning_simulator
   const auto vel_time_delay             = common::getParameter("vel_time_delay",             0.1);  /// @note 0.25 is default value on simple_planning_simulator
   const auto wheel_base                 = common::getParameter("wheel_base",                 parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
+
+  // 🌟 ここから追加：RK4・ブレーキ遅延・センサーノイズ用パラメータ
+  const auto acc_lim                    = common::getParameter("acc_lim",                    parameters.performance.max_acceleration);
+  const auto brake_lim                  = common::getParameter("brake_lim",                  parameters.performance.max_deceleration);
+  const auto acc_rate_lim               = common::getParameter("acc_rate_lim",               5.0);
+  const auto brake_rate_lim             = common::getParameter("brake_rate_lim",             10.0);
+  const auto brake_time_delay           = common::getParameter("brake_time_delay",           0.1);
+  const auto brake_time_constant        = common::getParameter("brake_time_constant",        0.1);
+  const auto acc_accuracy_error         = common::getParameter("acc_accuracy_error",         0.0);
+  const auto brake_accuracy_error       = common::getParameter("brake_accuracy_error",       0.0);
+  const auto brake_hysteresis_width     = common::getParameter("brake_hysteresis_width",     0.0);
+  const auto acc_dead_band              = common::getParameter("acc_dead_band",              0.0);
+  const auto brake_dead_band            = common::getParameter("brake_dead_band",            0.0);
+  const auto brake_jump_value           = common::getParameter("brake_jump_value",           0.0);
+  const auto acc_offset                 = common::getParameter("acc_offset",                 0.0);
+  const auto brake_offset               = common::getParameter("brake_offset",               0.0);
+  const auto acc_resolution             = common::getParameter("acc_resolution",             0.0);
+  const auto brake_resolution           = common::getParameter("brake_resolution",           0.0);
+  const auto steer_accuracy_error       = common::getParameter("steer_accuracy_error",       0.0);
+  const auto steer_resolution           = common::getParameter("steer_resolution",           0.0);
+  const auto steer_hysteresis_width     = common::getParameter("steer_hysteresis_width",     0.0);
+  const auto vel_sensor_delay           = common::getParameter("vel_sensor_delay",           0.0);
+  const auto vel_sensor_resolution      = common::getParameter("vel_sensor_resolution",      0.0);
+  const auto vel_sensor_noise_stddev    = common::getParameter("vel_sensor_noise_stddev",    0.0);
+  const int  vel_sensor_noise_seed      = common::getParameter("vel_sensor_noise_seed",      42);
+  const auto vel_sensor_accuracy_error  = common::getParameter("vel_sensor_accuracy_error",  0.0);
+  const auto vel_sensor_offset          = common::getParameter("vel_sensor_offset",          0.0);
   // clang-format on
 
   switch (vehicle_model_type) {
@@ -134,8 +161,13 @@ auto EgoEntitySimulation::makeSimulationModel(
     case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
       return std::make_shared<
         autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
-        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
-        acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
+        vel_lim, acc_lim, brake_lim, acc_rate_lim, brake_rate_lim, steer_lim, steer_rate_lim, wheel_base,
+        step_time, // 🌟 ここが dt に相当します
+        acc_time_delay, brake_time_delay, acc_time_constant, brake_time_constant,
+        acc_accuracy_error, brake_accuracy_error, brake_hysteresis_width, acc_dead_band, brake_dead_band, brake_jump_value, acc_offset, brake_offset, acc_resolution, brake_resolution,
+        steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
+        steer_accuracy_error, steer_resolution, steer_hysteresis_width,
+        vel_sensor_delay, vel_sensor_resolution, vel_sensor_noise_stddev, vel_sensor_noise_seed, vel_sensor_accuracy_error, vel_sensor_offset,
         debug_acc_scaling_factor, debug_steer_scaling_factor);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
