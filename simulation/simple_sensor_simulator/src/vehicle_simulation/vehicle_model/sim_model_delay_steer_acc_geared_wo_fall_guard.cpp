@@ -144,13 +144,9 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     double brake_cmd = std::abs(pedal_acc_des);
     brake_cmd = brake_cmd * (1.0 + brake_accuracy_error_);
 
-    double hist_cmd = brake_cmd;
-    if (brake_cmd > prev_brake_cmd_ + 1e-5) {
-      hist_cmd = std::max(0.0, brake_cmd - (brake_hysteresis_width_ / 2.0));
-    } else if (brake_cmd < prev_brake_cmd_ - 1e-5) {
-      hist_cmd = brake_cmd + (brake_hysteresis_width_ / 2.0);
-    }
-    prev_brake_cmd_ = brake_cmd;
+    double hist_cmd = std::clamp(prev_brake_cmd_, brake_cmd - (brake_hysteresis_width_ / 2.0), brake_cmd + (brake_hysteresis_width_ / 2.0));
+    hist_cmd = std::max(0.0, hist_cmd);
+    prev_brake_cmd_ = hist_cmd;
 
     double jump_cmd = 0.0;
     if (hist_cmd > brake_dead_band_) {
@@ -191,13 +187,8 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   double steer_des = sat(delayed_input(IDX_U::STEER_DES), steer_lim_, -steer_lim_) * debug_steer_scaling_factor_;
   steer_des *= (1.0 + steer_accuracy_error_);
 
-  double steer_hist = steer_des;
-  if (steer_des > prev_steer_cmd_ + 1e-5) {
-    steer_hist = steer_des - (steer_hysteresis_width_ / 2.0);
-  } else if (steer_des < prev_steer_cmd_ - 1e-5) {
-    steer_hist = steer_des + (steer_hysteresis_width_ / 2.0);
-  }
-  prev_steer_cmd_ = steer_des;
+  double steer_hist = std::clamp(prev_steer_cmd_, steer_des - (steer_hysteresis_width_ / 2.0), steer_des + (steer_hysteresis_width_ / 2.0));
+  prev_steer_cmd_ = steer_hist;
 
   if (steer_resolution_ > 1e-5) {
     steer_hist = std::round(steer_hist / steer_resolution_) * steer_resolution_;
@@ -206,6 +197,19 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   // =========================================================================
 
   const auto prev_state = state_;
+
+  // 🌟【最終改修1】真のブレーキジャンプ（踏み込みと抜きの両方）
+  if (delayed_input(IDX_U::PEDAL_ACCX_DES) <= -brake_jump_value_) {
+    // 踏み込み時：物理加速度がジャンプ値に達していない場合、即座に引き下げる
+    if (state_(IDX::PEDAL_ACCX) > -brake_jump_value_) {
+      state_(IDX::PEDAL_ACCX) = -brake_jump_value_;
+    }
+  } else if (delayed_input(IDX_U::PEDAL_ACCX_DES) > -brake_jump_value_) {
+    // 抜き時：ブレーキ指令が完全にゼロ（不感帯内）に戻ったら、引きずりを即座にゼロにする
+    if (state_(IDX::PEDAL_ACCX) < 0.0 && state_(IDX::PEDAL_ACCX) >= -brake_jump_value_) {
+      state_(IDX::PEDAL_ACCX) = 0.0;
+    }
+  }
 
   // 🌟 物理演算を高精度なルンゲ＝クッタ法（RK4）に切り替え
   updateRungeKutta(dt, delayed_input);
