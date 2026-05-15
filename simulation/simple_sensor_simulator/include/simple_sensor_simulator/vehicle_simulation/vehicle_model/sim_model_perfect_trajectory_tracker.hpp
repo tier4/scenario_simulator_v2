@@ -35,9 +35,9 @@
  * Input: none (trajectory is injected via setTrajectory())
  *
  * Extended API (not in SimModelInterface):
- *   setInitialReference() -- called once at construction
- *   setTrajectory()       -- called every simulation step
- *   getZ() / getPitch() / getRoll()
+ *   setInitialReference()    -- called once at construction
+ *   setTrajectory()          -- called every simulation step
+ *   setStateZInitialFrame()  -- sync initial-frame z from EgoEntitySimulation each step
  */
 class SimModelPerfectTrajectoryTracker : public SimModelInterface
 {
@@ -59,10 +59,13 @@ public:
   void setTrajectory(
     const rclcpp::Time & stamp, const autoware_planning_msgs::msg::Trajectory & msg);
 
-  // Extended getters (z/pitch not available in SimModelInterface)
-  double getZ() const;
-  double getPitch() const;
-  double getRoll() const { return 0.0; }
+  /**
+   * @brief Sync the initial-frame z component from EgoEntitySimulation's
+   *        world_relative_position_.z() before each update(). This lets the
+   *        model preserve the lanelet-corrected altitude through the R^T/R
+   *        roundtrip without an internal trajectory-Z or lanelet lookup.
+   */
+  void setStateZInitialFrame(double z);
 
   // SimModelInterface overrides
   double getX() override;
@@ -85,12 +88,6 @@ private:
     autoware_planning_msgs::msg::Trajectory msg;
   };
 
-  double interpolateZ(
-    const autoware_planning_msgs::msg::Trajectory & traj, std::size_t hint_idx, double x, double y,
-    double fallback_z) const;
-
-  double calculatePitchFromLanelet(double x, double y, double yaw) const;
-
   const double delay_time_sec_;
 
   mutable std::mutex mutex_;
@@ -106,11 +103,11 @@ private:
   double current_ax_{0.0};
   double current_wz_{0.0};
   double current_steer_{0.0};
-  double current_z_map_{0.0};
-  double current_pitch_{0.0};
 
-  // z-component of position in initial frame, updated each cycle to maintain exact R^T/R roundtrip.
-  // Using z=0 in the roundtrip introduces a per-step decay of sin²(pitch)*state_X in map-frame x.
+  // z-component of position in initial frame, set by EgoEntitySimulation before each update().
+  // EgoEntitySimulation computes world_relative_position_ = R^T*(map_pose - init_pose) at the
+  // start of each step (using the lanelet-corrected altitude from the previous setStatus() call),
+  // and passes .z() here so that R*[state_X, state_Y, state_z] = map_pos without z-mixing errors.
   double state_z_initial_frame_{0.0};
 };
 

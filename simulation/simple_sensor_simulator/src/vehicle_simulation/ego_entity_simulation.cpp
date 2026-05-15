@@ -432,6 +432,9 @@ void EgoEntitySimulation::update(
       if (stamp.nanoseconds() > 0) {
         perfect_tracker_model_->setTrajectory(stamp, traj);
       }
+      // Pass the lanelet-corrected initial-frame z so the model's R^T/R roundtrip
+      // is exact and the altitude stays on the lanelet spline (same source as all other models).
+      perfect_tracker_model_->setStateZInitialFrame(world_relative_position_.z());
       // Forward Autoware's gear command so the tracker can constrain motion
       // direction (e.g. forbid reverse motion while gear is DRIVE). The
       // trajectory's velocity sign is not always consistent with the gear
@@ -491,8 +494,6 @@ void EgoEntitySimulation::update(
   // only the position in the Oz axis is left unchanged, the rest is taken from SimModelInterface
   world_relative_position_.x() = vehicle_model_ptr_->getX();
   world_relative_position_.y() = vehicle_model_ptr_->getY();
-  // For PERFECT_TRAJECTORY_TRACKER, Z is output directly in getCurrentPose() via
-  // perfect_tracker_model_->getZ() (map-frame absolute), bypassing the rotation pipeline.
   updateStatus(current_time, step_time);
   updatePreviousValues();
 }
@@ -537,18 +538,11 @@ auto EgoEntitySimulation::getCurrentPose(const double pitch_angle) const -> geom
       .y(pitch_angle)
       .z(vehicle_model_ptr_->getYaw()));
 
-  // PERFECT_TRAJECTORY_TRACKER holds the trajectory-interpolated altitude as a map-frame
-  // absolute value in getZ(). Using the rotation pipeline would mix Z with the X component
-  // via initial pitch, causing compounding drift fed back through the diffusion planner.
-  const double z_map = (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER)
-                         ? perfect_tracker_model_->getZ()
-                         : initial_pose_.position.z + relative_position(2);
-
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(geometry_msgs::build<geometry_msgs::msg::Point>()
                 .x(initial_pose_.position.x + relative_position(0))
                 .y(initial_pose_.position.y + relative_position(1))
-                .z(z_map))
+                .z(initial_pose_.position.z + relative_position(2)))
     .orientation(initial_pose_.orientation * relative_orientation);
 }
 
@@ -611,10 +605,7 @@ auto EgoEntitySimulation::updateStatus(const double current_time, const double s
 {
   auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status_);
   status.time = std::isnan(current_time) ? 0 : current_time;
-  const double pitch_angle = (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER)
-                               ? perfect_tracker_model_->getPitch()
-                               : 0.0;
-  status.pose = getCurrentPose(pitch_angle);
+  status.pose = getCurrentPose(0.0);
   status.action_status.twist = getCurrentTwist();
   status.action_status.accel = getCurrentAccel(step_time);
   status.action_status.linear_jerk = getLinearJerk(step_time);
