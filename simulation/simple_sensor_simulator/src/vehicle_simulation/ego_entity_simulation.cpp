@@ -34,7 +34,13 @@ EgoEntitySimulation::EgoEntitySimulation(
 
   const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
 : autoware(std::make_unique<concealer::AutowareUniverse>(
-    common::getParameter<bool>("simulate_localization"))),
+    // EXTERNAL modes use an external node (Godot / autoware_perfect_tracker) to publish
+    // localization topics directly, so concealer must not publish them.
+    // simulate_localization=false redirects concealer's publishers to debug topics.
+    (getVehicleModelType() == VehicleModelType::EXTERNAL ||
+     getVehicleModelType() == VehicleModelType::EXTERNAL_PERFECT_TRAJECTORY_TRACKER)
+      ? false
+      : common::getParameter<bool>("simulate_localization"))),
   vehicle_model_type_(getVehicleModelType()),
   wheel_base_(common::getParameter(
     "wheel_base", parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x)),
