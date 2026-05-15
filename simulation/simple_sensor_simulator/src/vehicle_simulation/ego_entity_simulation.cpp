@@ -26,13 +26,21 @@
 
 namespace vehicle_simulation
 {
+auto toString(const VehicleModelType) -> std::string;
+
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::EntityStatus & initial_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
 
   const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
 : autoware(std::make_unique<concealer::AutowareUniverse>(
-    common::getParameter<bool>("simulate_localization"))),
+    // EXTERNAL modes use an external node (Godot / autoware_perfect_tracker) to publish
+    // localization topics directly, so concealer must not publish them.
+    // simulate_localization=false redirects concealer's publishers to debug topics.
+    (getVehicleModelType() == VehicleModelType::EXTERNAL ||
+     getVehicleModelType() == VehicleModelType::EXTERNAL_PERFECT_TRAJECTORY_TRACKER)
+      ? false
+      : common::getParameter<bool>("simulate_localization"))),
   vehicle_model_type_(getVehicleModelType()),
   wheel_base_(common::getParameter(
     "wheel_base", parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x)),
@@ -46,9 +54,11 @@ EgoEntitySimulation::EgoEntitySimulation(
   setStatus(initial_status);
   autoware->set_parameter(use_sim_time);
 
-  if (vehicle_model_type_ == VehicleModelType::EXTERNAL) {
+  if (
+    vehicle_model_type_ == VehicleModelType::EXTERNAL ||
+    vehicle_model_type_ == VehicleModelType::EXTERNAL_PERFECT_TRAJECTORY_TRACKER) {
     initializeExternalMode();
-  } else if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_FOLLOWER) {
+  } else if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER) {
     initializePerfectTrajectoryFollowerMode();
   }
 }
@@ -56,7 +66,7 @@ EgoEntitySimulation::EgoEntitySimulation(
 void EgoEntitySimulation::initializePerfectTrajectoryFollowerMode()
 {
   perfect_tracker_model_ =
-    dynamic_cast<SimModelPerfectTrajectoryFollower *>(vehicle_model_ptr_.get());
+    dynamic_cast<SimModelPerfectTrajectoryTracker *>(vehicle_model_ptr_.get());
   perfect_tracker_model_->setInitialReference(initial_pose_, initial_rotation_matrix_);
 }
 
@@ -82,10 +92,10 @@ void EgoEntitySimulation::initializeExternalMode()
 
   RCLCPP_INFO(
     autoware->get_logger(),
-    "Waiting for first /localization/kinematic_state from Godot "
-    "(signals map/mesh built and ros_bridge ready). "
+    "Waiting for first /localization/kinematic_state from external simulator (%s). "
     "initial_pose: x=%.3f y=%.3f z=%.3f",
-    initial_pose_.position.x, initial_pose_.position.y, initial_pose_.position.z);
+    toString(vehicle_model_type_).c_str(), initial_pose_.position.x, initial_pose_.position.y,
+    initial_pose_.position.z);
 }
 
 void EgoEntitySimulation::onKinematicState(const nav_msgs::msg::Odometry & msg)
@@ -104,7 +114,7 @@ void EgoEntitySimulation::onKinematicState(const nav_msgs::msg::Odometry & msg)
     external_initial_pose_pub_->publish(external_initial_pose_msg_);
     RCLCPP_INFO(
       autoware->get_logger(),
-      "First /localization/kinematic_state received; Godot is ready. "
+      "First /localization/kinematic_state received; external simulator is ready. "
       "Published /initialpose3d; engage will be driven by openscenario_interpreter.");
   }
 }
@@ -122,10 +132,11 @@ auto toString(const VehicleModelType datum) -> std::string
     BOILERPLATE(DELAY_STEER_MAP_ACC_GEARED);
     BOILERPLATE(DELAY_STEER_VEL);
     BOILERPLATE(EXTERNAL);
+    BOILERPLATE(EXTERNAL_PERFECT_TRAJECTORY_TRACKER);
     BOILERPLATE(IDEAL_STEER_ACC);
     BOILERPLATE(IDEAL_STEER_ACC_GEARED);
     BOILERPLATE(IDEAL_STEER_VEL);
-    BOILERPLATE(PERFECT_TRAJECTORY_FOLLOWER);
+    BOILERPLATE(PERFECT_TRAJECTORY_TRACKER);
   }
 
 #undef BOILERPLATE
@@ -146,10 +157,11 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
     {"DELAY_STEER_MAP_ACC_GEARED", VehicleModelType::DELAY_STEER_MAP_ACC_GEARED},
     {"DELAY_STEER_VEL", VehicleModelType::DELAY_STEER_VEL},
     {"EXTERNAL", VehicleModelType::EXTERNAL},
+    {"EXTERNAL_PERFECT_TRAJECTORY_TRACKER", VehicleModelType::EXTERNAL_PERFECT_TRAJECTORY_TRACKER},
     {"IDEAL_STEER_ACC", VehicleModelType::IDEAL_STEER_ACC},
     {"IDEAL_STEER_ACC_GEARED", VehicleModelType::IDEAL_STEER_ACC_GEARED},
     {"IDEAL_STEER_VEL", VehicleModelType::IDEAL_STEER_VEL},
-    {"PERFECT_TRAJECTORY_FOLLOWER", VehicleModelType::PERFECT_TRAJECTORY_FOLLOWER},
+    {"PERFECT_TRAJECTORY_TRACKER", VehicleModelType::PERFECT_TRAJECTORY_TRACKER},
   };
 
   const auto iter = table.find(vehicle_model_type);
@@ -228,15 +240,15 @@ auto EgoEntitySimulation::makeSimulationModel(
       return std::make_shared<SimModelIdealSteerAccGeared>(wheel_base);
 
     case VehicleModelType::EXTERNAL:
+    case VehicleModelType::EXTERNAL_PERFECT_TRAJECTORY_TRACKER:
       return std::make_shared<SimModelExternal>();
 
     case VehicleModelType::IDEAL_STEER_VEL:
       return std::make_shared<SimModelIdealSteerVel>(wheel_base);
 
-    case VehicleModelType::PERFECT_TRAJECTORY_FOLLOWER: {
-      const auto delay_time_sec =
-        common::getParameter("perfect_tracker_delay_time_sec", 0.0);
-      return std::make_shared<SimModelPerfectTrajectoryFollower>(delay_time_sec);
+    case VehicleModelType::PERFECT_TRAJECTORY_TRACKER: {
+      const auto delay_time_sec = common::getParameter("perfect_tracker_delay_time_sec", 0.0);
+      return std::make_shared<SimModelPerfectTrajectoryTracker>(delay_time_sec);
     }
 
     default:
@@ -290,10 +302,11 @@ void EgoEntitySimulation::requestSpeedChange(double value)
       break;
 
     case VehicleModelType::EXTERNAL:
+    case VehicleModelType::EXTERNAL_PERFECT_TRAJECTORY_TRACKER:
       // Speed is controlled by the external simulator; initial speed setting is ignored.
       return;
 
-    case VehicleModelType::PERFECT_TRAJECTORY_FOLLOWER:
+    case VehicleModelType::PERFECT_TRAJECTORY_TRACKER:
       // Speed is derived from the trajectory; initial speed setting is ignored.
       return;
 
@@ -372,13 +385,14 @@ auto EgoEntitySimulation::overwrite(
         break;
 
       case VehicleModelType::EXTERNAL:
+      case VehicleModelType::EXTERNAL_PERFECT_TRAJECTORY_TRACKER:
         external_model_->setExternalState(
           world_relative_position_.x(), world_relative_position_.y(), yaw,
           status.action_status.twist.linear.x, status.action_status.twist.linear.y,
           status.action_status.accel.linear.x, status.action_status.twist.angular.z, 0.0);
         break;
 
-      case VehicleModelType::PERFECT_TRAJECTORY_FOLLOWER:
+      case VehicleModelType::PERFECT_TRAJECTORY_TRACKER:
         // Trajectory drives state updates; external pose overwrite is intentionally ignored
         // to preserve trajectory-based consistency.
         break;
@@ -411,10 +425,12 @@ void EgoEntitySimulation::update(
                                status_.getMapPose().position.z - initial_pose_.position.z);
 
   if (is_npc_logic_started) {
-    if (vehicle_model_type_ == VehicleModelType::EXTERNAL) {
+    if (
+      vehicle_model_type_ == VehicleModelType::EXTERNAL ||
+      vehicle_model_type_ == VehicleModelType::EXTERNAL_PERFECT_TRAJECTORY_TRACKER) {
       // State is updated by the external simulator via ROS 2 subscription callbacks.
       // No Autoware command reading or vehicle model stepping required here.
-    } else if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_FOLLOWER) {
+    } else if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER) {
       // Inject the latest trajectory from Autoware and step the model.
       // The model selects the appropriate delayed trajectory internally.
       const auto traj = autoware->getTrajectory();
@@ -422,7 +438,17 @@ void EgoEntitySimulation::update(
       if (stamp.nanoseconds() > 0) {
         perfect_tracker_model_->setTrajectory(stamp, traj);
       }
+      // Pass the lanelet-corrected initial-frame z so the model's R^T/R roundtrip
+      // is exact and the altitude stays on the lanelet spline (same source as all other models).
+      perfect_tracker_model_->setStateZInitialFrame(world_relative_position_.z());
+      // Forward Autoware's gear command so the tracker can constrain motion
+      // direction (e.g. forbid reverse motion while gear is DRIVE). The
+      // trajectory's velocity sign is not always consistent with the gear
+      // command, so the gear acts as a safety/consistency layer over the
+      // trajectory.
+      vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
       vehicle_model_ptr_->update(step_time);
+
     } else {
       auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
@@ -474,18 +500,13 @@ void EgoEntitySimulation::update(
   // only the position in the Oz axis is left unchanged, the rest is taken from SimModelInterface
   world_relative_position_.x() = vehicle_model_ptr_->getX();
   world_relative_position_.y() = vehicle_model_ptr_->getY();
-  if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_FOLLOWER) {
-    // Override z with trajectory-interpolated altitude (map-frame absolute → relative)
-    world_relative_position_.z() =
-      perfect_tracker_model_->getZ() - initial_pose_.position.z;
-  }
   updateStatus(current_time, step_time);
   updatePreviousValues();
 }
 
 auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
-  if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_FOLLOWER) {
+  if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER) {
     // Slope acceleration is already embedded in trajectory acceleration_mps2.
     return 0.0;
   }
@@ -590,11 +611,7 @@ auto EgoEntitySimulation::updateStatus(const double current_time, const double s
 {
   auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status_);
   status.time = std::isnan(current_time) ? 0 : current_time;
-  const double pitch_angle =
-    (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_FOLLOWER)
-      ? perfect_tracker_model_->getPitch()
-      : 0.0;
-  status.pose = getCurrentPose(pitch_angle);
+  status.pose = getCurrentPose(0.0);
   status.action_status.twist = getCurrentTwist();
   status.action_status.accel = getCurrentAccel(step_time);
   status.action_status.linear_jerk = getLinearJerk(step_time);

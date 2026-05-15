@@ -45,13 +45,16 @@ auto Maneuver::run() -> void
         if (ev.hasExitSuccessAction()) {
           const auto unmet = ev.unmetStartTriggerConditions();
           if (!unmet.empty()) {
-            supplemental += "\nUnmet success conditions:";
-            for (const auto & [cond_name, cond_desc] : unmet) {
+            if (supplemental.empty()) {
+              supplemental += "\nUnmet success conditions:";
+            }
+            for (const auto & [cond_name, _] : unmet) {
               supplemental += "\n  - ";
               if (!cond_name.empty()) {
-                supplemental += "\"" + cond_name + "\": ";
+                supplemental += "\"" + cond_name + "\"";
+              } else {
+                supplemental += "<anonymous>";
               }
-              supplemental += cond_desc;
             }
           }
         }

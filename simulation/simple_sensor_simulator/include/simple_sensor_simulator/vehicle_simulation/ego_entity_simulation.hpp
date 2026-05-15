@@ -36,10 +36,11 @@ enum class VehicleModelType {
   DELAY_STEER_MAP_ACC_GEARED,
   DELAY_STEER_VEL,
   EXTERNAL,
+  EXTERNAL_PERFECT_TRAJECTORY_TRACKER,
   IDEAL_STEER_ACC,
   IDEAL_STEER_ACC_GEARED,
   IDEAL_STEER_VEL,
-  PERFECT_TRAJECTORY_FOLLOWER,
+  PERFECT_TRAJECTORY_TRACKER,
 };
 
 class EgoEntitySimulation
@@ -81,7 +82,7 @@ public:
 private:
   SimModelExternal * external_model_ = nullptr;
 
-  SimModelPerfectTrajectoryFollower * perfect_tracker_model_ = nullptr;
+  SimModelPerfectTrajectoryTracker * perfect_tracker_model_ = nullptr;
 
   auto initializePerfectTrajectoryFollowerMode() -> void;
 
