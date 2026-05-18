@@ -95,12 +95,35 @@ def main() -> None:
                         help="入力フル mcap ファイルパス")
     parser.add_argument("--output", required=True, type=Path,
                         help="出力 lite mcap ファイルパス")
+    parser.add_argument(
+        "--topics-yaml",
+        type=Path,
+        default=None,
+        help=(
+            "追加トピックリストを含む YAML ファイルのパス（省略時は既定トピックのみ）。"
+            "形式: real: [topic, ...] および/または sim: [topic, ...]"
+        ),
+    )
     args = parser.parse_args()
 
     if not args.input.exists():
         parser.error(f"入力ファイルが見つかりません: {args.input}")
 
-    topics = TOPICS[args.kind]
+    topics = set(TOPICS[args.kind])
+
+    if args.topics_yaml is not None:
+        try:
+            import yaml as _yaml
+            with open(args.topics_yaml, encoding="utf-8") as f:
+                extra = _yaml.safe_load(f) or {}
+            additional = extra.get(args.kind, [])
+            if additional:
+                topics |= set(additional)
+                print(f"追加トピック ({args.kind}): {sorted(additional)}")
+        except Exception as e:
+            import sys
+            print(f"WARNING: topics-yaml 読み込み失敗: {e}", file=sys.stderr)
+
     print(f"種別  : {args.kind}")
     print(f"入力  : {args.input} ({args.input.stat().st_size / 1024 / 1024:.0f} MB)")
     print(f"トピック: {sorted(topics)}")

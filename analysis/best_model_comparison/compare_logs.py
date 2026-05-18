@@ -8,6 +8,7 @@ Outputs: comparison/figures/*.{png,pdf}, comparison/report.md
 """
 
 import math
+import os
 import warnings
 from pathlib import Path
 
@@ -26,16 +27,36 @@ from _params_utils import add_params_annotation
 # ---------------------------------------------------------------------------
 # 設定
 # ---------------------------------------------------------------------------
-BASE = Path(__file__).parent
+# BEST_MODEL_BASE_DIR 環境変数が設定されている場合はそこを作業ディレクトリにする。
+# ローカル実行時（未設定）はスクリプトのあるディレクトリをそのまま使う。
+BASE = Path(os.environ.get("BEST_MODEL_BASE_DIR", Path(__file__).parent))
 LITE_DIR = BASE / "lite"
 OUT_DIR = BASE / "comparison"
 FIGS_DIR = OUT_DIR / "figures"
-MAP_DIR = Path.home() / ".webauto/simulation/data/map/x2_dev/2231"
+# 後方互換デフォルト（x2_dev/2231）。main() が MAP_OSM_PATH override を持つ場合は使われない。
+_DEFAULT_MAP_DIR = Path.home() / ".webauto/simulation/data/map/x2_dev/2231"
 SCENARIO_NAME = "x2_dev/2231 テレポート駅→日本科学未来館"
 
-LOGS = {
+# main() が外部から上書きする runtime 変数
+MAP_OSM_PATH_OVERRIDE: str | None = None  # 具体的な osm パス (override 時)
+_CURVE2_INDEX = 1                          # CURVE_CENTERS 内のカーブ② 位置
+_CURVE2_WINDOW = {"start": 20.0, "end": 120.0}  # カーブ② 発進検出窓 [s]
+
+AUTONOMOUS_MODE = 2  # autoware_adapi_v1_msgs OperationModeState.AUTONOMOUS
+WHEELBASE = 5.15     # m — kinematic_state × steering から実データで推定
+
+# 地図座標系でのカーブ中心（後方互換デフォルト: x2_dev/2231）
+# None に設定するとカーブ別解析プロットをすべてスキップする。
+CURVE_CENTERS: list | None = [
+    {"label": "カーブ①（右折）", "cx": 89440, "cy": 43200, "margin": 20},
+    {"label": "カーブ②（左折）", "cx": 89301, "cy": 43085, "margin": 20},
+    {"label": "カーブ③（右折）", "cx": 89372, "cy": 42830, "margin": 40},
+]
+
+# ログ定義（path は main() が LITE_DIR を確定した後に _rebuild_logs() で補完）
+_DEFAULT_LOG_SPECS: dict = {
     "実機": {
-        "path": LITE_DIR / "real.lite.mcap",
+        "mcap_name": "real.lite.mcap",
         "kinematic": "/sub/localization/kinematic_state",
         "accel": "/sub/localization/acceleration",
         "cmd": "/sub/control/command/control_cmd",
@@ -46,7 +67,7 @@ LOGS = {
         "ms": 5,
     },
     "Godot シム": {
-        "path": LITE_DIR / "sim_godot.lite.mcap",
+        "mcap_name": "sim_godot.lite.mcap",
         "kinematic": "/localization/kinematic_state",
         "accel": "/localization/acceleration",
         "cmd": "/control/trajectory_follower/control_cmd",
@@ -57,7 +78,7 @@ LOGS = {
         "ms": 5,
     },
     "通常シム": {
-        "path": LITE_DIR / "sim_normal.lite.mcap",
+        "mcap_name": "sim_normal.lite.mcap",
         "kinematic": "/localization/kinematic_state",
         "accel": "/localization/acceleration",
         "cmd": "/control/trajectory_follower/control_cmd",
@@ -69,15 +90,19 @@ LOGS = {
     },
 }
 
-AUTONOMOUS_MODE = 2  # autoware_adapi_v1_msgs OperationModeState.AUTONOMOUS
-WHEELBASE = 5.15     # m — kinematic_state × steering から実データで推定
 
-# 地図座標系でのカーブ中心（右折・左折・右折の順）
-CURVE_CENTERS = [
-    {"label": "カーブ①（右折）", "cx": 89440, "cy": 43200, "margin": 20},
-    {"label": "カーブ②（左折）", "cx": 89301, "cy": 43085, "margin": 20},
-    {"label": "カーブ③（右折）", "cx": 89372, "cy": 42830, "margin": 40},
-]
+def _rebuild_logs(lite_dir: Path, topic_overrides: dict | None = None) -> dict:
+    """LITE_DIR とオプショナルなトピック上書き辞書から LOGS dict を生成する。"""
+    result = {}
+    for label, spec in _DEFAULT_LOG_SPECS.items():
+        entry = {**spec, "path": lite_dir / spec["mcap_name"]}
+        if topic_overrides and label in topic_overrides:
+            entry.update(topic_overrides[label])
+        result[label] = entry
+    return result
+
+
+LOGS = _rebuild_logs(LITE_DIR)
 
 
 # ---------------------------------------------------------------------------
@@ -187,11 +212,21 @@ def align_time(df: pd.DataFrame, t0_ns: int) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def _resolve_map_osm() -> Path | None:
-    """MAP_DIR 下の最新バージョンディレクトリから lanelet2_map.osm を返す。"""
-    if not MAP_DIR.exists():
+    """利用可能な lanelet2_map.osm のパスを返す。
+
+    優先順位:
+      1. MAP_OSM_PATH_OVERRIDE (main() が外部引数から設定)
+      2. 後方互換フォールバック: _DEFAULT_MAP_DIR 下の最新バージョン glob
+    """
+    if MAP_OSM_PATH_OVERRIDE is not None:
+        if MAP_OSM_PATH_OVERRIDE == "":
+            return None  # 空文字は「地図なし」の明示指定
+        p = Path(MAP_OSM_PATH_OVERRIDE)
+        return p if p.exists() else None
+    if not _DEFAULT_MAP_DIR.exists():
         return None
     candidates = sorted(
-        MAP_DIR.glob("2231-*/lanelet2_map.osm"),
+        _DEFAULT_MAP_DIR.glob("*/lanelet2_map.osm"),
         key=lambda p: p.parent.name,
         reverse=True,
     )
@@ -389,6 +424,8 @@ def plot_steering(data: dict):
 
 def plot_curves(data: dict, map_ways: list | None):
     """3つのカーブにフォーカスした軌跡比較（横3列サブプロット）。"""
+    if not CURVE_CENTERS:
+        return
     n = len(CURVE_CENTERS)
     fig, axes = plt.subplots(1, n, figsize=(6 * n, 7))
     fig.suptitle(f"{SCENARIO_NAME}\nカーブ別軌跡比較", fontsize=11)
@@ -457,7 +494,7 @@ def _find_curve2_launch(df_vel: pd.DataFrame) -> float | None:
     for s, e in zip(starts_idx, ends_idx):
         dur = stopped[e] - stopped[s]
         t_end = stopped[e]
-        if dur >= 0.5 and 20.0 <= t_end <= 120.0:
+        if dur >= 0.5 and _CURVE2_WINDOW["start"] <= t_end <= _CURVE2_WINDOW["end"]:
             candidates.append(t_end)
     if not candidates:
         return None
@@ -466,10 +503,12 @@ def _find_curve2_launch(df_vel: pd.DataFrame) -> float | None:
 
 
 def _find_curve2_exit(df_kinematic: pd.DataFrame, t_launch: float, radius: float = 30.0) -> float | None:
-    """カーブ②領域（中心 cx=89301, cy=43085 から radius m 以内）を抜け出す時刻 [s] を返す。
+    """カーブ② 領域（CURVE_CENTERS[_CURVE2_INDEX] から radius m 以内）を抜け出す時刻 [s] を返す。
     t_launch 以降の軌跡を走査し、領域に入った後で最初に外に出たタイミングを採用。
     """
-    cx, cy = CURVE_CENTERS[1]["cx"], CURVE_CENTERS[1]["cy"]
+    if not CURVE_CENTERS or _CURVE2_INDEX >= len(CURVE_CENTERS):
+        return None
+    cx, cy = CURVE_CENTERS[_CURVE2_INDEX]["cx"], CURVE_CENTERS[_CURVE2_INDEX]["cy"]
     df_after = df_kinematic[df_kinematic["t"] >= t_launch]
     if df_after.empty:
         return None
@@ -518,7 +557,7 @@ def plot_curve2_analysis(data: dict, map_ways: list | None):
     T_PRE = -2.0
 
     # カーブ②表示範囲
-    c2 = CURVE_CENTERS[1]
+    c2 = CURVE_CENTERS[_CURVE2_INDEX]
     cx, cy, mg = c2["cx"], c2["cy"], 80
 
     # ---- 軌跡図 ----
@@ -649,7 +688,7 @@ def plot_curve2_steering_detail(data: dict, map_ways: list | None):
     ax_integ = fig.add_subplot(gs[2, 1])   # 右列下: 累積操舵量
 
     # カーブ②付近の軌跡
-    c2 = CURVE_CENTERS[1]
+    c2 = CURVE_CENTERS[_CURVE2_INDEX]
     cx, cy, mg = c2["cx"], c2["cy"], 80
     if map_ways:
         for pts in map_ways:
@@ -1210,6 +1249,113 @@ def build_report(data: dict) -> str:
 # ---------------------------------------------------------------------------
 
 def main():
+    import argparse
+    try:
+        import yaml as _yaml
+    except ImportError:
+        _yaml = None
+
+    parser = argparse.ArgumentParser(description="実機 vs シム 比較プロット生成")
+    parser.add_argument(
+        "--base-dir",
+        default=os.environ.get("BEST_MODEL_BASE_DIR", str(Path(__file__).parent)),
+        help="lite/ と comparison/ の親ディレクトリ (env: BEST_MODEL_BASE_DIR)",
+    )
+    parser.add_argument(
+        "--map-osm",
+        default=os.environ.get("MAP_OSM_PATH"),
+        help="lanelet2_map.osm の絶対パス。未指定なら ~/.webauto/... を試みる (env: MAP_OSM_PATH)",
+    )
+    parser.add_argument(
+        "--scenario-name",
+        default=os.environ.get("SCENARIO_NAME", ""),
+        help="図タイトルに表示するシナリオ名 (env: SCENARIO_NAME)",
+    )
+    parser.add_argument(
+        "--wheelbase",
+        type=float,
+        default=float(os.environ.get("WHEELBASE", "0") or "0"),
+        help="ホイールベース [m]。0 なら既定値を使用 (env: WHEELBASE)",
+    )
+    parser.add_argument(
+        "--curve-config",
+        # None=未指定（後方互換デフォルト）、""=スキップ、パス=YAML読み込み
+        default=os.environ.get("CURVE_CONFIG_YAML"),
+        help=(
+            "カーブ設定 YAML パス (env: CURVE_CONFIG_YAML)。"
+            "未指定=後方互換デフォルト、空文字=カーブ別解析スキップ"
+        ),
+    )
+    parser.add_argument(
+        "--topic-config",
+        default=os.environ.get("TOPIC_CONFIG_YAML", ""),
+        help="トピック設定 YAML パス。未指定なら規定トピックを使用 (env: TOPIC_CONFIG_YAML)",
+    )
+    args = parser.parse_args()
+
+    global BASE, LITE_DIR, OUT_DIR, FIGS_DIR
+    global SCENARIO_NAME, WHEELBASE, CURVE_CENTERS, LOGS
+    global MAP_OSM_PATH_OVERRIDE, _CURVE2_WINDOW, _CURVE2_INDEX
+
+    # --- ディレクトリ設定 ---
+    BASE = Path(args.base_dir)
+    LITE_DIR = BASE / "lite"
+    OUT_DIR = BASE / "comparison"
+    FIGS_DIR = OUT_DIR / "figures"
+
+    # --- シナリオ名 ---
+    if args.scenario_name:
+        SCENARIO_NAME = args.scenario_name
+
+    # --- WHEELBASE ---
+    if args.wheelbase and args.wheelbase > 0:
+        WHEELBASE = args.wheelbase
+
+    # --- 地図パス override ---
+    # None=未指定（後方互換フォールバック）、""=地図なし明示、パス文字列=その OSM を使用
+    if args.map_osm is not None:
+        MAP_OSM_PATH_OVERRIDE = args.map_osm
+
+    # --- カーブ設定 ---
+    if args.curve_config is None:
+        # 環境変数も引数も未設定 → デフォルト値を使う（後方互換）
+        pass
+    elif args.curve_config == "":
+        # 空文字を明示 → カーブ別解析スキップ
+        CURVE_CENTERS = None
+    else:
+        if _yaml is None:
+            warnings.warn("PyYAML が利用できないため curve_config を読み込めません。カーブ別解析をスキップ")
+            CURVE_CENTERS = None
+        else:
+            try:
+                with open(args.curve_config, encoding="utf-8") as f:
+                    cc = _yaml.safe_load(f)
+                CURVE_CENTERS = cc.get("curve_centers") or None
+                if "curve2_index" in cc:
+                    _CURVE2_INDEX = int(cc["curve2_index"])
+                if "curve2_window" in cc:
+                    w = cc["curve2_window"]
+                    _CURVE2_WINDOW = {
+                        "start": float(w.get("start", 0.0)),
+                        "end": float(w.get("end", 9999.0)),
+                    }
+            except Exception as e:
+                warnings.warn(f"curve_config YAML 読み込み失敗: {e}。カーブ別解析をスキップ")
+                CURVE_CENTERS = None
+
+    # --- トピック設定 ---
+    topic_overrides = None
+    if args.topic_config and _yaml is not None:
+        try:
+            with open(args.topic_config, encoding="utf-8") as f:
+                topic_overrides = _yaml.safe_load(f)
+        except Exception as e:
+            warnings.warn(f"topic_config YAML 読み込み失敗: {e}")
+
+    # --- LOGS 再構築（BASE が確定してから path を付与）---
+    LOGS = _rebuild_logs(LITE_DIR, topic_overrides)
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     FIGS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -1217,6 +1363,9 @@ def main():
     loaded = {}
     for label, cfg in LOGS.items():
         mcap_path: Path = cfg["path"]
+        if not mcap_path.exists():
+            warnings.warn(f"[{label}] {mcap_path} が見つからないためスキップ")
+            continue
         print(f"  [{label}] {mcap_path.name}")
 
         df_mode = load_operation_mode(mcap_path)
@@ -1237,6 +1386,10 @@ def main():
             "ms": cfg["ms"],
         }
 
+    if not loaded:
+        warnings.warn("有効なログが1つも読み込めませんでした")
+        return
+
     # Lanelet2 地図読み込み
     print("\n=== 地図読み込み中 ===")
     map_ways = None
@@ -1248,20 +1401,20 @@ def main():
         except Exception as e:
             warnings.warn(f"地図ロード失敗: {e}")
     else:
-        warnings.warn(f"地図ファイルが見つかりません: {MAP_DIR}/2231-*/lanelet2_map.osm")
+        warnings.warn("地図ファイルが見つかりません。軌跡プロットは地図背景なしで描画します")
 
     print("\n=== プロット生成中 ===")
     plot_trajectory(loaded, map_ways)
-    if not map_ways:
-        plot_trajectory(loaded, None)  # フォールバック: 地図なし
-    plot_curves(loaded, map_ways)
-    plot_curve2_analysis(loaded, map_ways)
-    plot_curve2_steering_detail(loaded, map_ways)
-    plot_curve2_yaw_steer(loaded)
-    plot_steer_response(loaded)
     plot_velocity(loaded)
     plot_acceleration(loaded)
     plot_steering(loaded)
+
+    if CURVE_CENTERS:
+        plot_curves(loaded, map_ways)
+        plot_curve2_analysis(loaded, map_ways)
+        plot_curve2_steering_detail(loaded, map_ways)
+        plot_curve2_yaw_steer(loaded)
+        plot_steer_response(loaded)
 
     print("\n=== レポート生成中 ===")
     try:

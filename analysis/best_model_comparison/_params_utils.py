@@ -12,13 +12,20 @@ _SIM_YAML  = _DESC_DIR / "simulator_model.param.yaml"
 _INFO_YAML = _DESC_DIR / "vehicle_info.param.yaml"
 
 
-def load_sim_params() -> dict:
+def load_sim_params(params_dir: Path | None = None) -> dict:
     """simulator_model.param.yaml + vehicle_info.param.yaml から主要パラメータを返す。
 
+    params_dir: vehicle_info.param.yaml と simulator_model.param.yaml が置かれたディレクトリ。
+                None の場合は既定の best_model_description/config/ を使用。
     YAML が読めない場合はフォールバック値を使用。
     """
+    if params_dir is not None:
+        d = Path(params_dir)
+        yaml_files = (d / "simulator_model.param.yaml", d / "vehicle_info.param.yaml")
+    else:
+        yaml_files = (_SIM_YAML, _INFO_YAML)
     params: dict = {}
-    for yaml_path in (_SIM_YAML, _INFO_YAML):
+    for yaml_path in yaml_files:
         try:
             import yaml  # PyYAML or ruamel.yaml
             with open(yaml_path, encoding="utf-8") as f:
@@ -89,13 +96,18 @@ def make_annotation_text(params: dict) -> str:
     return "\n".join(lines)
 
 
-def add_params_annotation(fig: plt.Figure, params: dict | None = None) -> None:
+def add_params_annotation(
+    fig: plt.Figure,
+    params: dict | None = None,
+    params_dir: Path | None = None,
+) -> None:
     """図の右下にモデルパラメータのテキストボックスを追加する。
 
     params が None の場合は YAML から自動読み込みする。
+    params_dir: vehicle_info.param.yaml 等が置かれたディレクトリ（任意）。
     """
     if params is None:
-        params = load_sim_params()
+        params = load_sim_params(params_dir)
     text = make_annotation_text(params)
     fig.text(
         0.99, 0.01,
