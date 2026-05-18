@@ -220,8 +220,8 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   state_(IDX::STEER) = sat(state_(IDX::STEER), steer_lim_, -steer_lim_);
   state_(IDX::PEDAL_ACCX) = sat(state_(IDX::PEDAL_ACCX), acc_lim_, -brake_lim_);
 
-  // 🌟 1. calcModelのtanhで使った「平滑化の幅」と同じ閾値を定義
-  const double vel_epsilon = 0.02;
+  // 🌟 1. クランプの閾値は、Autowareの停止判定基準に揃える
+  const double vel_epsilon = 0.01;
 
   // 🌟 2. 条件式に「閾値以下になったら」というクランプ条件を追加
   if (
