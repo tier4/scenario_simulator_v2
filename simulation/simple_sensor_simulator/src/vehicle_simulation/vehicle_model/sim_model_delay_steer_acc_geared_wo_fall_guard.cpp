@@ -219,8 +219,13 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   state_(IDX::STEER) = sat(state_(IDX::STEER), steer_lim_, -steer_lim_);
   state_(IDX::PEDAL_ACCX) = sat(state_(IDX::PEDAL_ACCX), acc_lim_, -brake_lim_);
+
+  // 🌟 1. calcModelのtanhで使った「平滑化の幅」と同じ閾値を定義
+  const double vel_epsilon = 0.02;
+
+  // 🌟 2. 条件式に「閾値以下になったら」というクランプ条件を追加
   if (
-    prev_state(IDX::VX) * state_(IDX::VX) <= 0.0 &&
+    (prev_state(IDX::VX) * state_(IDX::VX) <= 0.0 || std::abs(state_(IDX::VX)) < vel_epsilon) &&
     -state_(IDX::PEDAL_ACCX) >= std::abs(delayed_input(IDX_U::SLOPE_ACCX))) {
     state_(IDX::VX) = 0.0;
   }
@@ -331,20 +336,18 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
         return pedal_acc + input(IDX_U::SLOPE_ACCX);
       }
     } else {
-      if (vel > 0.0) {
-        return pedal_acc + input(IDX_U::SLOPE_ACCX);
-      } else if (vel < 0.0) {
-        return -pedal_acc + input(IDX_U::SLOPE_ACCX);
-      } else if (-pedal_acc >= std::abs(input(IDX_U::SLOPE_ACCX))) {
-        return 0.0;
-      } else {
-        // ブレーキが負けて転がり落ちる場合でも、ブレーキ力(pedal_acc < 0)を抵抗として計算する
-        if (input(IDX_U::SLOPE_ACCX) > 0.0) {
-          return input(IDX_U::SLOPE_ACCX) + pedal_acc;
-        } else {
-          return input(IDX_U::SLOPE_ACCX) - pedal_acc;
-        }
-      }
+      // =========================================================================
+      // 🌟 ブレーキ側：不連続な if (vel) 分岐を全廃し、数学的に平滑化する
+      // =========================================================================
+      // vel_epsilon: ブレーキ力が滑らかに反転する速度領域のスケール [m/s]
+      // ここでは極低速（時速約0.07km/h以下）の領域を指定
+      const double vel_epsilon = 0.02;
+
+      // pedal_acc（負の値）に対して、速度の向きに応じた滑らかな係数を掛ける
+      // vel > 0 の時は pedal_acc * (+1) = pedal_acc（減速）
+      // vel < 0 の時は pedal_acc * (-1) = -pedal_acc（前進方向への減速）
+      // vel = 0 の時は綺麗に 0 に収束する
+      return pedal_acc * std::tanh(vel / vel_epsilon) + input(IDX_U::SLOPE_ACCX);
     }
   }();
 
