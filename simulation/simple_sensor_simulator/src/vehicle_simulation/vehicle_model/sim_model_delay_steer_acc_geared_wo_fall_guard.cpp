@@ -157,7 +157,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   auto sat = [](double val, double u, double l) { return std::max(std::min(val, u), l); };
 
   // 1. アクセル・ブレーキ フィルタ
-  double pedal_acc_des = sat(delayed_input(IDX_U::PEDAL_ACCX_DES), acc_lim_, -brake_lim_) * debug_acc_scaling_factor_;
+  double pedal_acc_des = delayed_input(IDX_U::PEDAL_ACCX_DES) * debug_acc_scaling_factor_;
   if (pedal_acc_des < 0.0) {
     double brake_cmd = std::abs(pedal_acc_des);
     brake_cmd = brake_cmd * (1.0 + brake_accuracy_error_);
@@ -199,10 +199,10 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
     pedal_acc_des = pedal_acc_des + acc_offset_;
   }
-  delayed_input(IDX_U::PEDAL_ACCX_DES) = pedal_acc_des;
+  delayed_input(IDX_U::PEDAL_ACCX_DES) = sat(pedal_acc_des, acc_lim_, -brake_lim_);
 
   // 2. ステアリング フィルタ
-  double steer_des = sat(delayed_input(IDX_U::STEER_DES), steer_lim_, -steer_lim_) * debug_steer_scaling_factor_;
+  double steer_des = delayed_input(IDX_U::STEER_DES) * debug_steer_scaling_factor_;
   steer_des *= (1.0 + steer_accuracy_error_);
 
   double steer_hist = std::clamp(prev_steer_cmd_, steer_des - (steer_hysteresis_width_ / 2.0), steer_des + (steer_hysteresis_width_ / 2.0));
@@ -211,7 +211,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   if (steer_resolution_ > 1e-5) {
     steer_hist = std::round(steer_hist / steer_resolution_) * steer_resolution_;
   }
-  delayed_input(IDX_U::STEER_DES) = steer_hist;
+  delayed_input(IDX_U::STEER_DES) = sat(steer_hist, steer_lim_, -steer_lim_);
   // =========================================================================
 
   const auto prev_state = state_;
