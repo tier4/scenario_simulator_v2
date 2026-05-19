@@ -324,11 +324,11 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   constexpr double eps = 1e-5;
 
   const double current_tc = std::invoke([&]() {
-    if (pedal_acc_des > eps) {
+    if (pedal_acc_des > (acc_offset_ + eps)) {
       // 【パターン1：正（踏み込み加速）】➔ 純粋なアクセル動特性
       return acc_time_constant_;
     }
-    else if (pedal_acc_des < -eps) {
+    else if (pedal_acc_des < (-brake_offset_ - eps)) {
       // 【パターン2：負（踏み込み制動）】➔ 純粋なブレーキ作動動特性
       return brake_time_constant_;
     }
@@ -346,10 +346,10 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   });
 
   const double current_jerk_lim = std::invoke([&]() {
-    if (pedal_acc_des > eps) {
+    if (pedal_acc_des > (acc_offset_ + eps)) {
       return acc_rate_lim_;
     }
-    else if (pedal_acc_des < -eps) {
+    else if (pedal_acc_des < (-brake_offset_ - eps)) {
       return brake_rate_lim_;
     }
     else {
