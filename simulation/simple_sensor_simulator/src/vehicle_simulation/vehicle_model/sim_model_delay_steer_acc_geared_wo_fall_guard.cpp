@@ -113,19 +113,37 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
   Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
 
-  acc_input_queue_.push_back(input_(IDX_U::PEDAL_ACCX_DES));
-  brake_input_queue_.push_back(input_(IDX_U::PEDAL_ACCX_DES));
+  // =========================================================================
+  // 🌟【欠陥Aの解消（Level 1.5）】入力段階でのアクセルとブレーキ信号の完全分離
+  // =========================================================================
+  const double raw_pedal_cmd = input_(IDX_U::PEDAL_ACCX_DES);
 
+  if (raw_pedal_cmd >= 0.0) {
+    // 加速指令：アクセルキューには指令値を、ブレーキキューには「全離し(0.0)」を入れる
+    acc_input_queue_.push_back(raw_pedal_cmd);
+    brake_input_queue_.push_back(0.0);
+  } else {
+    // 制動指令：アクセルキューには「全離し(0.0)」を、ブレーキキューには指令値を入れる
+    acc_input_queue_.push_back(0.0);
+    brake_input_queue_.push_back(raw_pedal_cmd);
+  }
+
+  // それぞれの遅延時間が経過した値をキューから取り出す
   const double acc_delayed_val = acc_input_queue_.front();
   acc_input_queue_.pop_front();
   const double brake_delayed_val = brake_input_queue_.front();
   brake_input_queue_.pop_front();
 
-  if (acc_delayed_val >= 0.0) {
-    delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_delayed_val;
-  } else {
+  // 💡 ブレーキ・オーバーライド（BOS）論理による結合
+  // 万が一、遅延のタイミング差で「アクセル」と「ブレーキ」が同時に出てきた場合は、
+  // 実車の安全機構と同じく「ブレーキの指令」を優先して採用する。
+  if (brake_delayed_val < -1e-5) {
     delayed_input(IDX_U::PEDAL_ACCX_DES) = brake_delayed_val;
+  } else {
+    // ブレーキが出ていない時は、アクセルの値（0.0のコースティング状態も含む）を採用
+    delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_delayed_val;
   }
+  // =========================================================================
 
   steer_input_queue_.push_back(input_(IDX_U::STEER_DES));
   delayed_input(IDX_U::STEER_DES) = steer_input_queue_.front();
@@ -298,8 +316,48 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   // 🌟 update()で計算済みの固定指令値を使用
   const double pedal_acc_des = input(IDX_U::PEDAL_ACCX_DES);
   const double steer_des = input(IDX_U::STEER_DES);
-  const double current_tc = (pedal_acc_des < 0.0) ? brake_time_constant_ : acc_time_constant_;
-  const double current_jerk_lim = (pedal_acc_des < 0.0) ? brake_rate_lim_ : acc_rate_lim_;
+
+  // =========================================================================
+  // 指令値の「正・0・負」および「現在のペダル状態」による3パターン分離
+  // =========================================================================
+  // ゼロ判定のための閾値（1e-5）
+  constexpr double eps = 1e-5;
+
+  const double current_tc = std::invoke([&]() {
+    if (pedal_acc_des > eps) {
+      // 【パターン1：正（踏み込み加速）】➔ 純粋なアクセル動特性
+      return acc_time_constant_;
+    }
+    else if (pedal_acc_des < -eps) {
+      // 【パターン2：負（踏み込み制動）】➔ 純粋なブレーキ作動動特性
+      return brake_time_constant_;
+    }
+    else {
+      // 【パターン3：ゼロ（ペダル全離し・コースティング）】
+      // 💡 指令は0だが、現在の車両状態（pedal_acc）を見て、残っている力が抜けるスピードを決める
+      if (pedal_acc < 0.0) {
+        // 現在ブレーキが残っているなら、ブレーキの油圧・空圧が抜けるスピードを適用
+        return brake_time_constant_;
+      } else {
+        // 現在アクセル（推力）が残っているなら、エンジン回転が落ちるスピードを適用
+        return acc_time_constant_;
+      }
+    }
+  });
+
+  const double current_jerk_lim = std::invoke([&]() {
+    if (pedal_acc_des > eps) {
+      return acc_rate_lim_;
+    }
+    else if (pedal_acc_des < -eps) {
+      return brake_rate_lim_;
+    }
+    else {
+      // 指令が0のとき、現在残っている力に合わせて変化率の制限（ジャークリミット）を切り替える
+      return (pedal_acc < 0.0) ? brake_rate_lim_ : acc_rate_lim_;
+    }
+  });
+  // =========================================================================
 
   // 🌟 RK4の中間状態(state)を反映するため直接バイアスを足す
   const double current_steer_with_bias = state(IDX::STEER) + steer_bias_;
