@@ -223,9 +223,11 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
       state_(IDX::PEDAL_ACCX) = -brake_jump_value_;
     }
   } else if (delayed_input(IDX_U::PEDAL_ACCX_DES) > -brake_jump_value_) {
-    // 抜き時：ブレーキ指令が完全にゼロ（不感帯内）に戻ったら、引きずりを即座にゼロにする
-    if (state_(IDX::PEDAL_ACCX) < 0.0 && state_(IDX::PEDAL_ACCX) >= -brake_jump_value_) {
-      state_(IDX::PEDAL_ACCX) = 0.0;
+    // 💡 修正：目標値がジャンプ値より浅くなった場合、
+    // 物理加速度が目標値より下に残っていれば、即座に目標値まで引き上げる（抜く）
+    double target_release_val = std::min(delayed_input(IDX_U::PEDAL_ACCX_DES), 0.0);
+    if (state_(IDX::PEDAL_ACCX) < target_release_val && state_(IDX::PEDAL_ACCX) >= -brake_jump_value_) {
+      state_(IDX::PEDAL_ACCX) = target_release_val;
     }
   }
 
