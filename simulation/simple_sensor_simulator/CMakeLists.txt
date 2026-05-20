@@ -112,6 +112,16 @@ EXPORT export_simple_sensor_simulator_component
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
+add_library(vehicle_model_wrapper SHARED
+  src/vehicle_simulation/vehicle_model/vehicle_model_c_wrapper.cpp
+)
+target_include_directories(vehicle_model_wrapper PRIVATE ${EIGEN3_INCLUDE_DIRS})
+target_compile_features(vehicle_model_wrapper PRIVATE cxx_std_17)
+set_target_properties(vehicle_model_wrapper PROPERTIES POSITION_INDEPENDENT_CODE ON)
+install(TARGETS vehicle_model_wrapper
+  LIBRARY DESTINATION share/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
