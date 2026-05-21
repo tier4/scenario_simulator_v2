@@ -13,7 +13,6 @@
   <depend>autoware_map_msgs</depend>
   <depend>example_interfaces</depend>
   <depend>openscenario_interpreter</depend>
-  <depend>openscenario_interpreter_msgs</depend>
   <depend>openscenario_preprocessor</depend>
   <depend>openscenario_preprocessor_msgs</depend>
   <depend>openscenario_utility</depend>

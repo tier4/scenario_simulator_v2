@@ -27,7 +27,7 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchD
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import FrontendLaunchDescriptionSource
 
-from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.substitutions import LaunchConfiguration
 
 from launch_ros.actions import Node, LifecycleNode
 
@@ -98,8 +98,6 @@ def launch_setup(context, *args, **kwargs):
     record                                      = LaunchConfiguration("record",                                      default=True)
     record_option                               = LaunchConfiguration("record_option",                               default="")
     record_storage_id                           = LaunchConfiguration("record_storage_id",                           default="")
-    post_process_command                        = LaunchConfiguration("post_process_command",                        default="")
-    post_process_timeout                        = LaunchConfiguration("post_process_timeout",                        default=60)
     rviz_config                                 = LaunchConfiguration("rviz_config",                                 default=default_rviz_config_file())
     scenario                                    = LaunchConfiguration("scenario",                                    default=Path("/dev/null"))
     sensor_model                                = LaunchConfiguration("sensor_model",                                default="")
@@ -172,8 +170,6 @@ def launch_setup(context, *args, **kwargs):
     print(f"record                                      := {record.perform(context)}")
     print(f"record_option                               := {record_option.perform(context)}")
     print(f"record_storage_id                           := {record_storage_id.perform(context)}")
-    print(f"post_process_command                        := {post_process_command.perform(context)}")
-    print(f"post_process_timeout                        := {post_process_timeout.perform(context)}")
     print(f"rviz_config                                 := {rviz_config.perform(context)}")
     print(f"scenario                                    := {scenario.perform(context)}")
     print(f"sensor_model                                := {sensor_model.perform(context)}")
@@ -236,8 +232,6 @@ def launch_setup(context, *args, **kwargs):
             {"record": record},
             {"record_option": record_option},
             {"record_storage_id": record_storage_id},
-            {"post_process_command": post_process_command},
-            {"post_process_timeout": post_process_timeout},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
             {"sigterm_timeout": sigterm_timeout},
@@ -358,8 +352,6 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("pedestrian_ignore_see_around",                default_value=pedestrian_ignore_see_around               ),
         DeclareLaunchArgument("publish_empty_context",                       default_value=publish_empty_context                      ),
         DeclareLaunchArgument("record_option",                               default_value=record_option                              ),
-        DeclareLaunchArgument("post_process_command",                        default_value=post_process_command                       ),
-        DeclareLaunchArgument("post_process_timeout",                        default_value=post_process_timeout                       ),
         DeclareLaunchArgument("rviz_config",                                 default_value=rviz_config                                ),
         DeclareLaunchArgument("scenario",                                    default_value=scenario                                   ),
         DeclareLaunchArgument("sensor_model",                                default_value=sensor_model                               ),
@@ -418,15 +410,6 @@ def launch_setup(context, *args, **kwargs):
             parameters=make_parameters(),
             prefix=make_launch_prefix(),
             on_exit=ShutdownOnce(),
-        ),
-        Node(
-            package="scenario_test_runner",
-            executable="scenario_post_processor.py",
-            name="scenario_post_processor",
-            output="screen",
-            condition=IfCondition(
-                PythonExpression(["'", post_process_command, "' != ''"])
-            ),
         ),
         Node(
             package="openscenario_preprocessor",

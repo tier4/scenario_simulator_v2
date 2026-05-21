@@ -27,7 +27,6 @@
 #include <openscenario_interpreter/utility/execution_timer.hpp>
 #include <openscenario_interpreter/utility/visibility.hpp>
 #include <openscenario_interpreter_msgs/msg/context.hpp>
-#include <openscenario_interpreter_msgs/srv/post_process.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -80,14 +79,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
   String record_option;
 
   String record_storage_id;
-
-  String post_process_command;
-
-  std::int64_t post_process_timeout;
-
-  std::shared_ptr<rclcpp::Node> post_process_client_node;
-
-  rclcpp::Client<openscenario_interpreter_msgs::srv::PostProcess>::SharedPtr post_process_client;
 
   std::shared_ptr<OpenScenario> script;
 
