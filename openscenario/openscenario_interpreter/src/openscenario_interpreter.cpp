@@ -35,6 +35,14 @@
 
 namespace openscenario_interpreter
 {
+namespace
+{
+auto bag_path_from(const std::string & osc_path) -> std::string
+{
+  return std::filesystem::path(osc_path).replace_extension("").string();
+}
+}  // namespace
+
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
@@ -51,7 +59,15 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   publish_empty_context(false),
   record(false),
   record_option(""),
-  record_storage_id("")
+  record_storage_id(""),
+  post_process_command(""),
+  post_process_timeout(60),
+  post_process_client_node(std::make_shared<rclcpp::Node>(
+    "openscenario_interpreter_post_process_client")),
+  post_process_client(
+    post_process_client_node
+      ->create_client<openscenario_interpreter_msgs::srv::PostProcess>(
+        "/scenario_post_processor/post_process"))
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
@@ -61,6 +77,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(record);
   DECLARE_PARAMETER(record_option);
   DECLARE_PARAMETER(record_storage_id);
+  DECLARE_PARAMETER(post_process_command);
+  DECLARE_PARAMETER(post_process_timeout);
 
   SpeedCondition::compatibility =
     boost::lexical_cast<Compatibility>(common::getParameter<std::string>(
@@ -124,6 +142,8 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(record);
       GET_PARAMETER(record_option);
       GET_PARAMETER(record_storage_id);
+      GET_PARAMETER(post_process_command);
+      GET_PARAMETER(post_process_timeout);
 
       script = std::make_shared<OpenScenario>(osc_path);
 
@@ -232,8 +252,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          std::vector<std::string> options{
-            "-a", "-o", std::filesystem::path(osc_path).replace_extension("").string()};
+          std::vector<std::string> options{"-a", "-o", bag_path_from(osc_path)};
 
           if (not record_storage_id.empty()) {
             options.insert(options.end(), {"-s", record_storage_id});
@@ -392,6 +411,54 @@ auto Interpreter::reset() -> void
     as it sleeps for 3s and then waits until rosbag saving is finished.
     */
     common::status_monitor.overrideThreshold(simulator_core_shutdown_threshold, record::stop);
+  }
+
+  if (record and not post_process_command.empty()) {
+    if (not post_process_client->wait_for_service(std::chrono::milliseconds(100))) {
+      RCLCPP_WARN_STREAM(
+        get_logger(),
+        "post_process_command is set but the post-process service is not advertised; skipping");
+      return;
+    }
+
+    const auto result_str = std::visit(
+      overload(
+        [](const common::junit::Pass &) { return std::string("Pass"); },
+        [](const common::junit::Failure &) { return std::string("Failure"); },
+        [](const common::junit::Error &) { return std::string("Error"); }),
+      result);
+
+    auto request =
+      std::make_shared<openscenario_interpreter_msgs::srv::PostProcess::Request>();
+    request->command = post_process_command;
+    request->osc_path = osc_path;
+    request->bag_path = bag_path_from(osc_path);
+    request->output_directory = output_directory;
+    request->record_storage_id = record_storage_id;
+    request->result = result_str;
+    request->timeout_seconds = post_process_timeout;
+
+    common::status_monitor.overrideThreshold(
+      std::chrono::seconds(post_process_timeout),
+      [&]() {
+        auto future = post_process_client->async_send_request(request);
+        // NOTE: Spin on the dedicated client node so that the main interpreter
+        // executor (already running on_deactivate -> reset) does not get re-entered.
+        const auto code = rclcpp::spin_until_future_complete(
+          post_process_client_node, future,
+          std::chrono::seconds(post_process_timeout));
+        if (code == rclcpp::FutureReturnCode::SUCCESS) {
+          const auto response = future.get();
+          if (not response->success) {
+            RCLCPP_WARN_STREAM(
+              get_logger(), "post-process reported failure: " << response->message);
+          }
+        } else {
+          RCLCPP_WARN(
+            get_logger(),
+            "post-process service did not return within timeout");
+        }
+      });
   }
 }
 }  // namespace openscenario_interpreter
