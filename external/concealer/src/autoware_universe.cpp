@@ -27,13 +27,14 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
     "concealer", "simulation",
     rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true)),
   ContinuousTransformBroadcaster<AutowareUniverse>(simulate_localization? "base_link" : "base_link_ground_truth"),
+  getCandidateTrajectories(
+    "/planning/generator/diffusion_planner/candidate_trajectories", rclcpp::QoS(1), *this),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommand("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   getPathWithLaneId(
     "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1),
     *this),
-  getTrajectory("/planning/trajectory", rclcpp::QoS(1), *this),
   setAcceleration(
     simulate_localization ? "/localization/acceleration"
                           : "/simulation/debug/localization/acceleration",

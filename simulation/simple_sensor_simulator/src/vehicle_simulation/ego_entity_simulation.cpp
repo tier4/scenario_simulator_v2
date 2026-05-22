@@ -434,10 +434,30 @@ void EgoEntitySimulation::update(
     } else if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER) {
       // Inject the latest trajectory from Autoware and step the model.
       // The model selects the appropriate delayed trajectory internally.
-      const auto traj = autoware->getTrajectory();
-      const rclcpp::Time stamp(traj.header.stamp);
-      if (stamp.nanoseconds() > 0) {
-        perfect_tracker_model_->setTrajectory(stamp, traj);
+      const auto candidates = autoware->getCandidateTrajectories();
+      // Why front() is safe:
+      //   - The upstream publisher (autoware_diffusion_planner) pushes exactly
+      //     `batch_size` candidates per message; see
+      //     https://github.com/tier4/autoware_universe/blob/877d757cacb69243791202112f4d57f607cd5f29/planning/autoware_diffusion_planner/src/diffusion_planner_core.cpp#L341 .
+      //   - The default `batch_size: 1` is declared in
+      //     https://github.com/tier4/autoware_universe/blob/877d757cacb69243791202112f4d57f607cd5f29/planning/autoware_diffusion_planner/config/diffusion_planner.param.yaml#L10
+      //     of the same repository, so the array degenerates to a single element.
+      //   - Empirically confirmed by sampling 50 consecutive messages of
+      //     /planning/generator/diffusion_planner/candidate_trajectories from the
+      //     real rosbag: n_candidates is constantly 1
+      //     and generator_name is constantly "DiffusionPlanner_batch_0".
+      // If batch_size is ever raised above 1, front() picks an arbitrary sample
+      // and this selection policy must be revisited (e.g. choose by generator_id
+      // or by an external scoring topic).
+      if (!candidates.candidate_trajectories.empty()) {
+        const auto & front = candidates.candidate_trajectories.front();
+        const rclcpp::Time stamp(front.header.stamp);
+        if (stamp.nanoseconds() > 0) {
+          autoware_planning_msgs::msg::Trajectory traj;
+          traj.header = front.header;
+          traj.points = front.points;
+          perfect_tracker_model_->setTrajectory(stamp, traj);
+        }
       }
       // Pass the lanelet-corrected initial-frame z so the model's R^T/R roundtrip
       // is exact and the altitude stays on the lanelet spline (same source as all other models).

@@ -17,7 +17,7 @@
 
 #include <atomic>
 #include <autoware_control_msgs/msg/control.hpp>
-#include <autoware_planning_msgs/msg/trajectory.hpp>
+#include <autoware_internal_planning_msgs/msg/candidate_trajectories.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_vehicle_msgs/msg/gear_report.hpp>
@@ -46,6 +46,7 @@ class AutowareUniverse : public rclcpp::Node,
 public:
   // clang-format off
   using AccelWithCovarianceStamped  = geometry_msgs::msg::AccelWithCovarianceStamped;
+  using CandidateTrajectories       = autoware_internal_planning_msgs::msg::CandidateTrajectories;
   using Control                     = autoware_control_msgs::msg::Control;
   using ControlModeCommand          = autoware_vehicle_msgs::srv::ControlModeCommand;
   using ControlModeReport           = autoware_vehicle_msgs::msg::ControlModeReport;
@@ -56,14 +57,13 @@ public:
   using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
   using TurnIndicatorsCommand       = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
   using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
-  using Trajectory                  = autoware_planning_msgs::msg::Trajectory;
   using VelocityReport              = autoware_vehicle_msgs::msg::VelocityReport;
 
+  Subscriber<CandidateTrajectories>    getCandidateTrajectories;
   Subscriber<Control>                  getCommand;
   Subscriber<GearCommand>              getGearCommand;
   Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
   Subscriber<priority::PathWithLaneId> getPathWithLaneId;
-  Subscriber<Trajectory>               getTrajectory;
 
   Publisher<AccelWithCovarianceStamped>                    setAcceleration;
   Publisher<Odometry, NormalDistribution>                  setOdometry;
