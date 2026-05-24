@@ -182,7 +182,7 @@ auto EgoEntitySimulation::setAutowareStatus() -> void
 
   autoware->current_twist.store(getCurrentTwist());
 
-  autoware->current_steering_tire_angle.store(vehicle_model_ptr_->getSteer());
+  autoware->current_steering_tire_angle.store(static_cast<float>(vehicle_model_ptr_->getSteer()));
 }
 
 void EgoEntitySimulation::requestSpeedChange(double value)
