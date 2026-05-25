@@ -84,6 +84,11 @@ double SimModelDelaySteerAccGearedWoFallGuard::getYaw() { return state_(IDX::YAW
 double SimModelDelaySteerAccGearedWoFallGuard::getVx()
 {
   double vx = delayed_vx_;
+
+  if (std::abs(vx) < 1e-3) {
+    return 0.0;
+  }
+
   vx = vx * (1.0 + vel_sensor_accuracy_error_);
   vx += vel_sensor_offset_;
   if (vel_sensor_noise_stddev_ > 1e-5) {
@@ -302,7 +307,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
 
   size_t vel_input_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
   vel_history_queue_.resize(vel_input_queue_size);
-  std::fill(vel_history_queue_.begin(), vel_history_queue_.end(), 0.0);
+  std::fill(vel_history_queue_.begin(), vel_history_queue_.end(), state_(IDX::VX));
 }
 
 Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
