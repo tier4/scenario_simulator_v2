@@ -295,19 +295,22 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
 {
   size_t acc_input_queue_size = static_cast<size_t>(round(acc_delay_ / dt));
   acc_input_queue_.resize(acc_input_queue_size);
-  std::fill(acc_input_queue_.begin(), acc_input_queue_.end(), 0.0);
+  std::fill(acc_input_queue_.begin(), acc_input_queue_.end(), std::max(0.0, state_(IDX::PEDAL_ACCX)));
 
   size_t brake_input_queue_size = static_cast<size_t>(round(brake_delay_ / dt));
   brake_input_queue_.resize(brake_input_queue_size);
-  std::fill(brake_input_queue_.begin(), brake_input_queue_.end(), 0.0);
+  std::fill(brake_input_queue_.begin(), brake_input_queue_.end(), std::min(0.0, state_(IDX::PEDAL_ACCX)));
+  prev_brake_cmd_ = std::abs(std::min(0.0, state_(IDX::PEDAL_ACCX)));
 
   size_t steer_input_queue_size = static_cast<size_t>(round(steer_delay_ / dt));
   steer_input_queue_.resize(steer_input_queue_size);
-  std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), 0.0);
+  std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), state_(IDX::STEER));
+  prev_steer_cmd_ = state_(IDX::STEER);
 
   size_t vel_input_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
   vel_history_queue_.resize(vel_input_queue_size);
   std::fill(vel_history_queue_.begin(), vel_history_queue_.end(), state_(IDX::VX));
+  delayed_vx_ = state_(IDX::VX);
 }
 
 Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
