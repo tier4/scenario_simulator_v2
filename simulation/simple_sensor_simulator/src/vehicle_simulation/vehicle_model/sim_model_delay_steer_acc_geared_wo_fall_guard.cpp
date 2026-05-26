@@ -67,7 +67,6 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
   prev_brake_cmd_(0.0),
-  prev_steer_cmd_(0.0),
   delayed_vx_(0.0),
   vel_rng_(vel_sensor_noise_seed),
   vel_dist_(0.0, 1.0)
@@ -110,8 +109,7 @@ double SimModelDelaySteerAccGearedWoFallGuard::getWz()
 
 double SimModelDelaySteerAccGearedWoFallGuard::getSteer()
 {
-
-  return state_(IDX::STEER) + steer_bias_;
+  return (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
 }
 
 void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
@@ -208,14 +206,14 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   // 2. ステアリング フィルタ
   double steer_des = delayed_input(IDX_U::STEER_DES) * debug_steer_scaling_factor_;
-  steer_des *= (1.0 + steer_accuracy_error_);
-
-  double steer_hist = std::clamp(prev_steer_cmd_, steer_des - (steer_hysteresis_width_ / 2.0), steer_des + (steer_hysteresis_width_ / 2.0));
-  prev_steer_cmd_ = steer_hist;
 
   if (steer_resolution_ > 1e-5) {
-    steer_hist = std::round(steer_hist / steer_resolution_) * steer_resolution_;
+    steer_des = std::round(steer_des / steer_resolution_) * steer_resolution_;
   }
+
+  const double current_motor_angle = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
+  double steer_hist = std::clamp(current_motor_angle, steer_des - (steer_hysteresis_width_ / 2.0), steer_des + (steer_hysteresis_width_ / 2.0));
+
   delayed_input(IDX_U::STEER_DES) = sat(steer_hist, steer_lim_, -steer_lim_);
   // =========================================================================
 
@@ -242,7 +240,16 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   // 速度制限と停止判定
   state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
 
-  state_(IDX::STEER) = sat(state_(IDX::STEER), steer_lim_, -steer_lim_);
+  // 🌟 タイヤの物理的な可動限界は、モーターの限界（steer_lim_）にギア比とバイアスが乗った値になる
+  const double tire_steer_upper_lim = steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
+  const double tire_steer_lower_lim = -steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
+  // 念のため上下限の逆転を防ぐ安全策を施してクランプ
+  state_(IDX::STEER) = sat(
+    state_(IDX::STEER),
+    std::max(tire_steer_upper_lim, tire_steer_lower_lim),
+    std::min(tire_steer_upper_lim, tire_steer_lower_lim)
+  );
+
   state_(IDX::PEDAL_ACCX) = sat(state_(IDX::PEDAL_ACCX), acc_lim_, -brake_lim_);
 
   // 🌟 1. クランプの閾値は、Autowareの停止判定基準に揃える
@@ -304,8 +311,8 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
 
   size_t steer_input_queue_size = static_cast<size_t>(round(steer_delay_ / dt));
   steer_input_queue_.resize(steer_input_queue_size);
-  std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), state_(IDX::STEER));
-  prev_steer_cmd_ = state_(IDX::STEER);
+  const double initial_steer_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
+  std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), initial_steer_cmd);
 
   size_t vel_input_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
   vel_history_queue_.resize(vel_input_queue_size);
@@ -369,8 +376,8 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   });
   // =========================================================================
 
-  // 🌟 RK4の中間状態(state)を反映するため直接バイアスを足す
-  const double current_steer_with_bias = state(IDX::STEER) + steer_bias_;
+  // 真のタイヤ角度(state)から、バイアスを引きギア比で割って、モーター位置(u)を逆算する
+  const double current_steer_with_bias = (steer - steer_bias_) / (1.0 + steer_accuracy_error_);
   const double steer_diff = current_steer_with_bias - steer_des;
 
   const double steer_diff_with_dead_band = std::invoke([&]() {
@@ -422,7 +429,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const double raw_acc_rate = -(pedal_acc - pedal_acc_des) / current_tc;
   const double pedal_acc_rate = sat(raw_acc_rate, current_jerk_lim, -current_jerk_lim);
 
-  d_state(IDX::STEER) = steer_rate;
+  d_state(IDX::STEER) = steer_rate * (1.0 + steer_accuracy_error_);
   d_state(IDX::PEDAL_ACCX) = pedal_acc_rate;
 
   return d_state;

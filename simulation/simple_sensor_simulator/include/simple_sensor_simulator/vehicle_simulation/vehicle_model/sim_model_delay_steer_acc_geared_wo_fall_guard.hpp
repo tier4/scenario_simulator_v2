@@ -139,7 +139,6 @@ private:
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
 
   double prev_brake_cmd_; // ヒステリシス計算用に前回のブレーキ指令値を記憶する変数
-  double prev_steer_cmd_;
 
   std::deque<double> vel_history_queue_;       // 車速の遅延用バッファ
   double delayed_vx_;                          // 遅延適用後の物理車速
