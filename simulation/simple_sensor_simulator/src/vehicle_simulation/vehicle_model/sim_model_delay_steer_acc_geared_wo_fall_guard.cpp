@@ -23,7 +23,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -38,9 +38,18 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   steer_dead_band_(steer_dead_band),
   steer_bias_(steer_bias),
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
-  debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0))
+  debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
+  k_us_(k_us)
 {
   initializeInputQueue(dt);
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::calc_yaw_rate(double vel, double steer) const
+{
+  // Augmented-bicycle yaw rate. With k_us = 0 this is exactly the ideal kinematic
+  // bicycle, so existing setups remain bit-for-bit identical.
+  const double denom = wheelbase_ + k_us_ * vel * vel;
+  return vel * std::tan(steer) / denom;
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getX() { return state_(IDX::X); }
@@ -57,7 +66,7 @@ double SimModelDelaySteerAccGearedWoFallGuard::getAx() { return state_(IDX::ACCX
 
 double SimModelDelaySteerAccGearedWoFallGuard::getWz()
 {
-  return state_(IDX::VX) * std::tan(state_(IDX::STEER)) / wheelbase_;
+  return calc_yaw_rate(state_(IDX::VX), state_(IDX::STEER));
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getSteer()
@@ -141,7 +150,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
 
   d_state(IDX::X) = vel * cos(yaw);
   d_state(IDX::Y) = vel * sin(yaw);
-  d_state(IDX::YAW) = vel * std::tan(steer) / wheelbase_;
+  d_state(IDX::YAW) = calc_yaw_rate(vel, steer);
   d_state(IDX::VX) = [&] {
     if (pedal_acc >= 0.0) {
       using autoware_vehicle_msgs::msg::GearCommand;
