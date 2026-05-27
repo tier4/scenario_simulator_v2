@@ -80,24 +80,8 @@ double SimModelDelaySteerAccGearedWoFallGuard::getY() { return state_(IDX::Y); }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getYaw() { return state_(IDX::YAW); }
 
-double SimModelDelaySteerAccGearedWoFallGuard::getVx()
-{
-  double vx = delayed_vx_;
+double SimModelDelaySteerAccGearedWoFallGuard::getVx() { return delayed_vx_; }
 
-  if (std::abs(vx) < 1e-3) {
-    return 0.0;
-  }
-
-  vx = vx * (1.0 + vel_sensor_accuracy_error_);
-  vx += vel_sensor_offset_;
-  if (vel_sensor_noise_stddev_ > 1e-5) {
-    vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_;
-  }
-  if (vel_sensor_resolution_ > 1e-5) {
-    vx = std::round(vx / vel_sensor_resolution_) * vel_sensor_resolution_;
-  }
-  return vx;
-}
 double SimModelDelaySteerAccGearedWoFallGuard::getVy() { return 0.0; }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getAx() { return state_(IDX::ACCX); }
@@ -161,47 +145,74 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   // 1. アクセル・ブレーキ フィルタ
   double pedal_acc_des = delayed_input(IDX_U::PEDAL_ACCX_DES) * debug_acc_scaling_factor_;
+
+  bool is_brake_pad_contacting = false;
+
+  // 挿入：ベースラインをすべてのジャンプ処理の基準として先行計算
+  double baseline_acc = acc_offset_ - brake_offset_;
+
   if (pedal_acc_des < 0.0) {
     double brake_cmd = std::abs(pedal_acc_des);
-    brake_cmd = brake_cmd * (1.0 + brake_accuracy_error_);
 
-    double hist_cmd = std::clamp(prev_brake_cmd_, brake_cmd - (brake_hysteresis_width_ / 2.0), brake_cmd + (brake_hysteresis_width_ / 2.0));
+    if (brake_resolution_ > 1e-5) {
+      brake_cmd = std::round(brake_cmd / brake_resolution_) * brake_resolution_;
+    }
+
+    // 🌟 挿入：足を完全に離した時はヒステリシスを0に戻す
+    double hist_cmd = 0.0;
+    if (brake_cmd < 1e-5) {
+      hist_cmd = 0.0;
+    } else {
+      hist_cmd = std::clamp(prev_brake_cmd_, brake_cmd - (brake_hysteresis_width_ / 2.0), brake_cmd + (brake_hysteresis_width_ / 2.0));
+    }
     hist_cmd = std::max(0.0, hist_cmd);
     prev_brake_cmd_ = hist_cmd;
 
     double jump_cmd = 0.0;
     if (hist_cmd > brake_dead_band_) {
-      // 空振りした分（不感帯）を引き算して捨てる（アクセルと同じ処理！）
+      // 🌟 挿入：不感帯を抜けた＝パッドが接触している！
+      is_brake_pad_contacting = true;
+
       double deadzoned_cmd = hist_cmd - brake_dead_band_;
-
-      // パッドが触れた瞬間の反力（Jump）を足して出力とする
       jump_cmd = deadzoned_cmd + brake_jump_value_;
+      jump_cmd = jump_cmd * (1.0 + brake_accuracy_error_);
+
+      // 🌟 挿入：実際のジャンプ値（誤差込み）を計算し、ワープの到達点とする
+      double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
+      double apply_jump_target = baseline_acc - actual_jump_value;
+
+      if (state_(IDX::PEDAL_ACCX) <= baseline_acc && state_(IDX::PEDAL_ACCX) > apply_jump_target) {
+        state_(IDX::PEDAL_ACCX) = apply_jump_target;
+      }
     }
 
-    double res_cmd = jump_cmd;
-    if (brake_resolution_ > 1e-5) {
-      res_cmd = std::round(jump_cmd / brake_resolution_) * brake_resolution_;
-    }
-    pedal_acc_des = -res_cmd;
-
-    pedal_acc_des = pedal_acc_des - brake_offset_;
+    pedal_acc_des = -jump_cmd;
   } else {
     prev_brake_cmd_ = 0.0;
-
-    pedal_acc_des = pedal_acc_des * (1.0 + acc_accuracy_error_);
-
-    if (pedal_acc_des > acc_dead_band_) {
-      pedal_acc_des = pedal_acc_des - acc_dead_band_;
-    } else {
-      pedal_acc_des = 0.0;
-    }
 
     if (acc_resolution_ > 1e-5) {
       pedal_acc_des = std::round(pedal_acc_des / acc_resolution_) * acc_resolution_;
     }
 
-    pedal_acc_des = pedal_acc_des + acc_offset_;
+    if (pedal_acc_des > acc_dead_band_) {
+      pedal_acc_des = pedal_acc_des - acc_dead_band_;
+
+      pedal_acc_des = pedal_acc_des * (1.0 + acc_accuracy_error_);
+    } else {
+      pedal_acc_des = 0.0;
+    }
   }
+
+  // 🌟 挿入：離す時も、誤差込みの実際のジャンプ値を使って残存摩擦を判定する
+  if (!is_brake_pad_contacting) {
+    double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
+    if (state_(IDX::PEDAL_ACCX) < baseline_acc && state_(IDX::PEDAL_ACCX) >= baseline_acc - actual_jump_value) {
+      state_(IDX::PEDAL_ACCX) = baseline_acc;
+    }
+  }
+
+  pedal_acc_des = pedal_acc_des + baseline_acc;
+
   delayed_input(IDX_U::PEDAL_ACCX_DES) = sat(pedal_acc_des, acc_lim_, -brake_lim_);
 
   // 2. ステアリング フィルタ
@@ -218,21 +229,6 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   // =========================================================================
 
   const auto prev_state = state_;
-
-  // 🌟【最終改修1】真のブレーキジャンプ（踏み込みと抜きの両方）
-  if (delayed_input(IDX_U::PEDAL_ACCX_DES) <= -brake_jump_value_) {
-    // 踏み込み時：物理加速度がジャンプ値に達していない場合、即座に引き下げる
-    if (state_(IDX::PEDAL_ACCX) > -brake_jump_value_) {
-      state_(IDX::PEDAL_ACCX) = -brake_jump_value_;
-    }
-  } else if (delayed_input(IDX_U::PEDAL_ACCX_DES) > -brake_jump_value_) {
-    // 💡 修正：目標値がジャンプ値より浅くなった場合、
-    // 物理加速度が目標値より下に残っていれば、即座に目標値まで引き上げる（抜く）
-    double target_release_val = std::min(delayed_input(IDX_U::PEDAL_ACCX_DES), 0.0);
-    if (state_(IDX::PEDAL_ACCX) < target_release_val && state_(IDX::PEDAL_ACCX) >= -brake_jump_value_) {
-      state_(IDX::PEDAL_ACCX) = target_release_val;
-    }
-  }
 
   // 🌟 物理演算を高精度なルンゲ＝クッタ法（RK4）に切り替え
   updateRungeKutta(dt, delayed_input);
@@ -252,49 +248,46 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   state_(IDX::PEDAL_ACCX) = sat(state_(IDX::PEDAL_ACCX), acc_lim_, -brake_lim_);
 
-  // 🌟 1. クランプの閾値は、Autowareの停止判定基準に揃える
-  const double vel_epsilon = 0.01;
-
-  // 🌟 2. 条件式に「閾値以下になったら」というクランプ条件を追加
-  if (
-    (prev_state(IDX::VX) * state_(IDX::VX) <= 0.0 || std::abs(state_(IDX::VX)) < vel_epsilon) &&
-    -state_(IDX::PEDAL_ACCX) >= std::abs(delayed_input(IDX_U::SLOPE_ACCX))) {
-    state_(IDX::VX) = 0.0;
-  }
-
-  const auto apply_hsa_stop = [&]() {
-    state_(IDX::VX) = 0.0;
-    state_(IDX::X) = prev_state(IDX::X);
-    state_(IDX::Y) = prev_state(IDX::Y);
-    state_(IDX::YAW) = prev_state(IDX::YAW);
-  };
-
-  using autoware_vehicle_msgs::msg::GearCommand;
-  const auto gear = delayed_input(IDX_U::GEAR);
-  if (
-    gear == GearCommand::DRIVE || gear == GearCommand::DRIVE_2 || gear == GearCommand::DRIVE_3 ||
-    gear == GearCommand::DRIVE_4 || gear == GearCommand::DRIVE_5 || gear == GearCommand::DRIVE_6 ||
-    gear == GearCommand::DRIVE_7 || gear == GearCommand::DRIVE_8 || gear == GearCommand::DRIVE_9 ||
-    gear == GearCommand::DRIVE_10 || gear == GearCommand::DRIVE_11 ||
-    gear == GearCommand::DRIVE_12 || gear == GearCommand::DRIVE_13 ||
-    gear == GearCommand::DRIVE_14 || gear == GearCommand::DRIVE_15 ||
-    gear == GearCommand::DRIVE_16 || gear == GearCommand::DRIVE_17 ||
-    gear == GearCommand::DRIVE_18 || gear == GearCommand::LOW || gear == GearCommand::LOW_2) {
-    if (state_(IDX::VX) < 0.0) apply_hsa_stop();
-  } else if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
-    if (state_(IDX::VX) > 0.0) apply_hsa_stop();
-  } else if (gear == GearCommand::PARK) {
-    apply_hsa_stop();
+  // 🌟 挿入：ゼロ・スナップ処理（浮動小数点誤差のクリーニング）
+  // =========================================================================
+  // RK4の積分結果、速度が極めてゼロに近づいた場合は完全に 0.0 に丸める
+  // （ADKのステート遷移スタックを防止するための措置）
+  const double snap_epsilon = 0.001;
+  if (delayed_input(IDX_U::PEDAL_ACCX_DES) < 0.0) { // ブレーキ指令が出ている時
+    if (std::abs(state_(IDX::VX)) < snap_epsilon) {
+      state_(IDX::VX) = 0.0;
+      // 微小な位置のドリフトも固定する
+      state_(IDX::X) = prev_state(IDX::X);
+      state_(IDX::Y) = prev_state(IDX::Y);
+      state_(IDX::YAW) = prev_state(IDX::YAW);
+    }
   }
 
   state_(IDX::ACCX) = (state_(IDX::VX) - prev_state(IDX::VX)) / dt;
 
+  double raw_delayed_vx = 0.0;
+
   if (vel_history_queue_.empty()) {
-    delayed_vx_ = state_(IDX::VX);
+    raw_delayed_vx = state_(IDX::VX);
   } else {
     vel_history_queue_.push_back(state_(IDX::VX));
-    delayed_vx_ = vel_history_queue_.front();
+    raw_delayed_vx = vel_history_queue_.front();
     vel_history_queue_.pop_front();
+  }
+
+  // 📡 フェーズ7のセンサー計算をここに引っ越し（1ステップに1回だけ確定させる）
+  if (std::abs(raw_delayed_vx) < 1e-3) {
+    delayed_vx_ = 0.0;
+  } else {
+    double vx = raw_delayed_vx * (1.0 + vel_sensor_accuracy_error_);
+    vx += vel_sensor_offset_;
+    if (vel_sensor_noise_stddev_ > 1e-5) {
+      vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_; // サイコロを振るのはここだけ！
+    }
+    if (vel_sensor_resolution_ > 1e-5) {
+      vx = std::round(vx / vel_sensor_resolution_) * vel_sensor_resolution_;
+    }
+    delayed_vx_ = vx;
   }
 }
 
@@ -302,12 +295,25 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
 {
   size_t acc_input_queue_size = static_cast<size_t>(round(acc_delay_ / dt));
   acc_input_queue_.resize(acc_input_queue_size);
-  std::fill(acc_input_queue_.begin(), acc_input_queue_.end(), std::max(0.0, state_(IDX::PEDAL_ACCX)));
-
   size_t brake_input_queue_size = static_cast<size_t>(round(brake_delay_ / dt));
   brake_input_queue_.resize(brake_input_queue_size);
-  std::fill(brake_input_queue_.begin(), brake_input_queue_.end(), std::min(0.0, state_(IDX::PEDAL_ACCX)));
-  prev_brake_cmd_ = std::abs(std::min(0.0, state_(IDX::PEDAL_ACCX)));
+
+  double initial_acc_cmd = 0.0;
+  double initial_brake_cmd = 0.0;
+
+  if (state_(IDX::PEDAL_ACCX) > 0.0) {
+    initial_acc_cmd = (state_(IDX::PEDAL_ACCX) / (1.0 + acc_accuracy_error_)) + acc_dead_band_;
+  }
+  else if (state_(IDX::PEDAL_ACCX) < 0.0) {
+    double jump_cmd = std::abs(state_(IDX::PEDAL_ACCX));
+    double deadzoned_cmd = (jump_cmd / (1.0 + brake_accuracy_error_)) - brake_jump_value_;
+    double brake_cmd_abs = std::max(0.0, deadzoned_cmd) + brake_dead_band_;
+    initial_brake_cmd = -brake_cmd_abs;
+  }
+
+  std::fill(acc_input_queue_.begin(), acc_input_queue_.end(), initial_acc_cmd);
+  std::fill(brake_input_queue_.begin(), brake_input_queue_.end(), initial_brake_cmd);
+  prev_brake_cmd_ = std::abs(initial_brake_cmd);
 
   size_t steer_input_queue_size = static_cast<size_t>(round(steer_delay_ / dt));
   steer_input_queue_.resize(steer_input_queue_size);
@@ -411,18 +417,20 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
         return pedal_acc + input(IDX_U::SLOPE_ACCX);
       }
     } else {
+      // 🌟 挿入：静止摩擦モデル（クーロン摩擦の近似）
       // =========================================================================
-      // 🌟 ブレーキ側：不連続な if (vel) 分岐を全廃し、数学的に平滑化する
-      // =========================================================================
-      // vel_epsilon: ブレーキ力が滑らかに反転する速度領域のスケール [m/s]
-      // ここでは極低速（時速約0.07km/h以下）の領域を指定
+      // vel_epsilon: 速度をゼロに引き込む仮想バネの強さを決めるスケール
       const double vel_epsilon = 0.02;
+      const double k = 1.0 / vel_epsilon; // 仮想的なバネ定数
 
-      // pedal_acc（負の値）に対して、速度の向きに応じた滑らかな係数を掛ける
-      // vel > 0 の時は pedal_acc * (+1) = pedal_acc（減速）
-      // vel < 0 の時は pedal_acc * (-1) = -pedal_acc（前進方向への減速）
-      // vel = 0 の時は綺麗に 0 に収束する
-      return pedal_acc * std::tanh(vel / vel_epsilon) + input(IDX_U::SLOPE_ACCX);
+      // 理想のブレーキ力（坂道の重力を完全に打ち消し、かつ速度をゼロに引き戻す力）
+      double ideal_brake_acc = -input(IDX_U::SLOPE_ACCX) - (k * vel);
+
+      // 実際のペダル踏力（pedal_accはマイナス値）の範囲で限界を設ける
+      // 踏力が足りなければ重力に負け、十分なら重力と拮抗して静止する
+      double actual_brake_acc = std::clamp(ideal_brake_acc, pedal_acc, -pedal_acc);
+
+      return actual_brake_acc + input(IDX_U::SLOPE_ACCX);
     }
   }();
 
