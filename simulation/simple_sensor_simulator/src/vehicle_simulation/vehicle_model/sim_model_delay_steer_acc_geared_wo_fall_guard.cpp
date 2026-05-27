@@ -151,7 +151,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   bool is_brake_pad_contacting = false;
 
   // 挿入：ベースラインをすべてのジャンプ処理の基準として先行計算
-  double baseline_acc = acc_offset_ - brake_offset_;
+  const double baseline_acc = acc_offset_ - brake_offset_;
 
   if (pedal_acc_des < 0.0) {
     double brake_cmd = std::abs(pedal_acc_des);
