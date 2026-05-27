@@ -141,7 +141,7 @@ private:
   const double rolling_resistance_;          // 🌟 転がり抵抗係数 [m/s²]
   const double air_drag_coef_;               // 🌟 空気抵抗係数 [1/m]
 
-  double prev_brake_cmd_; // ヒステリシス計算用に前回のブレーキ指令値を記憶する変数
+  double brake_hysteresis_state_; // ヒステリシス（機械的なガタ）を通した後の、ブレーキペダル機構の実際の物理的な位置（残存量）
 
   std::deque<double> vel_history_queue_;       // 車速の遅延用バッファ
   double delayed_vx_;                          // 遅延適用後の物理車速

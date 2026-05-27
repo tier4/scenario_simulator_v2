@@ -68,7 +68,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
   rolling_resistance_(std::max(rolling_resistance, 0.0)),
   air_drag_coef_(std::max(air_drag_coef, 0.0)),
-  prev_brake_cmd_(0.0),
+  brake_hysteresis_state_(0.0),
   delayed_vx_(0.0),
   vel_rng_(vel_sensor_noise_seed),
   vel_dist_(0.0, 1.0)
@@ -165,10 +165,10 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     if (brake_cmd < 1e-5) {
       hist_cmd = 0.0;
     } else {
-      hist_cmd = std::clamp(prev_brake_cmd_, brake_cmd - (brake_hysteresis_width_ / 2.0), brake_cmd + (brake_hysteresis_width_ / 2.0));
+      hist_cmd = std::clamp(brake_hysteresis_state_, brake_cmd - (brake_hysteresis_width_ / 2.0), brake_cmd + (brake_hysteresis_width_ / 2.0));
     }
     hist_cmd = std::max(0.0, hist_cmd);
-    prev_brake_cmd_ = hist_cmd;
+    brake_hysteresis_state_ = hist_cmd;
 
     double jump_cmd = 0.0;
     if (hist_cmd > brake_dead_band_) {
@@ -190,7 +190,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
     pedal_acc_des = -jump_cmd;
   } else {
-    prev_brake_cmd_ = 0.0;
+    brake_hysteresis_state_ = 0.0;
 
     if (acc_resolution_ > 1e-5) {
       pedal_acc_des = std::round(pedal_acc_des / acc_resolution_) * acc_resolution_;
@@ -315,7 +315,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
 
   std::fill(acc_input_queue_.begin(), acc_input_queue_.end(), initial_acc_cmd);
   std::fill(brake_input_queue_.begin(), brake_input_queue_.end(), initial_brake_cmd);
-  prev_brake_cmd_ = std::abs(initial_brake_cmd);
+  brake_hysteresis_state_ = std::abs(initial_brake_cmd);
 
   size_t steer_input_queue_size = static_cast<size_t>(round(steer_delay_ / dt));
   steer_input_queue_.resize(steer_input_queue_size);
