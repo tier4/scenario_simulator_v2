@@ -143,6 +143,8 @@ auto EgoEntitySimulation::makeSimulationModel(
   const int  vel_sensor_noise_seed      = common::getParameter("vel_sensor_noise_seed",      42);
   const auto vel_sensor_accuracy_error  = common::getParameter("vel_sensor_accuracy_error",  0.0);
   const auto vel_sensor_offset          = common::getParameter("vel_sensor_offset",          0.0);
+  const auto rolling_resistance         = common::getParameter("rolling_resistance",         0.0);
+  const auto air_drag_coef              = common::getParameter("air_drag_coef",              0.0);
   // clang-format on
 
   switch (vehicle_model_type) {
@@ -168,7 +170,7 @@ auto EgoEntitySimulation::makeSimulationModel(
         steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
         steer_accuracy_error, steer_resolution, steer_hysteresis_width,
         vel_sensor_delay, vel_sensor_resolution, vel_sensor_noise_stddev, vel_sensor_noise_seed, vel_sensor_accuracy_error, vel_sensor_offset,
-        debug_acc_scaling_factor, debug_steer_scaling_factor);
+        debug_acc_scaling_factor, debug_steer_scaling_factor, rolling_resistance, air_drag_coef);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       if (!std::filesystem::exists(acceleration_map_path)) {

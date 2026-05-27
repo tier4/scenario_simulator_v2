@@ -76,7 +76,7 @@ public:
     double steer_delay, double steer_time_constant, double steer_dead_band, double steer_bias,
     double steer_accuracy_error, double steer_resolution, double steer_hysteresis_width,
     double vel_sensor_delay, double vel_sensor_resolution, double vel_sensor_noise_stddev, int vel_sensor_noise_seed, double vel_sensor_accuracy_error, double vel_sensor_offset,
-    double debug_acc_scaling_factor, double debug_steer_scaling_factor);
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double rolling_resistance, double air_drag_coef);
 
   /**
    * @brief default destructor
@@ -137,6 +137,9 @@ private:
   const double vel_sensor_offset_;
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
+
+  const double rolling_resistance_;          // 🌟 転がり抵抗係数 [m/s²]
+  const double air_drag_coef_;               // 🌟 空気抵抗係数 [1/m]
 
   double prev_brake_cmd_; // ヒステリシス計算用に前回のブレーキ指令値を記憶する変数
 

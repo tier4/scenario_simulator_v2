@@ -27,7 +27,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double steer_time_constant, double steer_dead_band, double steer_bias,
   double steer_accuracy_error, double steer_resolution, double steer_hysteresis_width,
   double vel_sensor_delay, double vel_sensor_resolution, double vel_sensor_noise_stddev, int vel_sensor_noise_seed, double vel_sensor_accuracy_error, double vel_sensor_offset,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double rolling_resistance, double air_drag_coef)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -66,6 +66,8 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   vel_sensor_offset_(vel_sensor_offset),
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
+  rolling_resistance_(std::max(rolling_resistance, 0.0)),
+  air_drag_coef_(std::max(air_drag_coef, 0.0)),
   prev_brake_cmd_(0.0),
   delayed_vx_(0.0),
   vel_rng_(vel_sensor_noise_seed),
@@ -404,34 +406,44 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   d_state(IDX::Y) = vel * sin(yaw);
   d_state(IDX::YAW) = vel * std::tan(steer) / wheelbase_;
   d_state(IDX::VX) = [&] {
+    using autoware_vehicle_msgs::msg::GearCommand;
+    const auto gear = input(IDX_U::GEAR);
+    if (gear == GearCommand::NONE || gear == GearCommand::PARK) {
+      return 0.0;
+    }
+
+    // 1. 空気抵抗（速度の2乗に比例し、常に進行方向と逆向きに働く力）
+    const double air_drag = -air_drag_coef_ * vel * std::abs(vel);
+
+    // 2. エンジン推力（アクセルペダルが踏まれている時のみ、ギア方向に従って発生）
+    double engine_acc = 0.0;
     if (pedal_acc >= 0.0) {
-      using autoware_vehicle_msgs::msg::GearCommand;
-      const auto gear = input(IDX_U::GEAR);
-      if (gear == GearCommand::NONE || gear == GearCommand::PARK) {
-        return 0.0;
-      } else if (gear == GearCommand::NEUTRAL) {
-        return input(IDX_U::SLOPE_ACCX);
+      if (gear == GearCommand::NEUTRAL) {
+        engine_acc = 0.0;
       } else if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
-        return -pedal_acc + input(IDX_U::SLOPE_ACCX);
+        engine_acc = -pedal_acc;
       } else {
-        return pedal_acc + input(IDX_U::SLOPE_ACCX);
+        engine_acc = pedal_acc;
       }
-    } else {
+    }
       // 🌟 挿入：静止摩擦モデル（クーロン摩擦の近似）
       // =========================================================================
       // vel_epsilon: 速度をゼロに引き込む仮想バネの強さを決めるスケール
       const double vel_epsilon = 0.02;
       const double k = 1.0 / vel_epsilon; // 仮想的なバネ定数
 
-      // 理想のブレーキ力（坂道の重力を完全に打ち消し、かつ速度をゼロに引き戻す力）
-      double ideal_brake_acc = -input(IDX_U::SLOPE_ACCX) - (k * vel);
+    // 3. 車体が持つ「最大静止摩擦力」（ブレーキ踏力 ＋ 常に働く転がり抵抗）
+    const double brake_force = (pedal_acc < 0.0) ? -pedal_acc : 0.0;
+    const double friction_limit = brake_force + rolling_resistance_;
 
-      // 実際のペダル踏力（pedal_accはマイナス値）の範囲で限界を設ける
-      // 踏力が足りなければ重力に負け、十分なら重力と拮抗して静止する
-      double actual_brake_acc = std::clamp(ideal_brake_acc, pedal_acc, -pedal_acc);
+    // 理想の摩擦力（エンジン推力、坂道重力、空気抵抗をすべて相殺し、車速をゼロに引き込む力）
+    double ideal_friction = -engine_acc - input(IDX_U::SLOPE_ACCX) - air_drag - (k * vel);
 
-      return actual_brake_acc + input(IDX_U::SLOPE_ACCX);
-    }
+    // 実際の摩擦力は、限界値（ブレーキ＋転がり抵抗）の範囲内で発揮される
+    double actual_friction = std::clamp(ideal_friction, -friction_limit, friction_limit);
+
+    // 4. 最終的な加速度の合算（ニュートンの運動方程式）
+    return engine_acc + input(IDX_U::SLOPE_ACCX) + air_drag + actual_friction;
   }();
 
   const double raw_acc_rate = -(pedal_acc - pedal_acc_des) / current_tc;
