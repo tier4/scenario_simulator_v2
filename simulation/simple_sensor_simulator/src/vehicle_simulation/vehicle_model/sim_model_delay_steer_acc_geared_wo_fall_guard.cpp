@@ -321,6 +321,8 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
 Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const Eigen::VectorXd & state, const Eigen::VectorXd & input)
 {
+  using autoware_vehicle_msgs::msg::GearCommand;
+
   const double vel = std::clamp(state(IDX::VX), -vx_lim_, vx_lim_);
   const double pedal_acc = std::clamp(state(IDX::PEDAL_ACCX), -brake_lim_, acc_lim_);
   const double yaw = state(IDX::YAW);
@@ -329,6 +331,8 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   // Use the pre-calculated final target pedal acceleration
   const double pedal_acc_des = input(IDX_U::PEDAL_ACCX_DES);
   const double steer_des = input(IDX_U::STEER_DES);
+  const double slope_accx = input(IDX_U::SLOPE_ACCX);
+  const auto gear = input(IDX_U::GEAR);
 
   // Dynamic selection of time constant and jerk limit (3 patterns)
   constexpr double eps = 1e-5;  // Threshold for zero evaluation
@@ -384,14 +388,10 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const double steer_rate =
     std::clamp(-steer_diff_with_dead_band / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_);
 
-  Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
-
-  d_state(IDX::X) = vel * std::cos(yaw);
-  d_state(IDX::Y) = vel * std::sin(yaw);
-  d_state(IDX::YAW) = vel * std::tan(steer) / wheelbase_;
-  d_state(IDX::VX) = [&] {
-    using autoware_vehicle_msgs::msg::GearCommand;
-    const auto gear = input(IDX_U::GEAR);
+  const double d_x = vel * std::cos(yaw);
+  const double d_y = vel * std::sin(yaw);
+  const double d_yaw = vel * std::tan(steer) / wheelbase_;
+  const double d_vx = [&] {
     if (gear == GearCommand::NONE || gear == GearCommand::PARK) {
       return 0.0;
     }
@@ -419,20 +419,27 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     const double friction_limit = brake_force + rolling_resistance_;
 
     // Ideal friction force (Force that cancels out engine thrust, slope gravity, and air drag to pull vehicle speed to zero)
-    const double ideal_friction = -engine_acc - input(IDX_U::SLOPE_ACCX) - air_drag - (k * vel);
+    const double ideal_friction = -engine_acc - slope_accx - air_drag - (k * vel);
 
     // Actual friction force is applied within the limits (brake + rolling resistance)
     const double actual_friction = std::clamp(ideal_friction, -friction_limit, friction_limit);
 
     // 4. Final calculation of acceleration (Newton's equation of motion)
-    return engine_acc + input(IDX_U::SLOPE_ACCX) + air_drag + actual_friction;
+    return engine_acc + slope_accx + air_drag + actual_friction;
   }();
 
   const double raw_acc_rate = -(pedal_acc - pedal_acc_des) / current_tc;
-  const double pedal_acc_rate = std::clamp(raw_acc_rate, -current_jerk_lim, current_jerk_lim);
+  const double d_pedal_accx = std::clamp(raw_acc_rate, -current_jerk_lim, current_jerk_lim);
+  const double d_steer = steer_rate * (1.0 + steer_accuracy_error_);
 
-  d_state(IDX::STEER) = steer_rate * (1.0 + steer_accuracy_error_);
-  d_state(IDX::PEDAL_ACCX) = pedal_acc_rate;
+  // Construction of the final d_state
+  Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
+  d_state(IDX::X)          = d_x;
+  d_state(IDX::Y)          = d_y;
+  d_state(IDX::YAW)        = d_yaw;
+  d_state(IDX::VX)         = d_vx;
+  d_state(IDX::STEER)      = d_steer;
+  d_state(IDX::PEDAL_ACCX) = d_pedal_accx;
 
   return d_state;
 }
