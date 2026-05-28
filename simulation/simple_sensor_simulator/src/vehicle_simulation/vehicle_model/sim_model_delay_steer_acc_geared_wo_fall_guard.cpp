@@ -285,9 +285,9 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
 void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double & dt)
 {
-  size_t acc_input_queue_size = static_cast<size_t>(std::round(acc_delay_ / dt));
+  const size_t acc_input_queue_size = static_cast<size_t>(std::round(acc_delay_ / dt));
   acc_input_queue_.resize(acc_input_queue_size);
-  size_t brake_input_queue_size = static_cast<size_t>(std::round(brake_delay_ / dt));
+  const size_t brake_input_queue_size = static_cast<size_t>(std::round(brake_delay_ / dt));
   brake_input_queue_.resize(brake_input_queue_size);
 
   double initial_acc_cmd = 0.0;
@@ -307,12 +307,12 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
   std::fill(brake_input_queue_.begin(), brake_input_queue_.end(), initial_brake_cmd);
   brake_hysteresis_state_ = std::abs(initial_brake_cmd);
 
-  size_t steer_input_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
+  const size_t steer_input_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
   steer_input_queue_.resize(steer_input_queue_size);
   const double initial_steer_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
   std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), initial_steer_cmd);
 
-  size_t vel_input_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
+  const size_t vel_input_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
   vel_history_queue_.resize(vel_input_queue_size);
   std::fill(vel_history_queue_.begin(), vel_history_queue_.end(), state_(IDX::VX));
   delayed_vx_ = state_(IDX::VX);
@@ -326,39 +326,31 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const double vel = std::clamp(state(IDX::VX), -vx_lim_, vx_lim_);
   const double pedal_acc = std::clamp(state(IDX::PEDAL_ACCX), -brake_lim_, acc_lim_);
   const double yaw = state(IDX::YAW);
-  const double steer = state(IDX::STEER);
+  const double current_steer = state(IDX::STEER);
 
-  // Use the pre-calculated final target pedal acceleration
   const double pedal_acc_des = input(IDX_U::PEDAL_ACCX_DES);
-  const double steer_des = input(IDX_U::STEER_DES);
+  const double steer_motor_des = input(IDX_U::STEER_DES);
   const double slope_accx = input(IDX_U::SLOPE_ACCX);
   const auto gear = input(IDX_U::GEAR);
 
-  // Dynamic selection of time constant and jerk limit (3 patterns)
+  // Dynamic selection of time constant and jerk limit
   constexpr double eps = 1e-5;  // Threshold for zero evaluation
-
   const double current_tc = [&]() {
-    if (pedal_acc_des > (acc_offset_ + eps)) {
-      // Pattern 1: Positive (Acceleration) -> Pure acceleration dynamics
+    if (pedal_acc_des > (acc_offset_ + eps)) {  // Acceleration -> Pure acceleration dynamics
       return acc_time_constant_;
     }
-    else if (pedal_acc_des < (-brake_offset_ - eps)) {
-      // Pattern 2: Negative (Braking) -> Pure braking dynamics
+    else if (pedal_acc_des < (-brake_offset_ - eps)) {  // Braking -> Pure braking dynamics
       return brake_time_constant_;
     }
-    else {
-      // Pattern 3: Coasting (pedal fully released)
+    else {  // Coasting
       // Determine the release speed of remaining forces based on the current vehicle state (pedal_acc) even when the command is 0
-      if (pedal_acc < 0.0) {
-        // Apply brake release dynamics if brake force remains
+      if (pedal_acc < 0.0) {  // Apply brake release dynamics if brake force remains
         return brake_time_constant_;
-      } else {
-        // Apply acceleration release dynamics if acceleration force remains
+      } else {  // Apply acceleration release dynamics if acceleration force remains
         return acc_time_constant_;
       }
     }
   }();
-
   const double current_jerk_lim = [&]() {
     if (pedal_acc_des > (acc_offset_ + eps)) {
       return acc_rate_lim_;
@@ -367,30 +359,22 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
       return brake_rate_lim_;
     }
     else {
-      // Switch the jerk limit based on the remaining force when the command is 0
       return (pedal_acc < 0.0) ? brake_rate_lim_ : acc_rate_lim_;
     }
   }();
 
-  // Calculate motor position (u) from actual tire angle (state) by removing bias and considering steering accuracy
-  const double current_steer_with_bias = (steer - steer_bias_) / (1.0 + steer_accuracy_error_);
-  const double steer_diff = current_steer_with_bias - steer_des;
-
-  const double steer_diff_with_dead_band = [&]() {
-    if (steer_diff > steer_dead_band_) {
-      return steer_diff - steer_dead_band_;
-    } else if (steer_diff < -steer_dead_band_) {
-      return steer_diff + steer_dead_band_;
+  const double current_steer_motor = (current_steer - steer_bias_) / (1.0 + steer_accuracy_error_);
+  const double steer_motor_diff = current_steer_motor - steer_motor_des;
+  const double steer_motor_diff_with_dead_band = [&]() {
+    if (steer_motor_diff > steer_dead_band_) {
+      return steer_motor_diff - steer_dead_band_;
+    } else if (steer_motor_diff < -steer_dead_band_) {
+      return steer_motor_diff + steer_dead_band_;
     } else {
       return 0.0;
     }
   }();
-  const double steer_rate =
-    std::clamp(-steer_diff_with_dead_band / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_);
 
-  const double d_x = vel * std::cos(yaw);
-  const double d_y = vel * std::sin(yaw);
-  const double d_yaw = vel * std::tan(steer) / wheelbase_;
   const double d_vx = [&] {
     if (gear == GearCommand::NONE || gear == GearCommand::PARK) {
       return 0.0;
@@ -400,46 +384,41 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     const double air_drag = -air_drag_coef_ * vel * std::abs(vel);
 
     // 2. Engine thrust (Generated according to gear direction only when the accelerator pedal is pressed)
-    double engine_acc = 0.0;
-    if (pedal_acc >= 0.0) {
-      if (gear == GearCommand::NEUTRAL) {
-        engine_acc = 0.0;
-      } else if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
-        engine_acc = -pedal_acc;
-      } else {
-        engine_acc = pedal_acc;
+    const double engine_acc = [&]() {
+      if (pedal_acc >= 0.0) {
+        if (gear == GearCommand::NEUTRAL) {
+          return 0.0;
+        } else if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
+          return -pedal_acc;
+        } else {
+          return pedal_acc;
+        }
       }
-    }
+      return 0.0;
+    }();
+
     // Static friction model (Approximation of Coulomb friction)
     const double vel_epsilon = 0.02;  // Scale determining the strength of the virtual spring that pulls the velocity to zero
     const double k = 1.0 / vel_epsilon; // Virtual spring constant
 
-    // Limit of static friction force (Brake force + Rolling resistance)
+    // Total external acceleration acting on the vehicle (Engine thrust, slope gravity, and air drag)
+    const double external_acc = engine_acc + slope_accx + air_drag;
+
+    // Limit of static friction force
     const double brake_force = (pedal_acc < 0.0) ? -pedal_acc : 0.0;
     const double friction_limit = brake_force + rolling_resistance_;
 
-    // Ideal friction force (Force that cancels out engine thrust, slope gravity, and air drag to pull vehicle speed to zero)
-    const double ideal_friction = -engine_acc - slope_accx - air_drag - (k * vel);
-
-    // Actual friction force is applied within the limits (brake + rolling resistance)
-    const double actual_friction = std::clamp(ideal_friction, -friction_limit, friction_limit);
-
-    // 4. Final calculation of acceleration (Newton's equation of motion)
-    return engine_acc + slope_accx + air_drag + actual_friction;
+    // Combined motion equation: Vehicle targets zero velocity (-k * vel), capped by friction limits around the external forces
+    return std::clamp(-k * vel, external_acc - friction_limit, external_acc + friction_limit);
   }();
 
-  const double raw_acc_rate = -(pedal_acc - pedal_acc_des) / current_tc;
-  const double d_pedal_accx = std::clamp(raw_acc_rate, -current_jerk_lim, current_jerk_lim);
-  const double d_steer = steer_rate * (1.0 + steer_accuracy_error_);
-
-  // Construction of the final d_state
   Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
-  d_state(IDX::X)          = d_x;
-  d_state(IDX::Y)          = d_y;
-  d_state(IDX::YAW)        = d_yaw;
+  d_state(IDX::X)          = vel * std::cos(yaw);
+  d_state(IDX::Y)          = vel * std::sin(yaw);
+  d_state(IDX::YAW)        = vel * std::tan(current_steer) / wheelbase_;
   d_state(IDX::VX)         = d_vx;
-  d_state(IDX::STEER)      = d_steer;
-  d_state(IDX::PEDAL_ACCX) = d_pedal_accx;
+  d_state(IDX::STEER)      = std::clamp(-steer_motor_diff_with_dead_band / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_) * (1.0 + steer_accuracy_error_);
+  d_state(IDX::PEDAL_ACCX) = std::clamp(-(pedal_acc - pedal_acc_des) / current_tc, -current_jerk_lim, current_jerk_lim);
 
   return d_state;
 }
