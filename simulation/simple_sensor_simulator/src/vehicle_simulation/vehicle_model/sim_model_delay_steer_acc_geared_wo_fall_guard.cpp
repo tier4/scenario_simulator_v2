@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <cmath>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
 
@@ -285,9 +286,9 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
 void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double & dt)
 {
-  size_t acc_input_queue_size = static_cast<size_t>(round(acc_delay_ / dt));
+  size_t acc_input_queue_size = static_cast<size_t>(std::round(acc_delay_ / dt));
   acc_input_queue_.resize(acc_input_queue_size);
-  size_t brake_input_queue_size = static_cast<size_t>(round(brake_delay_ / dt));
+  size_t brake_input_queue_size = static_cast<size_t>(std::round(brake_delay_ / dt));
   brake_input_queue_.resize(brake_input_queue_size);
 
   double initial_acc_cmd = 0.0;
@@ -307,7 +308,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
   std::fill(brake_input_queue_.begin(), brake_input_queue_.end(), initial_brake_cmd);
   brake_hysteresis_state_ = std::abs(initial_brake_cmd);
 
-  size_t steer_input_queue_size = static_cast<size_t>(round(steer_delay_ / dt));
+  size_t steer_input_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
   steer_input_queue_.resize(steer_input_queue_size);
   const double initial_steer_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
   std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), initial_steer_cmd);
@@ -333,7 +334,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   // Dynamic selection of time constant and jerk limit (3 patterns)
   constexpr double eps = 1e-5;  // Threshold for zero evaluation
 
-  const double current_tc = std::invoke([&]() {
+  const double current_tc = [&]() {
     if (pedal_acc_des > (acc_offset_ + eps)) {
       // Pattern 1: Positive (Acceleration) -> Pure acceleration dynamics
       return acc_time_constant_;
@@ -353,9 +354,9 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
         return acc_time_constant_;
       }
     }
-  });
+  }();
 
-  const double current_jerk_lim = std::invoke([&]() {
+  const double current_jerk_lim = [&]() {
     if (pedal_acc_des > (acc_offset_ + eps)) {
       return acc_rate_lim_;
     }
@@ -366,13 +367,13 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
       // Switch the jerk limit based on the remaining force when the command is 0
       return (pedal_acc < 0.0) ? brake_rate_lim_ : acc_rate_lim_;
     }
-  });
+  }();
 
   // Calculate motor position (u) from actual tire angle (state) by removing bias and considering steering accuracy
   const double current_steer_with_bias = (steer - steer_bias_) / (1.0 + steer_accuracy_error_);
   const double steer_diff = current_steer_with_bias - steer_des;
 
-  const double steer_diff_with_dead_band = std::invoke([&]() {
+  const double steer_diff_with_dead_band = [&]() {
     if (steer_diff > steer_dead_band_) {
       return steer_diff - steer_dead_band_;
     } else if (steer_diff < -steer_dead_band_) {
@@ -380,14 +381,14 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     } else {
       return 0.0;
     }
-  });
+  }();
   const double steer_rate =
     std::clamp(-steer_diff_with_dead_band / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_);
 
   Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
 
-  d_state(IDX::X) = vel * cos(yaw);
-  d_state(IDX::Y) = vel * sin(yaw);
+  d_state(IDX::X) = vel * std::cos(yaw);
+  d_state(IDX::Y) = vel * std::sin(yaw);
   d_state(IDX::YAW) = vel * std::tan(steer) / wheelbase_;
   d_state(IDX::VX) = [&] {
     using autoware_vehicle_msgs::msg::GearCommand;
