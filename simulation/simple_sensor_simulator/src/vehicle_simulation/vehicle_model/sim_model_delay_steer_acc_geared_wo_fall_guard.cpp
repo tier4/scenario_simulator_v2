@@ -145,6 +145,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   // Pre-calculate baseline pedal acceleration
   const double baseline_acc = acc_offset_ - brake_offset_;
+  const double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
 
   if (pedal_acc_des < 0.0) {
     double brake_cmd = std::abs(pedal_acc_des);
@@ -168,13 +169,12 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
       // Pad contact detection (exceeded dead band)
       is_brake_pad_contacting = true;
 
-      double deadzoned_cmd = hist_cmd - brake_dead_band_;
+      const double deadzoned_cmd = hist_cmd - brake_dead_band_;
       jump_cmd = deadzoned_cmd + brake_jump_value_;
       jump_cmd = jump_cmd * (1.0 + brake_accuracy_error_);
 
       // Calculate target pedal acceleration for the initial braking jump
-      double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
-      double apply_jump_target = baseline_acc - actual_jump_value;
+      const double apply_jump_target = baseline_acc - actual_jump_value;
 
       if (state_(IDX::PEDAL_ACCX) <= baseline_acc && state_(IDX::PEDAL_ACCX) > apply_jump_target) {
         state_(IDX::PEDAL_ACCX) = apply_jump_target;
@@ -200,7 +200,6 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   // Prevent unnatural brake dragging when the pedal is released
   if (!is_brake_pad_contacting) {
-    double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
     if (state_(IDX::PEDAL_ACCX) < baseline_acc && state_(IDX::PEDAL_ACCX) >= baseline_acc - actual_jump_value) {
       state_(IDX::PEDAL_ACCX) = baseline_acc;
     }
@@ -218,7 +217,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   }
 
   const double current_motor_angle = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
-  double steer_hist = std::clamp(current_motor_angle, steer_des - (steer_hysteresis_width_ / 2.0), steer_des + (steer_hysteresis_width_ / 2.0));
+  const double steer_hist = std::clamp(current_motor_angle, steer_des - (steer_hysteresis_width_ / 2.0), steer_des + (steer_hysteresis_width_ / 2.0));
 
   delayed_input(IDX_U::STEER_DES) = std::clamp(steer_hist, -steer_lim_, steer_lim_);
 
@@ -298,9 +297,9 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
     initial_acc_cmd = (state_(IDX::PEDAL_ACCX) / (1.0 + acc_accuracy_error_)) + acc_dead_band_;
   }
   else if (state_(IDX::PEDAL_ACCX) < 0.0) {
-    double jump_cmd = std::abs(state_(IDX::PEDAL_ACCX));
-    double deadzoned_cmd = (jump_cmd / (1.0 + brake_accuracy_error_)) - brake_jump_value_;
-    double brake_cmd_abs = std::max(0.0, deadzoned_cmd) + brake_dead_band_;
+    const double jump_cmd = std::abs(state_(IDX::PEDAL_ACCX));
+    const double deadzoned_cmd = (jump_cmd / (1.0 + brake_accuracy_error_)) - brake_jump_value_;
+    const double brake_cmd_abs = std::max(0.0, deadzoned_cmd) + brake_dead_band_;
     initial_brake_cmd = -brake_cmd_abs;
   }
 
@@ -420,10 +419,10 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     const double friction_limit = brake_force + rolling_resistance_;
 
     // Ideal friction force (Force that cancels out engine thrust, slope gravity, and air drag to pull vehicle speed to zero)
-    double ideal_friction = -engine_acc - input(IDX_U::SLOPE_ACCX) - air_drag - (k * vel);
+    const double ideal_friction = -engine_acc - input(IDX_U::SLOPE_ACCX) - air_drag - (k * vel);
 
     // Actual friction force is applied within the limits (brake + rolling resistance)
-    double actual_friction = std::clamp(ideal_friction, -friction_limit, friction_limit);
+    const double actual_friction = std::clamp(ideal_friction, -friction_limit, friction_limit);
 
     // 4. Final calculation of acceleration (Newton's equation of motion)
     return engine_acc + input(IDX_U::SLOPE_ACCX) + air_drag + actual_friction;
