@@ -114,10 +114,17 @@ EXPORT export_simple_sensor_simulator_component
 
 add_library(vehicle_model_wrapper SHARED
   src/vehicle_simulation/vehicle_model/vehicle_model_c_wrapper.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.cpp
 )
-target_include_directories(vehicle_model_wrapper PRIVATE ${EIGEN3_INCLUDE_DIRS})
+target_include_directories(vehicle_model_wrapper PRIVATE
+  ${EIGEN3_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/include
+)
 target_compile_features(vehicle_model_wrapper PRIVATE cxx_std_17)
 set_target_properties(vehicle_model_wrapper PROPERTIES POSITION_INDEPENDENT_CODE ON)
+ament_target_dependencies(vehicle_model_wrapper autoware_vehicle_msgs)
 install(TARGETS vehicle_model_wrapper
   LIBRARY DESTINATION share/${PROJECT_NAME}
 )

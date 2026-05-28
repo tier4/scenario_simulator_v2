@@ -117,6 +117,23 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
   std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), 0.0);
 }
 
+void SimModelDelaySteerAccGearedWoFallGuard::setInputQueues(
+  const std::deque<double> & acc_queue, const std::deque<double> & steer_queue)
+{
+  acc_input_queue_ = acc_queue;
+  steer_input_queue_ = steer_queue;
+}
+
+int SimModelDelaySteerAccGearedWoFallGuard::getAccQueueSize() const
+{
+  return static_cast<int>(acc_input_queue_.size());
+}
+
+int SimModelDelaySteerAccGearedWoFallGuard::getSteerQueueSize() const
+{
+  return static_cast<int>(steer_input_queue_.size());
+}
+
 Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const Eigen::VectorXd & state, const Eigen::VectorXd & input)
 {
