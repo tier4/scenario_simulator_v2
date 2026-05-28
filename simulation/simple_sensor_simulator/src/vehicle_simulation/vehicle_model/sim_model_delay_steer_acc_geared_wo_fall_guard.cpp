@@ -410,9 +410,9 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
         engine_acc = pedal_acc;
       }
     }
-      // Static friction model (Approximation of Coulomb friction)
-      const double vel_epsilon = 0.02;  // Scale determining the strength of the virtual spring that pulls the velocity to zero
-      const double k = 1.0 / vel_epsilon; // Virtual spring constant
+    // Static friction model (Approximation of Coulomb friction)
+    const double vel_epsilon = 0.02;  // Scale determining the strength of the virtual spring that pulls the velocity to zero
+    const double k = 1.0 / vel_epsilon; // Virtual spring constant
 
     // Limit of static friction force (Brake force + Rolling resistance)
     const double brake_force = (pedal_acc < 0.0) ? -pedal_acc : 0.0;
