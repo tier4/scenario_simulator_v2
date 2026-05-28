@@ -137,8 +137,6 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   delayed_input(IDX_U::SLOPE_ACCX) = input_(IDX_U::SLOPE_ACCX);
 
   // Nonlinear filter calculation
-  auto sat = [](double val, double u, double l) { return std::max(std::min(val, u), l); };
-
   // 1. Acceleration and brake filter
   double pedal_acc_des = delayed_input(IDX_U::PEDAL_ACCX_DES) * debug_acc_scaling_factor_;
 
@@ -209,7 +207,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   pedal_acc_des = pedal_acc_des + baseline_acc;
 
-  delayed_input(IDX_U::PEDAL_ACCX_DES) = sat(pedal_acc_des, acc_lim_, -brake_lim_);
+  delayed_input(IDX_U::PEDAL_ACCX_DES) = std::clamp(pedal_acc_des, -brake_lim_, acc_lim_);
 
   // 2. Steering filter
   double steer_des = delayed_input(IDX_U::STEER_DES) * debug_steer_scaling_factor_;
@@ -221,7 +219,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   const double current_motor_angle = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
   double steer_hist = std::clamp(current_motor_angle, steer_des - (steer_hysteresis_width_ / 2.0), steer_des + (steer_hysteresis_width_ / 2.0));
 
-  delayed_input(IDX_U::STEER_DES) = sat(steer_hist, steer_lim_, -steer_lim_);
+  delayed_input(IDX_U::STEER_DES) = std::clamp(steer_hist, -steer_lim_, steer_lim_);
 
   const auto prev_state = state_;
 
@@ -235,13 +233,13 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   const double tire_steer_upper_lim = steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
   const double tire_steer_lower_lim = -steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
   // Clamp with a failsafe to prevent upper and lower limit reversal
-  state_(IDX::STEER) = sat(
+  state_(IDX::STEER) = std::clamp(
     state_(IDX::STEER),
-    std::max(tire_steer_upper_lim, tire_steer_lower_lim),
-    std::min(tire_steer_upper_lim, tire_steer_lower_lim)
+    std::min(tire_steer_upper_lim, tire_steer_lower_lim),
+    std::max(tire_steer_upper_lim, tire_steer_lower_lim)
   );
 
-  state_(IDX::PEDAL_ACCX) = sat(state_(IDX::PEDAL_ACCX), acc_lim_, -brake_lim_);
+  state_(IDX::PEDAL_ACCX) = std::clamp(state_(IDX::PEDAL_ACCX), -brake_lim_, acc_lim_);
 
   // Zero-snap processing to prevent floating-point errors
   // Round off to exactly 0.0 if the RK4 integration result for velocity is extremely close to zero
@@ -323,10 +321,8 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
 Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const Eigen::VectorXd & state, const Eigen::VectorXd & input)
 {
-  auto sat = [](double val, double u, double l) { return std::max(std::min(val, u), l); };
-
-  const double vel = sat(state(IDX::VX), vx_lim_, -vx_lim_);
-  const double pedal_acc = sat(state(IDX::PEDAL_ACCX), acc_lim_, -brake_lim_);
+  const double vel = std::clamp(state(IDX::VX), -vx_lim_, vx_lim_);
+  const double pedal_acc = std::clamp(state(IDX::PEDAL_ACCX), -brake_lim_, acc_lim_);
   const double yaw = state(IDX::YAW);
   const double steer = state(IDX::STEER);
 
@@ -386,7 +382,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     }
   });
   const double steer_rate =
-    sat(-steer_diff_with_dead_band / steer_time_constant_, steer_rate_lim_, -steer_rate_lim_);
+    std::clamp(-steer_diff_with_dead_band / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_);
 
   Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
 
@@ -433,7 +429,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   }();
 
   const double raw_acc_rate = -(pedal_acc - pedal_acc_des) / current_tc;
-  const double pedal_acc_rate = sat(raw_acc_rate, current_jerk_lim, -current_jerk_lim);
+  const double pedal_acc_rate = std::clamp(raw_acc_rate, -current_jerk_lim, current_jerk_lim);
 
   d_state(IDX::STEER) = steer_rate * (1.0 + steer_accuracy_error_);
   d_state(IDX::PEDAL_ACCX) = pedal_acc_rate;
