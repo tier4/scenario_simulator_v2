@@ -102,37 +102,33 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
   Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
 
-  // =========================================================================
-  // 🌟【欠陥Aの解消（Level 1.5）】入力段階でのアクセルとブレーキ信号の完全分離
-  // =========================================================================
+  // Separation of acceleration and brake signals at the input stage
   const double raw_pedal_cmd = input_(IDX_U::PEDAL_ACCX_DES);
 
   if (raw_pedal_cmd >= 0.0) {
-    // 加速指令：アクセルキューには指令値を、ブレーキキューには「全離し(0.0)」を入れる
+    // Acceleration command: insert into acceleration queue, insert 0.0 into brake queue
     acc_input_queue_.push_back(raw_pedal_cmd);
     brake_input_queue_.push_back(0.0);
   } else {
-    // 制動指令：アクセルキューには「全離し(0.0)」を、ブレーキキューには指令値を入れる
+    // Braking command: insert 0.0 into acceleration queue, insert into brake queue
     acc_input_queue_.push_back(0.0);
     brake_input_queue_.push_back(raw_pedal_cmd);
   }
 
-  // それぞれの遅延時間が経過した値をキューから取り出す
+  // Dequeue values after their respective delay times have passed
   const double acc_delayed_val = acc_input_queue_.front();
   acc_input_queue_.pop_front();
   const double brake_delayed_val = brake_input_queue_.front();
   brake_input_queue_.pop_front();
 
-  // 💡 ブレーキ・オーバーライド（BOS）論理による結合
-  // 万が一、遅延のタイミング差で「アクセル」と「ブレーキ」が同時に出てきた場合は、
-  // 実車の安全機構と同じく「ブレーキの指令」を優先して採用する。
+  // Brake Override System (BOS)
+  // Prioritize brake command if both acceleration and brake commands are active simultaneously
   if (brake_delayed_val < -1e-5) {
     delayed_input(IDX_U::PEDAL_ACCX_DES) = brake_delayed_val;
   } else {
-    // ブレーキが出ていない時は、アクセルの値（0.0のコースティング状態も含む）を採用
+    // Use acceleration value (including 0.0 for coasting) when no brake command is active
     delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_delayed_val;
   }
-  // =========================================================================
 
   steer_input_queue_.push_back(input_(IDX_U::STEER_DES));
   delayed_input(IDX_U::STEER_DES) = steer_input_queue_.front();
@@ -140,17 +136,15 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   delayed_input(IDX_U::GEAR) = input_(IDX_U::GEAR);
   delayed_input(IDX_U::SLOPE_ACCX) = input_(IDX_U::SLOPE_ACCX);
 
-  // =========================================================================
-  // 🌟 非線形フィルタ計算（デジタルの世界）
-  // =========================================================================
+  // Nonlinear filter calculation
   auto sat = [](double val, double u, double l) { return std::max(std::min(val, u), l); };
 
-  // 1. アクセル・ブレーキ フィルタ
+  // 1. Acceleration and brake filter
   double pedal_acc_des = delayed_input(IDX_U::PEDAL_ACCX_DES) * debug_acc_scaling_factor_;
 
   bool is_brake_pad_contacting = false;
 
-  // 挿入：ベースラインをすべてのジャンプ処理の基準として先行計算
+  // Pre-calculate baseline pedal acceleration
   const double baseline_acc = acc_offset_ - brake_offset_;
 
   if (pedal_acc_des < 0.0) {
@@ -160,7 +154,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
       brake_cmd = std::round(brake_cmd / brake_resolution_) * brake_resolution_;
     }
 
-    // 🌟 挿入：足を完全に離した時はヒステリシスを0に戻す
+    // Reset hysteresis when the pedal is fully released
     double hist_cmd = 0.0;
     if (brake_cmd < 1e-5) {
       hist_cmd = 0.0;
@@ -172,14 +166,14 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
     double jump_cmd = 0.0;
     if (hist_cmd > brake_dead_band_) {
-      // 🌟 挿入：不感帯を抜けた＝パッドが接触している！
+      // Pad contact detection (exceeded dead band)
       is_brake_pad_contacting = true;
 
       double deadzoned_cmd = hist_cmd - brake_dead_band_;
       jump_cmd = deadzoned_cmd + brake_jump_value_;
       jump_cmd = jump_cmd * (1.0 + brake_accuracy_error_);
 
-      // 🌟 挿入：実際のジャンプ値（誤差込み）を計算し、ワープの到達点とする
+      // Calculate target pedal acceleration for the initial braking jump
       double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
       double apply_jump_target = baseline_acc - actual_jump_value;
 
@@ -205,7 +199,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     }
   }
 
-  // 🌟 挿入：離す時も、誤差込みの実際のジャンプ値を使って残存摩擦を判定する
+  // Prevent unnatural brake dragging when the pedal is released
   if (!is_brake_pad_contacting) {
     double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
     if (state_(IDX::PEDAL_ACCX) < baseline_acc && state_(IDX::PEDAL_ACCX) >= baseline_acc - actual_jump_value) {
@@ -217,7 +211,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   delayed_input(IDX_U::PEDAL_ACCX_DES) = sat(pedal_acc_des, acc_lim_, -brake_lim_);
 
-  // 2. ステアリング フィルタ
+  // 2. Steering filter
   double steer_des = delayed_input(IDX_U::STEER_DES) * debug_steer_scaling_factor_;
 
   if (steer_resolution_ > 1e-5) {
@@ -228,20 +222,19 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   double steer_hist = std::clamp(current_motor_angle, steer_des - (steer_hysteresis_width_ / 2.0), steer_des + (steer_hysteresis_width_ / 2.0));
 
   delayed_input(IDX_U::STEER_DES) = sat(steer_hist, steer_lim_, -steer_lim_);
-  // =========================================================================
 
   const auto prev_state = state_;
 
-  // 🌟 物理演算を高精度なルンゲ＝クッタ法（RK4）に切り替え
+  // Use 4th-order Runge-Kutta (RK4) method for precise physical simulation
   updateRungeKutta(dt, delayed_input);
 
-  // 速度制限と停止判定
+  // Speed limit and stop evaluation
   state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
 
-  // 🌟 タイヤの物理的な可動限界は、モーターの限界（steer_lim_）にギア比とバイアスが乗った値になる
+  // Calculate physical steering limits based on motor limits, gear ratio, and bias
   const double tire_steer_upper_lim = steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
   const double tire_steer_lower_lim = -steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
-  // 念のため上下限の逆転を防ぐ安全策を施してクランプ
+  // Clamp with a failsafe to prevent upper and lower limit reversal
   state_(IDX::STEER) = sat(
     state_(IDX::STEER),
     std::max(tire_steer_upper_lim, tire_steer_lower_lim),
@@ -250,15 +243,14 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   state_(IDX::PEDAL_ACCX) = sat(state_(IDX::PEDAL_ACCX), acc_lim_, -brake_lim_);
 
-  // 🌟 挿入：ゼロ・スナップ処理（浮動小数点誤差のクリーニング）
-  // =========================================================================
-  // RK4の積分結果、速度が極めてゼロに近づいた場合は完全に 0.0 に丸める
-  // （ADKのステート遷移スタックを防止するための措置）
+  // Zero-snap processing to prevent floating-point errors
+  // Round off to exactly 0.0 if the RK4 integration result for velocity is extremely close to zero
+  // (Measure to prevent ADK state transition deadlocks)
   const double snap_epsilon = 0.001;
-  if (delayed_input(IDX_U::PEDAL_ACCX_DES) < 0.0) { // ブレーキ指令が出ている時
+  if (delayed_input(IDX_U::PEDAL_ACCX_DES) < 0.0) { // When brake command is active
     if (std::abs(state_(IDX::VX)) < snap_epsilon) {
       state_(IDX::VX) = 0.0;
-      // 微小な位置のドリフトも固定する
+      // Fix minor positional drifts
       state_(IDX::X) = prev_state(IDX::X);
       state_(IDX::Y) = prev_state(IDX::Y);
       state_(IDX::YAW) = prev_state(IDX::YAW);
@@ -277,14 +269,14 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     vel_history_queue_.pop_front();
   }
 
-  // 📡 フェーズ7のセンサー計算をここに引っ越し（1ステップに1回だけ確定させる）
+  // Calculate sensor output once per step
   if (std::abs(raw_delayed_vx) < 1e-3) {
     delayed_vx_ = 0.0;
   } else {
     double vx = raw_delayed_vx * (1.0 + vel_sensor_accuracy_error_);
     vx += vel_sensor_offset_;
     if (vel_sensor_noise_stddev_ > 1e-5) {
-      vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_; // サイコロを振るのはここだけ！
+      vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_;
     }
     if (vel_sensor_resolution_ > 1e-5) {
       vx = std::round(vx / vel_sensor_resolution_) * vel_sensor_resolution_;
@@ -338,33 +330,30 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const double yaw = state(IDX::YAW);
   const double steer = state(IDX::STEER);
 
-  // 🌟 update()で計算済みの固定指令値を使用
+  // Use the pre-calculated final target pedal acceleration
   const double pedal_acc_des = input(IDX_U::PEDAL_ACCX_DES);
   const double steer_des = input(IDX_U::STEER_DES);
 
-  // =========================================================================
-  // 指令値の「正・0・負」および「現在のペダル状態」による3パターン分離
-  // =========================================================================
-  // ゼロ判定のための閾値（1e-5）
-  constexpr double eps = 1e-5;
+  // Dynamic selection of time constant and jerk limit (3 patterns)
+  constexpr double eps = 1e-5;  // Threshold for zero evaluation
 
   const double current_tc = std::invoke([&]() {
     if (pedal_acc_des > (acc_offset_ + eps)) {
-      // 【パターン1：正（踏み込み加速）】➔ 純粋なアクセル動特性
+      // Pattern 1: Positive (Acceleration) -> Pure acceleration dynamics
       return acc_time_constant_;
     }
     else if (pedal_acc_des < (-brake_offset_ - eps)) {
-      // 【パターン2：負（踏み込み制動）】➔ 純粋なブレーキ作動動特性
+      // Pattern 2: Negative (Braking) -> Pure braking dynamics
       return brake_time_constant_;
     }
     else {
-      // 【パターン3：ゼロ（ペダル全離し・コースティング）】
-      // 💡 指令は0だが、現在の車両状態（pedal_acc）を見て、残っている力が抜けるスピードを決める
+      // Pattern 3: Coasting (pedal fully released)
+      // Determine the release speed of remaining forces based on the current vehicle state (pedal_acc) even when the command is 0
       if (pedal_acc < 0.0) {
-        // 現在ブレーキが残っているなら、ブレーキの油圧・空圧が抜けるスピードを適用
+        // Apply brake release dynamics if brake force remains
         return brake_time_constant_;
       } else {
-        // 現在アクセル（推力）が残っているなら、エンジン回転が落ちるスピードを適用
+        // Apply acceleration release dynamics if acceleration force remains
         return acc_time_constant_;
       }
     }
@@ -378,13 +367,12 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
       return brake_rate_lim_;
     }
     else {
-      // 指令が0のとき、現在残っている力に合わせて変化率の制限（ジャークリミット）を切り替える
+      // Switch the jerk limit based on the remaining force when the command is 0
       return (pedal_acc < 0.0) ? brake_rate_lim_ : acc_rate_lim_;
     }
   });
-  // =========================================================================
 
-  // 真のタイヤ角度(state)から、バイアスを引きギア比で割って、モーター位置(u)を逆算する
+  // Calculate motor position (u) from actual tire angle (state) by removing bias and considering steering accuracy
   const double current_steer_with_bias = (steer - steer_bias_) / (1.0 + steer_accuracy_error_);
   const double steer_diff = current_steer_with_bias - steer_des;
 
@@ -412,10 +400,10 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
       return 0.0;
     }
 
-    // 1. 空気抵抗（速度の2乗に比例し、常に進行方向と逆向きに働く力）
+    // 1. Air resistance (Force proportional to the square of velocity, acting opposite to the direction of motion)
     const double air_drag = -air_drag_coef_ * vel * std::abs(vel);
 
-    // 2. エンジン推力（アクセルペダルが踏まれている時のみ、ギア方向に従って発生）
+    // 2. Engine thrust (Generated according to gear direction only when the accelerator pedal is pressed)
     double engine_acc = 0.0;
     if (pedal_acc >= 0.0) {
       if (gear == GearCommand::NEUTRAL) {
@@ -426,23 +414,21 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
         engine_acc = pedal_acc;
       }
     }
-      // 🌟 挿入：静止摩擦モデル（クーロン摩擦の近似）
-      // =========================================================================
-      // vel_epsilon: 速度をゼロに引き込む仮想バネの強さを決めるスケール
-      const double vel_epsilon = 0.02;
-      const double k = 1.0 / vel_epsilon; // 仮想的なバネ定数
+      // Static friction model (Approximation of Coulomb friction)
+      const double vel_epsilon = 0.02;  // Scale determining the strength of the virtual spring that pulls the velocity to zero
+      const double k = 1.0 / vel_epsilon; // Virtual spring constant
 
-    // 3. 車体が持つ「最大静止摩擦力」（ブレーキ踏力 ＋ 常に働く転がり抵抗）
+    // Limit of static friction force (Brake force + Rolling resistance)
     const double brake_force = (pedal_acc < 0.0) ? -pedal_acc : 0.0;
     const double friction_limit = brake_force + rolling_resistance_;
 
-    // 理想の摩擦力（エンジン推力、坂道重力、空気抵抗をすべて相殺し、車速をゼロに引き込む力）
+    // Ideal friction force (Force that cancels out engine thrust, slope gravity, and air drag to pull vehicle speed to zero)
     double ideal_friction = -engine_acc - input(IDX_U::SLOPE_ACCX) - air_drag - (k * vel);
 
-    // 実際の摩擦力は、限界値（ブレーキ＋転がり抵抗）の範囲内で発揮される
+    // Actual friction force is applied within the limits (brake + rolling resistance)
     double actual_friction = std::clamp(ideal_friction, -friction_limit, friction_limit);
 
-    // 4. 最終的な加速度の合算（ニュートンの運動方程式）
+    // 4. Final calculation of acceleration (Newton's equation of motion)
     return engine_acc + input(IDX_U::SLOPE_ACCX) + air_drag + actual_friction;
   }();
 
