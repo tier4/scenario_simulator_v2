@@ -124,7 +124,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   // Brake Override System (BOS)
   // Prioritize brake command if both acceleration and brake commands are active simultaneously
-  if (brake_delayed_val < -1e-5) {
+  if (brake_delayed_val < -1e-5) {  // tolerance for floating-point zero evaluation
     delayed_input(IDX_U::PEDAL_ACCX_DES) = brake_delayed_val;
   } else {
     // Use acceleration value (including 0.0 for coasting) when no brake command is active
@@ -149,13 +149,13 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   if (pedal_acc_des < 0.0) {
     double brake_cmd = std::abs(pedal_acc_des);
 
-    if (brake_resolution_ > 1e-5) {
+    if (brake_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
       brake_cmd = std::round(brake_cmd / brake_resolution_) * brake_resolution_;
     }
 
     // Reset hysteresis when the pedal is fully released
     double hist_cmd = 0.0;
-    if (brake_cmd < 1e-5) {
+    if (brake_cmd < 1e-5) { // tolerance to determine if the pedal is fully released
       hist_cmd = 0.0;
     } else {
       hist_cmd = std::clamp(brake_hysteresis_state_, brake_cmd - (brake_hysteresis_width_ / 2.0), brake_cmd + (brake_hysteresis_width_ / 2.0));
@@ -185,7 +185,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   } else {
     brake_hysteresis_state_ = 0.0;
 
-    if (acc_resolution_ > 1e-5) {
+    if (acc_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
       pedal_acc_des = std::round(pedal_acc_des / acc_resolution_) * acc_resolution_;
     }
 
@@ -213,7 +213,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   // 2. Steering filter
   double steer_des = delayed_input(IDX_U::STEER_DES) * debug_steer_scaling_factor_;
 
-  if (steer_resolution_ > 1e-5) {
+  if (steer_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
     steer_des = std::round(steer_des / steer_resolution_) * steer_resolution_;
   }
 
@@ -245,7 +245,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   // Zero-snap processing to prevent floating-point errors
   // Round off to exactly 0.0 if the RK4 integration result for velocity is extremely close to zero
   // (Measure to prevent ADK state transition deadlocks)
-  const double snap_epsilon = 0.001;
+  const double snap_epsilon = 0.001;  // threshold to snap velocity to exactly 0.0, preventing floating-point drift
   if (delayed_input(IDX_U::PEDAL_ACCX_DES) < 0.0) { // When brake command is active
     if (std::abs(state_(IDX::VX)) < snap_epsilon) {
       state_(IDX::VX) = 0.0;
@@ -269,15 +269,15 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   }
 
   // Calculate sensor output once per step
-  if (std::abs(raw_delayed_vx) < 1e-3) {
+  if (std::abs(raw_delayed_vx) < 1e-3) {  // threshold to snap sensor velocity output to 0.0
     delayed_vx_ = 0.0;
   } else {
     double vx = raw_delayed_vx * (1.0 + vel_sensor_accuracy_error_);
     vx += vel_sensor_offset_;
-    if (vel_sensor_noise_stddev_ > 1e-5) {
+    if (vel_sensor_noise_stddev_ > 1e-5) {  // tolerance to check if the parameter is configured (non-zero)
       vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_;
     }
-    if (vel_sensor_resolution_ > 1e-5) {
+    if (vel_sensor_resolution_ > 1e-5) {  // tolerance to check if the parameter is configured (non-zero)
       vx = std::round(vx / vel_sensor_resolution_) * vel_sensor_resolution_;
     }
     delayed_vx_ = vx;
