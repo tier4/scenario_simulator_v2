@@ -108,7 +108,7 @@ private:
 
   std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
   std::deque<double> brake_input_queue_;     //!< @brief buffer for brake command
-  std::deque<double> steer_input_queue_;     //!< @brief buffer for steering command
+  std::deque<double> steer_motor_input_queue_;     //!< @brief buffer for steering motor command
   const double acc_delay_;                   //!< @brief time delay for accel command [s]
   const double brake_delay_;                 //!< @brief time delay for brake command [s]
   const double acc_time_constant_;           //!< @brief time constant for accel dynamics

@@ -131,9 +131,9 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_delayed_val;
   }
 
-  steer_input_queue_.push_back(input_(IDX_U::STEER_DES));
-  delayed_input(IDX_U::STEER_DES) = steer_input_queue_.front();
-  steer_input_queue_.pop_front();
+  steer_motor_input_queue_.push_back(input_(IDX_U::STEER_DES));
+  delayed_input(IDX_U::STEER_DES) = steer_motor_input_queue_.front();
+  steer_motor_input_queue_.pop_front();
   delayed_input(IDX_U::GEAR) = input_(IDX_U::GEAR);
   delayed_input(IDX_U::SLOPE_ACCX) = input_(IDX_U::SLOPE_ACCX);
 
@@ -285,37 +285,40 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
 void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double & dt)
 {
-  const size_t acc_input_queue_size = static_cast<size_t>(std::round(acc_delay_ / dt));
-  acc_input_queue_.resize(acc_input_queue_size);
-  const size_t brake_input_queue_size = static_cast<size_t>(std::round(brake_delay_ / dt));
-  brake_input_queue_.resize(brake_input_queue_size);
+  // Calculate initial acceleration and brake commands
+  const auto [initial_acc_cmd, initial_brake_cmd] = [&]() -> std::pair<double, double> {
+    const double pedal_acc = state_(IDX::PEDAL_ACCX);
+    if (pedal_acc > 0.0) {
+      return {(pedal_acc / (1.0 + acc_accuracy_error_)) + acc_dead_band_, 0.0};
+    }
+    if (pedal_acc < 0.0) {
+      const double jump_cmd = std::abs(pedal_acc);
+      const double deadzoned_cmd = (jump_cmd / (1.0 + brake_accuracy_error_)) - brake_jump_value_;
+      const double brake_cmd_abs = std::max(0.0, deadzoned_cmd) + brake_dead_band_;
+      return {0.0, -brake_cmd_abs};
+    }
+    return {0.0, 0.0};
+  }();
 
-  double initial_acc_cmd = 0.0;
-  double initial_brake_cmd = 0.0;
+  // Initialize acceleration and brake queues
+  const size_t acc_queue_size = static_cast<size_t>(std::round(acc_delay_ / dt));
+  acc_input_queue_.assign(acc_queue_size, initial_acc_cmd);
+  const size_t brake_queue_size = static_cast<size_t>(std::round(brake_delay_ / dt));
+  brake_input_queue_.assign(brake_queue_size, initial_brake_cmd);
 
-  if (state_(IDX::PEDAL_ACCX) > 0.0) {
-    initial_acc_cmd = (state_(IDX::PEDAL_ACCX) / (1.0 + acc_accuracy_error_)) + acc_dead_band_;
-  }
-  else if (state_(IDX::PEDAL_ACCX) < 0.0) {
-    const double jump_cmd = std::abs(state_(IDX::PEDAL_ACCX));
-    const double deadzoned_cmd = (jump_cmd / (1.0 + brake_accuracy_error_)) - brake_jump_value_;
-    const double brake_cmd_abs = std::max(0.0, deadzoned_cmd) + brake_dead_band_;
-    initial_brake_cmd = -brake_cmd_abs;
-  }
-
-  std::fill(acc_input_queue_.begin(), acc_input_queue_.end(), initial_acc_cmd);
-  std::fill(brake_input_queue_.begin(), brake_input_queue_.end(), initial_brake_cmd);
   brake_hysteresis_state_ = std::abs(initial_brake_cmd);
 
-  const size_t steer_input_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
-  steer_input_queue_.resize(steer_input_queue_size);
-  const double initial_steer_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
-  std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), initial_steer_cmd);
+  // Calculate initial steering motor command and initialize steering motor queue
+  const double initial_steer_motor_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
+  const size_t steer_motor_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
+  steer_motor_input_queue_.assign(steer_motor_queue_size, initial_steer_motor_cmd);
 
-  const size_t vel_input_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
-  vel_history_queue_.resize(vel_input_queue_size);
-  std::fill(vel_history_queue_.begin(), vel_history_queue_.end(), state_(IDX::VX));
-  delayed_vx_ = state_(IDX::VX);
+  // Calculate initial velocity and initialize velocity history queue
+  const double initial_vel = state_(IDX::VX);
+  const size_t vel_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
+  vel_history_queue_.assign(vel_queue_size, initial_vel);
+
+  delayed_vx_ = initial_vel;
 }
 
 Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
