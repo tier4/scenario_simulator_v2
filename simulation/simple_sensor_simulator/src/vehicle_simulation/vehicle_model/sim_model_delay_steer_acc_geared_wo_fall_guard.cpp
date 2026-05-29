@@ -323,95 +323,93 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
 {
   using autoware_vehicle_msgs::msg::GearCommand;
 
+  // Extract states with safety clamps
   const double vel = std::clamp(state(IDX::VX), -vx_lim_, vx_lim_);
   const double pedal_acc = std::clamp(state(IDX::PEDAL_ACCX), -brake_lim_, acc_lim_);
   const double yaw = state(IDX::YAW);
-  const double current_steer = state(IDX::STEER);
+  // Prevent NaN explosion in std::tan() during Runge-Kutta integration steps
+  const double current_steer = std::clamp(state(IDX::STEER), -steer_lim_, steer_lim_);
 
   const double pedal_acc_des = input(IDX_U::PEDAL_ACCX_DES);
   const double steer_motor_des = input(IDX_U::STEER_DES);
   const double slope_accx = input(IDX_U::SLOPE_ACCX);
   const auto gear = input(IDX_U::GEAR);
 
-  // Dynamic selection of time constant and jerk limit
+  // Dynamically select time constants and jerk limits based on pedal commands
   constexpr double eps = 1e-5;  // Threshold for zero evaluation
   const double current_tc = [&]() {
-    if (pedal_acc_des > (acc_offset_ + eps)) {  // Acceleration -> Pure acceleration dynamics
-      return acc_time_constant_;
+    if (pedal_acc_des > (acc_offset_ + eps)) {
+      return acc_time_constant_;  // Active acceleration
     }
-    else if (pedal_acc_des < (-brake_offset_ - eps)) {  // Braking -> Pure braking dynamics
-      return brake_time_constant_;
+    if (pedal_acc_des < (-brake_offset_ - eps)) {
+      return brake_time_constant_;  // Active braking
     }
-    else {  // Coasting
-      // Determine the release speed of remaining forces based on the current vehicle state (pedal_acc) even when the command is 0
-      if (pedal_acc < 0.0) {  // Apply brake release dynamics if brake force remains
-        return brake_time_constant_;
-      } else {  // Apply acceleration release dynamics if acceleration force remains
-        return acc_time_constant_;
-      }
-    }
+    // Coasting: release remaining forces based on the actual pedal state
+    return (pedal_acc < 0.0) ? brake_time_constant_ : acc_time_constant_;
   }();
   const double current_jerk_lim = [&]() {
     if (pedal_acc_des > (acc_offset_ + eps)) {
       return acc_rate_lim_;
     }
-    else if (pedal_acc_des < (-brake_offset_ - eps)) {
+    if (pedal_acc_des < (-brake_offset_ - eps)) {
       return brake_rate_lim_;
     }
-    else {
-      return (pedal_acc < 0.0) ? brake_rate_lim_ : acc_rate_lim_;
-    }
+    return (pedal_acc < 0.0) ? brake_rate_lim_ : acc_rate_lim_;
   }();
 
+  // Evaluate steering motor control error with deadband
   const double current_steer_motor = (current_steer - steer_bias_) / (1.0 + steer_accuracy_error_);
   const double steer_motor_diff = current_steer_motor - steer_motor_des;
   const double steer_motor_diff_with_dead_band = [&]() {
     if (steer_motor_diff > steer_dead_band_) {
       return steer_motor_diff - steer_dead_band_;
-    } else if (steer_motor_diff < -steer_dead_band_) {
-      return steer_motor_diff + steer_dead_band_;
-    } else {
-      return 0.0;
     }
+    if (steer_motor_diff < -steer_dead_band_) {
+      return steer_motor_diff + steer_dead_band_;
+    }
+    return 0.0;
   }();
 
+  // Compute longitudinal acceleration (d_vx) using Newtonian mechanics and static friction models
   const double d_vx = [&] {
     if (gear == GearCommand::NONE || gear == GearCommand::PARK) {
       return 0.0;
     }
 
-    // 1. Air resistance (Force proportional to the square of velocity, acting opposite to the direction of motion)
+    // Aerodynamic drag: proportional to the square of velocity, opposing the motion
     const double air_drag = -air_drag_coef_ * vel * std::abs(vel);
 
-    // 2. Engine thrust (Generated according to gear direction only when the accelerator pedal is pressed)
+    // Engine thrust: generated only when the accelerator is pressed, depending on the gear
     const double engine_acc = [&]() {
       if (pedal_acc >= 0.0) {
         if (gear == GearCommand::NEUTRAL) {
           return 0.0;
-        } else if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
-          return -pedal_acc;
-        } else {
-          return pedal_acc;
         }
+        if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
+          return -pedal_acc;
+        }
+        return pedal_acc;
       }
       return 0.0;
     }();
 
-    // Static friction model (Approximation of Coulomb friction)
-    const double vel_epsilon = 0.02;  // Scale determining the strength of the virtual spring that pulls the velocity to zero
-    const double k = 1.0 / vel_epsilon; // Virtual spring constant
+    // Static friction model (Approximated Coulomb friction via virtual spring)
+    const double vel_epsilon = 0.02;    // Threshold for near-zero velocity
+    const double k = 1.0 / vel_epsilon; // Virtual spring constant (viscous damping coefficient)
 
-    // Total external acceleration acting on the vehicle (Engine thrust, slope gravity, and air drag)
+    // Total external acceleration acting on the vehicle
     const double external_acc = engine_acc + slope_accx + air_drag;
 
-    // Limit of static friction force
+    // Available static friction force limits (Brake force + Rolling resistance)
     const double brake_force = (pedal_acc < 0.0) ? -pedal_acc : 0.0;
     const double friction_limit = brake_force + rolling_resistance_;
 
-    // Combined motion equation: Vehicle targets zero velocity (-k * vel), capped by friction limits around the external forces
+    // Combined motion equation:
+    // The vehicle targets zero velocity (-k * vel) near standstill, capped by the available friction limit.
     return std::clamp(-k * vel, external_acc - friction_limit, external_acc + friction_limit);
   }();
 
+  // Construct the final state derivatives
   Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
   d_state(IDX::X)          = vel * std::cos(yaw);
   d_state(IDX::Y)          = vel * std::sin(yaw);
