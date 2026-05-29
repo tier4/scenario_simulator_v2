@@ -105,16 +105,8 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   // Separation of acceleration and brake signals at the input stage
   const double raw_pedal_cmd = input_(IDX_U::PEDAL_ACCX_DES);
-
-  if (raw_pedal_cmd >= 0.0) {
-    // Acceleration command: insert into acceleration queue, insert 0.0 into brake queue
-    acc_input_queue_.push_back(raw_pedal_cmd);
-    brake_input_queue_.push_back(0.0);
-  } else {
-    // Braking command: insert 0.0 into acceleration queue, insert into brake queue
-    acc_input_queue_.push_back(0.0);
-    brake_input_queue_.push_back(raw_pedal_cmd);
-  }
+  acc_input_queue_.push_back((raw_pedal_cmd >= 0.0) ? raw_pedal_cmd : 0.0);
+  brake_input_queue_.push_back((raw_pedal_cmd < 0.0) ? raw_pedal_cmd : 0.0);
 
   // Dequeue values after their respective delay times have passed
   const double acc_delayed_val = acc_input_queue_.front();
@@ -124,106 +116,99 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   // Brake Override System (BOS)
   // Prioritize brake command if both acceleration and brake commands are active simultaneously
-  if (brake_delayed_val < -1e-5) {  // tolerance for floating-point zero evaluation
-    delayed_input(IDX_U::PEDAL_ACCX_DES) = brake_delayed_val;
-  } else {
-    // Use acceleration value (including 0.0 for coasting) when no brake command is active
-    delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_delayed_val;
-  }
+  delayed_input(IDX_U::PEDAL_ACCX_DES) =
+    (brake_delayed_val < -1e-5) ? brake_delayed_val : acc_delayed_val;
 
+  // Steering motor queue processing
   steer_motor_input_queue_.push_back(input_(IDX_U::STEER_DES));
   delayed_input(IDX_U::STEER_DES) = steer_motor_input_queue_.front();
   steer_motor_input_queue_.pop_front();
+
   delayed_input(IDX_U::GEAR) = input_(IDX_U::GEAR);
   delayed_input(IDX_U::SLOPE_ACCX) = input_(IDX_U::SLOPE_ACCX);
 
-  // Nonlinear filter calculation
-  // 1. Acceleration and brake filter
-  double pedal_acc_des = delayed_input(IDX_U::PEDAL_ACCX_DES) * debug_acc_scaling_factor_;
-
-  bool is_brake_pad_contacting = false;
-
-  // Pre-calculate baseline pedal acceleration
+  // Pedal Nonlinear Filter (Acceleration & Braking)
   const double baseline_acc = acc_offset_ - brake_offset_;
   const double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
+  bool is_brake_pad_contacting = false;
 
-  if (pedal_acc_des < 0.0) {
-    double brake_cmd = std::abs(pedal_acc_des);
+  delayed_input(IDX_U::PEDAL_ACCX_DES) = [&]() {
+    double cmd = delayed_input(IDX_U::PEDAL_ACCX_DES) * debug_acc_scaling_factor_;
 
-    if (brake_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
-      brake_cmd = std::round(brake_cmd / brake_resolution_) * brake_resolution_;
-    }
+    if (cmd < 0.0) {  // --- Braking ---
+      double brake_cmd = std::abs(cmd);
 
-    // Reset hysteresis when the pedal is fully released
-    double hist_cmd = 0.0;
-    if (brake_cmd < 1e-5) { // tolerance to determine if the pedal is fully released
-      hist_cmd = 0.0;
-    } else {
-      hist_cmd = std::clamp(brake_hysteresis_state_, brake_cmd - (brake_hysteresis_width_ / 2.0), brake_cmd + (brake_hysteresis_width_ / 2.0));
-    }
-    hist_cmd = std::max(0.0, hist_cmd);
-    brake_hysteresis_state_ = hist_cmd;
-
-    double jump_cmd = 0.0;
-    if (hist_cmd > brake_dead_band_) {
-      // Pad contact detection (exceeded dead band)
-      is_brake_pad_contacting = true;
-
-      const double deadzoned_cmd = hist_cmd - brake_dead_band_;
-      jump_cmd = deadzoned_cmd + brake_jump_value_;
-      jump_cmd = jump_cmd * (1.0 + brake_accuracy_error_);
-
-      // Calculate target pedal acceleration for the initial braking jump
-      const double apply_jump_target = baseline_acc - actual_jump_value;
-
-      if (state_(IDX::PEDAL_ACCX) <= baseline_acc && state_(IDX::PEDAL_ACCX) > apply_jump_target) {
-        state_(IDX::PEDAL_ACCX) = apply_jump_target;
+      if (brake_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
+        brake_cmd = std::round(brake_cmd / brake_resolution_) * brake_resolution_;
       }
+
+      // Update hysteresis state
+      if (brake_cmd < 1e-5) { // tolerance to determine if the pedal is fully released
+        brake_hysteresis_state_ = 0.0;
+      } else {
+        brake_hysteresis_state_ = std::max(0.0, std::clamp(
+          brake_hysteresis_state_,
+          brake_cmd - (brake_hysteresis_width_ / 2.0),
+          brake_cmd + (brake_hysteresis_width_ / 2.0)
+        ));
+      }
+
+      // Calculate final braking command
+      cmd = 0.0;  // Default to zero friction (inside deadband)
+      if (brake_hysteresis_state_ > brake_dead_band_) {
+        is_brake_pad_contacting = true;
+        cmd = -(brake_hysteresis_state_ - brake_dead_band_ + brake_jump_value_) * (1.0 + brake_accuracy_error_);
+      }
+    } else {  // --- Acceleration or Coasting ---
+      // Reset brake internal state
+      brake_hysteresis_state_ = 0.0;
+
+      // Process acceleration command
+      if (acc_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
+        cmd = std::round(cmd / acc_resolution_) * acc_resolution_;
+      }
+      cmd = std::max(0.0, cmd - acc_dead_band_) * (1.0 + acc_accuracy_error_);
     }
 
-    pedal_acc_des = -jump_cmd;
+    return std::clamp(cmd + baseline_acc, -brake_lim_, acc_lim_);
+  }();
+
+  // Discrete Physical State Transitions (Overrides based on brake pad contact)
+  if (is_brake_pad_contacting) {
+    // Apply initial braking jump directly to vehicle state
+    const double apply_jump_target = baseline_acc - actual_jump_value;
+    if (state_(IDX::PEDAL_ACCX) <= baseline_acc && state_(IDX::PEDAL_ACCX) > apply_jump_target) {
+      state_(IDX::PEDAL_ACCX) = apply_jump_target;
+    }
   } else {
-    brake_hysteresis_state_ = 0.0;
-
-    if (acc_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
-      pedal_acc_des = std::round(pedal_acc_des / acc_resolution_) * acc_resolution_;
-    }
-
-    if (pedal_acc_des > acc_dead_band_) {
-      pedal_acc_des = pedal_acc_des - acc_dead_band_;
-
-      pedal_acc_des = pedal_acc_des * (1.0 + acc_accuracy_error_);
-    } else {
-      pedal_acc_des = 0.0;
-    }
-  }
-
-  // Prevent unnatural brake dragging when the pedal is released
-  if (!is_brake_pad_contacting) {
+    // Prevent unnatural brake dragging
     if (state_(IDX::PEDAL_ACCX) < baseline_acc && state_(IDX::PEDAL_ACCX) >= baseline_acc - actual_jump_value) {
       state_(IDX::PEDAL_ACCX) = baseline_acc;
     }
   }
 
-  pedal_acc_des = pedal_acc_des + baseline_acc;
+  // Steering motor command processing
+  delayed_input(IDX_U::STEER_DES) = [&]() {
+    double cmd = delayed_input(IDX_U::STEER_DES) * debug_steer_scaling_factor_;
 
-  delayed_input(IDX_U::PEDAL_ACCX_DES) = std::clamp(pedal_acc_des, -brake_lim_, acc_lim_);
+    // Apply Resolution
+    if (steer_resolution_ > 1e-5) {
+      cmd = std::round(cmd / steer_resolution_) * steer_resolution_;
+    }
 
-  // 2. Steering filter
-  double steer_des = delayed_input(IDX_U::STEER_DES) * debug_steer_scaling_factor_;
+    // Apply Hysteresis
+    const double steer_motor_hist = std::clamp(
+      (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_), // steering motor actual angle
+      cmd - (steer_hysteresis_width_ / 2.0),
+      cmd + (steer_hysteresis_width_ / 2.0)
+    );
 
-  if (steer_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
-    steer_des = std::round(steer_des / steer_resolution_) * steer_resolution_;
-  }
-
-  const double current_motor_angle = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
-  const double steer_hist = std::clamp(current_motor_angle, steer_des - (steer_hysteresis_width_ / 2.0), steer_des + (steer_hysteresis_width_ / 2.0));
-
-  delayed_input(IDX_U::STEER_DES) = std::clamp(steer_hist, -steer_lim_, steer_lim_);
+    // Apply final limit
+    return std::clamp(steer_motor_hist, -steer_lim_, steer_lim_);
+  }();
 
   const auto prev_state = state_;
 
-  // Use 4th-order Runge-Kutta (RK4) method for precise physical simulation
   updateRungeKutta(dt, delayed_input);
 
   // Speed limit and stop evaluation
