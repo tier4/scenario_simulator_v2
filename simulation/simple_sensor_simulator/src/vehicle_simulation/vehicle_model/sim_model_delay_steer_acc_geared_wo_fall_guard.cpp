@@ -127,7 +127,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   delayed_input(IDX_U::GEAR) = input_(IDX_U::GEAR);
   delayed_input(IDX_U::SLOPE_ACCX) = input_(IDX_U::SLOPE_ACCX);
 
-  // Pedal Nonlinear Filter (Acceleration & Braking)
+  // Pedal (Acceleration & Braking) command processing
   const double baseline_acc = acc_offset_ - brake_offset_;
   const double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
   bool is_brake_pad_contacting = false;
@@ -138,13 +138,14 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     if (cmd < 0.0) {  // --- Braking ---
       double brake_cmd = std::abs(cmd);
 
-      if (brake_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
+      // Apply resolution if configured
+      if (brake_resolution_ > 1e-5) {
         brake_cmd = std::round(brake_cmd / brake_resolution_) * brake_resolution_;
       }
 
       // Update hysteresis state
-      if (brake_cmd < 1e-5) { // tolerance to determine if the pedal is fully released
-        brake_hysteresis_state_ = 0.0;
+      if (brake_cmd < 1e-5) {
+        brake_hysteresis_state_ = 0.0;  // Reset when the pedal is fully released
       } else {
         brake_hysteresis_state_ = std::max(0.0, std::clamp(
           brake_hysteresis_state_,
@@ -163,25 +164,28 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
       // Reset brake internal state
       brake_hysteresis_state_ = 0.0;
 
-      // Process acceleration command
-      if (acc_resolution_ > 1e-5) { // tolerance to check if the parameter is configured (non-zero)
+      // Apply resolution if configured
+      if (acc_resolution_ > 1e-5) {
         cmd = std::round(cmd / acc_resolution_) * acc_resolution_;
       }
+
+      // Apply deadband and accuracy error
       cmd = std::max(0.0, cmd - acc_dead_band_) * (1.0 + acc_accuracy_error_);
     }
 
+    // Apply baseline and absolute physical limits
     return std::clamp(cmd + baseline_acc, -brake_lim_, acc_lim_);
   }();
 
-  // Discrete Physical State Transitions (Overrides based on brake pad contact)
-  if (is_brake_pad_contacting) {
-    // Apply initial braking jump directly to vehicle state
+  // Override continuous state to simulate discrete mechanical behavior
+  if (is_brake_pad_contacting) {  // Brake pad touched
+    // Apply initial braking jump directly to vehicle state (overcoming clearance)
     const double apply_jump_target = baseline_acc - actual_jump_value;
     if (state_(IDX::PEDAL_ACCX) <= baseline_acc && state_(IDX::PEDAL_ACCX) > apply_jump_target) {
       state_(IDX::PEDAL_ACCX) = apply_jump_target;
     }
-  } else {
-    // Prevent unnatural brake dragging
+  } else {  // Brake pad released
+    // Instantly clear residual braking force to prevent unnatural drag
     if (state_(IDX::PEDAL_ACCX) < baseline_acc && state_(IDX::PEDAL_ACCX) >= baseline_acc - actual_jump_value) {
       state_(IDX::PEDAL_ACCX) = baseline_acc;
     }
@@ -191,14 +195,14 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   delayed_input(IDX_U::STEER_DES) = [&]() {
     double cmd = delayed_input(IDX_U::STEER_DES) * debug_steer_scaling_factor_;
 
-    // Apply Resolution
+    // Apply resolution if configured
     if (steer_resolution_ > 1e-5) {
       cmd = std::round(cmd / steer_resolution_) * steer_resolution_;
     }
 
     // Apply Hysteresis
     const double steer_motor_hist = std::clamp(
-      (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_), // steering motor actual angle
+      (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_), // Current steering motor angle
       cmd - (steer_hysteresis_width_ / 2.0),
       cmd + (steer_hysteresis_width_ / 2.0)
     );
@@ -207,65 +211,64 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     return std::clamp(steer_motor_hist, -steer_lim_, steer_lim_);
   }();
 
+  // Cache state before integration, for post-processing and constraints evaluation
   const auto prev_state = state_;
 
   updateRungeKutta(dt, delayed_input);
 
-  // Speed limit and stop evaluation
-  state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
-
-  // Calculate physical steering limits based on motor limits, gear ratio, and bias
-  const double tire_steer_upper_lim = steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
-  const double tire_steer_lower_lim = -steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
-  // Clamp with a failsafe to prevent upper and lower limit reversal
-  state_(IDX::STEER) = std::clamp(
-    state_(IDX::STEER),
-    std::min(tire_steer_upper_lim, tire_steer_lower_lim),
-    std::max(tire_steer_upper_lim, tire_steer_lower_lim)
-  );
-
+  // Apply physical limits to raw integration results
+  state_(IDX::VX) = std::clamp(state_(IDX::VX), -vx_lim_, vx_lim_);
   state_(IDX::PEDAL_ACCX) = std::clamp(state_(IDX::PEDAL_ACCX), -brake_lim_, acc_lim_);
 
-  // Zero-snap processing to prevent floating-point errors
-  // Round off to exactly 0.0 if the RK4 integration result for velocity is extremely close to zero
-  // (Measure to prevent ADK state transition deadlocks)
-  const double snap_epsilon = 0.001;  // threshold to snap velocity to exactly 0.0, preventing floating-point drift
-  if (delayed_input(IDX_U::PEDAL_ACCX_DES) < 0.0) { // When brake command is active
-    if (std::abs(state_(IDX::VX)) < snap_epsilon) {
-      state_(IDX::VX) = 0.0;
-      // Fix minor positional drifts
-      state_(IDX::X) = prev_state(IDX::X);
-      state_(IDX::Y) = prev_state(IDX::Y);
-      state_(IDX::YAW) = prev_state(IDX::YAW);
-    }
+  // Enforce physical steering limits based on steering motor limits, accuracy error, and bias
+  state_(IDX::STEER) = [&]() {
+    const double upper = steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
+    const double lower = -steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
+
+    // Failsafe clamp to prevent upper/lower limit reversal
+    return std::clamp(state_(IDX::STEER), std::min(upper, lower), std::max(upper, lower));
+  }();
+
+  // Snap velocity to 0.0 and freeze position when braking to a halt.
+  // Prevents floating-point drift and guarantees stable ADK state transitions.
+  constexpr double stop_epsilon = 1e-3;
+  if (delayed_input(IDX_U::PEDAL_ACCX_DES) < 0.0 && std::abs(state_(IDX::VX)) < stop_epsilon) {
+    state_(IDX::VX) = 0.0;
+    state_(IDX::X) = prev_state(IDX::X);
+    state_(IDX::Y) = prev_state(IDX::Y);
+    state_(IDX::YAW) = prev_state(IDX::YAW);
   }
 
+  // Calculate actual acceleration based on the finalized velocity delta
   state_(IDX::ACCX) = (state_(IDX::VX) - prev_state(IDX::VX)) / dt;
 
-  double raw_delayed_vx = 0.0;
+  // Update velocity history queue and retrieve delayed velocity
+  const double raw_delayed_vx = [&]() {
+    if (vel_history_queue_.empty()) {
+      return state_(IDX::VX);
+    }
 
-  if (vel_history_queue_.empty()) {
-    raw_delayed_vx = state_(IDX::VX);
-  } else {
     vel_history_queue_.push_back(state_(IDX::VX));
-    raw_delayed_vx = vel_history_queue_.front();
+    const double front_val = vel_history_queue_.front();
     vel_history_queue_.pop_front();
-  }
+    return front_val;
+  }();
 
-  // Calculate sensor output once per step
-  if (std::abs(raw_delayed_vx) < 1e-3) {  // threshold to snap sensor velocity output to 0.0
-    delayed_vx_ = 0.0;
-  } else {
-    double vx = raw_delayed_vx * (1.0 + vel_sensor_accuracy_error_);
-    vx += vel_sensor_offset_;
-    if (vel_sensor_noise_stddev_ > 1e-5) {  // tolerance to check if the parameter is configured (non-zero)
+  // Apply sensor characteristics (accuracy, offset, noise, resolution)
+  delayed_vx_ = [&]() {
+    if (std::abs(raw_delayed_vx) < stop_epsilon) {
+      return 0.0;
+    }
+
+    double vx = raw_delayed_vx * (1.0 + vel_sensor_accuracy_error_) + vel_sensor_offset_;
+    if (vel_sensor_noise_stddev_ > 1e-5) {
       vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_;
     }
-    if (vel_sensor_resolution_ > 1e-5) {  // tolerance to check if the parameter is configured (non-zero)
+    if (vel_sensor_resolution_ > 1e-5) {
       vx = std::round(vx / vel_sensor_resolution_) * vel_sensor_resolution_;
     }
-    delayed_vx_ = vx;
-  }
+    return vx;
+  }();
 }
 
 void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double & dt)
