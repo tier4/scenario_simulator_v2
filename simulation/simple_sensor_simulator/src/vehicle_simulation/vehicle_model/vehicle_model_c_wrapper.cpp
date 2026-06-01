@@ -5,7 +5,7 @@
 //
 // API:
 //   factory: vm_create_<type>(...)        → VmModel *
-//   common : vm_set_input / vm_step / vm_step_dt / vm_get_x/y/yaw/vx/steer/ax / vm_destroy
+//   common : vm_set_input / vm_step / vm_step_dt / vm_get_x/y/yaw/vx/steer/ax/wz / vm_destroy
 //   reset  : vm_reset_full / vm_reset_state
 //   delay  : vm_set_queues / vm_get_acc_q_size / vm_get_steer_q_size
 //            (delay 系派生のみ動作。ideal 系では no-op / 0 を返す)
@@ -211,5 +211,8 @@ double vm_get_yaw(VmModel * m) { return m->impl->getYaw(); }
 double vm_get_vx(VmModel * m) { return m->impl->getVx(); }
 double vm_get_steer(VmModel * m) { return m->impl->getSteer(); }
 double vm_get_ax(VmModel * m) { return m->impl->getAx(); }
+// yaw rate (wz)。k_us 依存の calc_yaw_rate を経由するため、per-step でも understeer の
+// 寄与を直接観測できる (steer/位置指標は k_us 非感度なのに対し wz は感度を持つ)。
+double vm_get_wz(VmModel * m) { return m->impl->getWz(); }
 
 }  // extern "C"
