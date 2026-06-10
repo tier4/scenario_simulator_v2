@@ -137,6 +137,8 @@ auto toString(const VehicleModelType datum) -> std::string
     BOILERPLATE(IDEAL_STEER_ACC_GEARED);
     BOILERPLATE(IDEAL_STEER_VEL);
     BOILERPLATE(PERFECT_TRAJECTORY_TRACKER);
+    BOILERPLATE(TAIGA_DYN);
+    BOILERPLATE(TAIGA_X);
   }
 
 #undef BOILERPLATE
@@ -162,6 +164,8 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
     {"IDEAL_STEER_ACC_GEARED", VehicleModelType::IDEAL_STEER_ACC_GEARED},
     {"IDEAL_STEER_VEL", VehicleModelType::IDEAL_STEER_VEL},
     {"PERFECT_TRAJECTORY_TRACKER", VehicleModelType::PERFECT_TRAJECTORY_TRACKER},
+    {"TAIGA_DYN", VehicleModelType::TAIGA_DYN},
+    {"TAIGA_X", VehicleModelType::TAIGA_X},
   };
 
   const auto iter = table.find(vehicle_model_type);
@@ -252,6 +256,44 @@ auto EgoEntitySimulation::makeSimulationModel(
       return std::make_shared<SimModelPerfectTrajectoryTracker>(delay_time_sec);
     }
 
+    case VehicleModelType::TAIGA_DYN: {
+      // Dynamic-bicycle physical parameters. Defaults are nominal values for a heavy
+      // vehicle; the CG split derives from the wheelbase, and the cornering stiffnesses
+      // are initial seeds to be calibrated against steady-state cornering.
+      const auto mass = common::getParameter("mass", 6560.0);
+      const auto inertia_z = common::getParameter("inertia_z", 25868.2318);
+      const auto lf = common::getParameter("lf", wheel_base * 0.5 + 0.94323);
+      const auto lr = common::getParameter("lr", wheel_base * 0.5 - 0.94323);
+      const auto cornering_stiffness_front =
+        common::getParameter("cornering_stiffness_front", 115830.0);
+      const auto cornering_stiffness_rear =
+        common::getParameter("cornering_stiffness_rear", 535860.0);
+      const auto vx_min_dyn = common::getParameter("vx_min_dyn", 1.0);
+      return std::make_shared<
+        autoware::simulator::simple_planning_simulator::SimModelTaigaDyn>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
+        debug_acc_scaling_factor, debug_steer_scaling_factor, mass, inertia_z, lf, lr,
+        cornering_stiffness_front, cornering_stiffness_rear, vx_min_dyn);
+    }
+
+    case VehicleModelType::TAIGA_X: {
+      // High-fidelity physics backend (flat ground). Physical defaults mirror a
+      // heavy vehicle; the internal substep follows the engine fixed timestep.
+      const auto mass = common::getParameter("mass", 6560.0);
+      const auto inertia_z = common::getParameter("inertia_z", 25868.2318);
+      const auto cg_offset_x = common::getParameter("cg_offset_x", -0.94323);
+      const auto track_width = common::getParameter("track_width", 1.754);
+      const auto wheel_radius = common::getParameter("wheel_radius", 0.3725);
+      const auto max_accel = common::getParameter("max_accel", 2.3);
+      const auto max_brake = common::getParameter("max_brake", 5.9);
+      const auto fixed_dt = common::getParameter("taiga_x_fixed_dt", 1.0 / 1200.0);
+      return std::make_shared<
+        autoware::simulator::simple_planning_simulator::SimModelTaigaX>(
+        wheel_base, track_width, mass, inertia_z, cg_offset_x, steer_lim, max_accel, max_brake,
+        wheel_radius, fixed_dt);
+    }
+
     default:
       THROW_SEMANTIC_ERROR(
         "Unsupported vehicle_model_type ", toString(vehicle_model_type), " specified");
@@ -288,6 +330,23 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
       v << 0, 0, 0, value, 0, 0, 0;
       break;
+
+    case VehicleModelType::TAIGA_DYN:
+      // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX, VY, WZ]
+      v << 0, 0, 0, value, 0, 0, 0, 0, 0;
+      break;
+
+    case VehicleModelType::TAIGA_X:
+      // PhysX-backed: the authoritative state lives in the engine, so teleport
+      // through the model instead of writing the state mirror.
+      if (
+        auto * tx = dynamic_cast<autoware::simulator::simple_planning_simulator::SimModelTaigaX *>(
+          vehicle_model_ptr_.get())) {
+        tx->setFullState(
+          vehicle_model_ptr_->getX(), vehicle_model_ptr_->getY(), vehicle_model_ptr_->getYaw(),
+          value, 0.0, 0.0, 0.0, 0.0);
+      }
+      return;
 
     case VehicleModelType::IDEAL_STEER_ACC:
     case VehicleModelType::IDEAL_STEER_ACC_GEARED:
@@ -383,6 +442,46 @@ auto EgoEntitySimulation::overwrite(
         state(1) = world_relative_position_.y();
         state(2) = yaw;
         vehicle_model_ptr_->setState(state);
+        break;
+
+      case VehicleModelType::TAIGA_DYN:
+        // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX, VY, WZ]; the lateral
+        // states (VY, WZ) carry inertia, so seed them from the measured motion.
+        state(0) = world_relative_position_.x();
+        state(1) = world_relative_position_.y();
+        state(2) = yaw;
+        state(3) = status.action_status.twist.linear.x;
+        if (
+          std::abs(status.action_status.twist.linear.x) <
+          min_linear_velocity_for_steer_calculation) {
+          state(4) = 0.0;
+        } else {
+          state(4) = std::atan(
+            (status.action_status.twist.angular.z * wheel_base_) /
+            status.action_status.twist.linear.x);
+        }
+        state(5) = status.action_status.accel.linear.x;
+        state(6) = status.action_status.accel.linear.x;
+        state(7) = status.action_status.twist.linear.y;
+        state(8) = status.action_status.twist.angular.z;
+        vehicle_model_ptr_->setState(state);
+        break;
+
+      case VehicleModelType::TAIGA_X:
+        // PhysX-backed: teleport the engine chassis to the measured pose/motion.
+        if (
+          auto * tx =
+            dynamic_cast<autoware::simulator::simple_planning_simulator::SimModelTaigaX *>(
+              vehicle_model_ptr_.get())) {
+          const double vx = status.action_status.twist.linear.x;
+          const double steer = std::abs(vx) < min_linear_velocity_for_steer_calculation
+                                 ? 0.0
+                                 : std::atan(status.action_status.twist.angular.z * wheel_base_ / vx);
+          tx->setFullState(
+            world_relative_position_.x(), world_relative_position_.y(), yaw, vx,
+            status.action_status.twist.linear.y, status.action_status.twist.angular.z,
+            status.action_status.accel.linear.x, steer);
+        }
         break;
 
       case VehicleModelType::EXTERNAL:
@@ -496,6 +595,8 @@ void EgoEntitySimulation::update(
           break;
 
         case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+        case VehicleModelType::TAIGA_DYN:
+        case VehicleModelType::TAIGA_X:
           input(0) = acceleration;
           input(1) = autoware->getGearCommand().command;
           input(2) = acceleration_by_slope;

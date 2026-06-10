@@ -41,6 +41,8 @@ enum class VehicleModelType {
   IDEAL_STEER_ACC_GEARED,
   IDEAL_STEER_VEL,
   PERFECT_TRAJECTORY_TRACKER,
+  TAIGA_DYN,
+  TAIGA_X,
 };
 
 class EgoEntitySimulation

@@ -33,6 +33,46 @@ endif()
 
 ament_auto_find_build_dependencies()
 
+# --- PhysX backend for the taiga_x vehicle model (required) ------------------
+# PhysX is provided by the physx_vendor package, which exports PHYSX_SDK_DIR /
+# PHYSX_LIB_DIR pointing at the installed SDK (headers, release static libraries
+# and the vehicle snippet sources).
+find_package(physx_vendor REQUIRED)
+
+set(_taiga_x_physx_libs
+  PhysXVehicle2_static_64 PhysXExtensions_static_64 PhysXCooking_static_64
+  PhysX_static_64 PhysXPvdSDK_static_64 PhysXCommon_static_64 PhysXFoundation_static_64)
+if(NOT EXISTS "${PHYSX_SDK_DIR}/include/PxPhysicsAPI.h")
+  message(FATAL_ERROR "taiga_x: PhysX headers not found at ${PHYSX_SDK_DIR}/include "
+    "(build the physx_vendor package).")
+endif()
+foreach(_l IN LISTS _taiga_x_physx_libs)
+  if(NOT EXISTS "${PHYSX_LIB_DIR}/lib${_l}.a")
+    message(FATAL_ERROR "taiga_x: PhysX library not found: ${PHYSX_LIB_DIR}/lib${_l}.a")
+  endif()
+endforeach()
+message(STATUS "taiga_x: using PhysX SDK at ${PHYSX_SDK_DIR}")
+
+set(TAIGA_X_PHYSX_SOURCES
+  src/vehicle_simulation/vehicle_model/sim_model_taiga_x.cpp
+  ${PHYSX_SDK_DIR}/snippets/snippetvehiclecommon/base/Base.cpp
+  ${PHYSX_SDK_DIR}/snippets/snippetvehiclecommon/directdrivetrain/DirectDrivetrain.cpp
+  ${PHYSX_SDK_DIR}/snippets/snippetvehiclecommon/physxintegration/PhysXIntegration.cpp)
+set(TAIGA_X_PHYSX_INCLUDES ${PHYSX_SDK_DIR}/include ${PHYSX_SDK_DIR}/snippets)
+set(TAIGA_X_PHYSX_LINK_LIBS "")
+foreach(_l IN LISTS _taiga_x_physx_libs)
+  list(APPEND TAIGA_X_PHYSX_LINK_LIBS "${PHYSX_LIB_DIR}/lib${_l}.a")
+endforeach()
+list(APPEND TAIGA_X_PHYSX_LINK_LIBS pthread dl)
+
+# Apply the PhysX backend (sources, includes, libs, defines) to a target.
+function(taiga_x_apply_physx target)
+  target_sources(${target} PRIVATE ${TAIGA_X_PHYSX_SOURCES})
+  target_include_directories(${target} PRIVATE ${TAIGA_X_PHYSX_INCLUDES})
+  target_link_libraries(${target} ${TAIGA_X_PHYSX_LINK_LIBS})
+  target_compile_definitions(${target} PRIVATE PX_PHYSX_STATIC_LIB=1)
+endfunction()
+
 link_directories(${PCL_LIBRARY_DIRS})
 include_directories(
   include
@@ -65,6 +105,7 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_vel.cpp
   src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
   src/vehicle_simulation/vehicle_model/sim_model_perfect_trajectory_tracker.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_taiga_dyn.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
   glog
@@ -72,6 +113,7 @@ target_link_libraries(simple_sensor_simulator_component
   sodium
   zmq
 )
+taiga_x_apply_physx(simple_sensor_simulator_component)
 ament_target_dependencies(simple_sensor_simulator_component
   agnocast_wrapper
   simulation_interface
@@ -117,6 +159,7 @@ add_library(vehicle_model_wrapper SHARED
   src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
   src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_taiga_dyn.cpp
 )
 target_include_directories(vehicle_model_wrapper PRIVATE
   ${EIGEN3_INCLUDE_DIRS}
@@ -125,6 +168,7 @@ target_include_directories(vehicle_model_wrapper PRIVATE
 target_compile_features(vehicle_model_wrapper PRIVATE cxx_std_17)
 set_target_properties(vehicle_model_wrapper PROPERTIES POSITION_INDEPENDENT_CODE ON)
 ament_target_dependencies(vehicle_model_wrapper autoware_vehicle_msgs)
+taiga_x_apply_physx(vehicle_model_wrapper)
 install(TARGETS vehicle_model_wrapper
   LIBRARY DESTINATION share/${PROJECT_NAME}
 )
