@@ -20,8 +20,11 @@
 #define PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
 
 #include <algorithm>
+#include <cstdint>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/bag_stream.hpp>
+#include <unordered_set>
+#include <utility>
 
 namespace simple_sensor_simulator
 {
@@ -44,6 +47,26 @@ public:
   auto reset() -> void { index_ = 0; }
 
   auto done() const -> bool { return index_ >= data_.size(); }
+
+  /// @brief Keep only the traffic light groups whose id is in `governing_group_ids`.
+  /// @return Number of group occurrences (before, after) for logging.
+  auto filterGroups(const std::unordered_set<std::int64_t> & governing_group_ids)
+    -> std::pair<std::size_t, std::size_t>
+  {
+    std::size_t before = 0, after = 0;
+    for (auto & [time, message] : data_) {
+      before += message.traffic_light_groups.size();
+      message.traffic_light_groups.erase(
+        std::remove_if(
+          message.traffic_light_groups.begin(), message.traffic_light_groups.end(),
+          [&](const auto & group) {
+            return governing_group_ids.count(group.traffic_light_group_id) == 0;
+          }),
+        message.traffic_light_groups.end());
+      after += message.traffic_light_groups.size();
+    }
+    return {before, after};
+  }
 
 protected:
   auto pushMessage(double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data)

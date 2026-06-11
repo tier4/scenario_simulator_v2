@@ -23,6 +23,9 @@
 #include <rosbag2_storage/storage_options.hpp>
 #include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/perception_reproducer_sensor.hpp>
 #include <stdexcept>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
+#include <unordered_set>
 
 namespace simple_sensor_simulator
 {
@@ -300,6 +303,13 @@ auto PerceptionReproducerSensor::update(
     return;
   }
 
+  if (not signal_filter_applied_) {
+    signal_filter_applied_ = true;
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+    applyGoverningSignalFilter();
+#endif
+  }
+
   if (config_.use_position_based_replay) {
     if (ego_pose) {
       /// @note If the speed is unavailable, treat the ego as moving so that the replay stays
@@ -312,6 +322,56 @@ auto PerceptionReproducerSensor::update(
     updateTimeBased(current_scenario_time, current_ros_time);
   }
 }
+
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+auto PerceptionReproducerSensor::applyGoverningSignalFilter() -> void
+{
+  if (not traffic_light_stream_ or odometry_stream_.empty()) {
+    return;
+  }
+
+  // 実走 lanelet 集合 (記録 ego 軌跡を subsample し 5m 以内でレーンマッチ)
+  lanelet::Ids driven_lanelet_ids;
+  std::unordered_set<lanelet::Id> driven_set;
+  const std::size_t step = std::max<std::size_t>(1, odometry_stream_.size() / 500);
+  for (std::size_t i = 0; i < odometry_stream_.size(); i += step) {
+    if (
+      const auto lanelet_pose = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+        odometry_stream_.getPoseAt(i), false, 5.0)) {
+      if (driven_set.insert(lanelet_pose->lanelet_id).second) {
+        driven_lanelet_ids.push_back(lanelet_pose->lanelet_id);
+      }
+    }
+  }
+
+  if (driven_lanelet_ids.empty()) {
+    /// @note No recorded ego pose matched any lanelet, i.e. the lane matching failed
+    /// wholesale; filtering with an unreliable governing set would silence every signal, so
+    /// keep the recording unfiltered instead.
+    RCLCPP_WARN(
+      logger_, "Governing signal filter skipped: no recorded ego pose matched a lanelet.");
+    return;
+  }
+
+  /// @note An empty governing set with successful lane matching means the driven course has
+  /// no traffic light of its own; every replayed signal is then a cross-traffic signal, so
+  /// filtering down to zero groups is the desired outcome.
+  std::unordered_set<std::int64_t> governing_group_ids;
+  for (const auto & regulatory_element :
+       traffic_simulator::lanelet_wrapper::traffic_lights::autowareTrafficLightsOnPath(
+         driven_lanelet_ids)) {
+    governing_group_ids.insert(regulatory_element->id());
+  }
+
+  const auto [groups_before, groups_after] =
+    traffic_light_stream_->filterGroups(governing_group_ids);
+  RCLCPP_INFO(
+    logger_,
+    "Governing signal filter: %zu driven lanelets, %zu governing groups, group occurrences %zu "
+    "-> %zu.",
+    driven_lanelet_ids.size(), governing_group_ids.size(), groups_before, groups_after);
+}
+#endif
 
 auto PerceptionReproducerSensor::reset() -> void
 {

@@ -146,6 +146,16 @@ private:
 
   auto loadAllBagData(const std::string & bag_path, double start_time_s) -> void;
 
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  /// @note Restrict the replayed traffic lights to the groups governing the lanelets that the
+  /// recorded ego actually drove. Replaying cross-traffic signals too makes the behavior
+  /// planner misinterpret a red cross signal as the ego's own stop signal and falsely stop
+  /// (observed with the former Python sidecar reproducer). Applied lazily on the first
+  /// update() because the lanelet map is activated by the InitializeRequest, which arrives
+  /// after this sensor is constructed.
+  auto applyGoverningSignalFilter() -> void;
+#endif
+
   auto updateTimeBased(double current_scenario_time, const rclcpp::Time & current_ros_time) -> void;
 
   auto updatePositionBased(
@@ -184,6 +194,8 @@ private:
   std::optional<DwellAnchor> dwell_anchor_;
 
   static constexpr double stop_velocity_threshold_ = 0.5;  // [m/s]
+
+  bool signal_filter_applied_ = false;
 
   BagStream<DetectedObjects> detected_objects_stream_;
 
