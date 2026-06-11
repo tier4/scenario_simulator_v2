@@ -412,10 +412,22 @@ auto EgoEntitySimulation::overwrite(
       return convertQuaternionToEulerAngle(relative_orientation).z;
     }();
 
-    switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
+    /// @note Zero() is mandatory: a default-constructed VectorXd is uninitialized, and any
+    /// state index not explicitly seeded below would inject heap garbage into the vehicle
+    /// model. With DELAY_STEER_ACC_GEARED_WO_FALL_GUARD this manifested as PEDAL_ACCX stuck
+    /// at the saturation bound (vx_rate_lim) and the ego running away at full acceleration
+    /// while ignoring brake commands (2026-06-11).
+    switch (Eigen::VectorXd state = Eigen::VectorXd::Zero(vehicle_model_ptr_->getDimX());
+            vehicle_model_type_) {
+      case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+        // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX]; seed the pedal acceleration
+        // state with the measured acceleration so the post-replay integration continues
+        // from the observed motion.
+        state(6) = status.action_status.accel.linear.x;
+        [[fallthrough]];
+
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
         state(5) = status.action_status.accel.linear.x;
         [[fallthrough]];
@@ -570,7 +582,7 @@ void EgoEntitySimulation::update(
       vehicle_model_ptr_->update(step_time);
 
     } else {
-      auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
+      Eigen::VectorXd input = Eigen::VectorXd::Zero(vehicle_model_ptr_->getDimU());
 
       auto acceleration_by_slope = calculateAccelerationBySlope();
 
