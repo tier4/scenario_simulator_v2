@@ -111,6 +111,8 @@ public:
 
   auto getCurrentTime() const noexcept -> double;
 
+  auto getCurrentRosTime() -> rclcpp::Time { return clock_.getCurrentRosTime(); }
+
   auto closeZMQConnection() -> void;
 
   // update
