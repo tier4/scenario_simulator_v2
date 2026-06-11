@@ -17,6 +17,7 @@
 
 #include <tf2_ros/transform_broadcaster.h>
 
+#include <algorithm>
 #include <autoware_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
@@ -50,11 +51,19 @@ public:
 
   auto broadcastTf(double time_s, const rclcpp::Time & ros_time) -> geometry_msgs::msg::Pose;
 
-  auto findNearestIndex(const geometry_msgs::msg::Pose & ego_pose) const -> size_t
+  /// @note The search range can be restricted to [lo, hi) so that the caller can keep a
+  /// monotonic playhead: on self-overlapping courses (e.g. a rotary or a loop) the global
+  /// nearest sample may belong to a far-away arc of the recording, which would teleport the
+  /// replayed objects.
+  auto findNearestIndex(
+    const geometry_msgs::msg::Pose & ego_pose, size_t lo = 0,
+    size_t hi = std::numeric_limits<size_t>::max()) const -> size_t
   {
     double min_dist_sq = std::numeric_limits<double>::max();
-    size_t nearest = 0;
-    for (size_t i = 0; i < data_.size(); ++i) {
+    hi = std::min(hi, data_.size());
+    lo = std::min(lo, hi > 0 ? hi - 1 : 0);
+    size_t nearest = lo;
+    for (size_t i = lo; i < hi; ++i) {
       const auto & pos = data_[i].second.pose.pose.position;
       const double dx = pos.x - ego_pose.position.x;
       const double dy = pos.y - ego_pose.position.y;
@@ -146,6 +155,17 @@ private:
   rclcpp::Logger logger_;
 
   ReplayConfig config_;
+
+  /// @note Playhead (odometry sample index) for position-based replay. Monotonic: it never
+  /// moves backwards, and the nearest-neighbour search is restricted to a window around the
+  /// previous playhead so that self-overlapping courses cannot teleport the replay to a
+  /// far-away arc of the recording. The window widths are in odometry samples (~50 Hz, so
+  /// 50 back ≒ 1 s, 600 forward ≒ 12 s).
+  std::optional<size_t> playhead_;
+
+  static constexpr size_t playhead_window_back_ = 50;
+
+  static constexpr size_t playhead_window_forward_ = 600;
 
   BagStream<DetectedObjects> detected_objects_stream_;
 

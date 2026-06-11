@@ -194,7 +194,19 @@ auto PerceptionReproducerSensor::updatePositionBased(
     return;
   }
 
-  const size_t nearest_idx = odometry_stream_.findNearestIndex(ego_pose);
+  // 初回は大域探索、以降は前回 playhead 近傍の窓に限定 + 単調 (後退禁止)。
+  const size_t nearest_idx = [&]() {
+    if (not playhead_) {
+      playhead_ = odometry_stream_.findNearestIndex(ego_pose);
+    } else {
+      const size_t lo =
+        *playhead_ > playhead_window_back_ ? *playhead_ - playhead_window_back_ : 0;
+      playhead_ = std::max(
+        *playhead_,
+        odometry_stream_.findNearestIndex(ego_pose, lo, *playhead_ + playhead_window_forward_));
+    }
+    return *playhead_;
+  }();
   const double target_time_s = odometry_stream_.getTimeAt(nearest_idx);
 
   publishVehicleMarker(odometry_stream_.getPoseAt(nearest_idx), current_ros_time);
@@ -282,6 +294,7 @@ auto PerceptionReproducerSensor::update(
 
 auto PerceptionReproducerSensor::reset() -> void
 {
+  playhead_.reset();
   detected_objects_stream_.reset();
   tracked_objects_stream_.reset();
   trajectory_stream_.reset();
