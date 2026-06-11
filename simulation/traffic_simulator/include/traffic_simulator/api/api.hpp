@@ -23,6 +23,7 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/replay/ego_bag_replayer.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
@@ -89,6 +90,15 @@ public:
     entity_manager_ptr_->setTrafficLights(traffic_lights_ptr_);
     if (not init()) {
       throw common::SimulationError("Failed to initialize simulator by InitializeRequest");
+    }
+    if (const auto replay_bag_path = getROS2Parameter<std::string>("replay_bag_path", "");
+        not replay_bag_path.empty()) {
+      if (const auto replay_ego_duration = getROS2Parameter<double>("replay_ego_duration", 0.0);
+          replay_ego_duration > 0.0) {
+        ego_bag_replayer_ = std::make_unique<EgoBagReplayer>(
+          replay_bag_path, getROS2Parameter<double>("replay_start_time", 0.0),
+          replay_ego_duration);
+      }
     }
   }
 
@@ -315,6 +325,8 @@ private:
   const std::shared_ptr<TrafficLights> traffic_lights_ptr_;
 
   const rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr real_time_factor_subscriber_;
+
+  std::unique_ptr<EgoBagReplayer> ego_bag_replayer_;
 };
 }  // namespace traffic_simulator
 

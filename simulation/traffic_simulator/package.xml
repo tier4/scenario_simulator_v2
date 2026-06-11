@@ -26,10 +26,12 @@
   <depend>lanelet2_routing</depend>
   <depend>libboost-dev</depend>
   <depend>libomp-dev</depend>
+  <depend>nav_msgs</depend>
   <depend>nlohmann-json-dev</depend>
   <depend>pugixml-dev</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
+  <depend>rosbag2_cpp</depend>
   <depend>rosgraph_msgs</depend>
   <depend>rviz2</depend>
   <depend>simulation_interface</depend>
