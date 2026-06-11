@@ -187,23 +187,39 @@ auto PerceptionReproducerSensor::updateTimeBased(
 }
 
 auto PerceptionReproducerSensor::updatePositionBased(
-  const geometry_msgs::msg::Pose & ego_pose, double current_scenario_time,
+  const geometry_msgs::msg::Pose & ego_pose, double ego_speed, double current_scenario_time,
   const rclcpp::Time & current_ros_time) -> void
 {
   if (odometry_stream_.empty()) {
     return;
   }
 
-  // 初回は大域探索、以降は前回 playhead 近傍の窓に限定 + 単調 (後退禁止)。
+  // 初回は大域探索。走行中は前回 playhead 近傍の窓に限定した pose-sync + 単調 (後退禁止)。
+  // 停止中は記録の実ペースで時間前進し、実機の dwell→先行車発進を再生する (pose-sync の
+  // playhead 凍結による先行車発進の喪失=デッドロックを防ぐ)。
   const size_t nearest_idx = [&]() {
     if (not playhead_) {
       playhead_ = odometry_stream_.findNearestIndex(ego_pose);
-    } else {
+    } else if (ego_speed > stop_velocity_threshold_) {
+      dwell_anchor_.reset();
       const size_t lo =
         *playhead_ > playhead_window_back_ ? *playhead_ - playhead_window_back_ : 0;
       playhead_ = std::max(
         *playhead_,
         odometry_stream_.findNearestIndex(ego_pose, lo, *playhead_ + playhead_window_forward_));
+    } else {
+      if (not dwell_anchor_) {
+        dwell_anchor_ = {current_scenario_time, odometry_stream_.getTimeAt(*playhead_)};
+        RCLCPP_INFO(
+          logger_, "Ego stopped (%.2f m/s): advancing replay at recorded pace from bag time %.3f",
+          ego_speed, dwell_anchor_->bag_time);
+      }
+      const double target_bag_time =
+        dwell_anchor_->bag_time + (current_scenario_time - dwell_anchor_->scenario_time);
+      while (*playhead_ + 1 < odometry_stream_.size() &&
+             odometry_stream_.getTimeAt(*playhead_ + 1) <= target_bag_time) {
+        ++*playhead_;
+      }
     }
     return *playhead_;
   }();
@@ -277,7 +293,8 @@ auto PerceptionReproducerSensor::publishVehicleMarker(
 
 auto PerceptionReproducerSensor::update(
   double current_scenario_time, const rclcpp::Time & current_ros_time,
-  const std::optional<geometry_msgs::msg::Pose> & ego_pose) -> void
+  const std::optional<geometry_msgs::msg::Pose> & ego_pose,
+  const std::optional<double> & ego_speed) -> void
 {
   if (std::isnan(current_scenario_time) || current_scenario_time < 0.0) {
     return;
@@ -285,7 +302,11 @@ auto PerceptionReproducerSensor::update(
 
   if (config_.use_position_based_replay) {
     if (ego_pose) {
-      updatePositionBased(ego_pose.value(), current_scenario_time, current_ros_time);
+      /// @note If the speed is unavailable, treat the ego as moving so that the replay stays
+      /// pose-synced instead of silently time-advancing.
+      updatePositionBased(
+        ego_pose.value(), ego_speed.value_or(std::numeric_limits<double>::infinity()),
+        current_scenario_time, current_ros_time);
     }
   } else {
     updateTimeBased(current_scenario_time, current_ros_time);
@@ -295,6 +316,7 @@ auto PerceptionReproducerSensor::update(
 auto PerceptionReproducerSensor::reset() -> void
 {
   playhead_.reset();
+  dwell_anchor_.reset();
   detected_objects_stream_.reset();
   tracked_objects_stream_.reset();
   trajectory_stream_.reset();

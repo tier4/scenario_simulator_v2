@@ -78,6 +78,8 @@ public:
 
   auto getTimeAt(size_t idx) const -> double { return data_[idx].first; }
 
+  auto size() const -> size_t { return data_.size(); }
+
   auto getPoseAt(size_t idx) const -> const geometry_msgs::msg::Pose &
   {
     return data_[idx].second.pose.pose;
@@ -117,7 +119,8 @@ public:
 
   auto update(
     double current_scenario_time, const rclcpp::Time & current_ros_time,
-    const std::optional<geometry_msgs::msg::Pose> & ego_pose) -> void;
+    const std::optional<geometry_msgs::msg::Pose> & ego_pose,
+    const std::optional<double> & ego_speed) -> void;
 
   auto reset() -> void;
 
@@ -146,7 +149,7 @@ private:
   auto updateTimeBased(double current_scenario_time, const rclcpp::Time & current_ros_time) -> void;
 
   auto updatePositionBased(
-    const geometry_msgs::msg::Pose & ego_pose, double current_scenario_time,
+    const geometry_msgs::msg::Pose & ego_pose, double ego_speed, double current_scenario_time,
     const rclcpp::Time & current_ros_time) -> void;
 
   auto publishVehicleMarker(
@@ -166,6 +169,21 @@ private:
   static constexpr size_t playhead_window_back_ = 50;
 
   static constexpr size_t playhead_window_forward_ = 600;
+
+  /// @note While the sim ego is stopped (speed <= stop_velocity_threshold_), the playhead
+  /// advances at the recording's real pace instead of pose-sync. Pure pose-sync would freeze
+  /// the playhead while the ego is stopped, so the recorded lead vehicle would never depart
+  /// and the ego would never be released (deadlock). Advancing in recorded time replays the
+  /// dwell -> departure sequence exactly as the real vehicle experienced it.
+  struct DwellAnchor
+  {
+    double scenario_time;
+    double bag_time;
+  };
+
+  std::optional<DwellAnchor> dwell_anchor_;
+
+  static constexpr double stop_velocity_threshold_ = 0.5;  // [m/s]
 
   BagStream<DetectedObjects> detected_objects_stream_;
 
