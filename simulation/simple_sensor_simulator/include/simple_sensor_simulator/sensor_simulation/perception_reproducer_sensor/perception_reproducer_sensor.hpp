@@ -18,6 +18,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 
 #include <autoware_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <limits>
@@ -90,6 +91,7 @@ private:
 class PerceptionReproducerSensor
 {
   using DetectedObjects = autoware_perception_msgs::msg::DetectedObjects;
+  using TrackedObjects = autoware_perception_msgs::msg::TrackedObjects;
   using Trajectory = autoware_planning_msgs::msg::Trajectory;
   using OccupancyGrid = nav_msgs::msg::OccupancyGrid;
 
@@ -113,6 +115,13 @@ public:
 private:
   static constexpr const char * detected_objects_topic_ =
     "/perception/object_recognition/detection/objects";
+
+  /// @note Real vehicle logs often record only the tracking output (no detection topic). The
+  /// tracked objects are replayed verbatim so that consumers of the tracking topic (e.g.
+  /// DiffusionPlanner, map_based_prediction) receive the real-world objects even when the
+  /// Autoware tracker stays silent due to the suppressed detection sensor.
+  static constexpr const char * tracked_objects_topic_ =
+    "/perception/object_recognition/tracking/objects";
 
   static constexpr const char * odometry_topic_ = "/localization/kinematic_state";
 
@@ -139,6 +148,8 @@ private:
   ReplayConfig config_;
 
   BagStream<DetectedObjects> detected_objects_stream_;
+
+  BagStream<TrackedObjects> tracked_objects_stream_;
 
   BagStream<Trajectory> trajectory_stream_;
 

@@ -87,6 +87,8 @@ PerceptionReproducerSensor::PerceptionReproducerSensor(
   detected_objects_stream_(
     detected_objects_topic_,
     node.create_publisher<DetectedObjects>(detected_objects_topic_, 1)),
+  tracked_objects_stream_(
+    tracked_objects_topic_, node.create_publisher<TrackedObjects>(tracked_objects_topic_, 1)),
   trajectory_stream_(
     trajectory_topic_, node.create_publisher<Trajectory>("/simulation/replay/trajectory", 1)),
   odometry_stream_(odometry_topic_, "replay_base_link", node),
@@ -114,7 +116,11 @@ auto PerceptionReproducerSensor::loadAllBagData(
   auto reader = std::make_unique<rosbag2_cpp::Reader>();
   rosbag2_storage::StorageOptions storage_options;
   storage_options.uri = bag_path;
-  storage_options.storage_id = "mcap";
+  /// @note For a bare .mcap file there is no metadata.yaml to auto-detect the storage plugin
+  /// from, so set it explicitly. Directory bags (mcap or sqlite3) are auto-detected.
+  if (bag_path.size() >= 5 && bag_path.substr(bag_path.size() - 5) == ".mcap") {
+    storage_options.storage_id = "mcap";
+  }
   reader->open(storage_options);
 
   const rclcpp::Time first_time(
@@ -122,8 +128,8 @@ auto PerceptionReproducerSensor::loadAllBagData(
 
   rosbag2_storage::StorageFilter filter;
   filter.topics = {
-    detected_objects_topic_, trajectory_topic_, odometry_topic_, occupancy_grid_topic_,
-    traffic_light_topic_};
+    detected_objects_topic_, tracked_objects_topic_, trajectory_topic_,   odometry_topic_,
+    occupancy_grid_topic_,   traffic_light_topic_};
   reader->set_filter(filter);
 
   while (reader->has_next()) {
@@ -134,6 +140,7 @@ auto PerceptionReproducerSensor::loadAllBagData(
       if (shifted_time_s < 0.0) continue;
 
       detected_objects_stream_.tryPushMessage(bag_message, shifted_time_s);
+      tracked_objects_stream_.tryPushMessage(bag_message, shifted_time_s);
       trajectory_stream_.tryPushMessage(bag_message, shifted_time_s);
       odometry_stream_.tryPushMessage(bag_message, shifted_time_s);
       occupancy_grid_stream_.tryPushMessage(bag_message, shifted_time_s);
@@ -151,7 +158,9 @@ auto PerceptionReproducerSensor::loadAllBagData(
 auto PerceptionReproducerSensor::updateTimeBased(
   double current_scenario_time, const rclcpp::Time & current_ros_time) -> void
 {
-  if (detected_objects_stream_.done() && trajectory_stream_.done()) {
+  if (
+    detected_objects_stream_.done() && tracked_objects_stream_.done() &&
+    trajectory_stream_.done()) {
     return;
   }
 
@@ -161,6 +170,8 @@ auto PerceptionReproducerSensor::updateTimeBased(
   }
 
   detected_objects_stream_.publishUpTo(current_scenario_time, current_ros_time);
+
+  tracked_objects_stream_.publishUpTo(current_scenario_time, current_ros_time);
 
   trajectory_stream_.publishUpTo(current_scenario_time, current_ros_time);
 
@@ -190,6 +201,8 @@ auto PerceptionReproducerSensor::updatePositionBased(
   odometry_stream_.broadcastTf(current_scenario_time, current_ros_time);
 
   detected_objects_stream_.publishNearest(target_time_s, current_ros_time);
+
+  tracked_objects_stream_.publishNearest(target_time_s, current_ros_time);
 
   if (!occupancy_grid_stream_.empty()) {
     occupancy_grid_stream_.publishNearest(target_time_s, current_ros_time);
@@ -270,6 +283,7 @@ auto PerceptionReproducerSensor::update(
 auto PerceptionReproducerSensor::reset() -> void
 {
   detected_objects_stream_.reset();
+  tracked_objects_stream_.reset();
   trajectory_stream_.reset();
   odometry_stream_.reset();
   occupancy_grid_stream_.reset();

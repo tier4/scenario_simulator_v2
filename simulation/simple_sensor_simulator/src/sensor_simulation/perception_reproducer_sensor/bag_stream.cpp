@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <autoware_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <autoware_planning_msgs/msg/trajectory.hpp>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/bag_stream.hpp>
@@ -34,6 +35,7 @@ auto BagStream<T>::pushMessage(double time_s, const std::shared_ptr<rcutils_uint
 }
 
 template class BagStream<autoware_perception_msgs::msg::DetectedObjects>;
+template class BagStream<autoware_perception_msgs::msg::TrackedObjects>;
 template class BagStream<autoware_planning_msgs::msg::Trajectory>;
 template class BagStream<nav_msgs::msg::OccupancyGrid>;
 
