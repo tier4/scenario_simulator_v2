@@ -100,6 +100,8 @@ def launch_setup(context, *args, **kwargs):
     record_storage_id                           = LaunchConfiguration("record_storage_id",                           default="")
     post_process_command                        = LaunchConfiguration("post_process_command",                        default="")
     post_process_timeout                        = LaunchConfiguration("post_process_timeout",                        default=60)
+    replay_bag_path                             = LaunchConfiguration("replay_bag_path",                             default="")
+    replay_start_time                           = LaunchConfiguration("replay_start_time",                           default=0.0)
     rviz_config                                 = LaunchConfiguration("rviz_config",                                 default=default_rviz_config_file())
     scenario                                    = LaunchConfiguration("scenario",                                    default=Path("/dev/null"))
     sensor_model                                = LaunchConfiguration("sensor_model",                                default="")
@@ -174,6 +176,8 @@ def launch_setup(context, *args, **kwargs):
     print(f"record_storage_id                           := {record_storage_id.perform(context)}")
     print(f"post_process_command                        := {post_process_command.perform(context)}")
     print(f"post_process_timeout                        := {post_process_timeout.perform(context)}")
+    print(f"replay_bag_path                             := {replay_bag_path.perform(context)}")
+    print(f"replay_start_time                           := {replay_start_time.perform(context)}")
     print(f"rviz_config                                 := {rviz_config.perform(context)}")
     print(f"scenario                                    := {scenario.perform(context)}")
     print(f"sensor_model                                := {sensor_model.perform(context)}")
@@ -327,6 +331,13 @@ def launch_setup(context, *args, **kwargs):
         else:
             parameters += [path]
 
+        bag_path = replay_bag_path.perform(context)
+        if bag_path:
+            parameters += [
+                {"replay_bag_path": bag_path},
+                {"replay_start_time": replay_start_time},
+            ]
+
         return parameters
 
     def make_agnocast_additional_environment():
@@ -360,6 +371,8 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("record_option",                               default_value=record_option                              ),
         DeclareLaunchArgument("post_process_command",                        default_value=post_process_command                       ),
         DeclareLaunchArgument("post_process_timeout",                        default_value=post_process_timeout                       ),
+        DeclareLaunchArgument("replay_bag_path",                             default_value=replay_bag_path                            ),
+        DeclareLaunchArgument("replay_start_time",                           default_value=replay_start_time                          ),
         DeclareLaunchArgument("rviz_config",                                 default_value=rviz_config                                ),
         DeclareLaunchArgument("scenario",                                    default_value=scenario                                   ),
         DeclareLaunchArgument("sensor_model",                                default_value=sensor_model                               ),

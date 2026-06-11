@@ -13,14 +13,17 @@
 // limitations under the License.
 
 #include <memory>
+#include <optional>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <string>
 #include <vector>
 
 namespace simple_sensor_simulator
 {
 auto SensorSimulation::updateSensorFrame(
-  double current_simulation_time, const rclcpp::Time & current_ros_time,
+  double current_simulation_time, double current_scenario_time,
+  const rclcpp::Time & current_ros_time,
   const std::vector<traffic_simulator_msgs::EntityStatus> & entities,
   const simulation_api_schema::UpdateTrafficLightsRequest & update_traffic_lights_request) -> void
 {
@@ -38,8 +41,10 @@ auto SensorSimulation::updateSensorFrame(
     }
   }
 
-  for (auto & sensor : detection_sensors_) {
-    sensor->update(current_simulation_time, entities, current_ros_time, lidar_detected_objects);
+  if (not suppress_detection_sensor_) {
+    for (auto & sensor : detection_sensors_) {
+      sensor->update(current_simulation_time, entities, current_ros_time, lidar_detected_objects);
+    }
   }
 
   for (auto & sensor : occupancy_grid_sensors_) {
@@ -48,6 +53,21 @@ auto SensorSimulation::updateSensorFrame(
 
   for (auto & sensor : traffic_lights_detectors_) {
     sensor->updateFrame(current_ros_time, update_traffic_lights_request);
+  }
+
+  if (!perception_reproducer_sensors_.empty()) {
+    std::optional<geometry_msgs::msg::Pose> ego_pose;
+    for (const auto & entity : entities) {
+      if (entity.type().type() == traffic_simulator_msgs::EntityType::EGO) {
+        geometry_msgs::msg::Pose pose;
+        simulation_interface::toMsg(entity.pose(), pose);
+        ego_pose = pose;
+        break;
+      }
+    }
+    for (const auto & sensor : perception_reproducer_sensors_) {
+      sensor->update(current_scenario_time, current_ros_time, ego_pose);
+    }
   }
 }
 }  // namespace simple_sensor_simulator
