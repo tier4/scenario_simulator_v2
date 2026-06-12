@@ -1,0 +1,15 @@
+# Lockstep planning request: all per-frame inputs of autoware_diffusion_planner.
+# Route and vector map are assumed to be received by the planner node via topics
+# before the first call (mission_planner / map_loader run as usual).
+builtin_interfaces/Time frame_time
+nav_msgs/Odometry ego_kinematic_state
+geometry_msgs/AccelWithCovarianceStamped ego_acceleration
+autoware_perception_msgs/TrackedObjects tracked_objects
+autoware_perception_msgs/TrafficLightGroupArray traffic_signals
+bool has_traffic_signals
+autoware_vehicle_msgs/TurnIndicatorsReport turn_indicators
+---
+bool success
+string message
+autoware_planning_msgs/Trajectory trajectory
+autoware_vehicle_msgs/TurnIndicatorsCommand turn_indicators_command

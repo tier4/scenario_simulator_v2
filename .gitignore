@@ -14,6 +14,7 @@ log
 # external packages
 external/*
 !external/concealer
+!external/diffusion_planner_lockstep_msgs
 !external/embree_vendor
 
 # auto-generated files
