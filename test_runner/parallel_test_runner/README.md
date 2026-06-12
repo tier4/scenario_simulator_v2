@@ -23,13 +23,82 @@ openscenario_interpreter を best-effort ループ（wall timer 0ms）で回す�
 MPSなしでは6並列でほぼ頭打ちだが、`--mps` ありでは**12並列付近が最速**（16では逆に低下）。
 VRAMは約1.0〜1.1GB/ワーカー。判定結果は並列数によらず完全に一致する。
 
-## 前提条件
+## セットアップ
 
-- ワークスペースがビルド済み（`parallel_test_runner`, `scenario_test_runner`, `simple_sensor_simulator`,
-  `openscenario_interpreter`, `diffusion_planner_lockstep_msgs` ほか）
-- diffusion_planner のモデル/TensorRTエンジンがビルド済み（パスは `diffusion_planner.param.yaml` の `onnx_model_path` / `args_path` で指定）
+### 1. underlay ワークスペースのビルド
+
+`minimal_lockstep_autoware.launch.xml` が参照するパッケージが underlay に揃っている必要がある。
+以下のパッケージが `install/` に入っていなければビルドする。
+
+```bash
+cd <underlay_ws>
+
+# launch パッケージ（設定ファイル・launch ファイルのみ、高速にビルドできる）
+colcon build --symlink-install --packages-select \
+  autoware_launch \
+  tier4_planning_launch
+
+# vehicle description（使用する vehicle_model に合わせて選択）
+colcon build --symlink-install --packages-select <vehicle>_description
+```
+
+> **注意**: `autoware_launch` は多くのパッケージを `exec_depend` に持つため、
+> colcon がそれらの `package.sh` を参照してビルド可否を判断する。
+> 依存パッケージが `src/` にあってビルド未済の場合は
+> `--packages-up-to autoware_launch` で依存ごとビルドする。
+
+### 2. overlay ワークスペースの構築
+
+```bash
+mkdir -p <overlay_ws>/src
+cd <overlay_ws>
+
+# scenario_simulator（このリポジトリ）を lockstep ブランチで配置
+# 例: git worktree を使う場合
+git -C <scenario_simulator_repo> worktree add \
+  <overlay_ws>/src/simulator/scenario_simulator feat/v4.4/lockstep
+
+# autoware_universe を lockstep_planner ブランチで配置
+git -C <universe_repo> worktree add \
+  <overlay_ws>/src/autoware/universe feat/v4.4/lockstep_planner
+
+# autoware_trajectory が underlay の install に入っていない場合はシンボリックリンク
+# ln -s <underlay_ws>/src/autoware/core/common/autoware_trajectory \
+#        <overlay_ws>/src/autoware/core/common/autoware_trajectory
+```
+
+### 3. overlay のビルド
+
+```bash
+cd <overlay_ws>
+source <underlay_ws>/install/setup.bash
+
+colcon build --symlink-install --packages-select \
+  diffusion_planner_lockstep_msgs \
+  autoware_diffusion_planner \
+  simple_sensor_simulator \
+  openscenario_interpreter \
+  openscenario_utility \
+  parallel_test_runner
+```
+
+> `autoware_diffusion_planner` は `patches/autoware_diffusion_planner/` の
+> `git am` パッチが適用済みのブランチを使用すること（`feat/v4.4/lockstep_planner`）。
+
+### 4. 実行時の前提条件
+
+- diffusion_planner のモデルファイルと TensorRT エンジンがビルド済み
+  （パスは `autoware_launch/config/planning/neural_net_planner/diffusion_planner.param.yaml` の
+  `onnx_model_path` / `args_path` で指定）
 - `webauto` CLI が認証済み（suite / catalog の取得に使用。ローカルファイル実行のみなら不要）
 - `--mps` を使う場合: `nvidia-cuda-mps-control` が PATH にあること（CUDAドライバ付属）
+
+### 5. 実行前の source
+
+```bash
+source <underlay_ws>/install/setup.bash
+source <overlay_ws>/install/setup.bash
+```
 
 ## 使い方
 
