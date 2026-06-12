@@ -1,0 +1,318 @@
+From 08a46098909299fa809c73f6b3bfd7d5118c481a Mon Sep 17 00:00:00 2001
+From: Kotaro Yoshimoto <pythagora.yoshimoto@gmail.com>
+Date: Fri, 12 Jun 2026 19:52:15 +0900
+Subject: [PATCH] feat: add lockstep service mode to diffusion_planner
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Add lockstep_service_mode parameter (default: false)
+  - When true, disables the periodic timer and runs planning exclusively
+    via the PlanTrajectory service for lockstep simulation
+  - When false, existing on_timer behaviour is preserved (backward-compatible)
+- Refactor on_timer into run_planning_cycle + thin wrapper
+- Add on_plan_trajectory_service: takes per-frame inputs from the request
+  and delegates to run_planning_cycle
+- Add sub_route_lockstep_: callback-based route subscription for lockstep
+  mode to avoid sporadic misses under parallel load with polling take()
+- Add diffusion_planner_lockstep_msgs dependency to package.xml
+- Add lockstep_service_mode arg to diffusion_planner.launch.xml
+---
+ .../diffusion_planner_node.hpp                |  37 ++++++
+ .../launch/diffusion_planner.launch.xml       |   2 +
+ .../autoware_diffusion_planner/package.xml    |   1 +
+ .../src/diffusion_planner_node.cpp            | 108 ++++++++++++++----
+ 4 files changed, 127 insertions(+), 21 deletions(-)
+
+diff --git a/planning/autoware_diffusion_planner/include/autoware/diffusion_planner/diffusion_planner_node.hpp b/planning/autoware_diffusion_planner/include/autoware/diffusion_planner/diffusion_planner_node.hpp
+index a4231f2c77..9a7b221184 100644
+--- a/planning/autoware_diffusion_planner/include/autoware/diffusion_planner/diffusion_planner_node.hpp
++++ b/planning/autoware_diffusion_planner/include/autoware/diffusion_planner/diffusion_planner_node.hpp
+@@ -38,9 +38,11 @@
+ #include <autoware_perception_msgs/msg/traffic_light_group.hpp>
+ #include <autoware_planning_msgs/msg/trajectory.hpp>
+ #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
++#include <diffusion_planner_lockstep_msgs/srv/plan_trajectory.hpp>
+ #include <visualization_msgs/msg/marker_array.hpp>
+ 
+ #include <memory>
++#include <optional>
+ #include <string>
+ #include <vector>
+ 
+@@ -137,6 +139,29 @@ private:
+    */
+   void on_timer();
+ 
++  /**
++   * @brief Shared planning pipeline: frame context creation, preprocessing,
++   *        inference, postprocessing and publishing.
++   * @return The planner output on success, std::nullopt otherwise.
++   */
++  std::optional<PlannerOutput> run_planning_cycle(
++    const std::shared_ptr<const TrackedObjects> & objects,
++    const std::shared_ptr<const Odometry> & ego_kinematic_state,
++    const std::shared_ptr<const AccelWithCovarianceStamped> & ego_acceleration,
++    const std::vector<
++      std::shared_ptr<const autoware_perception_msgs::msg::TrafficLightGroupArray>> &
++      traffic_signals,
++    const std::shared_ptr<const TurnIndicatorsReport> & turn_indicators,
++    const LaneletRoute::ConstSharedPtr & route_ptr, const rclcpp::Time & current_time);
++
++  /**
++   * @brief Synchronous lockstep planning service handler. All per-frame inputs
++   *        are taken from the request instead of topic subscriptions.
++   */
++  void on_plan_trajectory_service(
++    const std::shared_ptr<diffusion_planner_lockstep_msgs::srv::PlanTrajectory::Request> request,
++    std::shared_ptr<diffusion_planner_lockstep_msgs::srv::PlanTrajectory::Response> response);
++
+   /**
+    * @brief Callback for receiving and processing map data.
+    * @param map_msg The received map message.
+@@ -179,8 +204,20 @@ private:
+   DiffusionPlannerParams params_;
+   DiffusionPlannerDebugParams debug_params_;
+ 
++  // When true, the periodic timer is disabled and planning runs only via the
++  // PlanTrajectory service (lockstep simulation).
++  bool lockstep_service_mode_{false};
++
+   // Node elements
+   rclcpp::TimerBase::SharedPtr timer_;
++  rclcpp::Service<diffusion_planner_lockstep_msgs::srv::PlanTrajectory>::SharedPtr
++    srv_plan_trajectory_;
++  // Callback-based route subscription for lockstep mode. The polling
++  // (take-based) route_subscriber_ turned out to sporadically miss the
++  // transient_local route under parallel multi-domain load, which stalls the
++  // whole lockstep simulation; a regular subscription is reliable.
++  rclcpp::Subscription<LaneletRoute>::SharedPtr sub_route_lockstep_;
++  LaneletRoute::ConstSharedPtr lockstep_route_;
+   rclcpp::Publisher<autoware_utils::ProcessingTimeDetail>::SharedPtr
+     debug_processing_time_detail_pub_;
+   rclcpp::Publisher<autoware_internal_debug_msgs::msg::Float64Stamped>::SharedPtr
+diff --git a/planning/autoware_diffusion_planner/launch/diffusion_planner.launch.xml b/planning/autoware_diffusion_planner/launch/diffusion_planner.launch.xml
+index b0e3837ce0..06550762a6 100644
+--- a/planning/autoware_diffusion_planner/launch/diffusion_planner.launch.xml
++++ b/planning/autoware_diffusion_planner/launch/diffusion_planner.launch.xml
+@@ -15,6 +15,7 @@
+   <arg name="input_vector_map" default="~/input/vector_map"/>
+   <arg name="input_turn_indicators" default="~/input/turn_indicators"/>
+   <arg name="build_only" default="false" description="shutdown node after TensorRT engine file is built"/>
++  <arg name="lockstep_service_mode" default="false" description="disable the periodic timer and run planning only via the PlanTrajectory service (lockstep simulation)"/>
+ 
+   <node pkg="autoware_diffusion_planner" exec="autoware_diffusion_planner_node" name="diffusion_planner_node" output="both">
+     <param from="$(var diffusion_planner_param_path)" allow_substs="true"/>
+@@ -32,5 +33,6 @@
+     <remap from="~/input/vector_map" to="$(var input_vector_map)"/>
+     <remap from="~/input/turn_indicators" to="$(var input_turn_indicators)"/>
+     <param name="build_only" value="$(var build_only)"/>
++    <param name="lockstep_service_mode" value="$(var lockstep_service_mode)"/>
+   </node>
+ </launch>
+diff --git a/planning/autoware_diffusion_planner/package.xml b/planning/autoware_diffusion_planner/package.xml
+index 1e38e5edec..6fdb6a4563 100644
+--- a/planning/autoware_diffusion_planner/package.xml
++++ b/planning/autoware_diffusion_planner/package.xml
+@@ -35,6 +35,7 @@
+   <depend>autoware_utils_geometry</depend>
+   <depend>autoware_utils_uuid</depend>
+   <depend>autoware_vehicle_info_utils</depend>
++  <depend>diffusion_planner_lockstep_msgs</depend>
+   <depend>geometry_msgs</depend>
+   <depend>lanelet2_core</depend>
+   <depend>lanelet2_routing</depend>
+diff --git a/planning/autoware_diffusion_planner/src/diffusion_planner_node.cpp b/planning/autoware_diffusion_planner/src/diffusion_planner_node.cpp
+index 723e19b066..30d8b68aee 100644
+--- a/planning/autoware_diffusion_planner/src/diffusion_planner_node.cpp
++++ b/planning/autoware_diffusion_planner/src/diffusion_planner_node.cpp
+@@ -116,9 +116,24 @@ DiffusionPlanner::DiffusionPlanner(const rclcpp::NodeOptions & options)
+     }
+   }
+ 
+-  timer_ = rclcpp::create_timer(
+-    this, get_clock(), rclcpp::Rate(params_.planning_frequency_hz).period(),
+-    std::bind(&DiffusionPlanner::on_timer, this));
++  if (lockstep_service_mode_) {
++    // Lockstep simulation: planning is driven synchronously by the simulator
++    // through this service; the periodic timer must stay disabled so that the
++    // 0.1 s history spacing of the core is controlled by the caller.
++    srv_plan_trajectory_ = create_service<diffusion_planner_lockstep_msgs::srv::PlanTrajectory>(
++      "/planning/diffusion_planner/srv/plan_trajectory",
++      std::bind(
++        &DiffusionPlanner::on_plan_trajectory_service, this, std::placeholders::_1,
++        std::placeholders::_2));
++    sub_route_lockstep_ = create_subscription<LaneletRoute>(
++      "~/input/route", rclcpp::QoS{1}.transient_local(),
++      [this](const LaneletRoute::ConstSharedPtr msg) { lockstep_route_ = msg; });
++    RCLCPP_INFO(get_logger(), "Lockstep service mode enabled. Periodic planning timer disabled.");
++  } else {
++    timer_ = rclcpp::create_timer(
++      this, get_clock(), rclcpp::Rate(params_.planning_frequency_hz).period(),
++      std::bind(&DiffusionPlanner::on_timer, this));
++  }
+ 
+   sub_map_ = create_subscription<HADMapBin>(
+     "~/input/vector_map", rclcpp::QoS{1}.transient_local(),
+@@ -159,6 +174,7 @@ void DiffusionPlanner::set_up_params()
+   params_.delay_step = this->declare_parameter<int64_t>("delay_step", 0);
+   params_.line_string_max_step_m = this->declare_parameter<double>("line_string_max_step_m", 5.0);
+   params_.use_time_interpolation = this->declare_parameter<bool>("use_time_interpolation", false);
++  lockstep_service_mode_ = this->declare_parameter<bool>("lockstep_service_mode", false);
+ 
+   // planning factor params
+   planning_factor_params_.enable_stop =
+@@ -312,21 +328,77 @@ void DiffusionPlanner::publish_debug_markers(
+ 
+ void DiffusionPlanner::on_timer()
+ {
+-  // Timer callback function
++  // Take data from subscribers
++  auto objects = sub_tracked_objects_.take_data();
++  auto ego_kinematic_state = sub_current_odometry_.take_data();
++  auto ego_acceleration = sub_current_acceleration_.take_data();
++  auto traffic_signals = sub_traffic_signals_.take_data();
++  auto temp_route_ptr = route_subscriber_.take_data();
++  auto turn_indicators_ptr = sub_turn_indicators_.take_data();
++
++  run_planning_cycle(
++    objects, ego_kinematic_state, ego_acceleration, traffic_signals, turn_indicators_ptr,
++    temp_route_ptr, this->now());
++}
++
++void DiffusionPlanner::on_plan_trajectory_service(
++  const std::shared_ptr<diffusion_planner_lockstep_msgs::srv::PlanTrajectory::Request> request,
++  std::shared_ptr<diffusion_planner_lockstep_msgs::srv::PlanTrajectory::Response> response)
++{
++  // All per-frame inputs come from the request; route and map are still
++  // received once via topics (mission_planner / map_loader). The route comes
++  // exclusively from the callback subscription (single source of truth).
++  const rclcpp::Time frame_time(request->frame_time, RCL_ROS_TIME);
++
++  // Aliasing shared_ptrs avoid deep-copying the (NPC-count proportional)
++  // request fields on every planning cycle; `request` stays alive through them.
++  std::vector<std::shared_ptr<const autoware_perception_msgs::msg::TrafficLightGroupArray>>
++    traffic_signals;
++  if (request->has_traffic_signals) {
++    traffic_signals.emplace_back(request, &request->traffic_signals);
++  }
++
++  const auto output = run_planning_cycle(
++    std::shared_ptr<const TrackedObjects>(request, &request->tracked_objects),
++    std::shared_ptr<const Odometry>(request, &request->ego_kinematic_state),
++    std::shared_ptr<const AccelWithCovarianceStamped>(request, &request->ego_acceleration),
++    traffic_signals,
++    std::shared_ptr<const TurnIndicatorsReport>(request, &request->turn_indicators),
++    lockstep_route_, frame_time);
++
++  if (output) {
++    response->success = true;
++    response->trajectory = output->trajectory;
++    response->turn_indicators_command = output->turn_indicator_command;
++  } else {
++    response->success = false;
++    response->message =
++      "planning cycle failed (model/map/route not ready, missing input, or inference error)";
++  }
++}
++
++std::optional<PlannerOutput> DiffusionPlanner::run_planning_cycle(
++  const std::shared_ptr<const TrackedObjects> & objects,
++  const std::shared_ptr<const Odometry> & ego_kinematic_state,
++  const std::shared_ptr<const AccelWithCovarianceStamped> & ego_acceleration,
++  const std::vector<std::shared_ptr<const autoware_perception_msgs::msg::TrafficLightGroupArray>> &
++    traffic_signals,
++  const std::shared_ptr<const TurnIndicatorsReport> & turn_indicators_ptr,
++  const LaneletRoute::ConstSharedPtr & route_ptr, const rclcpp::Time & current_time)
++{
+   autoware_utils_debug::ScopedTimeTrack st(__func__, *time_keeper_);
+   stop_watch_ptr_ = std::make_unique<autoware_utils_system::StopWatch<std::chrono::milliseconds>>();
+   stop_watch_ptr_->tic("processing_time");
+ 
+   diagnostics_inference_->clear();
+ 
+-  const rclcpp::Time current_time(get_clock()->now());
+   if (!core_->is_model_loaded()) {
+     RCLCPP_WARN_THROTTLE(
+       get_logger(), *this->get_clock(), constants::LOG_THROTTLE_INTERVAL_MS,
+       "Model not loaded. Inference is disabled. Check onnx_model_path and args_path parameters.");
+     diagnostics_inference_->update_level_and_message(DiagnosticStatus::ERROR, "Model not loaded");
+     diagnostics_inference_->publish(current_time);
+-    return;
++    return std::nullopt;
+   }
+ 
+   if (!core_->is_map_loaded()) {
+@@ -335,21 +407,13 @@ void DiffusionPlanner::on_timer()
+       "Waiting for map data...");
+     diagnostics_inference_->update_level_and_message(DiagnosticStatus::WARN, "Map data not loaded");
+     diagnostics_inference_->publish(current_time);
+-    return;
++    return std::nullopt;
+   }
+ 
+-  // Take data from subscribers
+-  auto objects = sub_tracked_objects_.take_data();
+-  auto ego_kinematic_state = sub_current_odometry_.take_data();
+-  auto ego_acceleration = sub_current_acceleration_.take_data();
+-  auto traffic_signals = sub_traffic_signals_.take_data();
+-  auto temp_route_ptr = route_subscriber_.take_data();
+-  auto turn_indicators_ptr = sub_turn_indicators_.take_data();
+-
+   // Prepare frame context using core
+   const std::optional<FrameContext> frame_context = core_->create_frame_context(
+-    ego_kinematic_state, ego_acceleration, objects, traffic_signals, turn_indicators_ptr,
+-    temp_route_ptr, this->now());
++    ego_kinematic_state, ego_acceleration, objects, traffic_signals, turn_indicators_ptr, route_ptr,
++    current_time);
+ 
+   if (!frame_context) {
+     // Log detailed information about missing inputs
+@@ -364,7 +428,7 @@ void DiffusionPlanner::on_timer()
+     diagnostics_inference_->update_level_and_message(
+       DiagnosticStatus::WARN, "No input data available for inference");
+     diagnostics_inference_->publish(current_time);
+-    return;
++    return std::nullopt;
+   }
+ 
+   if (traffic_signals.empty()) {
+@@ -401,7 +465,7 @@ void DiffusionPlanner::on_timer()
+     diagnostics_inference_->update_level_and_message(
+       DiagnosticStatus::WARN, "Input data contains invalid values");
+     diagnostics_inference_->publish(current_time);
+-    return;
++    return std::nullopt;
+   }
+ 
+   // Run inference using core
+@@ -413,7 +477,7 @@ void DiffusionPlanner::on_timer()
+     diagnostics_inference_->update_level_and_message(
+       DiagnosticStatus::ERROR, inference_result.error_msg);
+     diagnostics_inference_->publish(frame_time);
+-    return;
++    return std::nullopt;
+   }
+   const auto & [predictions, turn_indicator_logit] = inference_result.outputs.value();
+ 
+@@ -425,7 +489,7 @@ void DiffusionPlanner::on_timer()
+     RCLCPP_ERROR_STREAM(get_logger(), "Postprocessing failed: " << e.what());
+     diagnostics_inference_->update_level_and_message(DiagnosticStatus::ERROR, e.what());
+     diagnostics_inference_->publish(frame_time);
+-    return;
++    return std::nullopt;
+   }
+ 
+   pub_trajectory_->publish(planner_output.trajectory);
+@@ -443,6 +507,8 @@ void DiffusionPlanner::on_timer()
+   processing_time_msg.stamp = get_clock()->now();
+   processing_time_msg.data = stop_watch_ptr_->toc("processing_time", true);
+   debug_processing_time_pub_->publish(processing_time_msg);
++
++  return planner_output;
+ }
+ 
+ void DiffusionPlanner::publish_planning_factor(const Trajectory & trajectory)
+-- 
+2.34.1
+
