@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Minimal Autoware configuration for the diffusion_planner lockstep simulation
+  driven by scenario_simulator_v2 (scenario_test_runner).
+
+  Launches only:
+    - global parameter loader (vehicle_info)
+    - lanelet2 map loader + map projection loader (/map/vector_map)
+    - mission_planner + route_selector (route topics / services)
+    - diffusion_planner (lockstep service mode by default)
+    - minimal_adapi_stub (AD API surface required by concealer + gear_cmd)
+
+  No localization / perception / control / default_ad_api processes.
+  Per-frame planner inputs are injected by simple_sensor_simulator through the
+  /planning/diffusion_planner/srv/plan_trajectory service.
+
+  Usage:
+    ros2 launch scenario_test_runner scenario_test_runner.launch.py \
+      autoware_launch_file:=minimal_e2e_simulator.launch.xml \
+      vehicle_model:=<vehicle>_perfect_tracker sensor_model:=<sensor> ...
+-->
+<launch>
+  <!-- arguments always passed by concealer (traffic_simulator EgoEntity) -->
+  <arg name="map_path" description="map directory path"/>
+  <arg name="lanelet2_map_file" default="lanelet2_map.osm"/>
+  <arg name="pointcloud_map_file" default="pointcloud_map.pcd"/>
+  <arg name="vehicle_model" default="sample_vehicle"/>
+  <arg name="sensor_model" default="sample_sensor_kit"/>
+  <arg name="rviz_config" default="$(find-pkg-share autoware_launch)/rviz/autoware.rviz"/>
+  <arg name="scenario_simulation" default="true"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="localization_sim_mode" default="api"/>
+  <arg name="vehicle_id" default="default"/>
+  <arg name="rviz" default="false" description="launch rviz for debugging"/>
+
+  <arg name="lockstep_service_mode" default="true" description="run diffusion_planner via the lockstep service"/>
+  <arg name="mission_planner_param_path" default="$(find-pkg-share autoware_launch)/config/planning/mission_planning/mission_planner/mission_planner.param.yaml"/>
+  <arg name="diffusion_planner_param_path" default="$(find-pkg-share autoware_launch)/config/planning/neural_net_planner/diffusion_planner.param.yaml"/>
+
+  <set_parameter name="use_sim_time" value="$(var use_sim_time)"/>
+
+  <!-- global parameters (vehicle_info) -->
+  <include file="$(find-pkg-share autoware_global_parameter_loader)/launch/global_params.launch.py">
+    <arg name="use_sim_time" value="$(var use_sim_time)"/>
+    <arg name="vehicle_model" value="$(var vehicle_model)"/>
+  </include>
+
+  <!-- AD API stub: start first so that concealer's initial change_to_stop succeeds -->
+  <node pkg="parallel_test_runner" exec="minimal_adapi_stub" name="minimal_adapi_stub" output="screen"/>
+
+  <!-- lanelet2 map -->
+  <group>
+    <push-ros-namespace namespace="map"/>
+    <node_container pkg="rclcpp_components" exec="component_container" name="map_container" namespace="" output="both">
+      <composable_node pkg="autoware_map_loader" plugin="autoware::map_loader::Lanelet2MapLoaderNode" name="lanelet2_map_loader">
+        <param from="$(find-pkg-share autoware_launch)/config/map/lanelet2_map_loader.param.yaml"/>
+        <param name="lanelet2_map_path" value="$(var map_path)/$(var lanelet2_map_file)"/>
+        <remap from="output/lanelet2_map" to="vector_map"/>
+      </composable_node>
+    </node_container>
+    <include file="$(find-pkg-share autoware_map_projection_loader)/launch/map_projection_loader.launch.xml">
+      <arg name="param_path" value="$(find-pkg-share autoware_launch)/config/map/map_projection_loader.param.yaml"/>
+      <arg name="map_projector_info_path" value="$(var map_path)/map_projector_info.yaml"/>
+      <arg name="lanelet2_map_path" value="$(var map_path)/$(var lanelet2_map_file)"/>
+    </include>
+  </group>
+
+  <!-- mission planning (route topics: /planning/mission_planning/route, services: /planning/set_*_route) -->
+  <group>
+    <push-ros-namespace namespace="planning"/>
+    <push-ros-namespace namespace="mission_planning"/>
+    <include file="$(find-pkg-share tier4_planning_launch)/launch/mission_planning/mission_planning.launch.xml">
+      <arg name="mission_planner_param_path" value="$(var mission_planner_param_path)"/>
+    </include>
+  </group>
+
+  <!-- diffusion planner (same remaps as e2e_components/diffusion_planner.launch.xml) -->
+  <group>
+    <push-ros-namespace namespace="planning"/>
+    <push-ros-namespace namespace="trajectory_generator"/>
+    <push-ros-namespace namespace="neural_network_based_planner"/>
+    <include file="$(find-pkg-share autoware_diffusion_planner)/launch/diffusion_planner.launch.xml">
+      <arg name="diffusion_planner_param_path" value="$(var diffusion_planner_param_path)"/>
+      <arg name="input_odometry" value="/localization/kinematic_state"/>
+      <arg name="input_acceleration" value="/localization/acceleration"/>
+      <arg name="input_route" value="/planning/mission_planning/route"/>
+      <arg name="input_traffic_signals" value="/perception/traffic_light_recognition/traffic_signals"/>
+      <arg name="input_tracked_objects" value="/perception/object_recognition/ground_truth/objects"/>
+      <arg name="input_vector_map" value="/map/vector_map"/>
+      <arg name="input_turn_indicators" value="/vehicle/status/turn_indicators_status"/>
+      <arg name="debug/output_traffic_signal" value="/planning/scenario_planning/lane_driving/behavior_planning/debug/traffic_signal"/>
+      <arg name="output_trajectories" value="/planning/generator/diffusion_planner/candidate_trajectories"/>
+      <arg name="output_turn_indicators" value="/planning/turn_indicators_cmd"/>
+      <arg name="lockstep_service_mode" value="$(var lockstep_service_mode)"/>
+    </include>
+  </group>
+
+  <!-- rviz (optional) -->
+  <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen" args="-d $(var rviz_config)" if="$(var rviz)"/>
+</launch>

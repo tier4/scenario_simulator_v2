@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>parallel_test_runner</name>
+  <version>0.1.0</version>
+  <description>
+    Runs Web.Auto scenarios (suites / vehicle catalogs) locally in parallel
+    using the fast diffusion_planner lockstep configuration. Modeled after
+    scenario_test_runner: this package provides the test entry point, while
+    scenario execution itself is delegated to scenario_test_runner workers.
+  </description>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <license>Apache License 2.0</license>
+  <exec_depend>autoware_adapi_v1_msgs</exec_depend>
+  <exec_depend>autoware_planning_msgs</exec_depend>
+  <exec_depend>autoware_vehicle_msgs</exec_depend>
+  <exec_depend>openscenario_utility</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>scenario_test_runner</exec_depend>
+  <exec_depend>tier4_external_api_msgs</exec_depend>
+  <exec_depend>tier4_rtc_msgs</exec_depend>
+  <exec_depend>unique_identifier_msgs</exec_depend>
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
