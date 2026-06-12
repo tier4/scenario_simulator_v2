@@ -34,6 +34,12 @@
 
 namespace simple_sensor_simulator
 {
+/// Converts entity statuses into ground-truth TrackedObjects (same conversion
+/// as the detection sensor's ground-truth publisher, without noise or delay).
+auto makeGroundTruthTrackedObjects(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses, const rclcpp::Time & stamp)
+  -> autoware_perception_msgs::msg::TrackedObjects;
+
 class DetectionSensorBase
 {
 protected:

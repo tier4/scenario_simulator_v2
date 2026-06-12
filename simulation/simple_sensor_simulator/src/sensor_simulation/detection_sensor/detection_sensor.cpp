@@ -279,6 +279,20 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
   return tracked_object;
 };
 
+auto makeGroundTruthTrackedObjects(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses, const rclcpp::Time & stamp)
+  -> autoware_perception_msgs::msg::TrackedObjects
+{
+  auto tracked_objects = autoware_perception_msgs::msg::TrackedObjects();
+  tracked_objects.header.stamp = stamp;
+  tracked_objects.header.frame_id = "map";
+  tracked_objects.objects.reserve(statuses.size());
+  for (const auto & status : statuses) {
+    tracked_objects.objects.push_back(make<autoware_perception_msgs::msg::TrackedObject>(status));
+  }
+  return tracked_objects;
+}
+
 template <>
 auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
   const double current_simulation_time,
@@ -718,17 +732,6 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
       return detected_objects;
     };
 
-    auto make_ground_truth_objects = [&](const auto & detected_entities) {
-      auto ground_truth_objects = autoware_perception_msgs::msg::TrackedObjects();
-      ground_truth_objects.header.stamp = current_ros_time;
-      ground_truth_objects.header.frame_id = "map";
-      for (const auto & detected_entity : detected_entities) {
-        ground_truth_objects.objects.push_back(
-          make<autoware_perception_msgs::msg::TrackedObject>(detected_entity));
-      }
-      return ground_truth_objects;
-    };
-
     auto detected_entities = std::vector<traffic_simulator_msgs::EntityStatus>();
 
     std::copy_if(
@@ -750,8 +753,8 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     if (
       current_simulation_time - unpublished_ground_truth_entities.front().second >=
       delay<autoware_perception_msgs::msg::TrackedObjects>()) {
-      ground_truth_objects_publisher->publish(
-        make_ground_truth_objects(unpublished_ground_truth_entities.front().first));
+      ground_truth_objects_publisher->publish(makeGroundTruthTrackedObjects(
+        unpublished_ground_truth_entities.front().first, current_ros_time));
       unpublished_ground_truth_entities.pop();
     }
   }

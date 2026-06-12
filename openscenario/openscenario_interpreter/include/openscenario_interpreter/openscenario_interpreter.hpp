@@ -69,6 +69,11 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   double local_real_time_factor;
 
+  // When true, the storyboard evaluation loop runs as fast as possible
+  // (wall timer period 0) instead of pacing to local_frame_rate in wall-clock
+  // time. The simulation time step (1 / local_frame_rate) is unaffected.
+  bool best_effort_frame_rate;
+
   String osc_path;
 
   String output_directory;

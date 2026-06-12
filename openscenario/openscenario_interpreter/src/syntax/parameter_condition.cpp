@@ -30,6 +30,23 @@ ParameterCondition::ParameterCondition(const pugi::xml_node & node, Scope & scop
   value(readAttribute<String>("value", node, local())),
   rule(readAttribute<Rule>("rule", node, local()))
 {
+  try {
+    local().ref(parameter_ref);
+  } catch (const SyntaxError &) {
+    if (const String raw = node.attribute("parameterRef").value();
+        raw != parameter_ref and not raw.empty() and raw.front() == '$') {
+      throw SyntaxError(
+        "No parameter named ", std::quoted(parameter_ref), " is declared. Note that the value ",
+        std::quoted(raw), " given for attribute parameterRef of ParameterCondition is a parameter ",
+        "reference, so it is substituted with the value of parameter ", std::quoted(raw.substr(1)),
+        " before lookup. The attribute parameterRef must be the name of a parameter. Did you ",
+        "mean parameterRef=\"", raw.substr(1), "\"?");
+    } else {
+      throw SyntaxError(
+        "No parameter named ", std::quoted(parameter_ref),
+        " is declared (given for attribute parameterRef of ParameterCondition)");
+    }
+  }
 }
 
 auto ParameterCondition::compare(const Object & parameter, const Rule & rule, const String & value)
@@ -62,23 +79,30 @@ auto ParameterCondition::description() const -> String
 {
   std::stringstream description;
 
-  description << "The value of parameter " << std::quoted(parameter_ref) << " = "
-              << local().ref(parameter_ref) << " " << rule << " " << value << "?";
+  description << "The value of parameter " << std::quoted(parameter_ref) << " = ";
+
+  // The description is diagnostic information, so it must not throw even if
+  // the parameter reference is unresolvable (cf. publishCurrentContext).
+  try {
+    description << local().ref(parameter_ref);
+  } catch (const SyntaxError &) {
+    description << "<no such parameter>";
+  }
+
+  description << " " << rule << " " << value << "?";
 
   return description.str();
 }
 
 auto ParameterCondition::evaluate() const -> Object
 {
-  try {
-    const auto parameter = local().ref(parameter_ref);
-    if (not parameter) {
-      THROW_SYNTAX_ERROR(parameter_ref, " cannot be found from this scope");
-    } else {
-      return asBoolean(compare(parameter, rule, value));
-    }
-  } catch (const std::out_of_range &) {
-    throw SemanticError("No such parameter ", std::quoted(parameter_ref));
+  // Note: an unresolvable parameter_ref makes `Scope::ref` throw
+  // NoSuchVariableNamed (a SyntaxError), which is already a reasonable error
+  // for the scenario to fail with, so it is not caught here.
+  if (const auto parameter = local().ref(parameter_ref); not parameter) {
+    THROW_SYNTAX_ERROR(parameter_ref, " cannot be found from this scope");
+  } else {
+    return asBoolean(compare(parameter, rule, value));
   }
 }
 }  // namespace syntax

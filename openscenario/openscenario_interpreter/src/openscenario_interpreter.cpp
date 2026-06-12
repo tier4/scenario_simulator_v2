@@ -54,6 +54,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
     "/simulation/interpreter/execution_time/output", rclcpp::QoS(1).transient_local())),
   local_frame_rate(30),
   local_real_time_factor(1.0),
+  best_effort_frame_rate(false),
   osc_path(""),
   output_directory("/tmp"),
   publish_empty_context(false),
@@ -71,6 +72,7 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
+  DECLARE_PARAMETER(best_effort_frame_rate);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
@@ -136,6 +138,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       GET_PARAMETER(local_frame_rate);
       GET_PARAMETER(local_real_time_factor);
+      GET_PARAMETER(best_effort_frame_rate);
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
       GET_PARAMETER(publish_empty_context);
@@ -221,7 +224,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         output_time_publisher->publish(generate_double_user_defined_value_message(
           std::chrono::duration<double>(output_time).count()));
 
-        if (auto time_until_trigger = timer->time_until_trigger(); time_until_trigger.count() < 0) {
+        if (auto time_until_trigger = timer->time_until_trigger();
+            not best_effort_frame_rate and time_until_trigger.count() < 0) {
           /*
             Ideally, the scenario should be terminated with an error if the total
             time for the ScenarioDefinition evaluation and the traffic_simulator's
@@ -308,7 +312,12 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           throw Error("No script evaluable.");
         }
 
-        timer = create_wall_timer(currentLocalFrameRate(), evaluate_storyboard);
+        // With best_effort_frame_rate, the zero-period wall timer is always
+        // ready, so the loop runs back-to-back, paced only by the simulator
+        // and planner computation time (lockstep best-effort execution).
+        timer = create_wall_timer(
+          best_effort_frame_rate ? std::chrono::milliseconds(0) : currentLocalFrameRate(),
+          evaluate_storyboard);
 
         return Interpreter::Result::SUCCESS;  // => Active
       });
@@ -348,20 +357,28 @@ auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::publishCurrentContext() const -> void
 {
-  Context context;
-  {
-    boost::json::monotonic_resource mr;
-    boost::json::object json(&mr);
-    context.stamp = now();
-    if (publish_empty_context) {
-      context.data = "";
-    } else {
-      context.data = boost::json::serialize(json << *script);
+  // This function is also called from exception handlers (see on_activate), so
+  // it must not throw: an exception escaping from here would propagate through
+  // the timer callback and terminate the node with SIGABRT.
+  try {
+    Context context;
+    {
+      boost::json::monotonic_resource mr;
+      boost::json::object json(&mr);
+      context.stamp = now();
+      if (publish_empty_context) {
+        context.data = "";
+      } else {
+        context.data = boost::json::serialize(json << *script);
+      }
+      context.time = evaluateSimulationTime();
     }
-    context.time = evaluateSimulationTime();
-  }
 
-  publisher_of_context->publish(context);
+    publisher_of_context->publish(context);
+  } catch (const std::exception & exception) {
+    RCLCPP_ERROR_STREAM(
+      get_logger(), "Failed to publish the current context: " << exception.what());
+  }
 }
 
 auto Interpreter::reset() -> void

@@ -41,6 +41,23 @@ def iota(start, step, stop):
         start = start + step
 
 
+# Attribute names that are exclusively integer-typed (UnsignedInt /
+# UnsignedShort / Int) across all bundled OpenSCENARIO XSDs. Names that are
+# also used with Double or String types elsewhere (e.g. "value", "number")
+# are deliberately excluded so their textual representation never changes.
+INTEGER_TYPED_ATTRIBUTES = frozenset({
+    "dLane",
+    "from",
+    "maximumExecutionCount",
+    "numberOfTestRuns",
+    "numberOfVehicles",
+    "order",
+    "revMajor",
+    "revMinor",
+    "to",
+})
+
+
 def normalize_yaml_bools(obj):
     if isinstance(obj, dict):
         return {k: normalize_yaml_bools(v) for k, v in obj.items()}
@@ -141,6 +158,16 @@ def from_yaml(keyword, node):
                 #
                 # => @tag: { ... }
                 #
+                # NOTE: integer-typed attributes fail XSD validation when YAML
+                # represents the value in scientific notation (e.g. Web.Auto
+                # emits UINT32_MAX as 4.294967295e+09, which PyYAML loads as a
+                # float and would stringify as "4294967295.0").
+                if (
+                    tag in INTEGER_TYPED_ATTRIBUTES
+                    and isinstance(value, float)
+                    and value.is_integer()
+                ):
+                    value = int(value)
                 result["@" + tag] = str(value)
             else:
                 #

@@ -15,7 +15,11 @@
 #ifndef TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 #define TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 
+#include <autoware_perception_msgs/msg/tracked_objects.hpp>
+#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
+#include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
+#include <diffusion_planner_lockstep_msgs/srv/plan_trajectory.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <memory>
 #include <nav_msgs/msg/odometry.hpp>
@@ -29,6 +33,15 @@
 
 namespace vehicle_simulation
 {
+/// Per-frame planner inputs assembled by ScenarioSimulator (which owns the
+/// ground-truth entity states) for the lockstep diffusion_planner service.
+struct LockstepPlannerInput
+{
+  rclcpp::Time ros_time;
+  autoware_perception_msgs::msg::TrackedObjects tracked_objects;
+  std::optional<autoware_perception_msgs::msg::TrafficLightGroupArray> traffic_signals;
+};
+
 enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
@@ -86,6 +99,27 @@ private:
 
   auto initializePerfectTrajectoryFollowerMode() -> void;
 
+  // Lockstep diffusion_planner invocation (PERFECT_TRAJECTORY_TRACKER only).
+  // The client lives on the concealer node whose dedicated spinner thread
+  // processes the response while the ZMQ thread blocks on future.wait_for().
+  // The initializers below are the parameter defaults; see
+  // initializePerfectTrajectoryFollowerMode.
+  bool lockstep_enabled_ = false;
+
+  double lockstep_planner_period_ = 0.1;
+
+  double lockstep_service_timeout_sec_ = 60.0;
+
+  double next_planner_call_time_ = 0.0;
+
+  bool lockstep_received_first_trajectory_ = false;
+
+  rclcpp::Client<diffusion_planner_lockstep_msgs::srv::PlanTrajectory>::SharedPtr plan_client_;
+
+  autoware_vehicle_msgs::msg::TurnIndicatorsCommand last_turn_indicators_command_;
+
+  auto callPlannerService(LockstepPlannerInput && input, const double step_time) -> void;
+
   std::optional<concealer::Subscriber<nav_msgs::msg::Odometry>> ego_odometry_sub_;
 
   std::optional<concealer::Subscriber<geometry_msgs::msg::AccelWithCovarianceStamped>>
@@ -124,8 +158,14 @@ public:
     const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
     const double step_time, bool is_npc_logic_started) -> void;
 
-  auto update(const double current_time, const double step_time, const bool is_npc_logic_started)
-    -> void;
+  auto update(
+    const double current_time, const double step_time, const bool is_npc_logic_started,
+    std::optional<LockstepPlannerInput> lockstep_input) -> void;
+
+  // True when the next call to update(current_time, ...) will invoke the
+  // lockstep planner service, i.e. when a LockstepPlannerInput must be
+  // assembled for that frame.
+  auto isLockstepPlannerCallDue(const double current_time, const double step_time) const -> bool;
 
   auto requestSpeedChange(double value) -> void;
 

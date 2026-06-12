@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <chrono>
+#include <cmath>
 #include <concealer/autoware_universe.hpp>
 #include <filesystem>
+#include <future>
+#include <thread>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/get_rotation_matrix.hpp>
@@ -68,6 +72,123 @@ void EgoEntitySimulation::initializePerfectTrajectoryFollowerMode()
   perfect_tracker_model_ =
     dynamic_cast<SimModelPerfectTrajectoryTracker *>(vehicle_model_ptr_.get());
   perfect_tracker_model_->setInitialReference(initial_pose_, initial_rotation_matrix_);
+
+  lockstep_enabled_ = common::getParameter("diffusion_planner_lockstep", lockstep_enabled_);
+  if (lockstep_enabled_) {
+    lockstep_planner_period_ =
+      common::getParameter("lockstep_planner_period", lockstep_planner_period_);
+    lockstep_service_timeout_sec_ =
+      common::getParameter("lockstep_service_timeout_sec", lockstep_service_timeout_sec_);
+    plan_client_ = autoware->create_client<diffusion_planner_lockstep_msgs::srv::PlanTrajectory>(
+      "/planning/diffusion_planner/srv/plan_trajectory");
+    RCLCPP_INFO(
+      autoware->get_logger(),
+      "diffusion_planner lockstep mode enabled (period: %.3f s, timeout: %.1f s)",
+      lockstep_planner_period_, lockstep_service_timeout_sec_);
+  }
+}
+
+auto EgoEntitySimulation::isLockstepPlannerCallDue(
+  const double current_time, const double step_time) const -> bool
+{
+  // lockstep_enabled_ is only ever set for PERFECT_TRAJECTORY_TRACKER.
+  return lockstep_enabled_ && current_time >= next_planner_call_time_ - step_time * 0.5;
+}
+
+auto EgoEntitySimulation::callPlannerService(LockstepPlannerInput && input, const double step_time)
+  -> void
+{
+  using TurnIndicatorsCommand = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
+  using TurnIndicatorsReport = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
+
+  auto request =
+    std::make_shared<diffusion_planner_lockstep_msgs::srv::PlanTrajectory::Request>();
+  request->frame_time = input.ros_time;
+  request->ego_kinematic_state.header.stamp = input.ros_time;
+  request->ego_kinematic_state.header.frame_id = "map";
+  request->ego_kinematic_state.pose.pose = status_.getMapPose();
+  request->ego_kinematic_state.twist.twist = getCurrentTwist();
+  request->ego_acceleration.header = request->ego_kinematic_state.header;
+  request->ego_acceleration.accel.accel = getCurrentAccel(step_time);
+  request->tracked_objects = std::move(input.tracked_objects);
+  if (input.traffic_signals) {
+    request->traffic_signals = std::move(*input.traffic_signals);
+    request->has_traffic_signals = true;
+  }
+  // Mirror concealer's turn indicators command -> report conversion so the
+  // planner sees the same feedback it would get via the topic path.
+  request->turn_indicators.stamp = input.ros_time;
+  request->turn_indicators.report =
+    last_turn_indicators_command_.command == TurnIndicatorsCommand::NO_COMMAND
+      ? TurnIndicatorsReport::DISABLE
+      : last_turn_indicators_command_.command;
+
+  // Until the first trajectory has been obtained, block the simulation here:
+  // the planner may still be loading its TensorRT engine or waiting for the
+  // map / route to propagate. Blocking is correct in lockstep mode -- the
+  // simulation clock simply pauses until the planner pipeline is up. After
+  // the first success, fall back to single attempts so a sporadic failure
+  // only means "keep following the previous trajectory".
+  // Constant during this call: once the first trajectory has arrived, every
+  // later cycle is a single attempt instead of a retry-until-deadline loop.
+  const bool single_attempt = lockstep_received_first_trajectory_;
+  const auto deadline = std::chrono::steady_clock::now() +
+                        std::chrono::duration<double>(lockstep_service_timeout_sec_);
+  const auto give_up = [&] {
+    return single_attempt || std::chrono::steady_clock::now() > deadline;
+  };
+
+  while (rclcpp::ok()) {
+    if (!plan_client_->service_is_ready()) {
+      if (give_up()) {
+        RCLCPP_WARN(
+          autoware->get_logger(),
+          "diffusion_planner lockstep service not ready, skipping this cycle");
+        return;
+      }
+      RCLCPP_INFO_THROTTLE(
+        autoware->get_logger(), *autoware->get_clock(), 5000,
+        "waiting for diffusion_planner lockstep service...");
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      continue;
+    }
+
+    auto future = plan_client_->async_send_request(request);
+    // NOTE: Do not use rclcpp::spin_until_future_complete here: the concealer
+    // node is already spinning on its own executor thread, which also delivers
+    // this response while we block.
+    if (
+      future.wait_for(std::chrono::duration<double>(lockstep_service_timeout_sec_)) !=
+      std::future_status::ready) {
+      RCLCPP_ERROR(
+        autoware->get_logger(),
+        "diffusion_planner lockstep service timed out after %.1f s; keeping previous trajectory",
+        lockstep_service_timeout_sec_);
+      return;
+    }
+
+    if (const auto response = future.get(); response->success) {
+      const rclcpp::Time stamp(response->trajectory.header.stamp);
+      if (stamp.nanoseconds() > 0) {
+        perfect_tracker_model_->setTrajectory(stamp, response->trajectory);
+        lockstep_received_first_trajectory_ = true;
+      }
+      last_turn_indicators_command_ = response->turn_indicators_command;
+      return;
+    } else if (give_up()) {
+      RCLCPP_WARN(
+        autoware->get_logger(), "diffusion_planner lockstep service failed: %s",
+        response->message.c_str());
+      return;
+    } else {
+      // Startup phase: the planner is up but its map / route inputs have not
+      // arrived yet. Retry until the first trajectory comes back.
+      RCLCPP_INFO_THROTTLE(
+        autoware->get_logger(), *autoware->get_clock(), 5000,
+        "waiting for diffusion_planner to become ready: %s", response->message.c_str());
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+  }
 }
 
 void EgoEntitySimulation::initializeExternalMode()
@@ -408,7 +529,8 @@ auto EgoEntitySimulation::overwrite(
 }
 
 void EgoEntitySimulation::update(
-  const double current_time, const double step_time, const bool is_npc_logic_started)
+  const double current_time, const double step_time, const bool is_npc_logic_started,
+  std::optional<LockstepPlannerInput> lockstep_input)
 {
   using math::geometry::getRotationMatrix;
 
@@ -432,44 +554,67 @@ void EgoEntitySimulation::update(
       // State is updated by the external simulator via ROS 2 subscription callbacks.
       // No Autoware command reading or vehicle model stepping required here.
     } else if (vehicle_model_type_ == VehicleModelType::PERFECT_TRAJECTORY_TRACKER) {
-      // Inject the latest trajectory from Autoware and step the model.
-      // The model selects the appropriate delayed trajectory internally.
-      const auto candidates = autoware->getCandidateTrajectories();
-      // Why front() is safe:
-      //   - The upstream publisher (autoware_diffusion_planner) pushes exactly
-      //     `batch_size` candidates per message; see
-      //     https://github.com/tier4/autoware_universe/blob/877d757cacb69243791202112f4d57f607cd5f29/planning/autoware_diffusion_planner/src/diffusion_planner_core.cpp#L341 .
-      //   - The default `batch_size: 1` is declared in
-      //     https://github.com/tier4/autoware_universe/blob/877d757cacb69243791202112f4d57f607cd5f29/planning/autoware_diffusion_planner/config/diffusion_planner.param.yaml#L10
-      //     of the same repository, so the array degenerates to a single element.
-      //   - Empirically confirmed by sampling 50 consecutive messages of
-      //     /planning/generator/diffusion_planner/candidate_trajectories from the
-      //     real rosbag: n_candidates is constantly 1
-      //     and generator_name is constantly "DiffusionPlanner_batch_0".
-      // If batch_size is ever raised above 1, front() picks an arbitrary sample
-      // and this selection policy must be revisited (e.g. choose by generator_id
-      // or by an external scoring topic).
-      if (!candidates.candidate_trajectories.empty()) {
-        const auto & front = candidates.candidate_trajectories.front();
-        const rclcpp::Time stamp(front.header.stamp);
-        if (stamp.nanoseconds() > 0) {
-          autoware_planning_msgs::msg::Trajectory traj;
-          traj.header = front.header;
-          traj.points = front.points;
-          perfect_tracker_model_->setTrajectory(stamp, traj);
+      // The gear lets the tracker constrain motion direction (e.g. forbid
+      // reverse motion while gear is DRIVE); each mode below picks its source.
+      auto gear_command = autoware_vehicle_msgs::msg::GearCommand::DRIVE;
+      if (lockstep_enabled_) {
+        // Lockstep mode: invoke the planner synchronously on every
+        // lockstep_planner_period_ boundary of simulation time so the core's
+        // 0.1 s history spacing holds exactly. The caller assembles
+        // lockstep_input exactly on those boundaries (isLockstepPlannerCallDue);
+        // frames in between keep following the trajectory already queued in
+        // the tracker. The asynchronous candidate_trajectories topic path is
+        // skipped entirely.
+        if (lockstep_input) {
+          callPlannerService(std::move(*lockstep_input), step_time);
+          next_planner_call_time_ =
+            (std::round(current_time / lockstep_planner_period_) + 1.0) *
+            lockstep_planner_period_;
         }
+        // The gear stays fixed to DRIVE: reading /control/command/gear_cmd
+        // (published only by the AD API stub in the minimal configuration)
+        // would reintroduce nondeterministic topic timing, and a missed
+        // message decodes as NONE, which clamps the velocity to zero inside
+        // the tracker.
+      } else {
+        // Inject the latest trajectory from Autoware and step the model.
+        // The model selects the appropriate delayed trajectory internally.
+        const auto candidates = autoware->getCandidateTrajectories();
+        // Why front() is safe:
+        //   - The upstream publisher (autoware_diffusion_planner) pushes exactly
+        //     `batch_size` candidates per message; see
+        //     https://github.com/tier4/autoware_universe/blob/877d757cacb69243791202112f4d57f607cd5f29/planning/autoware_diffusion_planner/src/diffusion_planner_core.cpp#L341 .
+        //   - The default `batch_size: 1` is declared in
+        //     https://github.com/tier4/autoware_universe/blob/877d757cacb69243791202112f4d57f607cd5f29/planning/autoware_diffusion_planner/config/diffusion_planner.param.yaml#L10
+        //     of the same repository, so the array degenerates to a single element.
+        //   - Empirically confirmed by sampling 50 consecutive messages of
+        //     /planning/generator/diffusion_planner/candidate_trajectories from the
+        //     real rosbag: n_candidates is constantly 1
+        //     and generator_name is constantly "DiffusionPlanner_batch_0".
+        // If batch_size is ever raised above 1, front() picks an arbitrary sample
+        // and this selection policy must be revisited (e.g. choose by generator_id
+        // or by an external scoring topic).
+        if (!candidates.candidate_trajectories.empty()) {
+          const auto & front = candidates.candidate_trajectories.front();
+          const rclcpp::Time stamp(front.header.stamp);
+          if (stamp.nanoseconds() > 0) {
+            autoware_planning_msgs::msg::Trajectory traj;
+            traj.header = front.header;
+            traj.points = front.points;
+            perfect_tracker_model_->setTrajectory(stamp, traj);
+          }
+        }
+        // Forward Autoware's gear command so the tracker can constrain motion
+        // direction. The trajectory's velocity sign is not always consistent
+        // with the gear command, so the gear acts as a safety/consistency
+        // layer over the trajectory.
+        gear_command = autoware->getGearCommand().command;
       }
       // Pass the lanelet-corrected initial-frame z so the model's R^T/R roundtrip
       // is exact and the altitude stays on the lanelet spline (same source as all other models).
       perfect_tracker_model_->setStateZInitialFrame(world_relative_position_.z());
-      // Forward Autoware's gear command so the tracker can constrain motion
-      // direction (e.g. forbid reverse motion while gear is DRIVE). The
-      // trajectory's velocity sign is not always consistent with the gear
-      // command, so the gear acts as a safety/consistency layer over the
-      // trajectory.
-      vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+      vehicle_model_ptr_->setGear(gear_command);
       vehicle_model_ptr_->update(step_time);
-
     } else {
       auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 

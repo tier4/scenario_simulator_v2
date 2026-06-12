@@ -152,6 +152,8 @@ private:
   std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
   simulation_api_schema::UpdateTrafficLightsRequest traffic_signals_states_;
   traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string & name);
+  traffic_simulator_msgs::EntityStatus toEntityStatusWithBoundingBox(
+    const simulation_api_schema::EntityStatus & status);
   zeromq::MultiServer server_;
   std::shared_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
 

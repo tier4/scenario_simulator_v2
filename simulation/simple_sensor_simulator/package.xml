@@ -41,7 +41,9 @@
 
   <depend>autoware_perception_msgs</depend>
   <depend>autoware_planning_msgs</depend>
+  <depend>autoware_vehicle_msgs</depend>
   <depend>boost</depend>
+  <depend>diffusion_planner_lockstep_msgs</depend>
   <depend>eigen</depend>
   <depend>embree_vendor</depend>
   <depend>get_parameter</depend>

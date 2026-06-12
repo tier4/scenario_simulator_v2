@@ -19,9 +19,11 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <simple_sensor_simulator/exception.hpp>
+#include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
+#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/utils/lanelet_map.hpp>
 #include <utility>
 #include <vector>
@@ -99,18 +101,10 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
   simulation_interface::toMsg(req.current_ros_time(), t);
   current_ros_time_ = t;
   std::vector<traffic_simulator_msgs::EntityStatus> entity_status;
+  entity_status.reserve(entity_status_.size());
   std::transform(
     entity_status_.begin(), entity_status_.end(), std::back_inserter(entity_status),
-    [this](const auto & map_element) {
-      traffic_simulator_msgs::EntityStatus status;
-      *status.mutable_pose() = map_element.second.pose();
-      *status.mutable_action_status() = map_element.second.action_status();
-      *status.mutable_name() = map_element.second.name();
-      *status.mutable_type() = map_element.second.type();
-      *status.mutable_subtype() = map_element.second.subtype();
-      *status.mutable_bounding_box() = getBoundingBox(status.name());
-      return status;
-    });
+    [this](const auto & map_element) { return toEntityStatusWithBoundingBox(map_element.second); });
   sensor_sim_.updateSensorFrame(
     current_simulation_time_, current_ros_time_, entity_status, traffic_signals_states_);
   res.mutable_result()->set_success(true);
@@ -139,6 +133,35 @@ auto ScenarioSimulator::updateEntityStatus(
     updated_status->mutable_pose()->CopyFrom(status.pose());
   };
 
+  // Assemble the lockstep planner inputs from this request's ground truth so
+  // that ego update can call the diffusion_planner service synchronously.
+  // Only assembled on the frames where the planner will actually be invoked.
+  std::optional<vehicle_simulation::LockstepPlannerInput> lockstep_input;
+  if (
+    ego_entity_simulation_ && !req.overwrite_ego_status() && req.npc_logic_started() &&
+    ego_entity_simulation_->isLockstepPlannerCallDue(
+      current_scenario_time_ + step_time_, step_time_)) {
+    vehicle_simulation::LockstepPlannerInput input;
+    // This ego update represents the frame at current_ros_time_ + step_time_;
+    // derive it arithmetically instead of reading a clock to stay deterministic.
+    input.ros_time =
+      rclcpp::Time(current_ros_time_) + rclcpp::Duration::from_seconds(step_time_);
+    std::vector<traffic_simulator_msgs::EntityStatus> npc_statuses;
+    npc_statuses.reserve(req.status().size());
+    for (const auto & status : req.status()) {
+      if (!isEgo(status.name())) {
+        npc_statuses.push_back(toEntityStatusWithBoundingBox(status));
+      }
+    }
+    input.tracked_objects = makeGroundTruthTrackedObjects(npc_statuses, input.ros_time);
+    if (traffic_signals_states_.states_size() > 0) {
+      input.traffic_signals = std::move(*traffic_simulator::TrafficLightPublisher<
+                                          autoware_perception_msgs::msg::TrafficLightGroupArray>::
+                                          generateMessage(input.ros_time, traffic_signals_states_));
+    }
+    lockstep_input = std::move(input);
+  }
+
   for (const auto & status : req.status()) {
     try {
       if (isEgo(status.name())) {
@@ -151,7 +174,8 @@ auto ScenarioSimulator::updateEntityStatus(
             req.npc_logic_started());
         } else {
           ego_entity_simulation_->update(
-            current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
+            current_scenario_time_ + step_time_, step_time_, req.npc_logic_started(),
+            std::move(lockstep_input));
         }
         simulation_api_schema::EntityStatus ego_status;
         simulation_interface::toProto(ego_entity_simulation_->getStatus(), ego_status);
@@ -358,6 +382,22 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
   }
 
   THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
+}
+
+traffic_simulator_msgs::EntityStatus ScenarioSimulator::toEntityStatusWithBoundingBox(
+  const simulation_api_schema::EntityStatus & status)
+{
+  traffic_simulator_msgs::EntityStatus entity_status;
+  *entity_status.mutable_pose() = status.pose();
+  *entity_status.mutable_action_status() = status.action_status();
+  *entity_status.mutable_name() = status.name();
+  *entity_status.mutable_type() = status.type();
+  *entity_status.mutable_subtype() = status.subtype();
+  // simulation_api_schema::EntityStatus does not carry bounding boxes; fill
+  // them in from the spawn-time parameters or consumers see zero-sized
+  // entities.
+  *entity_status.mutable_bounding_box() = getBoundingBox(status.name());
+  return entity_status;
 }
 
 bool ScenarioSimulator::isEgo(const std::string & name)
