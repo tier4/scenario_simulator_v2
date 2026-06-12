@@ -16,7 +16,7 @@
 
   Usage:
     ros2 launch scenario_test_runner scenario_test_runner.launch.py \
-      autoware_launch_file:=minimal_e2e_simulator.launch.xml \
+      autoware_launch_file:=minimal_lockstep_autoware.launch.xml \
       vehicle_model:=<vehicle>_perfect_tracker sensor_model:=<sensor> ...
 -->
 <launch>

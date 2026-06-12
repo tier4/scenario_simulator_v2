@@ -101,7 +101,7 @@ ros2 run parallel_test_runner parallel_test_runner \
 | `parallel_runner.py` | 汎用N並列エンジン（ROS_DOMAIN_ID分離・プロセスグループ管理・junitマージ）。起動コマンドは知らない |
 | `lockstep_profile.py` | ロックステップ構成のlaunch引数組み立て・ZMQポート割当 |
 | `mps.py` | NVIDIA MPS デーモンのライフサイクル管理（contextmanager） |
-| `minimal_adapi_stub.py` | 最小構成用 AD API スタブ（launch/minimal_e2e_simulator.launch.xml から使用） |
+| `minimal_adapi_stub.py` | 最小構成用 AD API スタブ（launch/minimal_lockstep_autoware.launch.xml から使用） |
 
 並列実行はプル型ワークキュー方式で、ワーカー間の同期バリアはない（結合はGPU競合のみ）。
 

@@ -23,7 +23,7 @@ def add_profile_arguments(parser):
     parser.add_argument("--autoware-launch-package",
                         default="parallel_test_runner")
     parser.add_argument("--autoware-launch-file",
-                        default="minimal_e2e_simulator.launch.xml")
+                        default="minimal_lockstep_autoware.launch.xml")
     parser.add_argument("--launch-arg", action="append", default=[],
                         help="extra key:=value passed to "
                              "scenario_test_runner.launch.py; repeatable")
