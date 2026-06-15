@@ -20,6 +20,7 @@
 #include <memory>
 #include <nav_msgs/msg/odometry.hpp>
 #include <optional>
+#include <std_msgs/msg/empty.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
@@ -91,6 +92,8 @@ private:
   std::optional<concealer::Subscriber<geometry_msgs::msg::AccelWithCovarianceStamped>>
     ego_accel_sub_;
 
+  std::optional<concealer::Subscriber<std_msgs::msg::Empty>> carla_ready_sub_;
+
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
     external_initial_pose_pub_;
 
@@ -101,6 +104,8 @@ private:
   auto initializeExternalMode() -> void;
 
   auto onKinematicState(const nav_msgs::msg::Odometry & msg) -> void;
+
+  auto onCarlaReady(const std_msgs::msg::Empty & msg) -> void;
 
   auto getCurrentPose(const double pitch_angle = 0.0) const -> geometry_msgs::msg::Pose;
 

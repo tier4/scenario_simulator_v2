@@ -90,12 +90,31 @@ void EgoEntitySimulation::initializeExternalMode()
   external_initial_pose_msg_.header.frame_id = "map";
   external_initial_pose_msg_.pose.pose = initial_pose_;
 
+  carla_ready_sub_.emplace(
+    "/carla_bridge/ready",
+    rclcpp::QoS(1).transient_local().reliable(),
+    *autoware,
+    [this](const std_msgs::msg::Empty & msg) { onCarlaReady(msg); });
+
   RCLCPP_INFO(
     autoware->get_logger(),
-    "Waiting for first /localization/kinematic_state from external simulator (%s). "
+    "Waiting for first /localization/kinematic_state or /carla_bridge/ready (%s). "
     "initial_pose: x=%.3f y=%.3f z=%.3f",
     toString(vehicle_model_type_).c_str(), initial_pose_.position.x, initial_pose_.position.y,
     initial_pose_.position.z);
+}
+
+void EgoEntitySimulation::onCarlaReady(const std_msgs::msg::Empty &)
+{
+  if (not godot_ready_) {
+    godot_ready_ = true;
+    external_initial_pose_msg_.header.stamp = autoware->get_clock()->now();
+    external_initial_pose_pub_->publish(external_initial_pose_msg_);
+    RCLCPP_INFO(
+      autoware->get_logger(),
+      "/carla_bridge/ready received; CARLA is up. "
+      "Published /initialpose3d; engage will be driven by openscenario_interpreter.");
+  }
 }
 
 void EgoEntitySimulation::onKinematicState(const nav_msgs::msg::Odometry & msg)
