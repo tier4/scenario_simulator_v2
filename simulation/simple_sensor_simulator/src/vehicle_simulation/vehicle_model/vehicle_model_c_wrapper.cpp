@@ -126,14 +126,17 @@ VmModel * vm_create_delay_steer_acc_geared_wo_fall_guard(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
+  double lon_lat_coupling)
 {
   auto * m = new VmModel{};
   m->type = VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD;
   m->impl = std::make_unique<SimModelDelaySteerAccGearedWoFallGuard>(
     vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
     acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
+    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us, brake_time_constant, lon_drag_c0,
+    lon_drag_c1, lon_drag_c2, lon_lat_coupling);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
   return m;

@@ -23,7 +23,9 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
+  double lon_lat_coupling)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -39,17 +41,31 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   steer_bias_(steer_bias),
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
-  k_us_(k_us)
+  k_us_(k_us),
+  // brake_time_constant <= 0 keeps the single-tau behaviour (== acc_time_constant).
+  brake_time_constant_(
+    brake_time_constant > 0.0 ? std::max(brake_time_constant, MIN_TIME_CONSTANT)
+                              : std::max(acc_time_constant, MIN_TIME_CONSTANT)),
+  lon_drag_c0_(lon_drag_c0),
+  lon_drag_c1_(lon_drag_c1),
+  lon_drag_c2_(lon_drag_c2),
+  lon_lat_coupling_(lon_lat_coupling)
 {
   initializeInputQueue(dt);
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::calc_yaw_rate(double vel, double steer) const
 {
-  // Augmented-bicycle yaw rate. With k_us = 0 this is exactly the ideal kinematic
-  // bicycle, so existing setups remain bit-for-bit identical.
+  // Augmented-bicycle yaw rate with yaw-alignment bias. With k_us = 0 and steer_bias_ = 0 this is
+  // exactly the ideal kinematic bicycle, so existing setups remain bit-for-bit identical.
   const double denom = wheelbase_ + k_us_ * vel * vel;
-  return vel * std::tan(steer) / denom;
+  return vel * std::tan(steer + steer_bias_) / denom;
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::calc_drag(double vel) const
+{
+  // Steady-state running resistance / drag offset poly(v) added to the accel target.
+  return lon_drag_c0_ + lon_drag_c1_ * vel + lon_drag_c2_ * vel * vel;
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getX() { return state_(IDX::X); }
@@ -71,8 +87,10 @@ double SimModelDelaySteerAccGearedWoFallGuard::getWz()
 
 double SimModelDelaySteerAccGearedWoFallGuard::getSteer()
 {
-  // return measured values with bias added to actual values
-  return state_(IDX::STEER) + steer_bias_;
+  // Steer bias now enters the yaw equation (calc_yaw_rate, as the viewer's β), not the
+  // measured-steer/tracking loop, so that the bias produces a net yaw offset instead of being
+  // cancelled by the steer controller. The reported/tracked steer is the actual state value.
+  return state_(IDX::STEER);
 }
 
 void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
@@ -147,6 +165,18 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     sat(input(IDX_U::PEDAL_ACCX_DES), vx_rate_lim_, -vx_rate_lim_) * debug_acc_scaling_factor_;
   const double steer_des =
     sat(input(IDX_U::STEER_DES), steer_lim_, -steer_lim_) * debug_steer_scaling_factor_;
+
+  // Yaw rate (with k_us understeer and steer-bias β); reused for the corner-coupling term below.
+  const double yaw_rate = calc_yaw_rate(vel, steer);
+  // Acceleration target with running-resistance offset poly(v) and corner coupling c·(vx·ω)²,
+  // matching the verification viewer's a_target = a_cmd + poly(v) + c·(vx·ω)². The actuator
+  // (PEDAL_ACCX) tracks this target with a first-order lag whose time constant is split between
+  // throttle (a_cmd >= 0) and brake (a_cmd < 0). All extra terms vanish when their coefficients
+  // are zero, leaving the original single-tau behaviour.
+  const double lat_acc = vel * yaw_rate;
+  const double pedal_acc_target =
+    pedal_acc_des + calc_drag(vel) + lon_lat_coupling_ * lat_acc * lat_acc;
+  const double acc_tau = (pedal_acc_des >= 0.0) ? acc_time_constant_ : brake_time_constant_;
   // NOTE: `steer_des` is calculated by control from measured values. getSteer() also gets the
   // measured value. The steer_rate used in the motion calculation is obtained from these
   // differences.
@@ -167,7 +197,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
 
   d_state(IDX::X) = vel * cos(yaw);
   d_state(IDX::Y) = vel * sin(yaw);
-  d_state(IDX::YAW) = calc_yaw_rate(vel, steer);
+  d_state(IDX::YAW) = yaw_rate;
   d_state(IDX::VX) = [&] {
     if (pedal_acc >= 0.0) {
       using autoware_vehicle_msgs::msg::GearCommand;
@@ -194,7 +224,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     }
   }();
   d_state(IDX::STEER) = steer_rate;
-  d_state(IDX::PEDAL_ACCX) = -(pedal_acc - pedal_acc_des) / acc_time_constant_;
+  d_state(IDX::PEDAL_ACCX) = -(pedal_acc - pedal_acc_target) / acc_tau;
 
   return d_state;
 }

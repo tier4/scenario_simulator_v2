@@ -44,12 +44,28 @@ public:
    * @param [in] debug_acc_scaling_factor scaling factor for accel command
    * @param [in] debug_steer_scaling_factor scaling factor for steering command
    * @param [in] k_us understeer coefficient [rad/(m/s²)]; 0 keeps the ideal bicycle model
+   * @param [in] brake_time_constant time constant for accel dynamics while braking
+   *             (a_cmd < 0). <= 0 falls back to acc_time_constant (single-tau behaviour).
+   * @param [in] lon_drag_c0 constant longitudinal running-resistance offset added to the accel
+   *             target a_target [m/s²] (rolling resistance / standing slope). 0 disables.
+   * @param [in] lon_drag_c1 velocity-linear running-resistance coefficient [1/s]. 0 disables.
+   * @param [in] lon_drag_c2 velocity-quadratic (aero) running-resistance coefficient [1/m]. 0 disables.
+   * @param [in] lon_lat_coupling cornering deceleration coefficient; a_target += c·(vx·ω)²
+   *             [s²/m]. Typically negative (curve decel). 0 disables.
+   *
+   * @note Expressiveness brought to parity with the longitudinal/lateral verification viewer
+   *       (lib/_model_viewer.py lon_lat_model): throttle/brake split time constant, steady-state
+   *       running-resistance polynomial poly(v) and corner coupling on the accel target, and the
+   *       yaw bias β (steer_bias enters tan(δ+β)). All new terms default to neutral (single-tau,
+   *       no offset, no coupling) so existing setups stay bit-for-bit identical.
    */
   SimModelDelaySteerAccGearedWoFallGuard(
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, double steer_dead_band, double steer_bias,
-    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us);
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+    double brake_time_constant = 0.0, double lon_drag_c0 = 0.0, double lon_drag_c1 = 0.0,
+    double lon_drag_c2 = 0.0, double lon_lat_coupling = 0.0);
 
   /**
    * @brief default destructor
@@ -101,13 +117,26 @@ private:
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
   const double k_us_;                        //!< @brief understeer coefficient [rad/(m/s²)]
+  const double brake_time_constant_;         //!< @brief accel time constant while braking [s]
+  const double lon_drag_c0_;                 //!< @brief running-resistance offset p0 [m/s²]
+  const double lon_drag_c1_;                 //!< @brief running-resistance velocity-linear p1 [1/s]
+  const double lon_drag_c2_;                 //!< @brief running-resistance velocity-quadratic p2 [1/m]
+  const double lon_lat_coupling_;            //!< @brief corner decel coeff: a_target += c·(vx·ω)² [s²/m]
 
   /**
-   * @brief steady-state yaw rate including understeer:
-   *        ω = vx · tan(δ) / (L + k_us · vx²)
-   * Reduces to the ideal kinematic bicycle ω when k_us = 0.
+   * @brief steady-state yaw rate including understeer and steer bias:
+   *        ω = vx · tan(δ + steer_bias) / (L + k_us · vx²)
+   * Reduces to the ideal kinematic bicycle ω when k_us = 0 and steer_bias = 0.
+   * The steer_bias here is the yaw-alignment bias β of the verification viewer
+   * (lon_lat_model), so the offset does not cancel against the steer-tracking loop.
    */
   double calc_yaw_rate(double vel, double steer) const;
+
+  /**
+   * @brief steady-state running-resistance / drag offset poly(v) = p0 + p1·vx + p2·vx²
+   *        added to the accel target a_target. All-zero coefficients disable it.
+   */
+  double calc_drag(double vel) const;
 
   /**
    * @brief set queue buffer for input command

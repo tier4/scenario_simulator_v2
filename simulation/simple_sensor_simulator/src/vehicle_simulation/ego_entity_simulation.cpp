@@ -187,6 +187,13 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto acc_time_delay             = common::getParameter("acc_time_delay",             0.1);
   const auto acceleration_map_path      = common::getParameter("acceleration_map_path",      std::string(""));
   const auto k_us                       = common::getParameter("k_us",                       0.0);
+  // Verification-viewer-parity longitudinal terms (DELAY_STEER_ACC_GEARED_WO_FALL_GUARD only).
+  // All default to neutral so models that do not set them keep the original single-tau dynamics.
+  const auto brake_time_constant        = common::getParameter("brake_time_constant",        0.0);
+  const auto lon_drag_c0                = common::getParameter("lon_drag_c0",                0.0);
+  const auto lon_drag_c1                = common::getParameter("lon_drag_c1",                0.0);
+  const auto lon_drag_c2                = common::getParameter("lon_drag_c2",                0.0);
+  const auto lon_lat_coupling           = common::getParameter("lon_lat_coupling",          0.0);
   const auto debug_acc_scaling_factor   = common::getParameter("debug_acc_scaling_factor",   1.0);
   const auto debug_steer_scaling_factor = common::getParameter("debug_steer_scaling_factor", 1.0);
   const auto steer_bias                 = common::getParameter("steer_bias",                 0.0);
@@ -220,7 +227,8 @@ auto EgoEntitySimulation::makeSimulationModel(
         autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
-        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
+        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us, brake_time_constant,
+        lon_drag_c0, lon_drag_c1, lon_drag_c2, lon_lat_coupling);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       if (!std::filesystem::exists(acceleration_map_path)) {
