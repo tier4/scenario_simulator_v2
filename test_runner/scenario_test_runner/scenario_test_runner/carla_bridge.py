@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
-"""Minimal CARLA <-> Autoware bridge for the Odaiba use case.
+"""Minimal CARLA <-> Autoware bridge for scenario_simulator_v2 integration.
 
-Spawns the ego at lanelet 1960 on startup, initializes Autoware's
-localization, publishes /vehicle/status/control_mode (= MANUAL) for the
-engage flow, and teleports the ego on /initialpose. CARLA must be
-launched separately with `--ros2`; its in-engine ROS 2 bridge takes care
-of /tf, /localization/kinematic_state, /vehicle/status/* and IMU once a
-`sensor.other.vehicle_status` and `sensor.other.imu` are attached to the
-ego.
+Waits for CARLA to accept connections (retrying for up to 120 s), then
+publishes /carla_bridge/ready (TRANSIENT_LOCAL) so that
+EgoEntitySimulation can publish /initialpose3d.  On receipt of
+/initialpose3d (also TRANSIENT_LOCAL), spawns the ego vehicle in CARLA
+at the requested map-frame pose.
+
+CARLA must be launched separately (or via the launch file) with
+``--ros2``; its in-engine ROS 2 bridge takes care of /tf,
+/localization/kinematic_state, /vehicle/status/* and IMU once a
+``sensor.other.vehicle_status`` and ``sensor.other.imu`` are attached
+to the ego.
 """
 
 import math
@@ -18,11 +22,12 @@ from contextlib import contextmanager
 import carla
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import QoSDurabilityPolicy, QoSProfile, QoSReliabilityPolicy
 
-from autoware_adapi_v1_msgs.srv import InitializeLocalization
 from autoware_vehicle_msgs.msg import ControlModeReport
 from autoware_vehicle_msgs.srv import ControlModeCommand
-from geometry_msgs.msg import Point, PoseWithCovarianceStamped, Quaternion
+from geometry_msgs.msg import PoseWithCovarianceStamped
+from std_msgs.msg import Empty
 
 
 # --- Tier4 Odaiba localization anchor (matches CARLA build constants) ------
@@ -41,11 +46,6 @@ MAP_TO_CARLA_YAW_RAD = 0.0011632706731004028
 EGO_BLUEPRINT = "vehicle.byd.j6gen2"
 J6_PIVOT_TO_BASE_LINK_X = -2.23353124
 
-# lanelet 1960 bootstrap pose (autoware map frame).
-DEFAULT_POSE_MAP_X = 89405.36
-DEFAULT_POSE_MAP_Y = 43256.08
-DEFAULT_POSE_MAP_YAW_RAD = math.radians(-2.93)
-
 # Attributes the vehicle_status sensor needs so its in-engine publishers
 # emit Autoware-localization ground-truth in the map frame.
 VEHICLE_STATUS_ATTRS = (
@@ -63,8 +63,16 @@ VEHICLE_STATUS_ATTRS = (
     ("map_to_carla_yaw_rad", str(MAP_TO_CARLA_YAW_RAD)),
 )
 
-TICK_FAIL_LOG_PERIOD_S = 5.0  # throttle world.tick() failure spam
-SHUTDOWN_LOCK_TIMEOUT_S = 2.0  # never block shutdown waiting for a stuck tick
+CONNECT_TIMEOUT_S = 120.0
+CONNECT_RETRY_INTERVAL_S = 2.0
+TICK_FAIL_LOG_PERIOD_S = 5.0
+SHUTDOWN_LOCK_TIMEOUT_S = 2.0
+
+TRANSIENT_LOCAL_QOS = QoSProfile(
+    depth=1,
+    durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
+    reliability=QoSReliabilityPolicy.RELIABLE,
+)
 
 
 # --- Coordinate helpers ----------------------------------------------------
@@ -115,8 +123,7 @@ class CarlaBridge(Node):
         self.port = self.declare_parameter("port", 2000).value
         self.hz_rate = self.declare_parameter("hz_rate", 30).value
 
-        self.client = carla.Client(self.host, self.port)
-        self.client.set_timeout(60.0)
+        self.client = None
         self.world = self._get_world()
         self._configure_sync_mode()
 
@@ -126,14 +133,13 @@ class CarlaBridge(Node):
         self._mode = ControlModeReport.MANUAL
         self._world_lock = threading.Lock()
         self._shutdown = threading.Event()
-        self._pending_init = None  # (map_x, map_y, map_yaw) waiting for AdAPI
-        self._world_thread = None  # set after spawn so shutdown is safe
-        self._warn_throttle = {}   # what -> last-log monotonic seconds
+        self._world_thread = None
+        self._warn_throttle = {}
 
         self.control_mode_pub = self.create_publisher(
             ControlModeReport, "/vehicle/status/control_mode", 1
         )
-        self.create_timer(0.02, lambda: self.control_mode_pub.publish(  # 50 Hz
+        self.create_timer(0.02, lambda: self.control_mode_pub.publish(
             ControlModeReport(stamp=self.get_clock().now().to_msg(), mode=self._mode)
         ))
 
@@ -143,22 +149,18 @@ class CarlaBridge(Node):
             self._on_control_mode_request,
         )
         self.create_subscription(
-            PoseWithCovarianceStamped, "/initialpose", self._on_initialpose, 1
-        )
-        self.init_loc_client = self.create_client(
-            InitializeLocalization, "/api/localization/initialize"
-        )
-        self.create_timer(2.0, self._try_localization_init)
-
-        self._spawn_ego_at_map_pose(
-            DEFAULT_POSE_MAP_X,
-            DEFAULT_POSE_MAP_Y,
-            DEFAULT_POSE_MAP_YAW_RAD,
-            label="bootstrap",
+            PoseWithCovarianceStamped,
+            "/initialpose3d",
+            self._on_initialpose3d,
+            TRANSIENT_LOCAL_QOS,
         )
 
-        # Tick CARLA off the rclpy executor so the UE5 main loop is not
-        # gated by ROS callback latency (sync mode freezes otherwise).
+        self._ready_pub = self.create_publisher(
+            Empty, "/carla_bridge/ready", TRANSIENT_LOCAL_QOS
+        )
+        self._ready_pub.publish(Empty())
+        self.get_logger().info("Published /carla_bridge/ready.")
+
         self._world_thread = threading.Thread(
             target=self._world_loop, daemon=True
         )
@@ -181,20 +183,28 @@ class CarlaBridge(Node):
 
     # --- CARLA setup -------------------------------------------------------
     def _get_world(self):
-        # OpenDRIVE-less maps make the first get_world() flaky.
-        for attempt in range(3):
+        deadline = time.monotonic() + CONNECT_TIMEOUT_S
+        attempt = 0
+        while True:
+            attempt += 1
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise RuntimeError(
+                    f"client.get_world() failed after {CONNECT_TIMEOUT_S:.0f}s"
+                )
             try:
+                self.client = carla.Client(self.host, self.port)
+                self.client.set_timeout(60.0)
                 return self.client.get_world()
             except RuntimeError as exc:
                 self.get_logger().warn(
-                    f"client.get_world() attempt {attempt}: {exc!r}"
+                    f"client.get_world() attempt {attempt} failed: {exc!r} "
+                    f"({remaining:.0f}s remaining, retrying in "
+                    f"{CONNECT_RETRY_INTERVAL_S:.0f}s)"
                 )
-                time.sleep(0.5)
-        raise RuntimeError("client.get_world() failed 3 times")
+                time.sleep(CONNECT_RETRY_INTERVAL_S)
 
     def _configure_sync_mode(self):
-        # NOTE: CARLA's in-engine ROS 2 bridge is enabled by the `--ros2`
-        # CLI flag, not by a WorldSettings attribute.
         settings = self.world.get_settings()
         settings.synchronous_mode = True
         settings.fixed_delta_seconds = 1.0 / float(self.hz_rate)
@@ -221,15 +231,12 @@ class CarlaBridge(Node):
         bp_library = self.world.get_blueprint_library()
 
         ego_bp = bp_library.find(EGO_BLUEPRINT)
-        # role_name="ego" lets CARLA's built-in ROS 2 bridge route
-        # vehicle_status publishers to this actor.
         ego_bp.set_attribute("role_name", "ego")
 
         vs_bp = bp_library.find("sensor.other.vehicle_status")
         for name, value in VEHICLE_STATUS_ATTRS:
             vs_bp.set_attribute(name, value)
 
-        # Tie IMU rate to the world step so the sensor doesn't lag the sim.
         imu_bp = bp_library.find("sensor.other.imu")
         imu_bp.set_attribute("sensor_tick", f"{1.0 / float(self.hz_rate)}")
         imu_bp.set_attribute("ros_name", "tamagawa/imu_link")
@@ -268,54 +275,25 @@ class CarlaBridge(Node):
             f"{math.degrees(map_yaw_rad):.2f} deg) -> CARLA=("
             f"{spawn_tf.location.x:.2f}, {spawn_tf.location.y:.2f})"
         )
-        self._pending_init = (map_x, map_y, map_yaw_rad)
         return True
 
-    def _on_initialpose(self, msg):
+    def _on_initialpose3d(self, msg):
         if msg.header.frame_id not in ("", "map"):
             self.get_logger().warn(
-                f"/initialpose must be in map frame; got {msg.header.frame_id!r}"
+                f"/initialpose3d must be in map frame; got {msg.header.frame_id!r}"
             )
             return
         ok = self._spawn_ego_at_map_pose(
             msg.pose.pose.position.x,
             msg.pose.pose.position.y,
             yaw_from_quaternion(msg.pose.pose.orientation),
-            label="/initialpose",
+            label="/initialpose3d",
         )
         if not ok:
             self.get_logger().warn(
-                "/initialpose respawn failed; ego unchanged. "
+                "/initialpose3d respawn failed; ego unchanged. "
                 "Try another location with no obstacle."
             )
-
-    def _try_localization_init(self):
-        if self._pending_init is None or not self.init_loc_client.service_is_ready():
-            return
-        map_x, map_y, map_yaw_rad = self._pending_init
-
-        pose = PoseWithCovarianceStamped()
-        pose.header.frame_id = "map"
-        pose.header.stamp = self.get_clock().now().to_msg()
-        pose.pose.pose.position = Point(x=map_x, y=map_y, z=REFERENCE_MAP_Z)
-        pose.pose.pose.orientation = Quaternion(
-            z=math.sin(map_yaw_rad * 0.5), w=math.cos(map_yaw_rad * 0.5)
-        )
-        req = InitializeLocalization.Request()
-        req.pose.append(pose)
-
-        def done(future):
-            try:
-                future.result()
-                self.get_logger().info("Autoware localization initialized.")
-            except Exception as exc:
-                self.get_logger().warn(
-                    f"InitializeLocalization call failed: {exc!r}; "
-                    "will retry on the next spawn"
-                )
-
-        self._pending_init = None
-        self.init_loc_client.call_async(req).add_done_callback(done)
 
     # --- World tick + spectator (background thread) -----------------------
     def _world_loop(self):
@@ -336,8 +314,6 @@ class CarlaBridge(Node):
                 next_tick = time.monotonic()
 
     def _move_spectator(self):
-        # Snapshot the ego transform under the lock so it can't be destroyed
-        # between the None-check and the get_transform() RPC.
         with self._world_lock:
             ego = self.ego
             if ego is None:
@@ -365,9 +341,6 @@ class CarlaBridge(Node):
         self._shutdown.set()
         if self._world_thread is not None and self._world_thread.is_alive():
             self._world_thread.join(timeout=2.0)
-        # Best-effort cleanup; never block on a stuck world tick. If we
-        # can't get the lock, skip touching the world and just let the
-        # process exit so a kill -9 isn't needed.
         acquired = self._world_lock.acquire(timeout=SHUTDOWN_LOCK_TIMEOUT_S)
         try:
             self._destroy_attached_actors()
