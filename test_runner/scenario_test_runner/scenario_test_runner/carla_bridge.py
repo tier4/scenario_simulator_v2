@@ -24,8 +24,6 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSDurabilityPolicy, QoSProfile, QoSReliabilityPolicy
 
-from autoware_vehicle_msgs.msg import ControlModeReport
-from autoware_vehicle_msgs.srv import ControlModeCommand
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from std_msgs.msg import Empty
 
@@ -130,24 +128,11 @@ class CarlaBridge(Node):
         self.ego = None
         self._vehicle_status_sensor = None
         self._imu_sensor = None
-        self._mode = ControlModeReport.MANUAL
         self._world_lock = threading.Lock()
         self._shutdown = threading.Event()
         self._world_thread = None
         self._warn_throttle = {}
 
-        self.control_mode_pub = self.create_publisher(
-            ControlModeReport, "/vehicle/status/control_mode", 1
-        )
-        self.create_timer(0.02, lambda: self.control_mode_pub.publish(
-            ControlModeReport(stamp=self.get_clock().now().to_msg(), mode=self._mode)
-        ))
-
-        self.create_service(
-            ControlModeCommand,
-            "/control/control_mode_request",
-            self._on_control_mode_request,
-        )
         self.create_subscription(
             PoseWithCovarianceStamped,
             "/initialpose3d",
@@ -329,12 +314,6 @@ class CarlaBridge(Node):
             ),
             carla.Rotation(pitch=-15.0, yaw=ego_tf.rotation.yaw),
         ))
-
-    # --- ControlMode publish / service ------------------------------------
-    def _on_control_mode_request(self, request, response):
-        self._mode = int(request.mode)
-        response.success = True
-        return response
 
     # --- Shutdown ---------------------------------------------------------
     def shutdown(self):

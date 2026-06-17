@@ -285,11 +285,9 @@ def launch_setup(context, *args, **kwargs):
                         {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
                         {"/vehicle/status/steering_status.enabled": False},
                         {"/vehicle/status/gear_status.enabled": False},
-                        {"/vehicle/status/control_mode.enabled": False},
                         {"/vehicle/status/velocity_status.enabled": False},
                         {"/vehicle/status/turn_indicators_status.enabled": False},
                         {"tf.enabled": False},
-                        {"/control/control_mode_request.enabled": False},
                     ]
                 elif use_godot_sim:
                     return [
