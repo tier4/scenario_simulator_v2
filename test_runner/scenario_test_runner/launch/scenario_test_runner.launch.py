@@ -537,13 +537,6 @@ def launch_setup(context, *args, **kwargs):
                 output="screen",
                 on_exit=ShutdownOnce(),
             ),
-            Node(
-                package="topic_tools",
-                executable="relay",
-                name="autoware_to_vehicle_engage_relay",
-                arguments=["/autoware/engage", "/vehicle/engage"],
-                output="screen",
-            ),
             ExecuteProcess(
                 cmd=[
                     f"{carla_path_str}/Linux/CarlaUnreal.sh",
