@@ -2,7 +2,7 @@ OpenSCENARIO:
   FileHeader:
     author: ''
     date: '2026-06-15T07:45:30+09:00'
-    description: 'Carla Odaiba test scenario (j6_gen2, x2_dev map)'
+    description: 'Carla Odaiba test scenario (j6_gen2, x2_dev map, no traffic lights)'
     revMajor: 1
     revMinor: 0
   ParameterDeclarations:
@@ -65,8 +65,8 @@ OpenSCENARIO:
                   Position:
                     LanePosition:
                       roadId: ''
-                      laneId: '2224381'
-                      s: 5
+                      laneId: '132'
+                      s: 10
                       offset: 0
                       Orientation:
                         type: relative
@@ -78,8 +78,8 @@ OpenSCENARIO:
                     Position:
                       LanePosition:
                         roadId: ''
-                        laneId: '2224173'
-                        s: 20
+                        laneId: '139'
+                        s: 180
                         offset: 0
                         Orientation:
                           type: relative
@@ -118,8 +118,8 @@ OpenSCENARIO:
                                         Position:
                                           LanePosition:
                                             roadId: ''
-                                            laneId: '2224173'
-                                            s: 20
+                                            laneId: '139'
+                                            s: 180
                                             offset: 0
                                             Orientation:
                                               type: relative
@@ -132,7 +132,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     UserDefinedValueCondition:
-                                      name: RelativeHeadingCondition(ego, 2224173, 20)
+                                      name: RelativeHeadingCondition(ego, 139, 180)
                                       rule: lessThan
                                       value: 0.1
                                 - name: ''
