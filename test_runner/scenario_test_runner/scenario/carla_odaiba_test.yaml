@@ -65,8 +65,8 @@ OpenSCENARIO:
                   Position:
                     LanePosition:
                       roadId: ''
-                      laneId: '132'
-                      s: 10
+                      laneId: '348'
+                      s: 5
                       offset: 0
                       Orientation:
                         type: relative
@@ -78,8 +78,8 @@ OpenSCENARIO:
                     Position:
                       LanePosition:
                         roadId: ''
-                        laneId: '139'
-                        s: 180
+                        laneId: '36'
+                        s: 0
                         offset: 0
                         Orientation:
                           type: relative
@@ -118,8 +118,8 @@ OpenSCENARIO:
                                         Position:
                                           LanePosition:
                                             roadId: ''
-                                            laneId: '139'
-                                            s: 180
+                                            laneId: '36'
+                                            s: 0
                                             offset: 0
                                             Orientation:
                                               type: relative
@@ -132,7 +132,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     UserDefinedValueCondition:
-                                      name: RelativeHeadingCondition(ego, 139, 180)
+                                      name: RelativeHeadingCondition(ego, 36, 0)
                                       rule: lessThan
                                       value: 0.1
                                 - name: ''
