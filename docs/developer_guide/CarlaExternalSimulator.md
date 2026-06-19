@@ -55,12 +55,6 @@ Autoware が必要とするトピックと、CARLA モードでの配信元。
 |---|---|---|---|
 | `/control/control_mode_request` | concealer | concealer | |
 
-### 補足
-
-- **cmd echo**: CARLA は `turn_indicators_cmd` / `hazard_lights_cmd` を受信した値をそのまま status として返す。実際のライト点灯はしない。Autoware の planning feedback ループを閉じるため
-- **未使用 (TODO)**: `gear_cmd`, `emergency_cmd`, `engage` は AutowareController が subscribe しているが車両に未適用
-- **concealer 無効化**: CARLA モードでは `scenario_test_runner.launch.py` が上記テーブルで CARLA に移管されたトピックの concealer publisher を `.enabled: False` にしている。**control_mode と control_mode_request のみ有効のまま**
-
 ## 起動シーケンス
 
 ```mermaid
@@ -116,7 +110,6 @@ ROS 2 トピックの publish は `/carla_bridge/ready` のみ。それ以外は
 vehicle status と localization を publish し、制御コマンドを subscribe する。
 
 - **localization**: `publish_autoware_localization_ground_truth: "true"` を VehicleStatusSensor の attribute に設定すると有効化される。変換定数は carla_bridge.py の `VEHICLE_STATUS_ATTRS` 経由で渡される
-- **turn_indicators / hazard_lights**: CARLA は cmd を受信して実際にはライトを点灯しないが、受信した値をそのまま status として publish する（Autoware の planning feedback ループを閉じるため）
 - **control_mode**: CARLA は publish しない。concealer が担当する
 
 ### concealer
@@ -146,23 +139,3 @@ carla_bridge.py は spawn 時の map → CARLA 変換にのみ使用する。loc
 | control_mode | Godot が publish | concealer が publish |
 | engage relay | 必要 | 不要 |
 | world tick | Godot 自身が駆動 | carla_bridge.py が駆動 |
-
-## 実装ファイル
-
-### SSv2 側
-
-| ファイル | 内容 |
-|---|---|
-| `test_runner/.../carla_bridge.py` | CARLA lifecycle 管理 |
-| `test_runner/.../launch/scenario_test_runner.launch.py` | 起動設定・concealer disable リスト |
-| `simulation/.../ego_entity_simulation.cpp` | EXTERNAL モードの ready → initialpose3d ハンドシェイク |
-| `external/concealer/src/autoware_universe.cpp` | control_mode publish + service |
-
-### CARLA 側 (odaiba-carla)
-
-| ファイル | 内容 |
-|---|---|
-| `.../publishers/AutowarePublisher.cpp` | vehicle status publish |
-| `.../publishers/AutowareLocalizationPublisher.cpp` | localization publish |
-| `.../subscribers/AutowareController.cpp` | control_cmd subscribe + 車両適用 |
-| `.../Sensors/VehicleStatusSensor.cpp` | vehicle status 収集・localization config 読み取り |
