@@ -407,7 +407,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("use_trajectory_based_front_entity_detection", default_value=use_trajectory_based_front_entity_detection),
         DeclareLaunchArgument("vehicle_model",                               default_value=vehicle_model                              ),
         DeclareLaunchArgument("godot_executable",                            default_value=godot_executable                           ),
-        DeclareLaunchArgument("carla_path",                                  default_value=carla_path                                 ),
+        DeclareLaunchArgument("carla_path",                                  default_value=carla_path                                 ),  # e.g. /home/user/Carla-0.10.0-Linux-Shipping
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -537,9 +537,12 @@ def launch_setup(context, *args, **kwargs):
                 output="screen",
                 on_exit=ShutdownOnce(),
             ),
+            # Launch the CARLA binary directly (not via CarlaUnreal.sh) so that
+            # SIGTERM from the launch system reaches the UE process.
             ExecuteProcess(
                 cmd=[
-                    f"{carla_path_str}/Linux/CarlaUnreal.sh",
+                    f"{carla_path_str}/Linux/CarlaUnreal/Binaries/Linux/CarlaUnreal-Linux-Shipping",
+                    "CarlaUnreal",
                     "/Game/Carla/Maps/Odaiba",
                     "-vulkan",
                     "-prefernvidia",
@@ -557,6 +560,7 @@ def launch_setup(context, *args, **kwargs):
                     ),
                 },
                 output="screen",
+                on_exit=ShutdownOnce(),
             ),
         ]
         if use_carla
