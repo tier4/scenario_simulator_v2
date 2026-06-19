@@ -98,7 +98,7 @@ void EgoEntitySimulation::initializeExternalMode()
 
   RCLCPP_INFO(
     autoware->get_logger(),
-    "Waiting for first /localization/kinematic_state or /carla_bridge/ready (%s). "
+    "Waiting for first /localization/kinematic_state or from external simulator  (%s). "
     "initial_pose: x=%.3f y=%.3f z=%.3f",
     toString(vehicle_model_type_).c_str(), initial_pose_.position.x, initial_pose_.position.y,
     initial_pose_.position.z);
