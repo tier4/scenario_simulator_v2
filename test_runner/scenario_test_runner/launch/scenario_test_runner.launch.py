@@ -118,8 +118,13 @@ def launch_setup(context, *args, **kwargs):
     vehicle_id                                  = LaunchConfiguration("vehicle_id",                                  default="default")
     # Godot simulator options
     godot_executable                            = LaunchConfiguration("godot_executable",                            default="/home/kotaroyoshimoto/Downloads/godot_autoware_simulator.x86_64")
+    # CARLA options
+    carla_path                                  = LaunchConfiguration("carla_path",                                  default="")
     # fmt: on
     vehicle_model_name = vehicle_model.perform(context)
+    use_carla = vehicle_model_name.endswith("_carla")
+    if use_carla:
+        vehicle_model_name = vehicle_model_name[: -len("_carla")]
     use_godot_sim = vehicle_model_name.endswith("_godot")
     if use_godot_sim:
         vehicle_model_name = vehicle_model_name[: -len("_godot")]
@@ -129,6 +134,19 @@ def launch_setup(context, *args, **kwargs):
     use_perfect_tracker_sim = vehicle_model_name.endswith("_perfect_tracker")
     if use_perfect_tracker_sim:
         vehicle_model_name = vehicle_model_name[: -len("_perfect_tracker")]
+    carla_path_str = ""
+    if use_carla:
+        path_str = carla_path.perform(context)
+        if not path_str:
+            raise ValueError(
+                "carla_path must be specified when vehicle_model ends with '_carla'. "
+                "Pass carla_path:=/path/to/carla"
+            )
+        carla_dir = Path(path_str)
+        if not carla_dir.is_dir():
+            raise FileNotFoundError(f'CARLA directory "{carla_dir}" does not exist.')
+        carla_path_str = str(carla_dir)
+
     godot_executable_path = ""
     if use_godot_sim:
         executable_str = godot_executable.perform(context)
@@ -258,7 +276,20 @@ def launch_setup(context, *args, **kwargs):
         def collect_vehicle_parameters():
             if vehicle_model_name:
                 description = get_package_share_directory(vehicle_model_name + "_description")
-                if use_godot_sim:
+                if use_carla:
+                    return [
+                        description + "/config/vehicle_info.param.yaml",
+                        {"vehicle_model_type": "EXTERNAL"},
+                        {"/localization/acceleration.enabled": False},
+                        {"/localization/kinematic_state.enabled": False},
+                        {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
+                        {"/vehicle/status/steering_status.enabled": False},
+                        {"/vehicle/status/gear_status.enabled": False},
+                        {"/vehicle/status/velocity_status.enabled": False},
+                        {"/vehicle/status/turn_indicators_status.enabled": False},
+                        {"tf.enabled": False},
+                    ]
+                elif use_godot_sim:
                     return [
                         description + "/config/vehicle_info.param.yaml",
                         {"vehicle_model_type": "EXTERNAL"},
@@ -376,6 +407,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("use_trajectory_based_front_entity_detection", default_value=use_trajectory_based_front_entity_detection),
         DeclareLaunchArgument("vehicle_model",                               default_value=vehicle_model                              ),
         DeclareLaunchArgument("godot_executable",                            default_value=godot_executable                           ),
+        DeclareLaunchArgument("carla_path",                                  default_value=carla_path                                 ),  # e.g. /home/user/Carla-0.10.0-Linux-Shipping
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -495,6 +527,43 @@ def launch_setup(context, *args, **kwargs):
             ),
         ]
         if use_godot_sim
+        else []
+    ) + (
+        [
+            Node(
+                package="scenario_test_runner",
+                executable="carla_bridge.py",
+                name="carla_bridge_node",
+                output="screen",
+                on_exit=ShutdownOnce(),
+            ),
+            # Launch the CARLA binary directly (not via CarlaUnreal.sh) so that
+            # SIGTERM from the launch system reaches the UE process.
+            ExecuteProcess(
+                cmd=[
+                    f"{carla_path_str}/Linux/CarlaUnreal/Binaries/Linux/CarlaUnreal-Linux-Shipping",
+                    "CarlaUnreal",
+                    "/Game/Carla/Maps/Odaiba",
+                    "-vulkan",
+                    "-prefernvidia",
+                    "-log",
+                    "-game",
+                    "-noraytracing",
+                    "-quality-level=Low",
+                    "--ros2",
+                ],
+                cwd=carla_path_str,
+                additional_env={
+                    'LD_LIBRARY_PATH': (
+                        f"{carla_path_str}/Linux/CarlaUnreal/Plugins/CarlaRGL/Binaries/Linux"
+                        f":{os.environ.get('LD_LIBRARY_PATH', '')}"
+                    ),
+                },
+                output="screen",
+                on_exit=ShutdownOnce(),
+            ),
+        ]
+        if use_carla
         else []
     ) + (
         [
