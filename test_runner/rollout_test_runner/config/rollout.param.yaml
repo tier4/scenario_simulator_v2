@@ -1,0 +1,21 @@
+/**:
+  ros__parameters:
+    # Topics replayed from the rosbag with their original timestamps.
+    # Topics supplied by the simulator (/tf, /tf_static, /clock, /localization/*,
+    # /vehicle/status/*) are rejected automatically.
+    passthrough_topics:
+      - /perception/object_recognition/objects
+      - /perception/object_recognition/tracking/objects
+      - /perception/traffic_light_recognition/traffic_signals
+    # Topics among passthrough_topics that must be published with transient_local durability
+    # can be listed in a "transient_local_topics" string array parameter (default: none).
+    # NOTE: Do not set an empty array here; the ROS 2 Humble YAML parser cannot represent it.
+    # Topic in the rosbag that provides the replayed ego states.
+    odometry_topic: /localization/kinematic_state
+    acceleration_topic: /localization/acceleration
+    # Behavior when the rosbag runs out of ego states while still in the replay phase.
+    # "hold": keep the last state until the switch service is called. "switch": switch
+    # to closed-loop automatically.
+    on_bag_end: hold
+    # Scenario time [s] at which to switch to closed-loop automatically. Negative to disable.
+    auto_switch_time: -1.0

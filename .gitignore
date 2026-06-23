@@ -15,6 +15,7 @@ log
 external/*
 !external/concealer
 !external/embree_vendor
+!external/physx_vendor
 
 # auto-generated files
 html

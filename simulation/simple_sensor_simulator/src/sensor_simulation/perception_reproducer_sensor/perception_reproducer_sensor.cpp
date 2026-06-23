@@ -1,0 +1,391 @@
+// Copyright 2015 TIER IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <geometry/quaternion/normalize.hpp>
+#include <geometry/quaternion/slerp.hpp>
+#include <geometry/vector3/operator.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <rosbag2_cpp/reader.hpp>
+#include <rosbag2_storage/storage_filter.hpp>
+#include <rosbag2_storage/storage_options.hpp>
+#include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/perception_reproducer_sensor.hpp>
+#include <stdexcept>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
+#include <unordered_set>
+
+namespace simple_sensor_simulator
+{
+inline namespace experimental
+{
+
+auto TFStreamFromOdometry::pushMessage(
+  double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data) -> void
+{
+  auto odometry = deserialize(data);
+  odometry.pose.pose.orientation = math::geometry::normalize(odometry.pose.pose.orientation);
+  data_.emplace_back(time_s, odometry);
+}
+
+auto TFStreamFromOdometry::broadcastTf(double time_s, const rclcpp::Time & ros_time)
+  -> geometry_msgs::msg::Pose
+{
+  geometry_msgs::msg::Pose pose;
+
+  if (time_s <= data_.front().first) {
+    pose = data_.front().second.pose.pose;
+  } else if (time_s >= data_.back().first) {
+    index_ = data_.size() - 1;
+    pose = data_.back().second.pose.pose;
+  } else {
+    while (index_ + 1 < data_.size() && data_[index_ + 1].first <= time_s) {
+      ++index_;
+    }
+
+    const auto & prev = data_[index_].second.pose.pose;
+    const auto & next = data_[index_ + 1].second.pose.pose;
+
+    const double span = data_[index_ + 1].first - data_[index_].first;
+    const double ratio = (span > 0.0) ? (time_s - data_[index_].first) / span : 0.0;
+
+    using math::geometry::operator+;
+    using math::geometry::operator-;
+    using math::geometry::operator*;
+
+    pose.position = prev.position * (1.0 - ratio) + next.position * ratio;
+    pose.orientation = math::geometry::slerp(prev.orientation, next.orientation, ratio);
+  }
+
+  geometry_msgs::msg::TransformStamped transform;
+  transform.header.stamp = ros_time;
+  transform.header.frame_id = "map";
+  transform.child_frame_id = frame_id_;
+  transform.transform.translation.x = pose.position.x;
+  transform.transform.translation.y = pose.position.y;
+  transform.transform.translation.z = pose.position.z;
+  transform.transform.rotation = pose.orientation;
+  tf_broadcaster_->sendTransform(transform);
+
+  return pose;
+}
+
+PerceptionReproducerSensor::PerceptionReproducerSensor(
+  const std::string & bag_path, double start_time_s, const ReplayConfig & config,
+  rclcpp::Node & node)
+: logger_(node.get_logger()),
+  config_(config),
+  detected_objects_stream_(
+    detected_objects_topic_,
+    node.create_publisher<DetectedObjects>(detected_objects_topic_, 1)),
+  tracked_objects_stream_(
+    tracked_objects_topic_, node.create_publisher<TrackedObjects>(tracked_objects_topic_, 1)),
+  trajectory_stream_(
+    trajectory_topic_, node.create_publisher<Trajectory>("/simulation/replay/trajectory", 1)),
+  odometry_stream_(odometry_topic_, "replay_base_link", node),
+  occupancy_grid_stream_(
+    occupancy_grid_topic_,
+    node.create_publisher<OccupancyGrid>(occupancy_grid_topic_, rclcpp::QoS(1).transient_local())),
+  vehicle_marker_pub_(node.create_publisher<visualization_msgs::msg::MarkerArray>(
+    "/simulation/replay/vehicle_marker", 1))
+{
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  using TrafficLightGroupArray = autoware_perception_msgs::msg::TrafficLightGroupArray;
+  traffic_light_stream_ = std::make_unique<TrafficLightBagStream>(
+    traffic_light_topic_,
+    node.create_publisher<TrafficLightGroupArray>(traffic_light_topic_, 1));
+#endif
+
+  loadAllBagData(bag_path, start_time_s);
+}
+
+auto PerceptionReproducerSensor::loadAllBagData(
+  const std::string & bag_path, double start_time_s) -> void
+{
+  RCLCPP_INFO(logger_, "Loading bag: %s (start_time: %.3f s)", bag_path.c_str(), start_time_s);
+
+  auto reader = std::make_unique<rosbag2_cpp::Reader>();
+  rosbag2_storage::StorageOptions storage_options;
+  storage_options.uri = bag_path;
+  /// @note For a bare .mcap file there is no metadata.yaml to auto-detect the storage plugin
+  /// from, so set it explicitly. Directory bags (mcap or sqlite3) are auto-detected.
+  if (bag_path.size() >= 5 && bag_path.substr(bag_path.size() - 5) == ".mcap") {
+    storage_options.storage_id = "mcap";
+  }
+  reader->open(storage_options);
+
+  const rclcpp::Time first_time(
+    reader->get_metadata().starting_time.time_since_epoch().count(), RCL_ROS_TIME);
+
+  rosbag2_storage::StorageFilter filter;
+  filter.topics = {
+    detected_objects_topic_, tracked_objects_topic_, trajectory_topic_,   odometry_topic_,
+    occupancy_grid_topic_,   traffic_light_topic_};
+  reader->set_filter(filter);
+
+  while (reader->has_next()) {
+    try {
+      auto bag_message = reader->read_next();
+      const rclcpp::Time msg_time(bag_message->time_stamp, RCL_ROS_TIME);
+      const double shifted_time_s = (msg_time - first_time).seconds() - start_time_s;
+      if (shifted_time_s < 0.0) continue;
+
+      detected_objects_stream_.tryPushMessage(bag_message, shifted_time_s);
+      tracked_objects_stream_.tryPushMessage(bag_message, shifted_time_s);
+      trajectory_stream_.tryPushMessage(bag_message, shifted_time_s);
+      odometry_stream_.tryPushMessage(bag_message, shifted_time_s);
+      occupancy_grid_stream_.tryPushMessage(bag_message, shifted_time_s);
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+      if (traffic_light_stream_) {
+        traffic_light_stream_->tryPushMessage(bag_message, shifted_time_s);
+      }
+#endif
+    } catch (const std::exception & e) {
+      RCLCPP_ERROR(logger_, "Error reading message: %s", e.what());
+    }
+  }
+}
+
+auto PerceptionReproducerSensor::updateTimeBased(
+  double current_scenario_time, const rclcpp::Time & current_ros_time) -> void
+{
+  if (
+    detected_objects_stream_.done() && tracked_objects_stream_.done() &&
+    trajectory_stream_.done()) {
+    return;
+  }
+
+  if (!odometry_stream_.empty()) {
+    const auto pose = odometry_stream_.broadcastTf(current_scenario_time, current_ros_time);
+    publishVehicleMarker(pose, current_ros_time);
+  }
+
+  detected_objects_stream_.publishUpTo(current_scenario_time, current_ros_time);
+
+  tracked_objects_stream_.publishUpTo(current_scenario_time, current_ros_time);
+
+  trajectory_stream_.publishUpTo(current_scenario_time, current_ros_time);
+
+  if (!occupancy_grid_stream_.empty()) {
+    occupancy_grid_stream_.publishNearest(current_scenario_time, current_ros_time);
+  }
+
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  if (traffic_light_stream_) {
+    traffic_light_stream_->publishUpTo(current_scenario_time, current_ros_time);
+  }
+#endif
+}
+
+auto PerceptionReproducerSensor::updatePositionBased(
+  const geometry_msgs::msg::Pose & ego_pose, double ego_speed, double current_scenario_time,
+  const rclcpp::Time & current_ros_time) -> void
+{
+  if (odometry_stream_.empty()) {
+    return;
+  }
+
+  // 初回は大域探索。走行中は前回 playhead 近傍の窓に限定した pose-sync + 単調 (後退禁止)。
+  // 停止中は記録の実ペースで時間前進し、実機の dwell→先行車発進を再生する (pose-sync の
+  // playhead 凍結による先行車発進の喪失=デッドロックを防ぐ)。
+  const size_t nearest_idx = [&]() {
+    if (not playhead_) {
+      playhead_ = odometry_stream_.findNearestIndex(ego_pose);
+    } else if (ego_speed > stop_velocity_threshold_) {
+      dwell_anchor_.reset();
+      const size_t lo =
+        *playhead_ > playhead_window_back_ ? *playhead_ - playhead_window_back_ : 0;
+      playhead_ = std::max(
+        *playhead_,
+        odometry_stream_.findNearestIndex(ego_pose, lo, *playhead_ + playhead_window_forward_));
+    } else {
+      if (not dwell_anchor_) {
+        dwell_anchor_ = {current_scenario_time, odometry_stream_.getTimeAt(*playhead_)};
+        RCLCPP_INFO(
+          logger_, "Ego stopped (%.2f m/s): advancing replay at recorded pace from bag time %.3f",
+          ego_speed, dwell_anchor_->bag_time);
+      }
+      const double target_bag_time =
+        dwell_anchor_->bag_time + (current_scenario_time - dwell_anchor_->scenario_time);
+      while (*playhead_ + 1 < odometry_stream_.size() &&
+             odometry_stream_.getTimeAt(*playhead_ + 1) <= target_bag_time) {
+        ++*playhead_;
+      }
+    }
+    return *playhead_;
+  }();
+  const double target_time_s = odometry_stream_.getTimeAt(nearest_idx);
+
+  publishVehicleMarker(odometry_stream_.getPoseAt(nearest_idx), current_ros_time);
+  odometry_stream_.broadcastTf(current_scenario_time, current_ros_time);
+
+  detected_objects_stream_.publishNearest(target_time_s, current_ros_time);
+
+  tracked_objects_stream_.publishNearest(target_time_s, current_ros_time);
+
+  if (!occupancy_grid_stream_.empty()) {
+    occupancy_grid_stream_.publishNearest(target_time_s, current_ros_time);
+  }
+
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  if (traffic_light_stream_) {
+    traffic_light_stream_->publishNearest(target_time_s, current_ros_time);
+  }
+#endif
+}
+
+auto PerceptionReproducerSensor::publishVehicleMarker(
+  const geometry_msgs::msg::Pose & pose, const rclcpp::Time & ros_time) const -> void
+{
+  const auto make_marker = [&](int id, int type) {
+    visualization_msgs::msg::Marker m;
+    m.header.stamp = ros_time;
+    m.header.frame_id = "map";
+    m.ns = "replay_vehicle";
+    m.id = id;
+    m.type = type;
+    m.action = visualization_msgs::msg::Marker::ADD;
+    m.pose = pose;
+    m.lifetime = rclcpp::Duration::from_seconds(0.5);
+    return m;
+  };
+
+  auto cube = make_marker(0, visualization_msgs::msg::Marker::CUBE);
+  cube.scale.x = 4.5;
+  cube.scale.y = 1.8;
+  cube.scale.z = 1.5;
+  cube.color.r = 1.0f;
+  cube.color.g = 0.5f;
+  cube.color.b = 0.0f;
+  cube.color.a = 0.5f;
+
+  auto arrow = make_marker(1, visualization_msgs::msg::Marker::ARROW);
+  arrow.scale.x = 3.0;
+  arrow.scale.y = 0.3;
+  arrow.scale.z = 0.3;
+  arrow.color.r = 1.0f;
+  arrow.color.g = 0.5f;
+  arrow.color.b = 0.0f;
+  arrow.color.a = 0.8f;
+
+  auto text = make_marker(2, visualization_msgs::msg::Marker::TEXT_VIEW_FACING);
+  text.pose.position.z += 2.0;
+  text.scale.z = 0.8;
+  text.color.r = 1.0f;
+  text.color.g = 1.0f;
+  text.color.b = 1.0f;
+  text.color.a = 1.0f;
+  text.text = "Replay Vehicle";
+
+  visualization_msgs::msg::MarkerArray marker_array;
+  marker_array.markers = {cube, arrow, text};
+  vehicle_marker_pub_->publish(marker_array);
+}
+
+auto PerceptionReproducerSensor::update(
+  double current_scenario_time, const rclcpp::Time & current_ros_time,
+  const std::optional<geometry_msgs::msg::Pose> & ego_pose,
+  const std::optional<double> & ego_speed) -> void
+{
+  if (std::isnan(current_scenario_time) || current_scenario_time < 0.0) {
+    return;
+  }
+
+  if (not signal_filter_applied_) {
+    signal_filter_applied_ = true;
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+    applyGoverningSignalFilter();
+#endif
+  }
+
+  if (config_.use_position_based_replay) {
+    if (ego_pose) {
+      /// @note If the speed is unavailable, treat the ego as moving so that the replay stays
+      /// pose-synced instead of silently time-advancing.
+      updatePositionBased(
+        ego_pose.value(), ego_speed.value_or(std::numeric_limits<double>::infinity()),
+        current_scenario_time, current_ros_time);
+    }
+  } else {
+    updateTimeBased(current_scenario_time, current_ros_time);
+  }
+}
+
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+auto PerceptionReproducerSensor::applyGoverningSignalFilter() -> void
+{
+  if (not traffic_light_stream_ or odometry_stream_.empty()) {
+    return;
+  }
+
+  // 実走 lanelet 集合 (記録 ego 軌跡を subsample し 5m 以内でレーンマッチ)
+  lanelet::Ids driven_lanelet_ids;
+  std::unordered_set<lanelet::Id> driven_set;
+  const std::size_t step = std::max<std::size_t>(1, odometry_stream_.size() / 500);
+  for (std::size_t i = 0; i < odometry_stream_.size(); i += step) {
+    if (
+      const auto lanelet_pose = traffic_simulator::lanelet_wrapper::pose::toLaneletPose(
+        odometry_stream_.getPoseAt(i), false, 5.0)) {
+      if (driven_set.insert(lanelet_pose->lanelet_id).second) {
+        driven_lanelet_ids.push_back(lanelet_pose->lanelet_id);
+      }
+    }
+  }
+
+  if (driven_lanelet_ids.empty()) {
+    /// @note No recorded ego pose matched any lanelet, i.e. the lane matching failed
+    /// wholesale; filtering with an unreliable governing set would silence every signal, so
+    /// keep the recording unfiltered instead.
+    RCLCPP_WARN(
+      logger_, "Governing signal filter skipped: no recorded ego pose matched a lanelet.");
+    return;
+  }
+
+  /// @note An empty governing set with successful lane matching means the driven course has
+  /// no traffic light of its own; every replayed signal is then a cross-traffic signal, so
+  /// filtering down to zero groups is the desired outcome.
+  std::unordered_set<std::int64_t> governing_group_ids;
+  for (const auto & regulatory_element :
+       traffic_simulator::lanelet_wrapper::traffic_lights::autowareTrafficLightsOnPath(
+         driven_lanelet_ids)) {
+    governing_group_ids.insert(regulatory_element->id());
+  }
+
+  const auto [groups_before, groups_after] =
+    traffic_light_stream_->filterGroups(governing_group_ids);
+  RCLCPP_INFO(
+    logger_,
+    "Governing signal filter: %zu driven lanelets, %zu governing groups, group occurrences %zu "
+    "-> %zu.",
+    driven_lanelet_ids.size(), governing_group_ids.size(), groups_before, groups_after);
+}
+#endif
+
+auto PerceptionReproducerSensor::reset() -> void
+{
+  playhead_.reset();
+  dwell_anchor_.reset();
+  detected_objects_stream_.reset();
+  tracked_objects_stream_.reset();
+  trajectory_stream_.reset();
+  odometry_stream_.reset();
+  occupancy_grid_stream_.reset();
+#ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
+  if (traffic_light_stream_) traffic_light_stream_->reset();
+#endif
+}
+
+}  // namespace experimental
+}  // namespace simple_sensor_simulator

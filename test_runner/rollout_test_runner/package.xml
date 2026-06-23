@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>rollout_test_runner</name>
+  <version>0.1.0</version>
+  <description>
+    Closed-loop rollout evaluation runner: replays ego states from a rosbag while Autoware
+    planning/control runs open-loop, then switches to closed-loop vehicle simulation on demand.
+  </description>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rosbag2_cpp</depend>
+  <depend>rosbag2_storage</depend>
+  <depend>std_srvs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>traffic_simulator</depend>
+  <depend>traffic_simulator_msgs</depend>
+
+  <exec_depend>simple_sensor_simulator</exec_depend>
+  <exec_depend>openscenario_visualization</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

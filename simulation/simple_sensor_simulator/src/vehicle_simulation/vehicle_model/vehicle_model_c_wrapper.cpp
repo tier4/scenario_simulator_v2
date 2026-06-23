@@ -1,202 +1,108 @@
-// Self-contained C wrapper for DELAY_STEER_ACC_GEARED_WO_FALL_GUARD.
+// C wrapper around scenario_simulator's SimModelInterface vehicle models.
 //
-// Reproduces the original C++ implementation (sim_model_interface.cpp +
-// sim_model_delay_steer_acc_geared_wo_fall_guard.cpp) without any ROS 2
-// message dependencies.  Only Eigen is required.
+// SimModelInterface 派生を直接使い、複数モデル種別 (ideal_steer_acc /
+// delay_steer_acc_geared_wo_fall_guard / taiga_dyn / ...) をケース別解析で切り替える。
 //
-// Compile (example):
-//   g++ -shared -fPIC -O2 -std=c++17 -I/usr/include/eigen3 \
-//       -o libvehicle_model_wrapper.so vehicle_model_c_wrapper.cpp
+// API:
+//   factory: vm_create_<type>(...)        → VmModel *
+//   common : vm_set_input / vm_step / vm_step_dt / vm_get_x/y/yaw/vx/vy/steer/ax/wz / vm_destroy
+//   reset  : vm_reset_full / vm_reset_state  (末尾に wz を取り、動的モデルの yaw rate を seed)
+//   delay  : vm_set_queues / vm_get_acc_q_size / vm_get_steer_q_size
+//            (delay 系派生のみ動作。ideal 系では no-op / 0 を返す)
 //
-// Delay queue initialization strategy used in vm_reset_full():
-//   1. setState to actual vehicle state at t_k
-//   2. Run warmup_steps with steady-state input (ax, steer_state) to fill queues
-//   3. setState back to original  →  queues have the correct warm-up contents
-//   4. Caller then sets actual command and calls vm_step()
+// このラッパーは ament_target_dependencies(autoware_vehicle_msgs) と
+// sim_model_interface.cpp / 各派生 .cpp を link する必要がある (CMakeLists.txt 参照)。
 
 #include <Eigen/Core>
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <deque>
+#include <memory>
 
-// ---- GearCommand constants (from autoware_vehicle_msgs/msg/GearCommand) ----
-static constexpr uint8_t GEAR_NONE    =  0;
-static constexpr uint8_t GEAR_NEUTRAL =  1;
-static constexpr uint8_t GEAR_DRIVE   =  2;  // and DRIVE_2..DRIVE_18
-static constexpr uint8_t GEAR_REVERSE = 20;
-static constexpr uint8_t GEAR_REVERSE2 = 21;
-static constexpr uint8_t GEAR_PARK    = 22;
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
 
-// ---- State / Input index layout ----------------------------------------
-// IDX:   X=0, Y=1, YAW=2, VX=3, STEER=4, ACCX=5, PEDAL_ACCX=6
-// IDX_U: PEDAL_ACCX_DES=0, GEAR=1, SLOPE_ACCX=2, STEER_DES=3
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_taiga_dyn.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_taiga_x.hpp>
 
-struct SimModel {
-    // ---- params ----
-    double vx_lim_, vx_rate_lim_;
-    double steer_lim_, steer_rate_lim_;
-    double wheelbase_;
-    double acc_tc_, steer_tc_;
-    double steer_db_, steer_bias_;
-    double dbg_acc_, dbg_steer_;
+namespace
+{
+using autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard;
+using autoware::simulator::simple_planning_simulator::SimModelTaigaDyn;
+using autoware::simulator::simple_planning_simulator::SimModelTaigaX;
+using GearCommand = autoware_vehicle_msgs::msg::GearCommand;
+}  // namespace
 
-    // ---- state & input ----
-    Eigen::VectorXd state_;   // dim 7
-    Eigen::VectorXd input_;   // dim 4
-    uint8_t gear_;
-
-    // ---- delay queues ----
-    std::deque<double> acc_q_, steer_q_;
-    double sub_dt_;
-    int acc_q_size_, steer_q_size_;
-
-    // ---- constructor ----
-    SimModel(double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim,
-             double wheelbase, double sub_dt,
-             double acc_delay, double acc_tc,
-             double steer_delay, double steer_tc,
-             double steer_db, double steer_bias,
-             double dbg_acc = 1.0, double dbg_steer = 1.0)
-    : vx_lim_(vx_lim), vx_rate_lim_(vx_rate_lim),
-      steer_lim_(steer_lim), steer_rate_lim_(steer_rate_lim),
-      wheelbase_(wheelbase),
-      acc_tc_(std::max(acc_tc, 0.03)),
-      steer_tc_(std::max(steer_tc, 0.03)),
-      steer_db_(steer_db), steer_bias_(steer_bias),
-      dbg_acc_(std::max(dbg_acc, 0.0)), dbg_steer_(std::max(dbg_steer, 0.0)),
-      sub_dt_(sub_dt), gear_(GEAR_DRIVE)
-    {
-        state_ = Eigen::VectorXd::Zero(7);
-        input_ = Eigen::VectorXd::Zero(4);
-
-        acc_q_size_   = std::max(0, (int)std::round(acc_delay   / sub_dt));
-        steer_q_size_ = std::max(0, (int)std::round(steer_delay / sub_dt));
-        acc_q_.assign(acc_q_size_,   0.0);
-        steer_q_.assign(steer_q_size_, 0.0);
-    }
-
-    void setState(const Eigen::VectorXd & s) { state_ = s; }
-    void setInput(const Eigen::VectorXd & u) { input_ = u; }
-    void setGear(uint8_t g) { gear_ = g; }
-
-    double getX()     const { return state_(0); }
-    double getY()     const { return state_(1); }
-    double getYaw()   const { return state_(2); }
-    double getVx()    const { return state_(3); }
-    double getAx()    const { return state_(5); }
-    double getSteer() const { return state_(4) + steer_bias_; }  // internal + bias
-
-    // ---- calcModel (copied from sim_model_delay_steer_acc_geared_wo_fall_guard.cpp) ----
-    Eigen::VectorXd calcModel(const Eigen::VectorXd & state,
-                              const Eigen::VectorXd & input) const
-    {
-        auto sat = [](double val, double u, double l) {
-            return std::max(std::min(val, u), l);
-        };
-
-        const double vel       = sat(state(3), vx_lim_, -vx_lim_);
-        const double pedal_acc = sat(state(6), vx_rate_lim_, -vx_rate_lim_);
-        const double yaw       = state(2);
-        const double steer_st  = state(4);
-        const double pa_des    = sat(input(0), vx_rate_lim_, -vx_rate_lim_) * dbg_acc_;
-        const double sd_sat    = sat(input(3), steer_lim_, -steer_lim_) * dbg_steer_;
-
-        // steer_diff uses getSteer() = state(4) + bias
-        const double steer_measured = steer_st + steer_bias_;
-        double steer_diff = steer_measured - sd_sat;
-        if      (steer_diff >  steer_db_) steer_diff -= steer_db_;
-        else if (steer_diff < -steer_db_) steer_diff += steer_db_;
-        else                              steer_diff  = 0.0;
-        const double steer_rate = sat(-steer_diff / steer_tc_, steer_rate_lim_, -steer_rate_lim_);
-
-        // longitudinal dynamics (gear-dependent)
-        const double gear  = input(1);
-        const double slope = input(2);
-        double d_vx = 0.0;
-        if (pedal_acc >= 0.0) {
-            if      (gear == GEAR_NONE || gear == GEAR_PARK) d_vx = 0.0;
-            else if (gear == GEAR_NEUTRAL)                   d_vx = slope;
-            else if (gear == GEAR_REVERSE || gear == GEAR_REVERSE2)
-                                                             d_vx = -pedal_acc + slope;
-            else                                             d_vx =  pedal_acc + slope;
-        } else {
-            if      (vel > 0.0)  d_vx = pedal_acc + slope;
-            else if (vel < 0.0)  d_vx = -pedal_acc + slope;
-            else if (-pedal_acc >= std::abs(slope)) d_vx = 0.0;
-            else                 d_vx = slope;
-        }
-
-        Eigen::VectorXd ds = Eigen::VectorXd::Zero(7);
-        ds(0) = vel * std::cos(yaw);
-        ds(1) = vel * std::sin(yaw);
-        ds(2) = vel * std::tan(steer_st) / wheelbase_;
-        ds(3) = d_vx;
-        ds(4) = steer_rate;
-        ds(5) = 0.0;   // ACCX updated after Euler in update()
-        ds(6) = -(pedal_acc - pa_des) / acc_tc_;
-        return ds;
-    }
-
-    // ---- update (Euler, copied from sim_model_delay_steer_acc_geared_wo_fall_guard.cpp) ----
-    void update(double dt)
-    {
-        // delay queue
-        Eigen::VectorXd delayed = input_;
-        acc_q_.push_back(input_(0));
-        delayed(0) = acc_q_.front(); acc_q_.pop_front();
-        steer_q_.push_back(input_(3));
-        delayed(3) = steer_q_.front(); steer_q_.pop_front();
-        delayed(1) = input_(1);  // GEAR (no delay)
-        delayed(2) = input_(2);  // SLOPE (no delay)
-
-        const auto prev_state = state_;
-        // Euler integration
-        state_ += calcModel(state_, delayed) * dt;
-
-        // velocity limit
-        state_(3) = std::max(-vx_lim_, std::min(state_(3), vx_lim_));
-
-        // stop condition
-        if (prev_state(3) * state_(3) <= 0.0 &&
-            -state_(6) >= std::abs(delayed(2)))
-        {
-            state_(3) = 0.0;
-        }
-
-        // ACCX = actual acceleration = Δvx/dt
-        state_(5) = (state_(3) - prev_state(3)) / dt;
-    }
+enum class VmModelType {
+  IDEAL_STEER_ACC = 0,
+  DELAY_STEER_ACC_GEARED_WO_FALL_GUARD = 1,
+  TAIGA_DYN = 2,
+  TAIGA_X = 3,
 };
 
-// ---- per-step reset with queue warmup ----
-// steer_actual: measured steering angle (getSteer() = internal + bias)
-static void reset_full(SimModel * m,
-                       double x, double y, double yaw, double vx,
-                       double steer_actual, double ax)
+struct VmModel
 {
-    double steer_state = steer_actual - m->steer_bias_;
+  VmModelType type;
+  std::unique_ptr<SimModelInterface> impl;
+  double sub_dt;
+  // delay 系 (wo_fall_guard / taiga_dyn) 用。reset_full の warmup と vm_set_queues の
+  // バイアス計算で使う。
+  double steer_bias = 0.0;
+};
 
-    // Initial state
-    Eigen::VectorXd s(7);
-    s << x, y, yaw, vx, steer_state, ax, ax;
-    m->setState(s);
-    m->setGear(GEAR_DRIVE);
+// --- internal helpers ---------------------------------------------------
+// delay queue を持つ派生 (wo_fall_guard / taiga_dyn) を横断して扱うためのヘルパ。
+// SimModelInterface には queue API が無いため、queue API を公開する派生へ
+// dynamic_cast し、見つかった派生に対し fn を適用する (見つからなければ dflt)。
+template <typename R, typename Fn>
+static R for_queue_model(VmModel * m, R dflt, Fn fn)
+{
+  if (auto * w = dynamic_cast<SimModelDelaySteerAccGearedWoFallGuard *>(m->impl.get())) {
+    return fn(w);
+  }
+  if (auto * t = dynamic_cast<SimModelTaigaDyn *>(m->impl.get())) {
+    return fn(t);
+  }
+  return dflt;
+}
 
-    // Warmup with steady-state input to fill delay queues.
-    //   acc_queue  ← ax          (so delayed_acc  = ax)
-    //   steer_queue← steer_state (so delayed_steer = steer_state)
-    Eigen::VectorXd wu_input(4);
-    wu_input << ax, (double)GEAR_DRIVE, 0.0, steer_state;
-    m->setInput(wu_input);
+static int acc_queue_size(VmModel * m)
+{
+  return for_queue_model(m, 0, [](auto * model) { return model->getAccQueueSize(); });
+}
 
-    int warmup = std::max(m->acc_q_size_, m->steer_q_size_);
-    for (int i = 0; i < warmup; i++) {
-        m->update(m->sub_dt_);
-    }
+static int steer_queue_size(VmModel * m)
+{
+  return for_queue_model(m, 0, [](auto * model) { return model->getSteerQueueSize(); });
+}
 
-    // Reset state back to actual  (queues retain warmed-up contents).
-    m->setState(s);
+static void set_input_queues(
+  VmModel * m, const std::deque<double> & acc_dq, const std::deque<double> & steer_dq)
+{
+  for_queue_model(m, 0, [&](auto * model) {
+    model->setInputQueues(acc_dq, steer_dq);
+    return 0;  // ideal 系等は queue 無し → no-op
+  });
+}
+
+// 構築済み state ベクタ s で delay 系モデルをリセットし、定常入力で delay queue を充填する
+// (state 設定 → 定常入力で queue warmup → state 復元)。delay 系派生で共通。
+static void warmup_delay_queues(
+  VmModel * m, const Eigen::VectorXd & s, double ax, double steer_state)
+{
+  m->impl->setState(s);
+  m->impl->setGear(GearCommand::DRIVE);
+
+  Eigen::VectorXd wu(4);
+  wu << ax, static_cast<double>(GearCommand::DRIVE), 0.0, steer_state;
+  m->impl->setInput(wu);
+  const int warmup = std::max(acc_queue_size(m), steer_queue_size(m));
+  for (int i = 0; i < warmup; ++i) m->impl->update(m->sub_dt);
+
+  m->impl->setState(s);  // restore actual state (queues now contain warm-up history)
 }
 
 // ============================================================
@@ -204,73 +110,210 @@ static void reset_full(SimModel * m,
 // ============================================================
 extern "C" {
 
-SimModel * vm_create(
-    double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim,
-    double wheelbase, double sub_dt,
-    double acc_delay, double acc_tc,
-    double steer_delay, double steer_tc,
-    double steer_dead_band, double steer_bias)
+// ---- factories (model-specific) ---------------------------------------
+
+VmModel * vm_create_ideal_steer_acc(double wheelbase, double sub_dt)
 {
-    return new SimModel(vx_lim, steer_lim, vx_rate_lim, steer_rate_lim,
-                        wheelbase, sub_dt,
-                        acc_delay, acc_tc,
-                        steer_delay, steer_tc,
-                        steer_dead_band, steer_bias,
-                        1.0, 1.0);
+  auto * m = new VmModel{};
+  m->type = VmModelType::IDEAL_STEER_ACC;
+  m->impl = std::make_unique<SimModelIdealSteerAcc>(wheelbase);
+  m->sub_dt = sub_dt;
+  m->steer_bias = 0.0;
+  return m;
 }
 
-void vm_reset_full(SimModel * m,
-                   double x, double y, double yaw, double vx,
-                   double steer_actual, double ax)
+VmModel * vm_create_delay_steer_acc_geared_wo_fall_guard(
+  double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
+  double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
+  double steer_time_constant, double steer_dead_band, double steer_bias,
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
+  double lon_lat_coupling)
 {
-    reset_full(m, x, y, yaw, vx, steer_actual, ax);
+  auto * m = new VmModel{};
+  m->type = VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD;
+  m->impl = std::make_unique<SimModelDelaySteerAccGearedWoFallGuard>(
+    vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
+    acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
+    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us, brake_time_constant, lon_drag_c0,
+    lon_drag_c1, lon_drag_c2, lon_lat_coupling);
+  m->sub_dt = sub_dt;
+  m->steer_bias = steer_bias;
+  return m;
 }
 
-void vm_set_input(SimModel * m, double accel_des, double steer_des)
+VmModel * vm_create_taiga_dyn(
+  double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
+  double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
+  double steer_time_constant, double steer_dead_band, double steer_bias,
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double mass,
+  double inertia_z, double lf, double lr, double cornering_stiffness_front,
+  double cornering_stiffness_rear, double vx_min_dyn)
 {
-    Eigen::VectorXd u(4);
-    u << accel_des, (double)GEAR_DRIVE, 0.0, steer_des;
-    m->setInput(u);
+  auto * m = new VmModel{};
+  m->type = VmModelType::TAIGA_DYN;
+  m->impl = std::make_unique<SimModelTaigaDyn>(
+    vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
+    acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
+    debug_acc_scaling_factor, debug_steer_scaling_factor, mass, inertia_z, lf, lr,
+    cornering_stiffness_front, cornering_stiffness_rear, vx_min_dyn);
+  m->sub_dt = sub_dt;
+  m->steer_bias = steer_bias;
+  return m;
 }
 
-void vm_step(SimModel * m) { m->update(m->sub_dt_); }
-
-// Reset state only — queues are NOT touched.
-// Call vm_set_queues() afterward to supply actual past command history.
-void vm_reset_state(SimModel * m,
-                    double x, double y, double yaw, double vx,
-                    double steer_actual, double ax)
+VmModel * vm_create_taiga_x(
+  double wheelbase, double track_width, double mass, double inertia_z, double cg_offset_x,
+  double max_steer, double max_accel, double max_brake, double wheel_radius, double sub_dt,
+  double fixed_dt)
 {
-    double steer_state = steer_actual - m->steer_bias_;
-    Eigen::VectorXd s(7);
-    s << x, y, yaw, vx, steer_state, ax, ax;
-    m->setState(s);
-    m->setGear(GEAR_DRIVE);
+  auto * m = new VmModel{};
+  m->type = VmModelType::TAIGA_X;
+  m->impl = std::make_unique<SimModelTaigaX>(
+    wheelbase, track_width, mass, inertia_z, cg_offset_x, max_steer, max_accel, max_brake,
+    wheel_radius, fixed_dt);
+  m->sub_dt = sub_dt;
+  m->steer_bias = 0.0;
+  return m;
 }
 
-// Overwrite delay queue contents with actual past command history.
-// acc_q[0..n_acc-1]   : accel commands oldest→newest (n_acc == acc_q_size)
-// steer_q[0..n_steer-1]: steer commands oldest→newest (n_steer == steer_q_size)
-void vm_set_queues(SimModel * m,
-                   const double * acc_q,   int n_acc,
-                   const double * steer_q, int n_steer)
+void vm_destroy(VmModel * m) { delete m; }
+
+// ---- input --------------------------------------------------------------
+
+void vm_set_input(VmModel * m, double accel_des, double steer_des)
 {
-    m->acc_q_.clear();
-    for (int i = 0; i < n_acc;   ++i) m->acc_q_.push_back(acc_q[i]);
-    m->steer_q_.clear();
-    for (int i = 0; i < n_steer; ++i) m->steer_q_.push_back(steer_q[i]);
+  Eigen::VectorXd u;
+  switch (m->type) {
+    case VmModelType::IDEAL_STEER_ACC:
+      // IDX_U: AX_DES=0, STEER_DES=1
+      u.resize(2);
+      u << accel_des, steer_des;
+      break;
+    case VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+    case VmModelType::TAIGA_DYN:
+    case VmModelType::TAIGA_X:
+      // IDX_U: (PEDAL_)ACCX_DES=0, GEAR=1, SLOPE_ACCX=2, STEER_DES=3
+      u.resize(4);
+      u << accel_des, static_cast<double>(GearCommand::DRIVE), 0.0, steer_des;
+      break;
+  }
+  m->impl->setInput(u);
+  m->impl->setGear(GearCommand::DRIVE);
 }
 
-int vm_get_acc_q_size(SimModel * m)   { return m->acc_q_size_; }
-int vm_get_steer_q_size(SimModel * m) { return m->steer_q_size_; }
+// ---- integration --------------------------------------------------------
 
-double vm_get_x(SimModel * m)     { return m->getX(); }
-double vm_get_y(SimModel * m)     { return m->getY(); }
-double vm_get_yaw(SimModel * m)   { return m->getYaw(); }
-double vm_get_vx(SimModel * m)    { return m->getVx(); }
-double vm_get_steer(SimModel * m) { return m->getSteer(); }
-double vm_get_ax(SimModel * m)    { return m->getAx(); }
+void vm_step(VmModel * m) { m->impl->update(m->sub_dt); }
 
-void vm_destroy(SimModel * m) { delete m; }
+// 任意 dt で 1 step 進める。端数積分 (interval < sub_dt) に使う。
+// 注意 (delay 系派生): update() は dt に依らず必ず delay queue を 1 tick (= 構築時 sub_dt
+// 相当) push/pop するため、dt < sub_dt で呼ぶと「物理時間は dt 秒」「遅延 queue は sub_dt
+// 秒分」進むという位相ずれが発生する。run_rollout は各反復冒頭で vm_set_queues により
+// queue を実履歴で再構築するため累積はしないが、ステップ内では delay 応答が ~sub_dt だけ
+// 短く見える系統誤差を持つ。
+void vm_step_dt(VmModel * m, double dt) { m->impl->update(dt); }
 
-} // extern "C"
+// ---- state reset (full = state + delay-queue warmup) -------------------
+// 末尾 wz は動的モデル (taiga_dyn) の yaw rate state を実測値で seed するために使う。
+// 静的 (kinematic) モデルでは wz は無視される。
+
+void vm_reset_full(
+  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax, double wz)
+{
+  switch (m->type) {
+    case VmModelType::IDEAL_STEER_ACC: {
+      Eigen::VectorXd s(4);
+      s << x, y, yaw, vx;
+      m->impl->setState(s);
+      break;
+    }
+    case VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD: {
+      const double steer_state = steer_actual - m->steer_bias;
+      Eigen::VectorXd s(7);
+      s << x, y, yaw, vx, steer_state, ax, ax;
+      warmup_delay_queues(m, s, ax, steer_state);
+      break;
+    }
+    case VmModelType::TAIGA_DYN: {
+      const double steer_state = steer_actual - m->steer_bias;
+      // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX, VY, WZ]
+      Eigen::VectorXd s(9);
+      s << x, y, yaw, vx, steer_state, ax, ax, 0.0, wz;
+      warmup_delay_queues(m, s, ax, steer_state);
+      break;
+    }
+    case VmModelType::TAIGA_X: {
+      // PhysX-backed: teleport the chassis (no delay queue to warm up).
+      if (auto * tx = dynamic_cast<SimModelTaigaX *>(m->impl.get())) {
+        tx->setFullState(x, y, yaw, vx, 0.0, wz, ax, steer_actual - m->steer_bias);
+      }
+      break;
+    }
+  }
+}
+
+// ---- state reset (state only; queues untouched) ------------------------
+
+void vm_reset_state(
+  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax, double wz)
+{
+  switch (m->type) {
+    case VmModelType::IDEAL_STEER_ACC: {
+      Eigen::VectorXd s(4);
+      s << x, y, yaw, vx;
+      m->impl->setState(s);
+      break;
+    }
+    case VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD: {
+      const double steer_state = steer_actual - m->steer_bias;
+      Eigen::VectorXd s(7);
+      s << x, y, yaw, vx, steer_state, ax, ax;
+      m->impl->setState(s);
+      m->impl->setGear(GearCommand::DRIVE);
+      break;
+    }
+    case VmModelType::TAIGA_DYN: {
+      const double steer_state = steer_actual - m->steer_bias;
+      Eigen::VectorXd s(9);
+      s << x, y, yaw, vx, steer_state, ax, ax, 0.0, wz;
+      m->impl->setState(s);
+      m->impl->setGear(GearCommand::DRIVE);
+      break;
+    }
+    case VmModelType::TAIGA_X: {
+      if (auto * tx = dynamic_cast<SimModelTaigaX *>(m->impl.get())) {
+        tx->setFullState(x, y, yaw, vx, 0.0, wz, ax, steer_actual - m->steer_bias);
+      }
+      break;
+    }
+  }
+}
+
+// ---- delay queue API (delay 系派生のみ動作) ----------------------------
+
+void vm_set_queues(
+  VmModel * m, const double * acc_q, int n_acc, const double * steer_q, int n_steer)
+{
+  std::deque<double> acc_dq(acc_q, acc_q + n_acc);
+  std::deque<double> steer_dq(steer_q, steer_q + n_steer);
+  set_input_queues(m, acc_dq, steer_dq);  // ideal 系等は queue 無し → no-op
+}
+
+int vm_get_acc_q_size(VmModel * m) { return acc_queue_size(m); }
+
+int vm_get_steer_q_size(VmModel * m) { return steer_queue_size(m); }
+
+// ---- getters (SimModelInterface virtual 経由) --------------------------
+
+double vm_get_x(VmModel * m) { return m->impl->getX(); }
+double vm_get_y(VmModel * m) { return m->impl->getY(); }
+double vm_get_yaw(VmModel * m) { return m->impl->getYaw(); }
+double vm_get_vx(VmModel * m) { return m->impl->getVx(); }
+double vm_get_vy(VmModel * m) { return m->impl->getVy(); }
+double vm_get_steer(VmModel * m) { return m->impl->getSteer(); }
+double vm_get_ax(VmModel * m) { return m->impl->getAx(); }
+// yaw rate (wz)。kinematic モデルでは steer/vx から導出、taiga_dyn では yaw rate state を返す。
+double vm_get_wz(VmModel * m) { return m->impl->getWz(); }
+
+}  // extern "C"

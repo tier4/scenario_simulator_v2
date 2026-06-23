@@ -17,12 +17,16 @@
 
 namespace traffic_simulator
 {
-SimulationClock::SimulationClock(bool use_sim_time, double realtime_factor, double frame_rate)
+SimulationClock::SimulationClock(
+  bool use_sim_time, double realtime_factor, double frame_rate,
+  double initial_simulation_ros_time)
 : rclcpp::Clock(RCL_ROS_TIME),
   use_sim_time(use_sim_time),
   realtime_factor(realtime_factor),
   frame_rate_(frame_rate),
-  time_at_the_start_of_the_simulator_(use_sim_time ? 0 : now().nanoseconds())
+  time_at_the_start_of_the_simulator_(
+    use_sim_time ? static_cast<int64_t>(initial_simulation_ros_time * 1e9) : now().nanoseconds(),
+    RCL_ROS_TIME)
 {
 }
 

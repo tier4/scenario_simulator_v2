@@ -42,9 +42,11 @@ public:
   SimModelInterface(int dim_x, int dim_u);
 
   /**
-   * @brief destructor
+   * @brief virtual destructor — base for unique_ptr<SimModelInterface> ownership
+   *        (e.g. vehicle_model_c_wrapper.cpp VmModel). Non-virtual would invoke
+   *        UB on delete via base pointer; deque<double> in derivatives would leak.
    */
-  ~SimModelInterface() = default;
+  virtual ~SimModelInterface() = default;
 
   /**
    * @brief get state vector of model

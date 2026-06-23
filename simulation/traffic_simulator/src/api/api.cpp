@@ -130,6 +130,10 @@ auto API::updateFrame() -> bool
     THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
   }
 
+  if (ego_bag_replayer_) {
+    ego_bag_replayer_->update(getCurrentTime(), *entity_manager_ptr_);
+  }
+
   if (!updateEntitiesStatusInSim()) {
     return false;
   }

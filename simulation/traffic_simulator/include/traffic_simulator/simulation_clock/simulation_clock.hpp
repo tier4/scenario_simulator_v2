@@ -23,7 +23,9 @@ namespace traffic_simulator
 class SimulationClock : rclcpp::Clock
 {
 public:
-  explicit SimulationClock(bool use_sim_time, double realtime_factor, double frame_rate);
+  explicit SimulationClock(
+    bool use_sim_time, double realtime_factor, double frame_rate,
+    double initial_simulation_ros_time = 0.0);
 
   auto getCurrentRosTime() -> rclcpp::Time;
 

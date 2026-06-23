@@ -49,6 +49,18 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     },
     [this](auto &&... xs) { return updateStepTime(std::forward<decltype(xs)>(xs)...); })
 {
+  const auto replay_bag_path =
+    common::getParameter<std::string>(get_node_parameters_interface(), "replay_bag_path", "");
+  if (not replay_bag_path.empty()) {
+    const auto replay_start_time =
+      common::getParameter<double>(get_node_parameters_interface(), "replay_start_time", 0.0);
+    PerceptionReproducerSensor::ReplayConfig replay_config;
+    replay_config.use_position_based_replay = common::getParameter<bool>(
+      get_node_parameters_interface(), "replay_use_position_based", false);
+    sensor_sim_.attachPerceptionReproducerSensor(
+      replay_bag_path, replay_start_time, replay_config, *this);
+    sensor_sim_.setSuppressDetectionSensor(true);
+  }
 }
 
 ScenarioSimulator::~ScenarioSimulator() {}
@@ -81,6 +93,9 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   pedestrians_.clear();
   misc_objects_.clear();
   entity_status_.clear();
+
+  sensor_sim_.resetPerceptionReproducerSensors();
+
   return res;
 }
 
@@ -112,7 +127,8 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
       return status;
     });
   sensor_sim_.updateSensorFrame(
-    current_simulation_time_, current_ros_time_, entity_status, traffic_signals_states_);
+    current_simulation_time_, current_scenario_time_, current_ros_time_, entity_status,
+    traffic_signals_states_);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
   return res;

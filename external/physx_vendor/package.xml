@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>physx_vendor</name>
+  <version>5.6.1</version>
+  <description>
+    Vendor package that builds and installs the NVIDIA PhysX SDK
+    (https://github.com/NVIDIA-Omniverse/PhysX) so that downstream packages can
+    depend on it through find_package(physx_vendor). Exposes PHYSX_SDK_DIR /
+    PHYSX_LIB_DIR pointing at the installed SDK (headers, static libraries and
+    the vehicle snippet sources).
+  </description>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Tools needed by the from-source PhysX build (generate_projects.sh + packman). -->
+  <build_depend>git</build_depend>
+  <build_depend>curl</build_depend>
+  <build_depend>python3</build_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
