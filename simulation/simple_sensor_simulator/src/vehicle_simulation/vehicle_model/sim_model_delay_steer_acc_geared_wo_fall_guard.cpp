@@ -25,7 +25,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double steer_time_constant, double steer_dead_band, double steer_bias,
   double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
   double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
-  double lon_lat_coupling)
+  double lon_lat_coupling, int n_substep)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -49,7 +49,8 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   lon_drag_c0_(lon_drag_c0),
   lon_drag_c1_(lon_drag_c1),
   lon_drag_c2_(lon_drag_c2),
-  lon_lat_coupling_(lon_lat_coupling)
+  lon_lat_coupling_(lon_lat_coupling),
+  n_substep_(std::max(n_substep, 1))
 {
   initializeInputQueue(dt);
 }
@@ -97,6 +98,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
   Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
 
+  // Delay queue advances once per update() call regardless of n_substep_.
   acc_input_queue_.push_back(input_(IDX_U::PEDAL_ACCX_DES));
   delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_input_queue_.front();
   acc_input_queue_.pop_front();
@@ -107,17 +109,19 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   delayed_input(IDX_U::SLOPE_ACCX) = input_(IDX_U::SLOPE_ACCX);
 
   const auto prev_state = state_;
-  updateEuler(dt, delayed_input);
-  // we cannot use updateRungeKutta() because the differentiability or the continuity condition is
-  // not satisfied, but we can use Runge-Kutta method with code reconstruction.
+  const double sub_dt = dt / n_substep_;
+  for (int i = 0; i < n_substep_; ++i) {
+    // we cannot use updateRungeKutta() because the differentiability or the continuity
+    // condition is not satisfied, but we can use Runge-Kutta method with code reconstruction.
+    updateEuler(sub_dt, delayed_input);
+    // take velocity limit after each sub-step
+    state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
+  }
 
-  // take velocity limit explicitly
-  state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
-
+  // Stop condition: detect zero crossing over the full dt window using the outer prev_state.
   if (
     prev_state(IDX::VX) * state_(IDX::VX) <= 0.0 &&
     -state_(IDX::PEDAL_ACCX) >= std::abs(delayed_input(IDX_U::SLOPE_ACCX))) {
-    // stop condition is satisfied
     state_(IDX::VX) = 0.0;
   }
 

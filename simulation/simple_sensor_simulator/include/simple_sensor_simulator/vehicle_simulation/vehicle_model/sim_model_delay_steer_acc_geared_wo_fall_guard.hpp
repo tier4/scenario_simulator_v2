@@ -65,7 +65,7 @@ public:
     double steer_time_constant, double steer_dead_band, double steer_bias,
     double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
     double brake_time_constant = 0.0, double lon_drag_c0 = 0.0, double lon_drag_c1 = 0.0,
-    double lon_drag_c2 = 0.0, double lon_lat_coupling = 0.0);
+    double lon_drag_c2 = 0.0, double lon_lat_coupling = 0.0, int n_substep = 1);
 
   /**
    * @brief default destructor
@@ -122,6 +122,7 @@ private:
   const double lon_drag_c1_;                 //!< @brief running-resistance velocity-linear p1 [1/s]
   const double lon_drag_c2_;                 //!< @brief running-resistance velocity-quadratic p2 [1/m]
   const double lon_lat_coupling_;            //!< @brief corner decel coeff: a_target += c·(vx·ω)² [s²/m]
+  const int n_substep_;                      //!< @brief Euler sub-steps per update() call (>= 1)
 
   /**
    * @brief steady-state yaw rate including understeer and steer bias:
