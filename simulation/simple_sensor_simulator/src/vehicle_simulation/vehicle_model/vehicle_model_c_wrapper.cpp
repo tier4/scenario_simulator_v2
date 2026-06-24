@@ -316,4 +316,82 @@ double vm_get_ax(VmModel * m) { return m->impl->getAx(); }
 // yaw rate (wz)。kinematic モデルでは steer/vx から導出、taiga_dyn では yaw rate state を返す。
 double vm_get_wz(VmModel * m) { return m->impl->getWz(); }
 
+// ---- batch integration for open-loop tuning hotpath --------------------
+// Integrate n_intervals command intervals from k0, snapping state at each
+// horizon checkpoint.  All array arguments are full-dataset pointers; the
+// k0 argument shifts the base index so per-k0 slicing in Python is avoided.
+//
+// horizons[0..n_horizons-1]: sorted ascending interval-tick offsets (e.g. [20,40]).
+//   A checkpoint fires after completing interval j when horizons[h_idx]==j+1.
+// n_full[k0+j]: integer sub-steps for interval j (int32).
+// rem[k0+j]:    fractional remainder [s]; integrated if > rem_eps.
+// steer_out:    raw getSteer() value (= steer_state + steer_bias; matches vm_get_steer).
+void vm_integrate_to_horizons(
+  VmModel * m,
+  int n_intervals,
+  int k0,
+  const double * accel_des,
+  const double * steer_des,
+  const int * n_full,
+  const double * rem,
+  double rem_eps,
+  int n_horizons,
+  const int * horizons,
+  double * x_out,
+  double * y_out,
+  double * yaw_out,
+  double * vx_out,
+  double * ax_out,
+  double * steer_out)
+{
+  // Build type-specific input vector template once.
+  Eigen::VectorXd u;
+  bool is_ideal = false;
+  switch (m->type) {
+    case VmModelType::IDEAL_STEER_ACC:
+      u.resize(2);
+      is_ideal = true;
+      break;
+    default:
+      u.resize(4);
+      u(1) = static_cast<double>(GearCommand::DRIVE);
+      u(2) = 0.0;
+      break;
+  }
+  m->impl->setGear(GearCommand::DRIVE);
+
+  int h_idx = 0;
+  for (int j = 0; j < n_intervals && h_idx < n_horizons; ++j) {
+    const int idx = k0 + j;
+    if (is_ideal) {
+      u(0) = accel_des[idx];
+      u(1) = steer_des[idx];
+    } else {
+      u(0) = accel_des[idx];
+      u(3) = steer_des[idx];
+    }
+    m->impl->setInput(u);
+
+    const int nf = n_full[idx];
+    for (int s = 0; s < nf; ++s) {
+      m->impl->update(m->sub_dt);
+    }
+    const double r = rem[idx];
+    if (r > rem_eps) {
+      m->impl->update(r);
+    }
+
+    // Snap at horizon checkpoints (horizons are 1-indexed interval counts).
+    while (h_idx < n_horizons && horizons[h_idx] == j + 1) {
+      x_out[h_idx]     = m->impl->getX();
+      y_out[h_idx]     = m->impl->getY();
+      yaw_out[h_idx]   = m->impl->getYaw();
+      vx_out[h_idx]    = m->impl->getVx();
+      ax_out[h_idx]    = m->impl->getAx();
+      steer_out[h_idx] = m->impl->getSteer();
+      ++h_idx;
+    }
+  }
+}
+
 }  // extern "C"
