@@ -319,7 +319,11 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const double pedal_acc = std::clamp(state(IDX::PEDAL_ACCX), -brake_lim_, acc_lim_);
   const double yaw = state(IDX::YAW);
   // Prevent NaN explosion in std::tan() during Runge-Kutta integration steps
-  const double current_steer = std::clamp(state(IDX::STEER), -steer_lim_, steer_lim_);
+  const double current_steer = [&]() {
+    const double upper = steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
+    const double lower = -steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
+    return std::clamp(state(IDX::STEER), std::min(upper, lower), std::max(upper, lower));
+  }();
 
   const double pedal_acc_des = input(IDX_U::PEDAL_ACCX_DES);
   const double steer_motor_des = input(IDX_U::STEER_DES);
