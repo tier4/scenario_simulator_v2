@@ -73,6 +73,29 @@ TRANSIENT_LOCAL_QOS = QoSProfile(
 )
 
 
+# =============================================================================
+# Vehicle tuning defaults -- each key is also exposed as a ROS 2 parameter, so
+# any of these can be overridden at launch without editing this file.
+# =============================================================================
+TUNING = {
+    # --- Server-side input shaping (applied via the ported per-vehicle API) ---
+    # Steering rate limit on normalized steer [-1, 1]. Units: 1/s. <=0 disables.
+    "steer_rate_limit_1ps": 20,
+    # Steering first-order lag time constant. Units: s. <=0 disables.
+    "steer_first_order_lag_tau_s": 0.2,
+    # Acceleration jerk limits for constant-acceleration mode. Units: m/s^3. <=0 disables.
+    "accel_jerk_limit_pos_mps3": 4.0,
+    "accel_jerk_limit_neg_mps3": 6.0,
+    # Acceleration first-order lag time constant. Units: s. <=0 disables.
+    "accel_first_order_lag_tau_s": 0.2,
+
+    # --- Tyre friction multipliers (applied on top of the blueprint) ---
+    # Set to 1.0 to leave unchanged. Front/rear split is by wheel offset.x.
+    "front_friction_force_multiplier_mul": 1.0,
+    "rear_friction_force_multiplier_mul": 1.0,
+}
+
+
 # --- Coordinate helpers ----------------------------------------------------
 def normalize_angle(a):
     while a > math.pi:
@@ -113,6 +136,15 @@ def map_pose_to_carla_spawn(map_x, map_y, map_yaw_rad):
     )
 
 
+# --- Tyre tuning helper ----------------------------------------------------
+def _front_axle_indices(wheels):
+    """Front wheels = the half with the largest offset.x (forward)."""
+    xs = [(i, float(getattr(w.offset, "x", 0.0))) for i, w in enumerate(wheels)]
+    xs.sort(key=lambda t: t[1], reverse=True)
+    n_front = max(1, len(wheels) // 2)
+    return {i for i, _ in xs[:n_front]}
+
+
 # --- Bridge node -----------------------------------------------------------
 class CarlaBridge(Node):
     def __init__(self):
@@ -122,6 +154,14 @@ class CarlaBridge(Node):
         self.hz_rate = self.declare_parameter("hz_rate", 30).value
 
         self.client = None
+
+        # Vehicle tuning knobs: declare each TUNING default as a ROS 2 parameter
+        # so it can be overridden at launch, then snapshot the resolved values.
+        self.tuning = {
+            key: float(self.declare_parameter(key, float(default)).value)
+            for key, default in TUNING.items()
+        }
+
         self.world = self._get_world()
         self._configure_sync_mode()
 
@@ -190,6 +230,8 @@ class CarlaBridge(Node):
                 time.sleep(CONNECT_RETRY_INTERVAL_S)
 
     def _configure_sync_mode(self):
+        # NOTE: CARLA's in-engine ROS 2 bridge is enabled by the `--ros2`
+        # CLI flag, not by a WorldSettings attribute.
         settings = self.world.get_settings()
         settings.synchronous_mode = True
         settings.fixed_delta_seconds = 1.0 / float(self.hz_rate)
@@ -199,6 +241,75 @@ class CarlaBridge(Node):
             f"World sync mode at {self.hz_rate} Hz "
             f"(dt={settings.fixed_delta_seconds:.3f}s)"
         )
+
+    # --- Vehicle tuning ----------------------------------------------------
+    def _apply_tuning(self, vehicle):
+        """Apply the tuning knobs to `vehicle`: tyre physics + input shaping.
+
+        Mirrors apply_tuning() in odaiba_vehicle_tuning.py. Called after every
+        spawn so tuning survives /initialpose respawns. Never raises -- a
+        missing API or physics failure is logged and swallowed so the bridge
+        keeps running.
+        """
+        t = self.tuning
+
+        # --- Tyre friction (lateral grip) ---
+        # friction_force_multiplier is applied through the per-wheel runtime API
+        # (set_wheel_friction_force_multiplier), which writes the live Chaos sim
+        # wheel WITHOUT rebuilding the physics state. So 1.0 is a true no-op and
+        # any other value has no side effect beyond the friction change itself.
+        # Front/rear split is by wheel offset.x. (cornering_stiffness is not tuned;
+        # the engine has no runtime setter for it, so it would require a physics
+        # rebuild via apply_physics_control, which perturbs the freshly spawned ego.)
+        try:
+            pc = vehicle.get_physics_control()   # read-only snapshot of base values
+            wheels = list(pc.wheels)
+            front_idx = _front_axle_indices(wheels)
+            for i, w in enumerate(wheels):
+                front = i in front_idx
+                ff_mul = t["front_friction_force_multiplier_mul"] if front else t["rear_friction_force_multiplier_mul"]
+                if ff_mul != 1.0 and hasattr(w, "friction_force_multiplier"):
+                    vehicle.set_wheel_friction_force_multiplier(
+                        i, float(w.friction_force_multiplier) * float(ff_mul))
+            w0 = vehicle.get_physics_control().wheels[0]
+            self.get_logger().info(
+                "tuning tyre: wheel[0] friction_force_multiplier=%.3f (after apply)"
+                % float(w0.friction_force_multiplier)
+            )
+        except AttributeError as ex:
+            self.get_logger().warn(
+                f"set_wheel_friction_force_multiplier not available ({ex!r}); the "
+                "'carla' package is likely not the one built from the odaiba-carla "
+                "repo. Tyre friction tuning was skipped."
+            )
+        except Exception as ex:  # noqa: BLE001 -- never let tuning crash the bridge
+            self.get_logger().warn(f"tyre friction tuning failed: {ex!r}")
+
+        # --- Server-side input shaping (steer + acceleration) ---
+        try:
+            vehicle.set_steer_rate_limit(float(t["steer_rate_limit_1ps"]))
+            vehicle.set_steer_first_order_lag_tau(float(t["steer_first_order_lag_tau_s"]))
+            vehicle.set_constant_acceleration_jerk_limit(
+                float(t["accel_jerk_limit_pos_mps3"]), float(t["accel_jerk_limit_neg_mps3"])
+            )
+            vehicle.set_constant_acceleration_first_order_lag_tau(
+                float(t["accel_first_order_lag_tau_s"])
+            )
+            self.get_logger().info(
+                "tuning input shaping: steer_rate=%.1f/s steer_tau=%.3fs "
+                "jerk=+%.1f/-%.1f m/s^3 accel_tau=%.3fs"
+                % (t["steer_rate_limit_1ps"], t["steer_first_order_lag_tau_s"],
+                   t["accel_jerk_limit_pos_mps3"], t["accel_jerk_limit_neg_mps3"],
+                   t["accel_first_order_lag_tau_s"])
+            )
+        except AttributeError as ex:
+            self.get_logger().warn(
+                f"input-shaping API not available ({ex!r}); the 'carla' package "
+                "is likely not the one built from the odaiba-carla repo. "
+                "Tuning of steer/accel was skipped."
+            )
+        except Exception as ex:  # noqa: BLE001
+            self.get_logger().warn(f"input-shaping tuning failed: {ex!r}")
 
     # --- Ego spawn / teleport ---------------------------------------------
     def _destroy_attached_actors(self):
@@ -216,12 +327,15 @@ class CarlaBridge(Node):
         bp_library = self.world.get_blueprint_library()
 
         ego_bp = bp_library.find(EGO_BLUEPRINT)
+        # role_name="ego" lets CARLA's built-in ROS 2 bridge route
+        # vehicle_status publishers to this actor.
         ego_bp.set_attribute("role_name", "ego")
 
         vs_bp = bp_library.find("sensor.other.vehicle_status")
         for name, value in VEHICLE_STATUS_ATTRS:
             vs_bp.set_attribute(name, value)
 
+        # Tie IMU rate to the world step so the sensor doesn't lag the sim.
         imu_bp = bp_library.find("sensor.other.imu")
         imu_bp.set_attribute("sensor_tick", f"{1.0 / float(self.hz_rate)}")
         imu_bp.set_attribute("ros_name", "tamagawa/imu_link")
@@ -252,6 +366,10 @@ class CarlaBridge(Node):
                 self.get_logger().error(f"{label} IMU sensor spawn failed")
             else:
                 self._imu_sensor.enable_for_ros()
+
+            # Apply the vehicle tuning to the freshly spawned ego so it
+            # survives /initialpose respawns.
+            self._apply_tuning(self.ego)
 
             self.world.tick()
 
@@ -299,6 +417,8 @@ class CarlaBridge(Node):
                 next_tick = time.monotonic()
 
     def _move_spectator(self):
+        # Snapshot the ego transform under the lock so it can't be destroyed
+        # between the None-check and the get_transform() RPC.
         with self._world_lock:
             ego = self.ego
             if ego is None:
@@ -320,6 +440,9 @@ class CarlaBridge(Node):
         self._shutdown.set()
         if self._world_thread is not None and self._world_thread.is_alive():
             self._world_thread.join(timeout=2.0)
+        # Best-effort cleanup; never block on a stuck world tick. If we
+        # can't get the lock, skip touching the world and just let the
+        # process exit so a kill -9 isn't needed.
         acquired = self._world_lock.acquire(timeout=SHUTDOWN_LOCK_TIMEOUT_S)
         try:
             self._destroy_attached_actors()
