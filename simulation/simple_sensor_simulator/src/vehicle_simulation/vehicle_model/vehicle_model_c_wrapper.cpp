@@ -127,6 +127,7 @@ VmModel * vm_create_delay_steer_acc_geared_wo_fall_guard(
   double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
   double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+  double k_us_vx_lo, double k_us_vx_hi,
   double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
   double lon_lat_coupling, int n_substep)
 {
@@ -135,8 +136,8 @@ VmModel * vm_create_delay_steer_acc_geared_wo_fall_guard(
   m->impl = std::make_unique<SimModelDelaySteerAccGearedWoFallGuard>(
     vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
     acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us, brake_time_constant, lon_drag_c0,
-    lon_drag_c1, lon_drag_c2, lon_lat_coupling, n_substep);
+    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us, k_us_vx_lo, k_us_vx_hi,
+    brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2, lon_lat_coupling, n_substep);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
   return m;
@@ -215,11 +216,12 @@ void vm_step(VmModel * m) { m->impl->update(m->sub_dt); }
 void vm_step_dt(VmModel * m, double dt) { m->impl->update(dt); }
 
 // ---- state reset (full = state + delay-queue warmup) -------------------
-// 末尾 wz は動的モデル (taiga_dyn) の yaw rate state を実測値で seed するために使う。
-// 静的 (kinematic) モデルでは wz は無視される。
+// 末尾 wz/vy は動的モデル (taiga_dyn) の yaw rate・横速度 state を実測値で seed するために
+// 使う。kinematic モデルでは無視される。vy を渡さない場合は 0 (直進近似) で初期化される。
 
 void vm_reset_full(
-  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax, double wz)
+  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax,
+  double wz, double vy)
 {
   switch (m->type) {
     case VmModelType::IDEAL_STEER_ACC: {
@@ -239,14 +241,14 @@ void vm_reset_full(
       const double steer_state = steer_actual - m->steer_bias;
       // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX, VY, WZ]
       Eigen::VectorXd s(9);
-      s << x, y, yaw, vx, steer_state, ax, ax, 0.0, wz;
+      s << x, y, yaw, vx, steer_state, ax, ax, vy, wz;
       warmup_delay_queues(m, s, ax, steer_state);
       break;
     }
     case VmModelType::TAIGA_X: {
       // PhysX-backed: teleport the chassis (no delay queue to warm up).
       if (auto * tx = dynamic_cast<SimModelTaigaX *>(m->impl.get())) {
-        tx->setFullState(x, y, yaw, vx, 0.0, wz, ax, steer_actual - m->steer_bias);
+        tx->setFullState(x, y, yaw, vx, vy, wz, ax, steer_actual - m->steer_bias);
       }
       break;
     }
@@ -256,7 +258,8 @@ void vm_reset_full(
 // ---- state reset (state only; queues untouched) ------------------------
 
 void vm_reset_state(
-  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax, double wz)
+  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax,
+  double wz, double vy)
 {
   switch (m->type) {
     case VmModelType::IDEAL_STEER_ACC: {
@@ -275,15 +278,16 @@ void vm_reset_state(
     }
     case VmModelType::TAIGA_DYN: {
       const double steer_state = steer_actual - m->steer_bias;
+      // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX, VY, WZ]
       Eigen::VectorXd s(9);
-      s << x, y, yaw, vx, steer_state, ax, ax, 0.0, wz;
+      s << x, y, yaw, vx, steer_state, ax, ax, vy, wz;
       m->impl->setState(s);
       m->impl->setGear(GearCommand::DRIVE);
       break;
     }
     case VmModelType::TAIGA_X: {
       if (auto * tx = dynamic_cast<SimModelTaigaX *>(m->impl.get())) {
-        tx->setFullState(x, y, yaw, vx, 0.0, wz, ax, steer_actual - m->steer_bias);
+        tx->setFullState(x, y, yaw, vx, vy, wz, ax, steer_actual - m->steer_bias);
       }
       break;
     }

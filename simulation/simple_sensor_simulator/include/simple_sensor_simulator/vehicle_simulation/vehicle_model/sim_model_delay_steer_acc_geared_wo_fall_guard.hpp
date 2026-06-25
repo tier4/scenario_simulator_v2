@@ -44,6 +44,8 @@ public:
    * @param [in] debug_acc_scaling_factor scaling factor for accel command
    * @param [in] debug_steer_scaling_factor scaling factor for steering command
    * @param [in] k_us understeer coefficient [rad/(m/s²)]; 0 keeps the ideal bicycle model
+   * @param [in] k_us_vx_lo speed at which k_us ramp starts [m/s]; 0 disables ramp (full k_us)
+   * @param [in] k_us_vx_hi speed at which k_us ramp reaches full value [m/s]; must be > k_us_vx_lo
    * @param [in] brake_time_constant time constant for accel dynamics while braking
    *             (a_cmd < 0). <= 0 falls back to acc_time_constant (single-tau behaviour).
    * @param [in] lon_drag_c0 constant longitudinal running-resistance offset added to the accel
@@ -64,6 +66,7 @@ public:
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, double steer_dead_band, double steer_bias,
     double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+    double k_us_vx_lo = 0.0, double k_us_vx_hi = 0.0,
     double brake_time_constant = 0.0, double lon_drag_c0 = 0.0, double lon_drag_c1 = 0.0,
     double lon_drag_c2 = 0.0, double lon_lat_coupling = 0.0, int n_substep = 1);
 
@@ -117,6 +120,8 @@ private:
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
   const double k_us_;                        //!< @brief understeer coefficient [rad/(m/s²)]
+  const double k_us_vx_lo_;                  //!< @brief speed below which k_us ramps to 0 [m/s]
+  const double k_us_vx_hi_;                  //!< @brief speed at which k_us reaches full value [m/s]
   const double brake_time_constant_;         //!< @brief accel time constant while braking [s]
   const double lon_drag_c0_;                 //!< @brief running-resistance offset p0 [m/s²]
   const double lon_drag_c1_;                 //!< @brief running-resistance velocity-linear p1 [1/s]
@@ -125,8 +130,10 @@ private:
   const int n_substep_;                      //!< @brief Euler sub-steps per update() call (>= 1)
 
   /**
-   * @brief steady-state yaw rate including understeer and steer bias:
-   *        ω = vx · tan(δ + steer_bias) / (L + k_us · vx²)
+   * @brief steady-state yaw rate including speed-dependent understeer and steer bias:
+   *        k_us_eff = k_us · ramp(vx, k_us_vx_lo, k_us_vx_hi)
+   *        ω = vx · tan(δ + steer_bias) / (L + k_us_eff · vx²)
+   * When k_us_vx_lo >= k_us_vx_hi (default 0/0), ramp = 1 and k_us_eff = k_us always.
    * Reduces to the ideal kinematic bicycle ω when k_us = 0 and steer_bias = 0.
    * The steer_bias here is the yaw-alignment bias β of the verification viewer
    * (lon_lat_model), so the offset does not cancel against the steer-tracking loop.
