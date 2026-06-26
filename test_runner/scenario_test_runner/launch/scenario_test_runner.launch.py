@@ -339,10 +339,18 @@ def launch_setup(context, *args, **kwargs):
                         {"vehicle_model_type": "PERFECT_TRAJECTORY_TRACKER"},
                     ]
                 else:
-                    return [
+                    params = [
                         description + "/config/vehicle_info.param.yaml",
                         description + "/config/simulator_model.param.yaml",
                     ]
+                    override = os.path.join(
+                        get_package_share_directory("scenario_test_runner"),
+                        "config",
+                        vehicle_model_name + "_simulator_model_override.param.yaml",
+                    )
+                    if os.path.exists(override):
+                        params.append(override)
+                    return params
             else:
                 return []
 
