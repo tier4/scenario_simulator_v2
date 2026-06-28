@@ -208,9 +208,9 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto k_us                       = common::getParameter("k_us",                       0.0);
   // Verification-viewer-parity longitudinal terms (DELAY_STEER_ACC_GEARED_WO_FALL_GUARD only).
   // All default to neutral so models that do not set them keep the original single-tau dynamics.
-  // k_us_vx_lo/hi: speed-dependent k_us ramp boundaries. 0/0 disables the ramp (constant k_us).
-  const auto k_us_vx_lo                 = common::getParameter("k_us_vx_lo",                 0.0);
-  const auto k_us_vx_hi                 = common::getParameter("k_us_vx_hi",                 0.0);
+  // k_us_bands / k_us_thresholds: step-band k_us. Empty → scalar k_us at all speeds.
+  const auto k_us_bands      = common::getParameter("k_us_bands",      std::vector<double>{});
+  const auto k_us_thresholds = common::getParameter("k_us_thresholds", std::vector<double>{});
   const auto brake_time_constant        = common::getParameter("brake_time_constant",        0.0);
   const auto lon_drag_c0                = common::getParameter("lon_drag_c0",                0.0);
   const auto lon_drag_c1                = common::getParameter("lon_drag_c1",                0.0);
@@ -249,7 +249,8 @@ auto EgoEntitySimulation::makeSimulationModel(
         autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
-        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us, k_us_vx_lo, k_us_vx_hi,
+        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
+        k_us_thresholds, k_us_bands,
         brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2, lon_lat_coupling);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:

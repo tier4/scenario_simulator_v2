@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <deque>
 #include <memory>
+#include <vector>
 
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 
@@ -127,16 +128,24 @@ VmModel * vm_create_delay_steer_acc_geared_wo_fall_guard(
   double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
   double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-  double k_us_vx_lo, double k_us_vx_hi,
+  const double * k_us_thresholds, const double * k_us_band_values, int n_kus_bands,
   double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
   double lon_lat_coupling, int n_substep)
 {
+  const int n = std::max(n_kus_bands, 0);
+  const std::vector<double> thresh_vec(
+    (k_us_thresholds && n > 1) ? k_us_thresholds : nullptr,
+    (k_us_thresholds && n > 1) ? k_us_thresholds + n - 1 : nullptr);
+  const std::vector<double> bands_vec(
+    (k_us_band_values && n > 0) ? k_us_band_values : nullptr,
+    (k_us_band_values && n > 0) ? k_us_band_values + n : nullptr);
   auto * m = new VmModel{};
   m->type = VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD;
   m->impl = std::make_unique<SimModelDelaySteerAccGearedWoFallGuard>(
     vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
     acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us, k_us_vx_lo, k_us_vx_hi,
+    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
+    thresh_vec, bands_vec,
     brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2, lon_lat_coupling, n_substep);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;

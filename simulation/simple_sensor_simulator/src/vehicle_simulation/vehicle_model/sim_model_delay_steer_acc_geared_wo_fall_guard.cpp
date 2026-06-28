@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
+#include <vector>
 
 namespace autoware::simulator::simple_planning_simulator
 {
@@ -24,7 +25,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
   double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-  double k_us_vx_lo, double k_us_vx_hi,
+  std::vector<double> k_us_thresholds, std::vector<double> k_us_band_values,
   double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
   double lon_lat_coupling, int n_substep)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
@@ -43,8 +44,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
   k_us_(k_us),
-  k_us_vx_lo_(k_us_vx_lo),
-  k_us_vx_hi_(k_us_vx_hi),
+  n_kus_bands_(std::min(static_cast<int>(k_us_band_values.size()), MAX_KUS_BANDS)),
   // brake_time_constant <= 0 keeps the single-tau behaviour (== acc_time_constant).
   brake_time_constant_(
     brake_time_constant > 0.0 ? std::max(brake_time_constant, MIN_TIME_CONSTANT)
@@ -55,17 +55,26 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   lon_lat_coupling_(lon_lat_coupling),
   n_substep_(std::max(n_substep, 1))
 {
+  for (int i = 0; i < n_kus_bands_ - 1; ++i) k_us_thresholds_[i] = k_us_thresholds[i];
+  for (int i = 0; i < n_kus_bands_; ++i)     k_us_band_values_[i] = k_us_band_values[i];
   initializeInputQueue(dt);
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::calc_yaw_rate(double vel, double steer) const
 {
-  // Speed-dependent understeer: k_us ramps linearly from 0 at vx_lo to full at vx_hi.
-  // When k_us_vx_lo_ >= k_us_vx_hi_ (default 0/0), ramp = 1 → bit-for-bit identical to before.
-  double k_us_eff = k_us_;
-  if (k_us_vx_hi_ > k_us_vx_lo_) {
-    const double t = (vel - k_us_vx_lo_) / (k_us_vx_hi_ - k_us_vx_lo_);
-    k_us_eff *= std::min(std::max(t, 0.0), 1.0);
+  double k_us_eff;
+  if (n_kus_bands_ > 0) {
+    // Step-band lookup: band i covers [thresholds[i-1], thresholds[i]).
+    // band 0 covers [0, thresholds[0]); last band covers [thresholds[n-2], ∞).
+    k_us_eff = k_us_band_values_[n_kus_bands_ - 1];
+    for (int i = 0; i < n_kus_bands_ - 1; ++i) {
+      if (vel < k_us_thresholds_[i]) {
+        k_us_eff = k_us_band_values_[i];
+        break;
+      }
+    }
+  } else {
+    k_us_eff = k_us_;
   }
   const double denom = wheelbase_ + k_us_eff * vel * vel;
   return vel * std::tan(steer + steer_bias_) / denom;
