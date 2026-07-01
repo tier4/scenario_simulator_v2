@@ -215,7 +215,6 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto lon_drag_c0                = common::getParameter("lon_drag_c0",                0.0);
   const auto lon_drag_c1                = common::getParameter("lon_drag_c1",                0.0);
   const auto lon_drag_c2                = common::getParameter("lon_drag_c2",                0.0);
-  const auto lon_lat_coupling           = common::getParameter("lon_lat_coupling",          0.0);
   const auto debug_acc_scaling_factor   = common::getParameter("debug_acc_scaling_factor",   1.0);
   const auto debug_steer_scaling_factor = common::getParameter("debug_steer_scaling_factor", 1.0);
   const auto steer_bias                 = common::getParameter("steer_bias",                 0.0);
@@ -251,7 +250,7 @@ auto EgoEntitySimulation::makeSimulationModel(
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
         debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
         k_us_thresholds, k_us_bands,
-        brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2, lon_lat_coupling);
+        brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       if (!std::filesystem::exists(acceleration_map_path)) {

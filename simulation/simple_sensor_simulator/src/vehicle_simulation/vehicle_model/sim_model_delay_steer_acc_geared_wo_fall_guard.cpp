@@ -27,7 +27,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
   std::vector<double> k_us_thresholds, std::vector<double> k_us_band_values,
   double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
-  double lon_lat_coupling, int n_substep)
+  int n_substep)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -52,7 +52,6 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   lon_drag_c0_(lon_drag_c0),
   lon_drag_c1_(lon_drag_c1),
   lon_drag_c2_(lon_drag_c2),
-  lon_lat_coupling_(lon_lat_coupling),
   n_substep_(std::max(n_substep, 1))
 {
   for (int i = 0; i < n_kus_bands_ - 1; ++i) k_us_thresholds_[i] = k_us_thresholds[i];
@@ -194,9 +193,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   // (PEDAL_ACCX) tracks this target with a first-order lag whose time constant is split between
   // throttle (a_cmd >= 0) and brake (a_cmd < 0). All extra terms vanish when their coefficients
   // are zero, leaving the original single-tau behaviour.
-  const double lat_acc = vel * yaw_rate;
-  const double pedal_acc_target =
-    pedal_acc_des + calc_drag(vel) + lon_lat_coupling_ * lat_acc * lat_acc;
+  const double pedal_acc_target = pedal_acc_des + calc_drag(vel);
   const double acc_tau = (pedal_acc_des >= 0.0) ? acc_time_constant_ : brake_time_constant_;
   // NOTE: `steer_des` is calculated by control from measured values. getSteer() also gets the
   // measured value. The steer_rate used in the motion calculation is obtained from these
