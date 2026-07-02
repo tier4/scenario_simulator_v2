@@ -16,6 +16,7 @@ install(
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/scenario_post_processor.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/carla_bridge.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/rosbag_merger.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/rosbag_reader.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/report_generator.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/alpine_js.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/pico_css.py

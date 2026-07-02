@@ -17,7 +17,14 @@
 
 
 import os
+import sys
+
+# --symlink-install causes sys.path[0] to resolve to the symlink target's
+# directory instead of the install directory where report/*.py are flattened.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import rclpy
+import tempfile
 import time
 import json
 
@@ -32,8 +39,8 @@ from openscenario_utility.conversion import convert
 from pathlib import Path
 from rclpy.executors import ExternalShutdownException
 from report_generator import generate_report
-from rosbag_merger import merge_comparison_rosbags
-from shutil import rmtree
+from rosbag_merger import merge_single_rosbag
+from shutil import copytree, rmtree
 from subprocess import run as subprocess_run
 from sys import exit
 from typing import List
@@ -59,6 +66,24 @@ def convert_scenario_to_xosc(scenario: Scenario, output_directory: Path):
             result.append(Scenario(path, scenario.frame_rate))
 
     return result
+
+
+def build_webautobag(final_dir, staging_dir, topics, logger):
+    models = sorted(d for d in staging_dir.iterdir() if d.is_dir())
+    if not models:
+        return
+
+    first_model = models[0]
+    copytree(str(first_model), str(final_dir), dirs_exist_ok=True)
+
+    for model_dir in models[1:]:
+        for xosc in sorted(first_model.rglob("*.xosc")):
+            rel = xosc.relative_to(first_model)
+            target_bag = final_dir / rel.parent / xosc.stem
+            run_bag = model_dir / rel.parent / xosc.stem
+            if not target_bag.is_dir() or not run_bag.is_dir():
+                continue
+            merge_single_rosbag(target_bag, run_bag, model_dir.name, topics, logger)
 
 
 class ScenarioTestRunner(LifecycleController):
@@ -332,49 +357,32 @@ class ScenarioTestRunner(LifecycleController):
 
     def run_scenario_with_comparison(self, scenario, comparison_topics):
         self.validate_comparison_models()
-        host_model = self.comparison_model_paths[0]
-        remaining_models = self.comparison_model_paths[1:]
-        host_dir = self.output_directory
+        final_dir = self.output_directory
 
+        staging_dir = Path(tempfile.mkdtemp(prefix="scenario_staging_"))
         try:
-            # Phase 1: Run all models
-            self.setup_model_symlink(host_model)
-            self.get_logger().info(f"[Model Compare] Running host model: {host_model.name}")
-            self.execute_scenario(scenario)
-
-            comparisons_dir = host_dir / ".comparisons"
-            comparisons_dir.mkdir(exist_ok=True)
-            comparison_results = []
-
-            for i, model in enumerate(remaining_models, start=1):
-                self.get_logger().info(f"[Model Compare] Running model {i}: {model.name}")
-                self.setup_model_symlink(model)
-                model_output = comparisons_dir / f"model_{i}"
-                model_output.mkdir(exist_ok=True)
-                self.output_directory = model_output
+            for model_path in self.comparison_model_paths:
+                self.get_logger().info(f"[Model Compare] Running model: {model_path.name}")
+                self.setup_model_symlink(model_path)
+                run_output = staging_dir / model_path.name
+                run_output.mkdir(exist_ok=True)
+                self.output_directory = run_output
                 try:
                     self.execute_scenario(scenario)
-                    comparison_results.append((i, model.name, model_output))
                 finally:
-                    self.output_directory = host_dir
+                    self.output_directory = final_dir
         finally:
             self.teardown_model_symlink()
 
-        # Phase 2: Post-processing (all raw bags accessible)
-        report_path = generate_report(host_dir, comparison_results)
-        self.get_logger().info(f"[Model Compare] Report: {report_path}")
+        staging_link = final_dir / "staging"
+        staging_link.symlink_to(staging_dir)
 
-        for i, name, model_dir in comparison_results:
-            merge_comparison_rosbags(
-                host_dir=host_dir,
-                secondary_dir=model_dir,
-                model_index=i,
-                model_name=name,
-                topics=comparison_topics,
-                logger=self.get_logger(),
-            )
+        build_webautobag(final_dir, staging_dir, comparison_topics, self.get_logger())
 
-        rmtree(comparisons_dir, ignore_errors=True)
+        report_paths = generate_report(final_dir)
+        for p in report_paths:
+            self.get_logger().info(f"[Model Compare] Report: {p}")
+
         self.shutdown()
         self.destroy_node()
 

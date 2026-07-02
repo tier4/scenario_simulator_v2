@@ -158,57 +158,41 @@ def detect_storage_id(bag_dir):
     return "mcap"
 
 
-def merge_comparison_rosbags(host_dir, secondary_dir, model_index, model_name, topics, logger):
-    for xosc_file in sorted(host_dir.rglob("*.xosc")):
-        bag_dir_name = xosc_file.stem
-        rel_path = xosc_file.parent.relative_to(host_dir)
-
-        host_bag = host_dir / rel_path / bag_dir_name
-        sec_bag = secondary_dir / rel_path / bag_dir_name
-        if not host_bag.is_dir() or not sec_bag.is_dir():
-            continue
-
-        merge_single_rosbag(host_bag, sec_bag, model_index, model_name, topics, logger)
-
-
-def merge_single_rosbag(host_bag_dir, sec_bag_dir, model_index, model_name, topics, logger):
-    sec_reader = rosbag2_py.SequentialReader()
-    sec_reader.open(
-        rosbag2_py.StorageOptions(uri=str(sec_bag_dir)),
+def merge_single_rosbag(target_bag_dir, run_bag_dir, run_name, topics, logger):
+    run_reader = rosbag2_py.SequentialReader()
+    run_reader.open(
+        rosbag2_py.StorageOptions(uri=str(run_bag_dir)),
         rosbag2_py.ConverterOptions("", ""),
     )
 
     topic_type_map = {
-        t.name: t for t in sec_reader.get_all_topics_and_types() if t.name in topics
+        t.name: t for t in run_reader.get_all_topics_and_types() if t.name in topics
     }
     if not topic_type_map:
         return
 
-    # Build output topic mapping: original topic -> list of (prefixed_name, type, converter)
-    model_prefix = f"/models/model_{model_index}"
+    run_prefix = f"/runs/{run_name}"
     output_map = {}
     for orig_name, orig_meta in topic_type_map.items():
         outputs = TOPIC_OUTPUTS.get(orig_name)
         if outputs:
             output_map[orig_name] = [
-                (f"{model_prefix}{infix}{orig_name}", out_type, converter)
+                (f"{run_prefix}{infix}{orig_name}", out_type, converter)
                 for infix, out_type, converter in outputs
             ]
         else:
             output_map[orig_name] = [
-                (f"{model_prefix}{orig_name}", orig_meta.type, None)
+                (f"{run_prefix}{orig_name}", orig_meta.type, None)
             ]
 
-    # Resolve timestamp offset before reading messages — avoids wasted I/O when
-    # DRIVING state is missing from either bag.
-    host_driving_ts = find_driving_timestamp(host_bag_dir)
-    sec_driving_ts = find_driving_timestamp(sec_bag_dir)
-    if host_driving_ts is None or sec_driving_ts is None:
+    target_driving_ts = find_driving_timestamp(target_bag_dir)
+    run_driving_ts = find_driving_timestamp(run_bag_dir)
+    if target_driving_ts is None or run_driving_ts is None:
         logger.warn(
-            f"[Model Compare] DRIVING state not found, skipping model {model_index} data"
+            f"[Model Compare] DRIVING state not found, skipping run {run_name}"
         )
         return
-    ts_offset = host_driving_ts - sec_driving_ts
+    ts_offset = target_driving_ts - run_driving_ts
 
     merged_bag_dir = Path(tempfile.mkdtemp(prefix="merge_"))
     merged_bag_path = merged_bag_dir / "merged"
@@ -216,18 +200,17 @@ def merge_single_rosbag(host_bag_dir, sec_bag_dir, model_index, model_name, topi
         writer = rosbag2_py.SequentialWriter()
         writer.open(
             rosbag2_py.StorageOptions(
-                uri=str(merged_bag_path), storage_id=detect_storage_id(host_bag_dir),
+                uri=str(merged_bag_path), storage_id=detect_storage_id(target_bag_dir),
             ),
             rosbag2_py.ConverterOptions("", ""),
         )
 
-        # Copy all host topic definitions, then add comparison topic definitions.
-        pri_reader = rosbag2_py.SequentialReader()
-        pri_reader.open(
-            rosbag2_py.StorageOptions(uri=str(host_bag_dir)),
+        target_reader = rosbag2_py.SequentialReader()
+        target_reader.open(
+            rosbag2_py.StorageOptions(uri=str(target_bag_dir)),
             rosbag2_py.ConverterOptions("", ""),
         )
-        for topic_meta in pri_reader.get_all_topics_and_types():
+        for topic_meta in target_reader.get_all_topics_and_types():
             writer.create_topic(topic_meta)
         for orig_name, entries in output_map.items():
             orig_meta = topic_type_map[orig_name]
@@ -240,45 +223,41 @@ def merge_single_rosbag(host_bag_dir, sec_bag_dir, model_index, model_name, topi
                     )
                 )
 
-        # Read all host messages.
-        pri_messages = []
-        while pri_reader.has_next():
-            pri_messages.append(pri_reader.read_next())
+        target_messages = []
+        while target_reader.has_next():
+            target_messages.append(target_reader.read_next())
 
-        # Read secondary messages — apply timestamp offset and topic conversion in one pass.
-        sec_reader.set_filter(rosbag2_py.StorageFilter(topics=list(topics)))
-        sec_messages = []
-        while sec_reader.has_next():
-            topic, data, timestamp = sec_reader.read_next()
+        run_reader.set_filter(rosbag2_py.StorageFilter(topics=list(topics)))
+        run_messages = []
+        while run_reader.has_next():
+            topic, data, timestamp = run_reader.read_next()
             adjusted_ts = timestamp + ts_offset
             for out_name, _, converter in output_map[topic]:
-                out_data = converter(data, model_name=model_name) if converter else data
-                sec_messages.append((out_name, out_data, adjusted_ts))
+                out_data = converter(data, model_name=run_name) if converter else data
+                run_messages.append((out_name, out_data, adjusted_ts))
 
-        if not sec_messages:
+        if not run_messages:
             return
 
-        # Merge and write in timestamp order.
-        all_messages = pri_messages + sec_messages
+        all_messages = target_messages + run_messages
         all_messages.sort(key=lambda m: m[2])
         for topic, data, timestamp in all_messages:
             writer.write(topic, data, timestamp)
         del writer
 
-        # Replace host bag files with the merged result.
-        for f in host_bag_dir.iterdir():
+        for f in target_bag_dir.iterdir():
             f.unlink()
         for f in merged_bag_path.iterdir():
             try:
-                os.rename(str(f), str(host_bag_dir / f.name))
+                os.rename(str(f), str(target_bag_dir / f.name))
             except OSError:
-                shutil.copy2(str(f), str(host_bag_dir / f.name))
+                shutil.copy2(str(f), str(target_bag_dir / f.name))
                 os.remove(str(f))
 
         out_topics = [n for entries in output_map.values() for n, _, _ in entries]
         logger.info(
-            f"[Model Compare] Merged {len(sec_messages)} messages from model {model_index} "
-            f"into {host_bag_dir.name} ({out_topics})"
+            f"[Model Compare] Merged {len(run_messages)} messages from run {run_name} "
+            f"into {target_bag_dir.name} ({out_topics})"
         )
     finally:
         rmtree(merged_bag_dir, ignore_errors=True)
