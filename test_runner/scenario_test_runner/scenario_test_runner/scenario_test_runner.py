@@ -18,6 +18,7 @@
 
 import os
 import rclpy
+import tempfile
 import time
 import json
 
@@ -31,11 +32,19 @@ from openscenario_preprocessor_msgs.srv import SetParameter
 from openscenario_utility.conversion import convert
 from pathlib import Path
 from rclpy.executors import ExternalShutdownException
+from rosbag_merger import merge_comparison_rosbags
 from shutil import rmtree
+from subprocess import run as subprocess_run
 from sys import exit
 from typing import List
 from scenario import Scenario
 from scenario import substitute_ros_package
+
+# Workaround: diffusion planner model switching via symlink.
+# The launcher hardcodes the model path below and cannot be modified.
+# When this path becomes configurable, remove all model-switching code
+# (search for MODEL_SYMLINK_PATH to find all related code).
+MODEL_SYMLINK_PATH = Path("/opt/autoware/mlmodels/diffusion_planner_for_x2")
 
 
 def convert_scenario_to_xosc(scenario: Scenario, output_directory: Path):
@@ -71,7 +80,8 @@ class ScenarioTestRunner(LifecycleController):
         global_real_time_factor: float,
         global_timeout: int,  # [sec]
         output_directory: Path,
-        override_parameters: str
+        override_parameters: str,
+        comparison_model_paths: list = None,
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -142,6 +152,8 @@ class ScenarioTestRunner(LifecycleController):
                     self.print_debug('/simulation/openscenario_preprocessor/set_parameter: timeout')
                     exit(1)
 
+        self.comparison_model_paths = comparison_model_paths or []
+        self.model_backup_path = None  # MODEL_SYMLINK_PATH workaround
 
     def spin(self):
         """Run scenario."""
@@ -159,8 +171,7 @@ class ScenarioTestRunner(LifecycleController):
                 else:
                     time.sleep(self.SLEEP_RATE)
 
-    def run_scenario(self, scenario: Scenario):
-
+    def execute_scenario(self, scenario: Scenario):
         # convert t4v2/xosc to xosc
         xosc_scenarios = convert_scenario_to_xosc(scenario, self.output_directory)
 
@@ -186,6 +197,8 @@ class ScenarioTestRunner(LifecycleController):
             else:
                 exit(1)
 
+    def run_scenario(self, scenario: Scenario):
+        self.execute_scenario(scenario)
         self.shutdown()
         self.destroy_node()
 
@@ -274,6 +287,88 @@ class ScenarioTestRunner(LifecycleController):
     def print_debug(self, message: str):
         self.get_logger().info(message)
 
+    def validate_comparison_models(self):
+        for p in self.comparison_model_paths:
+            if not p.is_dir():
+                raise RuntimeError(f"Comparison model path does not exist: {p}")
+        self.get_logger().info(
+            f"[Model Compare] {len(self.comparison_model_paths)} models: "
+            f"{[p.name for p in self.comparison_model_paths]}"
+        )
+
+    # --- MODEL_SYMLINK_PATH workaround: begin ---
+
+    def setup_model_symlink(self, model_path):
+        symlink = MODEL_SYMLINK_PATH
+        if self.model_backup_path is None and symlink.exists() and not symlink.is_symlink():
+            self.model_backup_path = Path("/tmp") / (symlink.name + ".backup")
+            subprocess_run(
+                ["sudo", "mv", str(symlink), str(self.model_backup_path)], check=True
+            )
+            self.get_logger().info(
+                f"[Model Switch] Backed up {symlink} -> {self.model_backup_path}"
+            )
+        if symlink.is_symlink():
+            subprocess_run(["sudo", "rm", str(symlink)], check=True)
+        subprocess_run(
+            ["sudo", "ln", "-s", str(model_path), str(symlink)], check=True
+        )
+        self.get_logger().info(f"[Model Switch] {symlink} -> {model_path}")
+
+    def teardown_model_symlink(self):
+        symlink = MODEL_SYMLINK_PATH
+        if symlink.is_symlink():
+            subprocess_run(["sudo", "rm", str(symlink)], check=True)
+        if self.model_backup_path and self.model_backup_path.exists():
+            subprocess_run(
+                ["sudo", "mv", str(self.model_backup_path), str(symlink)], check=True
+            )
+            self.get_logger().info(
+                f"[Model Switch] Restored {symlink} from {self.model_backup_path}"
+            )
+            self.model_backup_path = None
+
+    # --- MODEL_SYMLINK_PATH workaround: end ---
+
+    def run_scenario_with_comparison(self, scenario, comparison_topics):
+        self.validate_comparison_models()
+        host_model = self.comparison_model_paths[0]
+        remaining_models = self.comparison_model_paths[1:]
+
+        try:
+            self.setup_model_symlink(host_model)
+            self.get_logger().info(f"[Model Compare] Running host model: {host_model.name}")
+            self.execute_scenario(scenario)
+
+            for i, model in enumerate(remaining_models, start=1):
+                self.get_logger().info(
+                    f"[Model Compare] Running model {i}: {model.name}"
+                )
+                self.setup_model_symlink(model)
+                tmp_output = Path(tempfile.mkdtemp(
+                    prefix=f"model_{i}_",
+                    dir=self.output_directory.parent,
+                ))
+                original_output_dir = self.output_directory
+                self.output_directory = tmp_output
+                try:
+                    self.execute_scenario(scenario)
+                    merge_comparison_rosbags(
+                        host_dir=original_output_dir,
+                        secondary_dir=tmp_output,
+                        model_index=i,
+                        model_name=model.name,
+                        topics=comparison_topics,
+                        logger=self.get_logger(),
+                    )
+                finally:
+                    self.output_directory = original_output_dir
+                    rmtree(tmp_output, ignore_errors=True)
+        finally:
+            self.teardown_model_symlink()
+        self.shutdown()
+        self.destroy_node()
+
 
 def main(args=None):
 
@@ -293,6 +388,16 @@ def main(args=None):
 
     parser.add_argument("-s", "--scenario", default="/dev/null", type=Path)
 
+    parser.add_argument(
+        "--comparison-model-paths", default="", type=str,
+        help="Comma-separated paths to model directories. First is the host bag.",
+    )
+
+    parser.add_argument(
+        "--comparison-topics", default="/planning/trajectory", type=str,
+        help="Comma-separated topic names to merge from comparison model rosbags",
+    )
+
     parser.add_argument("--ros-args", nargs="*")  # XXX DIRTY HACK
     parser.add_argument("-r", nargs="*")  # XXX DIRTY HACK
 
@@ -304,15 +409,21 @@ def main(args=None):
         global_timeout=args.global_timeout,
         output_directory=args.output_directory / "scenario_test_runner",
         override_parameters=args.override_parameters,
+        comparison_model_paths=[
+            Path(p.strip()) for p in args.comparison_model_paths.split(",") if p.strip()
+        ],
     )
 
     if args.scenario != Path("/dev/null"):
-        test_runner.run_scenario(
-            Scenario(
-                substitute_ros_package(args.scenario).resolve(),
-                args.global_frame_rate,
-            )
+        scenario = Scenario(
+            substitute_ros_package(args.scenario).resolve(),
+            args.global_frame_rate,
         )
+        if args.comparison_model_paths:
+            comparison_topics = [t.strip() for t in args.comparison_topics.split(",") if t.strip()]
+            test_runner.run_scenario_with_comparison(scenario, comparison_topics)
+        else:
+            test_runner.run_scenario(scenario)
     else:
         print("No scenario is specified. Specify one.")
 
