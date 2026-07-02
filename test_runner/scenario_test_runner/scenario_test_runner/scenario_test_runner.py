@@ -31,6 +31,7 @@ from openscenario_preprocessor_msgs.srv import SetParameter
 from openscenario_utility.conversion import convert
 from pathlib import Path
 from rclpy.executors import ExternalShutdownException
+from report_generator import generate_report
 from rosbag_merger import merge_comparison_rosbags
 from shutil import rmtree
 from subprocess import run as subprocess_run
@@ -360,6 +361,9 @@ class ScenarioTestRunner(LifecycleController):
             self.teardown_model_symlink()
 
         # Phase 2: Post-processing (all raw bags accessible)
+        report_path = generate_report(host_dir, comparison_results)
+        self.get_logger().info(f"[Model Compare] Report: {report_path}")
+
         for i, name, model_dir in comparison_results:
             merge_comparison_rosbags(
                 host_dir=host_dir,
