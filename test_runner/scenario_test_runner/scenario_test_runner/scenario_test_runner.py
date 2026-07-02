@@ -18,7 +18,6 @@
 
 import os
 import rclpy
-import tempfile
 import time
 import json
 
@@ -334,38 +333,44 @@ class ScenarioTestRunner(LifecycleController):
         self.validate_comparison_models()
         host_model = self.comparison_model_paths[0]
         remaining_models = self.comparison_model_paths[1:]
+        host_dir = self.output_directory
 
         try:
+            # Phase 1: Run all models
             self.setup_model_symlink(host_model)
             self.get_logger().info(f"[Model Compare] Running host model: {host_model.name}")
             self.execute_scenario(scenario)
 
+            comparisons_dir = host_dir / ".comparisons"
+            comparisons_dir.mkdir(exist_ok=True)
+            comparison_results = []
+
             for i, model in enumerate(remaining_models, start=1):
-                self.get_logger().info(
-                    f"[Model Compare] Running model {i}: {model.name}"
-                )
+                self.get_logger().info(f"[Model Compare] Running model {i}: {model.name}")
                 self.setup_model_symlink(model)
-                tmp_output = Path(tempfile.mkdtemp(
-                    prefix=f"model_{i}_",
-                    dir=self.output_directory.parent,
-                ))
-                original_output_dir = self.output_directory
-                self.output_directory = tmp_output
+                model_output = comparisons_dir / f"model_{i}"
+                model_output.mkdir(exist_ok=True)
+                self.output_directory = model_output
                 try:
                     self.execute_scenario(scenario)
-                    merge_comparison_rosbags(
-                        host_dir=original_output_dir,
-                        secondary_dir=tmp_output,
-                        model_index=i,
-                        model_name=model.name,
-                        topics=comparison_topics,
-                        logger=self.get_logger(),
-                    )
+                    comparison_results.append((i, model.name, model_output))
                 finally:
-                    self.output_directory = original_output_dir
-                    rmtree(tmp_output, ignore_errors=True)
+                    self.output_directory = host_dir
         finally:
             self.teardown_model_symlink()
+
+        # Phase 2: Post-processing (all raw bags accessible)
+        for i, name, model_dir in comparison_results:
+            merge_comparison_rosbags(
+                host_dir=host_dir,
+                secondary_dir=model_dir,
+                model_index=i,
+                model_name=name,
+                topics=comparison_topics,
+                logger=self.get_logger(),
+            )
+
+        rmtree(comparisons_dir, ignore_errors=True)
         self.shutdown()
         self.destroy_node()
 
