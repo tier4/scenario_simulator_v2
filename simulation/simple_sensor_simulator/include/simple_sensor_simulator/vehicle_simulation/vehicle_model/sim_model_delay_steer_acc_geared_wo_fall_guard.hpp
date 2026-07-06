@@ -17,11 +17,9 @@
 
 #include <Eigen/Core>
 #include <Eigen/LU>
-#include <array>
 #include <deque>
 #include <iostream>
 #include <queue>
-#include <vector>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
 
 namespace autoware::simulator::simple_planning_simulator
@@ -45,34 +43,16 @@ public:
    * @param [in] steer_bias steering bias [rad]
    * @param [in] debug_acc_scaling_factor scaling factor for accel command
    * @param [in] debug_steer_scaling_factor scaling factor for steering command
-   * @param [in] k_us understeer coefficient (scalar fallback when k_us_band_values is empty) [rad/(m/s²)]; 0 = ideal bicycle
-   * @param [in] k_us_thresholds sorted speed thresholds for k_us step bands [m/s]; length = k_us_band_values.size()-1; empty = scalar mode
-   * @param [in] k_us_band_values k_us value per speed band [rad/(m/s²)]; empty = use scalar k_us at all speeds.
-   *             band i covers [k_us_thresholds[i-1], k_us_thresholds[i]) with band 0 starting at 0.
-   *             last band covers [k_us_thresholds.back(), ∞).
-   * @param [in] brake_time_constant time constant for accel dynamics while braking
-   *             (a_cmd < 0). <= 0 falls back to acc_time_constant (single-tau behaviour).
-   * @param [in] lon_drag_c0 constant longitudinal running-resistance offset added to the accel
-   *             target a_target [m/s²] (rolling resistance / standing slope). 0 disables.
-   * @param [in] lon_drag_c1 velocity-linear running-resistance coefficient [1/s]. 0 disables.
-   * @param [in] lon_drag_c2 velocity-quadratic (aero) running-resistance coefficient [1/m]. 0 disables.
-   * @param [in] lon_lat_coupling cornering deceleration coefficient; a_target += c·(vx·ω)²
-   *             [s²/m]. Typically negative (curve decel). 0 disables.
+   * @param [in] k_us understeer coefficient [rad/(m/s²)]; 0 = ideal bicycle model
    *
-   * @note Expressiveness brought to parity with the longitudinal/lateral verification viewer
-   *       (lib/_model_viewer.py lon_lat_model): throttle/brake split time constant, steady-state
-   *       running-resistance polynomial poly(v) and corner coupling on the accel target, and the
-   *       yaw bias β (steer_bias enters tan(δ+β)). All new terms default to neutral (single-tau,
-   *       no offset, no coupling) so existing setups stay bit-for-bit identical.
+   * @note The yaw bias β (steer_bias) enters the yaw equation as tan(δ+β), producing a net yaw
+   *       offset instead of being cancelled by the steer controller.
    */
   SimModelDelaySteerAccGearedWoFallGuard(
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, double steer_dead_band, double steer_bias,
-    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-    std::vector<double> k_us_thresholds = {}, std::vector<double> k_us_band_values = {},
-    double brake_time_constant = 0.0, double lon_drag_c0 = 0.0, double lon_drag_c1 = 0.0,
-    double lon_drag_c2 = 0.0, int n_substep = 1);
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us);
 
   /**
    * @brief default destructor
@@ -123,36 +103,16 @@ private:
   const double steer_bias_;                  //!< @brief steering angle bias [rad]
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
-  const double k_us_;                        //!< @brief understeer coefficient scalar fallback (n_kus_bands_==0) [rad/(m/s²)]
-  static constexpr int MAX_KUS_BANDS = 16;
-  std::array<double, MAX_KUS_BANDS> k_us_thresholds_{};   //!< @brief sorted speed thresholds (n_kus_bands_-1 used)
-  std::array<double, MAX_KUS_BANDS> k_us_band_values_{};  //!< @brief k_us per speed band (n_kus_bands_ used)
-  const int n_kus_bands_;                    //!< @brief number of step bands; 0 = legacy k_us + ramp
-  const double brake_time_constant_;         //!< @brief accel time constant while braking [s]
-  const double lon_drag_c0_;                 //!< @brief running-resistance offset p0 [m/s²]
-  const double lon_drag_c1_;                 //!< @brief running-resistance velocity-linear p1 [1/s]
-  const double lon_drag_c2_;                 //!< @brief running-resistance velocity-quadratic p2 [1/m]
-  const int n_substep_;                      //!< @brief Euler sub-steps per update() call (>= 1)
+  const double k_us_;                        //!< @brief understeer coefficient [rad/(m/s²)]
 
   /**
-   * @brief steady-state yaw rate including speed-dependent understeer and steer bias.
+   * @brief steady-state yaw rate including understeer (k_us) and steer bias.
    *
-   * Step-band mode (n_kus_bands_ > 0):
-   *   k_us_thresholds_[0..n-2] are sorted thresholds; k_us_band_values_[i] applies when
-   *   vx < k_us_thresholds_[i] (i=0 is lowest band). The last band covers [thresh[n-2], ∞).
-   *   ω = vx · tan(δ + steer_bias) / (L + k_us_band_values_[band] · vx²)
-   *
-   * Scalar mode (n_kus_bands_ == 0): k_us_eff = k_us_ at all speeds.
+   *   ω = vx · tan(δ + steer_bias) / (L + k_us · vx²)
    *
    * Reduces to the ideal bicycle model when k_us = 0 and steer_bias = 0.
    */
   double calc_yaw_rate(double vel, double steer) const;
-
-  /**
-   * @brief steady-state running-resistance / drag offset poly(v) = p0 + p1·vx + p2·vx²
-   *        added to the accel target a_target. All-zero coefficients disable it.
-   */
-  double calc_drag(double vel) const;
 
   /**
    * @brief set queue buffer for input command

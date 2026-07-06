@@ -143,57 +143,35 @@ VmModel * vm_create_delay_steer_acc_geared_wo_fall_guard(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-  const double * k_us_thresholds, const double * k_us_band_values, int n_kus_bands,
-  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
-  int n_substep)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
 {
-  const int n = std::max(n_kus_bands, 0);
-  const std::vector<double> thresh_vec(
-    (k_us_thresholds && n > 1) ? k_us_thresholds : nullptr,
-    (k_us_thresholds && n > 1) ? k_us_thresholds + n - 1 : nullptr);
-  const std::vector<double> bands_vec(
-    (k_us_band_values && n > 0) ? k_us_band_values : nullptr,
-    (k_us_band_values && n > 0) ? k_us_band_values + n : nullptr);
   auto * m = new VmModel{};
   m->type = VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD;
   m->impl = std::make_unique<SimModelDelaySteerAccGearedWoFallGuard>(
     vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
     acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
-    thresh_vec, bands_vec,
-    brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2, n_substep);
+    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
   return m;
 }
 
-// full-RHS delay 派生。引数列は wo_fall_guard と完全一致 (登録・Python バインドを共通化するため)。
-// 差分はステア・加速度の遅延が指令のみ → 右辺全体 (状態フィードバックも t-d) になった点のみ。
+// full-RHS delay 派生。差分はステア・加速度の遅延が指令のみ → 右辺全体 (状態フィードバックも t-d)
+// になった点と、走行抵抗 poly(v)・throttle/brake 分離 τ を保持する点。
 VmModel * vm_create_delay_steer_acc_geared_for_diffusion_planner(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
   double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-  const double * k_us_thresholds, const double * k_us_band_values, int n_kus_bands,
-  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
-  int n_substep)
+  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2)
 {
-  const int n = std::max(n_kus_bands, 0);
-  const std::vector<double> thresh_vec(
-    (k_us_thresholds && n > 1) ? k_us_thresholds : nullptr,
-    (k_us_thresholds && n > 1) ? k_us_thresholds + n - 1 : nullptr);
-  const std::vector<double> bands_vec(
-    (k_us_band_values && n > 0) ? k_us_band_values : nullptr,
-    (k_us_band_values && n > 0) ? k_us_band_values + n : nullptr);
   auto * m = new VmModel{};
   m->type = VmModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER;
   m->impl = std::make_unique<SimModelDelaySteerAccGearedForDiffusionPlanner>(
     vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
     acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
     debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
-    thresh_vec, bands_vec,
-    brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2, n_substep);
+    brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
   return m;

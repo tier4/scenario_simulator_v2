@@ -16,7 +16,6 @@
 #include <cmath>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_for_diffusion_planner.hpp>
-#include <vector>
 
 namespace autoware::simulator::simple_planning_simulator
 {
@@ -26,9 +25,7 @@ SimModelDelaySteerAccGearedForDiffusionPlanner::SimModelDelaySteerAccGearedForDi
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
   double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-  std::vector<double> k_us_thresholds, std::vector<double> k_us_band_values,
-  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
-  int n_substep)
+  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -45,39 +42,21 @@ SimModelDelaySteerAccGearedForDiffusionPlanner::SimModelDelaySteerAccGearedForDi
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
   k_us_(k_us),
-  n_kus_bands_(std::min(static_cast<int>(k_us_band_values.size()), MAX_KUS_BANDS)),
   // brake_time_constant <= 0 keeps the single-tau behaviour (== acc_time_constant).
   brake_time_constant_(
     brake_time_constant > 0.0 ? std::max(brake_time_constant, MIN_TIME_CONSTANT)
                               : std::max(acc_time_constant, MIN_TIME_CONSTANT)),
   lon_drag_c0_(lon_drag_c0),
   lon_drag_c1_(lon_drag_c1),
-  lon_drag_c2_(lon_drag_c2),
-  n_substep_(std::max(n_substep, 1))
+  lon_drag_c2_(lon_drag_c2)
 {
-  for (int i = 0; i < n_kus_bands_ - 1; ++i) k_us_thresholds_[i] = k_us_thresholds[i];
-  for (int i = 0; i < n_kus_bands_; ++i)     k_us_band_values_[i] = k_us_band_values[i];
   initializeInputQueue(dt);
   initializeStateQueue(dt);
 }
 
 double SimModelDelaySteerAccGearedForDiffusionPlanner::calc_yaw_rate(double vel, double steer) const
 {
-  double k_us_eff;
-  if (n_kus_bands_ > 0) {
-    // Step-band lookup: band i covers [thresholds[i-1], thresholds[i]).
-    // band 0 covers [0, thresholds[0]); last band covers [thresholds[n-2], ∞).
-    k_us_eff = k_us_band_values_[n_kus_bands_ - 1];
-    for (int i = 0; i < n_kus_bands_ - 1; ++i) {
-      if (vel < k_us_thresholds_[i]) {
-        k_us_eff = k_us_band_values_[i];
-        break;
-      }
-    }
-  } else {
-    k_us_eff = k_us_;
-  }
-  const double denom = wheelbase_ + k_us_eff * vel * vel;
+  const double denom = wheelbase_ + k_us_ * vel * vel;
   return vel * std::tan(steer + steer_bias_) / denom;
 }
 
@@ -116,7 +95,7 @@ void SimModelDelaySteerAccGearedForDiffusionPlanner::update(const double & dt)
 {
   Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
 
-  // Command delay queues advance once per update() call regardless of n_substep_ (as wo_fall_guard).
+  // Command delay queues advance once per update() call (as wo_fall_guard).
   acc_input_queue_.push_back(input_(IDX_U::PEDAL_ACCX_DES));
   delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_input_queue_.front();
   acc_input_queue_.pop_front();
@@ -128,7 +107,7 @@ void SimModelDelaySteerAccGearedForDiffusionPlanner::update(const double & dt)
 
   // full-RHS delay: sample the state feedback for the steer / accel channels at t-d as well.
   // The queues advance identically to the command queues (same size round(delay/dt)); the popped
-  // value is frozen for the whole substep loop so the steer / pedal derivatives are constant over
+  // value is frozen for the whole update so the steer / pedal derivatives are constant over
   // dt, matching Python's per-step frozen RHS (e_eff / e_a_eff computed once per step).
   steer_state_queue_.push_back(state_(IDX::STEER));
   delayed_steer_state_ = steer_state_queue_.front();
@@ -141,14 +120,11 @@ void SimModelDelaySteerAccGearedForDiffusionPlanner::update(const double & dt)
   vel_state_queue_.pop_front();
 
   const auto prev_state = state_;
-  const double sub_dt = dt / n_substep_;
-  for (int i = 0; i < n_substep_; ++i) {
-    // we cannot use updateRungeKutta() because the differentiability or the continuity
-    // condition is not satisfied, but we can use Runge-Kutta method with code reconstruction.
-    updateEuler(sub_dt, delayed_input);
-    // take velocity limit after each sub-step
-    state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
-  }
+  // we cannot use updateRungeKutta() because the differentiability or the continuity
+  // condition is not satisfied, but we can use Runge-Kutta method with code reconstruction.
+  updateEuler(dt, delayed_input);
+  // take velocity limit
+  state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
 
   // Stop condition: detect zero crossing over the full dt window using the outer prev_state.
   if (

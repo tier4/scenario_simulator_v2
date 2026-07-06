@@ -15,7 +15,6 @@
 #include <algorithm>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
-#include <vector>
 
 namespace autoware::simulator::simple_planning_simulator
 {
@@ -24,10 +23,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-  std::vector<double> k_us_thresholds, std::vector<double> k_us_band_values,
-  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
-  int n_substep)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -43,46 +39,15 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   steer_bias_(steer_bias),
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
-  k_us_(k_us),
-  n_kus_bands_(std::min(static_cast<int>(k_us_band_values.size()), MAX_KUS_BANDS)),
-  // brake_time_constant <= 0 keeps the single-tau behaviour (== acc_time_constant).
-  brake_time_constant_(
-    brake_time_constant > 0.0 ? std::max(brake_time_constant, MIN_TIME_CONSTANT)
-                              : std::max(acc_time_constant, MIN_TIME_CONSTANT)),
-  lon_drag_c0_(lon_drag_c0),
-  lon_drag_c1_(lon_drag_c1),
-  lon_drag_c2_(lon_drag_c2),
-  n_substep_(std::max(n_substep, 1))
+  k_us_(k_us)
 {
-  for (int i = 0; i < n_kus_bands_ - 1; ++i) k_us_thresholds_[i] = k_us_thresholds[i];
-  for (int i = 0; i < n_kus_bands_; ++i)     k_us_band_values_[i] = k_us_band_values[i];
   initializeInputQueue(dt);
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::calc_yaw_rate(double vel, double steer) const
 {
-  double k_us_eff;
-  if (n_kus_bands_ > 0) {
-    // Step-band lookup: band i covers [thresholds[i-1], thresholds[i]).
-    // band 0 covers [0, thresholds[0]); last band covers [thresholds[n-2], ∞).
-    k_us_eff = k_us_band_values_[n_kus_bands_ - 1];
-    for (int i = 0; i < n_kus_bands_ - 1; ++i) {
-      if (vel < k_us_thresholds_[i]) {
-        k_us_eff = k_us_band_values_[i];
-        break;
-      }
-    }
-  } else {
-    k_us_eff = k_us_;
-  }
-  const double denom = wheelbase_ + k_us_eff * vel * vel;
+  const double denom = wheelbase_ + k_us_ * vel * vel;
   return vel * std::tan(steer + steer_bias_) / denom;
-}
-
-double SimModelDelaySteerAccGearedWoFallGuard::calc_drag(double vel) const
-{
-  // Steady-state running resistance / drag offset poly(v) added to the accel target.
-  return lon_drag_c0_ + lon_drag_c1_ * vel + lon_drag_c2_ * vel * vel;
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getX() { return state_(IDX::X); }
@@ -114,7 +79,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
   Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
 
-  // Delay queue advances once per update() call regardless of n_substep_.
+  // Delay queue advances once per update() call.
   acc_input_queue_.push_back(input_(IDX_U::PEDAL_ACCX_DES));
   delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_input_queue_.front();
   acc_input_queue_.pop_front();
@@ -125,14 +90,11 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   delayed_input(IDX_U::SLOPE_ACCX) = input_(IDX_U::SLOPE_ACCX);
 
   const auto prev_state = state_;
-  const double sub_dt = dt / n_substep_;
-  for (int i = 0; i < n_substep_; ++i) {
-    // we cannot use updateRungeKutta() because the differentiability or the continuity
-    // condition is not satisfied, but we can use Runge-Kutta method with code reconstruction.
-    updateEuler(sub_dt, delayed_input);
-    // take velocity limit after each sub-step
-    state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
-  }
+  // we cannot use updateRungeKutta() because the differentiability or the continuity
+  // condition is not satisfied, but we can use Runge-Kutta method with code reconstruction.
+  updateEuler(dt, delayed_input);
+  // take velocity limit
+  state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
 
   // Stop condition: detect zero crossing over the full dt window using the outer prev_state.
   if (
@@ -186,15 +148,8 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const double steer_des =
     sat(input(IDX_U::STEER_DES), steer_lim_, -steer_lim_) * debug_steer_scaling_factor_;
 
-  // Yaw rate (with k_us understeer and steer-bias β); reused for the corner-coupling term below.
+  // Yaw rate (with k_us understeer and steer-bias β).
   const double yaw_rate = calc_yaw_rate(vel, steer);
-  // Acceleration target with running-resistance offset poly(v) and corner coupling c·(vx·ω)²,
-  // matching the verification viewer's a_target = a_cmd + poly(v) + c·(vx·ω)². The actuator
-  // (PEDAL_ACCX) tracks this target with a first-order lag whose time constant is split between
-  // throttle (a_cmd >= 0) and brake (a_cmd < 0). All extra terms vanish when their coefficients
-  // are zero, leaving the original single-tau behaviour.
-  const double pedal_acc_target = pedal_acc_des + calc_drag(vel);
-  const double acc_tau = (pedal_acc_des >= 0.0) ? acc_time_constant_ : brake_time_constant_;
   // NOTE: `steer_des` is calculated by control from measured values. getSteer() also gets the
   // measured value. The steer_rate used in the motion calculation is obtained from these
   // differences.
@@ -242,7 +197,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     }
   }();
   d_state(IDX::STEER) = steer_rate;
-  d_state(IDX::PEDAL_ACCX) = -(pedal_acc - pedal_acc_target) / acc_tau;
+  d_state(IDX::PEDAL_ACCX) = -(pedal_acc - pedal_acc_des) / acc_time_constant_;
 
   return d_state;
 }
