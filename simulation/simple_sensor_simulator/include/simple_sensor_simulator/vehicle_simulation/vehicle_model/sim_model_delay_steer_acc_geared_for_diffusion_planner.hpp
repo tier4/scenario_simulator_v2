@@ -1,0 +1,267 @@
+// Copyright 2025 The Autoware Foundation.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef AUTOWARE__SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER_HPP_  // NOLINT
+#define AUTOWARE__SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER_HPP_  // NOLINT
+
+#include <Eigen/Core>
+#include <Eigen/LU>
+#include <array>
+#include <deque>
+#include <iostream>
+#include <queue>
+#include <vector>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
+
+namespace autoware::simulator::simple_planning_simulator
+{
+
+/**
+ * @brief 継続改良のための汎用派生モデル（初出は diffusion planner のモデル差し替え用途）。
+ *
+ * SimModelDelaySteerAccGearedWoFallGuard の忠実なコピーを土台に、ステア・加速度チャネルの
+ * むだ時間を「指令のみ遅延（入力キュー）」から「右辺全体の遅延（full-RHS delay）」へ拡張した
+ * 派生。以後の物理項の追加はこの 1 モデルに蓄積する想定で、特定機能名に依存しない汎用名とする。
+ *
+ * ## wo_fall_guard との差分（full-RHS delay）
+ * wo_fall_guard はステア/加速度の「指令」だけを入力キューで t−d 遅延させ、状態フィードバック
+ * （現ステア角・現 pedal 加速度）は現在値のまま用いる。本モデルはこれに加えて、ステア式・加速度
+ * 式が参照する「状態」も t−d でサンプリングする。すなわち各チャネル c の右辺全体を t−d_c で
+ * 評価する（Python 側 vehicle_model_fitting の統一枠組みと 1:1 対応）。
+ *   - ステア式(STEER): steer_rate = f(STEER(t−d_steer), steer_des(t−d_steer))
+ *   - 加速度式(PEDAL_ACCX): -(pedal(t−d_acc) − a_target)/τ,
+ *                          a_target = pedal_des(t−d_acc) + drag(VX(t−d_acc))
+ * 位置式(X,Y)・ヨー式(YAW)・速度式(VX, ギア則) は遅延を持たない（現在状態で評価）。ヨー観測
+ * 遅延 d_tt はこのフェーズの対象外（将来この派生へ追加）。
+ *
+ * ## substep をまたぐ凍結（Python の per-step 凍結 RHS との一致）
+ * 遅延状態は update() 冒頭で substep ループ前に一度だけ取り出してメンバに凍結し、n_substep 個の
+ * Euler サブステップを通して定数として用いる。指令遅延も update() ごとに 1 回だけ進むため、
+ * ステア/加速度チャネルの微分は dt 区間で定数となり、Python が 1 ステップで e_eff/e_a_eff を
+ * 1 回だけ計算して RK4 の全段で凍結するのと等価になる。
+ *
+ * ## 退化性（bit 一致ゲート）
+ * 全遅延 = 0 かつ n_substep = 1 のとき、遅延状態 = 現在状態・凍結 = 逐次再計算が一致するため、
+ * 本モデルは wo_fall_guard と bit 単位で一致する（配管全体の検証アンカー）。
+ */
+class SimModelDelaySteerAccGearedForDiffusionPlanner : public SimModelInterface
+{
+public:
+  /**
+   * @param [in] vx_lim velocity limit [m/s]
+   * @param [in] steer_lim steering limit [rad]
+   * @param [in] vx_rate_lim acceleration limit [m/ss]
+   * @param [in] steer_rate_lim steering angular velocity limit [rad/ss]
+   * @param [in] wheelbase vehicle wheelbase length [m]
+   * @param [in] dt delta time information to set input buffer for delay
+   * @param [in] acc_delay time delay for accel command [s]
+   * @param [in] acc_time_constant time constant for 1D model of accel dynamics
+   * @param [in] steer_delay time delay for steering command [s]
+   * @param [in] steer_time_constant time constant for 1D model of steering dynamics
+   * @param [in] steer_dead_band dead band for steering angle [rad]
+   * @param [in] steer_bias steering bias [rad]
+   * @param [in] debug_acc_scaling_factor scaling factor for accel command
+   * @param [in] debug_steer_scaling_factor scaling factor for steering command
+   * @param [in] k_us understeer coefficient (scalar fallback when k_us_band_values is empty) [rad/(m/s²)]; 0 = ideal bicycle
+   * @param [in] k_us_thresholds sorted speed thresholds for k_us step bands [m/s]; length = k_us_band_values.size()-1; empty = scalar mode
+   * @param [in] k_us_band_values k_us value per speed band [rad/(m/s²)]; empty = use scalar k_us at all speeds.
+   *             band i covers [k_us_thresholds[i-1], k_us_thresholds[i]) with band 0 starting at 0.
+   *             last band covers [k_us_thresholds.back(), ∞).
+   * @param [in] brake_time_constant time constant for accel dynamics while braking
+   *             (a_cmd < 0). <= 0 falls back to acc_time_constant (single-tau behaviour).
+   * @param [in] lon_drag_c0 constant longitudinal running-resistance offset added to the accel
+   *             target a_target [m/s²] (rolling resistance / standing slope). 0 disables.
+   * @param [in] lon_drag_c1 velocity-linear running-resistance coefficient [1/s]. 0 disables.
+   * @param [in] lon_drag_c2 velocity-quadratic (aero) running-resistance coefficient [1/m]. 0 disables.
+   * @param [in] n_substep Euler sub-steps per update() call (>= 1)
+   *
+   * @note wo_fall_guard と同一の引数列（末尾 n_substep まで）。full-RHS delay 化は内部実装の
+   *       差分のみで、コンストラクタ signature は互換に保つ（登録・ファクトリを共通化するため）。
+   *       全パラメータが中立（遅延 0・単一 τ・オフセット無し）のとき wo_fall_guard と bit 一致。
+   */
+  SimModelDelaySteerAccGearedForDiffusionPlanner(
+    double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
+    double dt, double acc_delay, double acc_time_constant, double steer_delay,
+    double steer_time_constant, double steer_dead_band, double steer_bias,
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+    std::vector<double> k_us_thresholds = {}, std::vector<double> k_us_band_values = {},
+    double brake_time_constant = 0.0, double lon_drag_c0 = 0.0, double lon_drag_c1 = 0.0,
+    double lon_drag_c2 = 0.0, int n_substep = 1);
+
+  /**
+   * @brief default destructor
+   */
+  ~SimModelDelaySteerAccGearedForDiffusionPlanner() = default;
+
+  /**
+   * @brief replace internal acc / steer delay queues with caller-supplied histories.
+   *        Used by C wrapper to inject actual past command history for per-step
+   *        real-vs-sim replay (see vehicle_model_c_wrapper.cpp).
+   */
+  void setInputQueues(
+    const std::deque<double> & acc_queue, const std::deque<double> & steer_queue);
+
+  /**
+   * @brief re-fill the delayed-state history buffers (STEER / PEDAL_ACCX / VX) with a constant
+   *        equal to the current state. Call after seeding the state (reset / warmup restore) so the
+   *        full-RHS delay reads the steady pre-window state, not the warm-up transient.
+   */
+  void resetStateQueues();
+
+  /**
+   * @brief sizes of the internal delay queues (driven by acc_delay / steer_delay / dt).
+   */
+  int getAccQueueSize() const;
+  int getSteerQueueSize() const;
+
+private:
+  const double MIN_TIME_CONSTANT;  //!< @brief minimum time constant
+
+  enum IDX {
+    X = 0,
+    Y,
+    YAW,
+    VX,
+    STEER,
+    ACCX,
+    PEDAL_ACCX,
+  };
+  enum IDX_U { PEDAL_ACCX_DES = 0, GEAR, SLOPE_ACCX, STEER_DES };
+
+  const double vx_lim_;          //!< @brief velocity limit [m/s]
+  const double vx_rate_lim_;     //!< @brief acceleration limit [m/ss]
+  const double steer_lim_;       //!< @brief steering limit [rad]
+  const double steer_rate_lim_;  //!< @brief steering angular velocity limit [rad/s]
+  const double wheelbase_;       //!< @brief vehicle wheelbase length [m]
+
+  std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
+  std::deque<double> steer_input_queue_;     //!< @brief buffer for steering command
+  // full-RHS delay: 状態フィードバックも t−d でサンプリングするための状態履歴バッファ。
+  // dt 粒度（指令キューと同サイズ round(delay/dt)）で保持し、substep をまたいで凍結する。
+  std::deque<double> steer_state_queue_;     //!< @brief buffer for STEER state (delayed feedback)
+  std::deque<double> pedal_state_queue_;     //!< @brief buffer for PEDAL_ACCX state (delayed feedback)
+  std::deque<double> vel_state_queue_;       //!< @brief buffer for VX state (delayed drag argument)
+  // update() 冒頭で 1 回だけ取り出し、calcModel が全 substep で参照する凍結遅延状態。
+  double delayed_steer_state_ = 0.0;         //!< @brief STEER at t−steer_delay (frozen per update)
+  double delayed_pedal_state_ = 0.0;         //!< @brief PEDAL_ACCX at t−acc_delay (frozen per update)
+  double delayed_vel_state_ = 0.0;           //!< @brief VX at t−acc_delay (frozen per update)
+  const double acc_delay_;                   //!< @brief time delay for accel command [s]
+  const double acc_time_constant_;           //!< @brief time constant for accel dynamics
+  const double steer_delay_;                 //!< @brief time delay for steering command [s]
+  const double steer_time_constant_;         //!< @brief time constant for steering dynamics
+  const double steer_dead_band_;             //!< @brief dead band for steering angle [rad]
+  const double steer_bias_;                  //!< @brief steering angle bias [rad]
+  const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
+  const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
+  const double k_us_;                        //!< @brief understeer coefficient scalar fallback (n_kus_bands_==0) [rad/(m/s²)]
+  static constexpr int MAX_KUS_BANDS = 16;
+  std::array<double, MAX_KUS_BANDS> k_us_thresholds_{};   //!< @brief sorted speed thresholds (n_kus_bands_-1 used)
+  std::array<double, MAX_KUS_BANDS> k_us_band_values_{};  //!< @brief k_us per speed band (n_kus_bands_ used)
+  const int n_kus_bands_;                    //!< @brief number of step bands; 0 = legacy k_us + ramp
+  const double brake_time_constant_;         //!< @brief accel time constant while braking [s]
+  const double lon_drag_c0_;                 //!< @brief running-resistance offset p0 [m/s²]
+  const double lon_drag_c1_;                 //!< @brief running-resistance velocity-linear p1 [1/s]
+  const double lon_drag_c2_;                 //!< @brief running-resistance velocity-quadratic p2 [1/m]
+  const int n_substep_;                      //!< @brief Euler sub-steps per update() call (>= 1)
+
+  /**
+   * @brief steady-state yaw rate including speed-dependent understeer and steer bias.
+   *
+   * Step-band mode (n_kus_bands_ > 0):
+   *   k_us_thresholds_[0..n-2] are sorted thresholds; k_us_band_values_[i] applies when
+   *   vx < k_us_thresholds_[i] (i=0 is lowest band). The last band covers [thresh[n-2], ∞).
+   *   ω = vx · tan(δ + steer_bias) / (L + k_us_band_values_[band] · vx²)
+   *
+   * Scalar mode (n_kus_bands_ == 0): k_us_eff = k_us_ at all speeds.
+   *
+   * Reduces to the ideal bicycle model when k_us = 0 and steer_bias = 0.
+   */
+  double calc_yaw_rate(double vel, double steer) const;
+
+  /**
+   * @brief steady-state running-resistance / drag offset poly(v) = p0 + p1·vx + p2·vx²
+   *        added to the accel target a_target. All-zero coefficients disable it.
+   */
+  double calc_drag(double vel) const;
+
+  /**
+   * @brief set queue buffer for input command
+   * @param [in] dt delta time
+   */
+  void initializeInputQueue(const double & dt);
+
+  /**
+   * @brief set queue buffer for delayed state feedback (STEER / PEDAL_ACCX / VX)
+   * @param [in] dt delta time
+   */
+  void initializeStateQueue(const double & dt);
+
+  /**
+   * @brief get vehicle position x
+   */
+  double getX() override;
+
+  /**
+   * @brief get vehicle position y
+   */
+  double getY() override;
+
+  /**
+   * @brief get vehicle angle yaw
+   */
+  double getYaw() override;
+
+  /**
+   * @brief get vehicle velocity vx
+   */
+  double getVx() override;
+
+  /**
+   * @brief get vehicle lateral velocity
+   */
+  double getVy() override;
+
+  /**
+   * @brief get vehicle longitudinal acceleration
+   */
+  double getAx() override;
+
+  /**
+   * @brief get vehicle angular-velocity wz
+   */
+  double getWz() override;
+
+  /**
+   * @brief get vehicle steering angle
+   */
+  double getSteer() override;
+
+  /**
+   * @brief update vehicle states
+   * @param [in] dt delta time [s]
+   */
+  void update(const double & dt) override;
+
+  /**
+   * @brief calculate derivative of states with time delay steering model
+   * @param [in] state current model state
+   * @param [in] input input vector to model
+   */
+  Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
+};
+
+}  // namespace autoware::simulator::simple_planning_simulator
+
+// NOLINTNEXTLINE
+#endif  // AUTOWARE__SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER_HPP_

@@ -147,6 +147,7 @@ auto toString(const VehicleModelType datum) -> std::string
   switch (datum) {
     BOILERPLATE(DELAY_STEER_ACC);
     BOILERPLATE(DELAY_STEER_ACC_GEARED);
+    BOILERPLATE(DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER);
     BOILERPLATE(DELAY_STEER_ACC_GEARED_WO_FALL_GUARD);
     BOILERPLATE(DELAY_STEER_MAP_ACC_GEARED);
     BOILERPLATE(DELAY_STEER_VEL);
@@ -173,6 +174,8 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
     {"DELAY_STEER_ACC_GEARED", VehicleModelType::DELAY_STEER_ACC_GEARED},
+    {"DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER",
+     VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER},
     {"DELAY_STEER_ACC_GEARED_WO_FALL_GUARD",
      VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD},
     {"DELAY_STEER_MAP_ACC_GEARED", VehicleModelType::DELAY_STEER_MAP_ACC_GEARED},
@@ -246,6 +249,18 @@ auto EgoEntitySimulation::makeSimulationModel(
     case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
       return std::make_shared<
         autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
+        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
+        k_us_thresholds, k_us_bands,
+        brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2);
+
+    case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
+      // wo_fall_guard と同一パラメータ列で構築（signature 互換）。差分はステア・加速度の遅延が
+      // full-RHS（状態フィードバックも t-d）になる点のみ。全パラメータが中立なら bit 一致。
+      return std::make_shared<
+        autoware::simulator::simple_planning_simulator::
+          SimModelDelaySteerAccGearedForDiffusionPlanner>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
         debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
@@ -358,6 +373,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
       break;
 
     case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+    case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
       v << 0, 0, 0, value, 0, 0, 0;
       break;
 
@@ -450,6 +466,7 @@ auto EgoEntitySimulation::overwrite(
     switch (Eigen::VectorXd state = Eigen::VectorXd::Zero(vehicle_model_ptr_->getDimX());
             vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+      case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
         // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX]; seed the pedal acceleration
         // state with the measured acceleration so the post-replay integration continues
         // from the observed motion.
@@ -637,6 +654,7 @@ void EgoEntitySimulation::update(
           break;
 
         case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+        case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
         case VehicleModelType::TAIGA_DYN:
         case VehicleModelType::TAIGA_X:
           input(0) = acceleration;
