@@ -15,17 +15,13 @@ install(
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/lanelet_bridge_node.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/scenario_post_processor.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/carla_bridge.py
-           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/rosbag_merger.py
-           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/rosbag_reader.py
-           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/report_generator.py
-           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/alpine_js.py
-           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/chota_css.py
   DESTINATION lib/${PROJECT_NAME})
 
 install(
   DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config
             ${CMAKE_CURRENT_SOURCE_DIR}/launch
             ${CMAKE_CURRENT_SOURCE_DIR}/scenario
+            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/templates
   DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)

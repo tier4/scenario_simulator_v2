@@ -8,6 +8,7 @@
   <license>Apache License 2.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_python</buildtool_depend>
+  <depend>ament_index_python</depend>
   <depend>ament_copyright</depend>
   <depend>ament_pep257</depend>
   <depend>autoware_map_msgs</depend>

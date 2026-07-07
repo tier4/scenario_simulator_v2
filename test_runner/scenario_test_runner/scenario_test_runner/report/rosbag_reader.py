@@ -25,7 +25,7 @@ import rosbag2_py
 from autoware_map_msgs.msg import LaneletMapBin
 from autoware_planning_msgs.msg import Trajectory
 from pathlib import Path
-from rosbag_merger import find_driving_timestamp
+from .rosbag_merger import find_driving_timestamp
 
 import lanelet2  # noqa: F401 — needed for loadRobust
 from lanelet2.io import Origin, loadRobust

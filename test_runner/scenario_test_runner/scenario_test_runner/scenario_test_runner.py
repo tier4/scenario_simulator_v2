@@ -16,18 +16,21 @@
 # limitations under the License.
 
 
+import json
 import os
 import sys
-
-# --symlink-install causes sys.path[0] to resolve to the symlink target's
-# directory instead of the install directory where report/*.py are flattened.
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-import rclpy
 import tempfile
 import time
-import json
 
+# This script's name collides with the installed Python package.
+# Temporarily remove sys.path[0] (the script's directory) so the
+# package import resolves to the ament-installed package, not this file.
+_sp0 = sys.path.pop(0)
+from scenario_test_runner.report.report_generator import generate_report
+from scenario_test_runner.report.rosbag_merger import merge_single_rosbag
+sys.path.insert(0, _sp0)
+
+import rclpy
 from argparse import ArgumentParser
 from glob import glob
 from lifecycle_controller import LifecycleController
@@ -38,8 +41,6 @@ from openscenario_preprocessor_msgs.srv import SetParameter
 from openscenario_utility.conversion import convert
 from pathlib import Path
 from rclpy.executors import ExternalShutdownException
-from report_generator import generate_report
-from rosbag_merger import merge_single_rosbag
 from shutil import copytree, rmtree
 from subprocess import run as subprocess_run
 from sys import exit
