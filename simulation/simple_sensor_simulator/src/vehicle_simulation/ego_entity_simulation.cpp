@@ -244,15 +244,29 @@ auto EgoEntitySimulation::makeSimulationModel(
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
         debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
 
-    case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
+    case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER: {
       // 差分はステア・加速度の遅延が full-RHS（状態フィードバックも t-d）になる点。
       // 全遅延が 0 なら wo_fall_guard と bit 一致。
+      // このモデルのみチューニングパラメータを delay_steer_acc_geared_for_diffusion_planner.version /
+      // delay_steer_acc_geared_for_diffusion_planner.v{N}.* というバージョン名前空間から読む。
+      const auto delay_steer_acc_geared_for_diffusion_planner_version =
+        common::getParameter<int>("delay_steer_acc_geared_for_diffusion_planner.version", 1);
+      const auto ns = "delay_steer_acc_geared_for_diffusion_planner.v" +
+                       std::to_string(delay_steer_acc_geared_for_diffusion_planner_version) + ".";
       return std::make_shared<
         autoware::simulator::simple_planning_simulator::
           SimModelDelaySteerAccGearedForDiffusionPlanner>(
-        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
-        acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
-        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time,
+        common::getParameter<double>(ns + "acc_time_delay", 0.1),
+        common::getParameter<double>(ns + "acc_time_constant", 0.1),
+        common::getParameter<double>(ns + "steer_time_delay", 0.24),
+        common::getParameter<double>(ns + "steer_time_constant", 0.27),
+        common::getParameter<double>(ns + "steer_dead_band", 0.0),
+        common::getParameter<double>(ns + "steer_bias", 0.0),
+        common::getParameter<double>(ns + "debug_acc_scaling_factor", 1.0),
+        common::getParameter<double>(ns + "debug_steer_scaling_factor", 1.0),
+        common::getParameter<double>(ns + "k_us", 0.0));
+    }
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       if (!std::filesystem::exists(acceleration_map_path)) {
