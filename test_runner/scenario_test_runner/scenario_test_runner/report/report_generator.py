@@ -15,13 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if __name__ == "__main__" and __package__ is None:
+    import sys as _sys
+    from pathlib import Path as _Path
+
+    _pkg_parent = str(_Path(__file__).resolve().parent.parent.parent)
+    if _pkg_parent not in _sys.path:
+        _sys.path.insert(0, _pkg_parent)
+    __package__ = "scenario_test_runner.report"
+
 import json
 from pathlib import Path
 
 from ament_index_python.packages import get_package_share_directory
 
 from .alpine_js import ALPINE_JS
-from .chota_css import CHOTA_CSS
+from .d3_js import D3_JS
+from .open_props import OPEN_PROPS_CSS
 
 _TEMPLATE_PATH = (
     Path(get_package_share_directory("scenario_test_runner"))
@@ -34,6 +44,24 @@ def _load_template():
     return _TEMPLATE_PATH.read_text()
 
 
+_MODEL_HUES = [210, 30, 150, 330, 60, 270, 0, 120]
+
+
+def _assign_color(index):
+    hue = _MODEL_HUES[index % len(_MODEL_HUES)]
+    return f"hsl({hue},70%,55%)"
+
+
+def _compute_bbox(models):
+    all_x, all_y = [], []
+    for m in models:
+        all_x.extend(v for v in m["x"] if v is not None)
+        all_y.extend(v for v in m["y"] if v is not None)
+    if not all_x:
+        return [0, 0, 1, 1]
+    return [min(all_x), min(all_y), max(all_x), max(all_y)]
+
+
 def generate_report(output_dir):
     """Generate self-contained HTML comparison reports.
 
@@ -41,7 +69,7 @@ def generate_report(output_dir):
     Falls back to single-model discovery when staging is absent.
     Reports are written to ``output_dir/result_archive/``.
     """
-    from .rosbag_reader import extract_map_data, extract_trajectories
+    from .rosbag_reader import extract_map_data, extract_trajectories, RATE_HZ
 
     output_dir = Path(output_dir)
     staging = output_dir / "staging"
@@ -75,24 +103,32 @@ def generate_report(output_dir):
         if model_dirs:
             rel = scenario_bag.relative_to(model_dirs[0])
             models = []
-            for md in model_dirs:
+            for i, md in enumerate(model_dirs):
                 bag = md / rel
                 if bag.is_dir():
-                    models.append({
-                        "name": md.name,
-                        "trajectories": extract_trajectories(bag),
-                    })
+                    traj_data = extract_trajectories(bag)
+                    traj_data["name"] = md.name
+                    traj_data["color"] = _assign_color(i)
+                    models.append(traj_data)
         else:
-            models = [{
-                "name": output_dir.name,
-                "trajectories": extract_trajectories(scenario_bag),
-            }]
+            traj_data = extract_trajectories(scenario_bag)
+            traj_data["name"] = output_dir.name
+            traj_data["color"] = _assign_color(0)
+            models = [traj_data]
 
-        data = {"map": map_data, "models": models}
+        n = max((len(m["x"]) for m in models), default=0)
+        data = {
+            "rate_hz": RATE_HZ,
+            "n": n,
+            "bbox": _compute_bbox(models),
+            "map": map_data,
+            "models": models,
+        }
         html = (
             _load_template()
-            .replace("{{CHOTA_CSS}}", CHOTA_CSS)
+            .replace("{{OPEN_PROPS_CSS}}", OPEN_PROPS_CSS)
             .replace("{{ALPINE_JS}}", ALPINE_JS)
+            .replace("{{D3_JS}}", D3_JS)
             .replace("{{DATA_JSON}}", json.dumps(data, separators=(",", ":")))
         )
 

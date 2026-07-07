@@ -3,258 +3,849 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Diffusion Planner Model Comparison</title>
-  <style>{{CHOTA_CSS}}</style>
+  <title>Trajectory Comparison Report</title>
+  <style>{{OPEN_PROPS_CSS}}</style>
   <style>
+    /* --- Theme tokens --- */
     :root {
-      --bg-color: #13161f;
-      --bg-secondary-color: #1a1e2e;
-      --font-color: #c9d1d9;
-      --color-grey: #8b949e;
-      --color-lightGrey: #30363d;
-      --color-darkGrey: #c9d1d9;
-      --color-primary: #58a6ff;
-      --color-error: #f85149;
-      --color-success: #3fb950;
-      --grid-maxWidth: 1200px;
+      --surface-1: #13161f;
+      --surface-2: #1a1e2e;
+      --surface-3: #242a3a;
+      --text-1: #c9d1d9;
+      --text-2: #8b949e;
+      --border-dim: #30363d;
+      --accent: #58a6ff;
+      --danger: #f85149;
+      --success: #3fb950;
       color-scheme: dark;
     }
-    canvas {
-      display: block; cursor: grab;
-      background: var(--bg-secondary-color); border-radius: 4px;
+
+    /* --- Reset + Base --- */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-size: var(--font-size-1);
+      line-height: var(--font-lineheight-3);
+      color: var(--text-1);
+      background: var(--surface-1);
     }
-    canvas:active { cursor: grabbing; }
+    h3 { margin: var(--size-3) 0 var(--size-1); font-size: var(--font-size-3); }
+    img, svg, canvas { max-width: 100%; display: block; }
+
+    /* --- Layout --- */
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 var(--size-3); }
+    .row { display: grid; grid-template-columns: 3fr 1fr; gap: var(--size-3); }
+    @media (max-width: 768px) { .row { grid-template-columns: 1fr; } }
+
+    /* --- Card --- */
+    .card {
+      background: var(--surface-2);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-2);
+      padding: var(--size-3);
+    }
+
+    /* --- Controls --- */
     .controls {
-      display: flex; align-items: center; gap: .5rem;
-      margin: .5rem 0;
+      display: flex; align-items: center; gap: var(--size-2);
+      margin: var(--size-2) 0; flex-wrap: wrap;
     }
-    .controls input[type=range] { flex: 1; border: none; padding: 0; }
-    .controls small { color: var(--color-grey); white-space: nowrap; }
-    .model-list { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
-    .model-list label {
-      display: inline-flex; align-items: center; gap: .5rem;
-      cursor: pointer; padding: 0;
+    .controls input[type=range] { flex: 1; min-width: 120px; border: none; padding: 0; }
+    .controls small { color: var(--text-2); white-space: nowrap; }
+
+    /* --- Buttons --- */
+    button {
+      font-family: inherit;
+      font-size: var(--font-size-1);
+      padding: var(--size-1) var(--size-3);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-2);
+      background: transparent;
+      color: var(--text-1);
+      cursor: pointer;
+    }
+    button:hover { background: var(--surface-3); }
+
+    /* --- Select --- */
+    select {
+      font-family: inherit;
+      font-size: var(--font-size-1);
+      padding: var(--size-1) var(--size-2);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-2);
+      background: var(--surface-2);
+      color: var(--text-1);
+    }
+
+    /* --- Range input --- */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: var(--border-dim);
+      border-radius: var(--radius-round);
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 14px; height: 14px;
+      border-radius: var(--radius-round);
+      background: var(--accent);
+      cursor: pointer;
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 14px; height: 14px;
+      border: none;
+      border-radius: var(--radius-round);
+      background: var(--accent);
+      cursor: pointer;
+    }
+    input[type=range]::-moz-range-track {
+      height: 6px;
+      background: var(--border-dim);
+      border-radius: var(--radius-round);
+    }
+
+    /* --- Checkbox / Radio --- */
+    input[type=checkbox], input[type=radio] {
+      accent-color: var(--accent);
+    }
+
+    /* --- Map --- */
+    .map-wrap {
+      position: relative;
+      width: 100%;
+      background: var(--surface-2);
+      border-radius: var(--radius-2);
+      overflow: hidden;
+    }
+    .map-wrap canvas, .map-wrap svg {
+      display: block;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    .map-wrap canvas { cursor: grab; }
+    .map-wrap canvas:active { cursor: grabbing; }
+    .map-wrap svg { pointer-events: none; }
+
+    /* --- Legend --- */
+    .legend-panel {
+      display: flex; flex-direction: column; gap: var(--size-2);
+      padding: var(--size-3); font-size: var(--font-size-1);
+    }
+    .legend-item { display: flex; align-items: center; gap: var(--size-2); }
+    .legend-item label {
+      cursor: pointer; display: flex; align-items: center;
+      gap: var(--size-1); margin: 0; padding: 0;
     }
     .swatch {
       display: inline-block; width: .9em; height: .9em;
-      border-radius: 3px;
+      border-radius: var(--radius-1);
     }
+    .stat { color: var(--text-2); font-size: var(--font-size-0); margin-left: var(--size-4); }
+
+    /* --- Plots --- */
+    .plot-row {
+      display: flex; gap: var(--size-1); flex-wrap: wrap;
+      margin-top: var(--size-2); font-size: var(--font-size-1);
+    }
+    .plot-cell { flex: 1 1 200px; min-width: 180px; }
+    .plot-cell svg { width: 100%; display: block; }
+    .plot-title {
+      font-size: var(--font-size-1); color: var(--text-2);
+      text-align: center; margin: 0;
+    }
+
+    /* --- Utilities --- */
+    .text-muted { color: var(--text-2); }
   </style>
 </head>
 <body>
-  <main class="container" x-data="reportApp()" x-init="init()">
-    <h1>Diffusion Planner Model Comparison</h1>
-    <p class="subtitle" x-text="data.models.length + ' model(s)'"></p>
+  <main class="container" x-data="viewer">
+    <h3 style="margin-bottom:.25rem">Trajectory Comparison</h3>
+    <p class="text-muted" style="margin-top:0" x-text="$store.models.list.length + ' model(s)'"></p>
 
-    <canvas x-ref="canvas" height="600"
-      @mousedown="onMouseDown($event)"
-      @mousemove="onMouseMove($event)"
-      @mouseup="onMouseUp()"
-      @mouseleave="onMouseUp()"
-      @wheel.prevent="onWheel($event)"></canvas>
-
+    <!-- Controls -->
     <div class="controls">
-      <button @click="togglePlay()" x-text="playing ? '⏸' : '▶'"></button>
-      <input type="range" min="0" :max="maxTime || 1" step="0.001"
-        :value="currentTime"
-        @pointerdown="if (playing) togglePlay()"
-        @input="currentTime = +$event.target.value; draw()">
-      <small x-text="currentTime.toFixed(1) + 's / ' + maxTime.toFixed(1) + 's'"></small>
-      <button @click="fitToTrajectory(); draw()">Fit</button>
+      <select x-model="$store.playback.mode" @change="onModeChange()">
+        <option value="time">Time Sync</option>
+        <option value="pos">Position Sync</option>
+      </select>
+      <button @click="togglePlay()" x-text="$store.playback.playing ? 'Pause' : 'Play'"></button>
+      <select x-model.number="$store.playback.speedMul">
+        <option value="0.25">0.25x</option>
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="2">2x</option>
+        <option value="4">4x</option>
+      </select>
+      <button @click="$store.camera.follow = !$store.camera.follow"
+        x-text="$store.camera.follow ? 'Unfollow' : 'Follow'"></button>
+      <button @click="fitAll()">Fit All</button>
+      <label style="display:flex;align-items:center;gap:.3rem;cursor:pointer">
+        <input type="checkbox" x-model="$store.ui.showPlanned"> Planned
+      </label>
     </div>
 
-    <div class="model-list">
-      <template x-for="(model, mi) in data.models" :key="mi">
-        <label>
-          <input type="checkbox" checked
-            @change="visible[mi] = $el.checked; draw()">
-          <span class="swatch"
-            :style="'background:hsl(' + hues[mi % hues.length] + ',80%,50%)'"></span>
-          <span x-text="model.name"></span>
-        </label>
+    <!-- Seek bar -->
+    <div class="controls">
+      <template x-if="$store.playback.mode === 'time'">
+        <input type="range" min="0" :max="$store.playback.maxT || 1" step="0.01"
+          :value="$store.playback.curT"
+          @input="$store.playback.curT = +$event.target.value; markDirty()">
       </template>
+      <template x-if="$store.playback.mode === 'pos'">
+        <input type="range" min="0" :max="$store.playback.maxS || 1" step="0.1"
+          :value="$store.playback.curS"
+          @input="$store.playback.curS = +$event.target.value; markDirty()">
+      </template>
+      <small x-show="$store.playback.mode === 'time'"
+        x-text="$store.playback.curT.toFixed(1) + 's / ' + $store.playback.maxT.toFixed(1) + 's'"></small>
+      <small x-show="$store.playback.mode === 'pos'"
+        x-text="$store.playback.curS.toFixed(1) + 'm / ' + $store.playback.maxS.toFixed(1) + 'm'"></small>
+    </div>
+
+    <!-- Map + Legend -->
+    <div class="row">
+      <div x-data="mapCanvas">
+        <div class="map-wrap" x-ref="mapWrap" style="height:550px">
+          <canvas x-ref="mapCvs"
+            @mousedown="onMouseDown($event)"
+            @mousemove="onMouseMove($event)"
+            @mouseup="onMouseUp()"
+            @mouseleave="onMouseUp()"
+            @wheel.prevent="onWheel($event)"></canvas>
+          <svg x-ref="mapSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+      </div>
+      <div x-data="legend">
+        <div class="legend-panel card">
+          <strong>Models</strong>
+          <template x-for="(m, i) in $store.models.list" :key="i">
+            <div class="legend-item">
+              <label>
+                <input type="checkbox" :checked="$store.models.visible[i]"
+                  @change="$store.models.visible[i] = $el.checked; markDirty()">
+                <span class="swatch" :style="'background:' + m.color"></span>
+                <span x-text="m.name"></span>
+              </label>
+              <div>
+                <input type="radio" :name="'baseline'" :value="i"
+                  :checked="$store.models.baselineIdx === i"
+                  @change="setBaseline(i)">
+                <small class="text-muted">base</small>
+              </div>
+            </div>
+          </template>
+          <template x-for="(m, i) in $store.models.list" :key="'stat'+i">
+            <div class="stat" x-show="$store.models.visible[i]" x-html="getStats(i)"></div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time-series plots -->
+    <div x-data="plotsPanel" x-show="$store.ui.showPlots">
+      <div class="controls" style="margin-top:.5rem">
+        <label style="display:flex;align-items:center;gap:.3rem;cursor:pointer">
+          <input type="checkbox" x-model="$store.ui.showPlots" checked> Charts
+        </label>
+        <select x-model.number="$store.ui.plotWindowS" style="width:auto">
+          <option value="5">5s window</option>
+          <option value="10" selected>10s window</option>
+          <option value="20">20s window</option>
+          <option value="0">Full range</option>
+        </select>
+      </div>
+      <div class="plot-row" x-ref="plotRow"></div>
+    </div>
+    <div class="controls" x-show="!$store.ui.showPlots">
+      <label style="display:flex;align-items:center;gap:.3rem;cursor:pointer">
+        <input type="checkbox" x-model="$store.ui.showPlots"> Charts
+      </label>
     </div>
   </main>
 
   <script>const REPORT_DATA = {{DATA_JSON}};</script>
   <script>
-  function reportApp() {
-    const HUES = [210, 0, 120, 45, 270];
-    const cam = { cx: 0, cy: 0, scale: 1 };
-    const drag = { active: false, sx: 0, sy: 0, cx0: 0, cy0: 0 };
-    let animId = null, lastAnimTime = 0;
-    let ctx = null;
-    let canvas = null;
+  (function() {
+    "use strict";
+    const D = REPORT_DATA;
+    const RATE = D.rate_hz;
+    const N = D.n;
+    const MODELS = D.models;
+    const CHANNELS = ["velocity", "accel", "heading_rate", "steer"];
+    const CH_LABELS = {velocity: "Velocity [m/s]", accel: "Accel [m/s²]",
+                       heading_rate: "Heading Rate [rad/s]", steer: "Steer [deg]"};
 
-    function wx(px) { return (px - cam.cx) * cam.scale + canvas.width / 2; }
-    function wy(py) { return -(py - cam.cy) * cam.scale + canvas.height / 2; }
+    // Global dirty flag — shared between Alpine template expressions and JS components
+    let _dirty = true;
+    window.markDirty = function() { _dirty = true; };
 
-    function polyline(pts) {
-      if (pts.length < 2) return;
-      ctx.beginPath();
-      ctx.moveTo(wx(pts[0][0]), wy(pts[0][1]));
-      for (let i = 1; i < pts.length; i++) ctx.lineTo(wx(pts[i][0]), wy(pts[i][1]));
-      ctx.stroke();
+    // --- Interpolation helpers ---
+    function sampleAtT(run, t) {
+      const nv = run.n_valid;
+      if (nv < 2) return null;
+      const fi = Math.min(Math.max(t * RATE, 0), N - 1);
+      const i = Math.floor(fi);
+      const j = Math.min(i + 1, N - 1);
+      const f = fi - i;
+      const L = (a) => a[i] + (a[j] - a[i]) * f;
+      const tEnd = (nv - 1) / RATE;
+      const ended = t > tEnd + 1e-9;
+      return { x: L(run.x), y: L(run.y), yaw: L(run.yaw), s: L(run.s),
+               v: ended ? 0 : L(run.v), t: Math.min(t, tEnd), ended };
     }
 
-    function drawMap(map) {
-      ctx.strokeStyle = '#445'; ctx.lineWidth = 1;
-      for (const ll of map.lanelets) { polyline(ll.left); polyline(ll.right); }
-      for (const rm of map.road_markings) {
-        if (rm.type === 'stop_line') { ctx.strokeStyle = '#c44'; ctx.lineWidth = 2; }
-        else { ctx.strokeStyle = '#556'; ctx.lineWidth = 1; }
-        polyline(rm.points);
+    function upperBound(arr, val, n) {
+      let lo = 0, hi = n;
+      while (lo < hi) { const m = (lo + hi) >> 1; arr[m] <= val ? lo = m + 1 : hi = m; }
+      return lo;
+    }
+
+    function sampleAtS(run, s) {
+      const nv = run.n_valid;
+      if (nv < 2) return null;
+      const sc = Math.min(Math.max(s, 0), run.s_total);
+      let j = upperBound(run.s, sc, nv);
+      j = Math.min(Math.max(j, 1), nv - 1);
+      const i = j - 1;
+      const ds = run.s[j] - run.s[i];
+      const f = ds > 1e-9 ? (sc - run.s[i]) / ds : 0;
+      const L = (a) => a[i] + (a[j] - a[i]) * f;
+      const ended = sc >= run.s_total - 1e-9;
+      return { x: L(run.x), y: L(run.y), yaw: L(run.yaw), s: sc,
+               v: ended ? 0 : L(run.v), t: (i + f) / RATE, ended };
+    }
+
+    function sampleChannel(run, ch, t) {
+      const arr = run.ch[ch];
+      if (!arr || !arr.length) return null;
+      const fi = Math.min(Math.max(t * RATE, 0), arr.length - 1);
+      const i = Math.floor(fi);
+      const j = Math.min(i + 1, arr.length - 1);
+      if (arr[i] === null || arr[j] === null) return null;
+      const f = fi - i;
+      return arr[i] + (arr[j] - arr[i]) * f;
+    }
+
+    // --- Scale bar ---
+    function niceScaleBar(pxPerMeter) {
+      const candidates = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000];
+      let best = candidates[0];
+      for (const c of candidates) {
+        const px = c * pxPerMeter;
+        if (px >= 60 && px <= 200) { best = c; break; }
+        if (px < 300) best = c;
       }
+      return { meters: best, px: best * pxPerMeter };
     }
 
-    function velColor(vel, hue, alpha) {
-      const l = 30 + Math.min(Math.abs(vel), 2.0) * 20;
-      return 'hsla(' + hue + ',80%,' + Math.round(l) + '%,' + (alpha ?? 0.55) + ')';
+    // --- Closest planned frame ---
+    function closestPlanned(planned, t) {
+      if (!planned || !planned.length) return null;
+      let lo = 0, hi = planned.length - 1;
+      while (lo < hi) { const m = (lo + hi + 1) >> 1; planned[m].t <= t ? lo = m : hi = m - 1; }
+      return planned[lo];
     }
 
-    function closestFrame(trajs, t) {
-      if (!trajs.length) return null;
-      let lo = 0, hi = trajs.length - 1;
-      while (lo < hi) { const m = (lo + hi + 1) >> 1; trajs[m].t <= t ? lo = m : hi = m - 1; }
-      return trajs[lo];
-    }
+    // --- Alpine stores ---
+    document.addEventListener('alpine:init', () => {
+      const maxT = Math.max(...MODELS.map(m => m.n_valid > 0 ? (m.n_valid - 1) / RATE : 0));
+      const maxS = Math.max(...MODELS.map(m => m.s_total || 0));
 
-    return {
-      data: REPORT_DATA,
-      playing: false,
-      currentTime: 0,
-      maxTime: 0,
-      visible: {},
-      hues: HUES,
+      Alpine.store('playback', {
+        mode: 'time',
+        playing: false,
+        speedMul: 1,
+        curT: 0,
+        curS: 0,
+        maxT: maxT,
+        maxS: maxS,
+      });
 
-      init() {
-        canvas = this.$refs.canvas;
-        ctx = canvas.getContext('2d');
-        for (let i = 0; i < this.data.models.length; i++) {
-          this.visible[i] = true;
-          const t = this.data.models[i].trajectories;
-          if (t.length) this.maxTime = Math.max(this.maxTime, t[t.length - 1].t);
+      Alpine.store('camera', {
+        cx: (D.bbox[0] + D.bbox[2]) / 2,
+        cy: (D.bbox[1] + D.bbox[3]) / 2,
+        viewW: Math.max(D.bbox[2] - D.bbox[0], D.bbox[3] - D.bbox[1], 10) * 1.1,
+        targetViewW: 0,
+        follow: true,
+      });
+
+      Alpine.store('models', {
+        list: MODELS,
+        visible: MODELS.map(() => true),
+        baselineIdx: 0,
+      });
+
+      Alpine.store('ui', {
+        showPlanned: true,
+        showPlots: true,
+        plotWindowS: 10,
+      });
+
+      // --- viewer component (root) ---
+      Alpine.data('viewer', () => {
+        let animId = null, lastAnimTime = 0;
+        let pb, cam, mdl;
+
+        function tick() {
+          if (!pb.playing) return;
+          const now = performance.now();
+          const dt = (now - lastAnimTime) / 1000 * pb.speedMul;
+          lastAnimTime = now;
+          if (pb.mode === 'time') {
+            pb.curT += dt;
+            if (pb.curT > pb.maxT) pb.curT = 0;
+          } else {
+            const base = MODELS[mdl.baselineIdx];
+            if (base && base.n_valid > 1) {
+              const st = sampleAtS(base, pb.curS);
+              if (st) {
+                const ns = sampleAtT(base, st.t + dt);
+                pb.curS = ns ? ns.s : pb.maxS;
+              }
+            }
+            if (pb.curS >= pb.maxS) pb.curS = 0;
+          }
+          markDirty();
+          animId = requestAnimationFrame(tick);
         }
-        this.resizeCanvas();
-        this.fitToTrajectory();
-        this.draw();
-        window.addEventListener('resize', () => { this.resizeCanvas(); this.fitToTrajectory(); this.draw(); });
-      },
 
-      resizeCanvas() {
-        const w = canvas.parentElement.clientWidth;
-        canvas.width = w;
-        canvas.height = Math.max(Math.round(w * 0.55), 400);
-      },
+        return {
+          init() {
+            pb = this.$store.playback;
+            cam = this.$store.camera;
+            mdl = this.$store.models;
+            window.addEventListener('resize', () => { markDirty(); });
+          },
+          togglePlay() {
+            pb.playing = !pb.playing;
+            if (pb.playing) { lastAnimTime = performance.now(); tick(); }
+            else if (animId) { cancelAnimationFrame(animId); animId = null; }
+          },
+          onModeChange() {
+            const base = MODELS[mdl.baselineIdx];
+            if (!base || base.n_valid < 2) return;
+            if (pb.mode === 'pos') { const st = sampleAtT(base, pb.curT); pb.curS = st ? st.s : 0; }
+            else { const st = sampleAtS(base, pb.curS); pb.curT = st ? st.t : 0; }
+            markDirty();
+          },
+          fitAll() {
+            const dx = D.bbox[2] - D.bbox[0], dy = D.bbox[3] - D.bbox[1];
+            const aspect = W > 0 && H > 0 ? W / H : 1;
+            cam.cx = (D.bbox[0] + D.bbox[2]) / 2;
+            cam.cy = (D.bbox[1] + D.bbox[3]) / 2;
+            cam.viewW = Math.max(dx, dy * aspect, 10) * 1.1;
+            cam.follow = false;
+            markDirty();
+          },
+        };
+      });
 
-      fitToTrajectory(smooth) {
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        for (let mi = 0; mi < this.data.models.length; mi++) {
-          if (!this.visible[mi]) continue;
-          const frame = closestFrame(this.data.models[mi].trajectories, this.currentTime);
-          if (!frame) continue;
-          for (const p of frame.points) {
-            if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0];
-            if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1];
+      // --- mapCanvas component ---
+      Alpine.data('mapCanvas', () => {
+        let ctx = null, canvas = null, svg = null;
+        const drag = { active: false, sx: 0, sy: 0, cx0: 0, cy0: 0 };
+        let W = 800, H = 550;
+        let cam, pb, mdl, ui;
+
+        function toScreen(wx, wy) {
+          const scale = W / cam.viewW;
+          return [
+            (wx - cam.cx) * scale + W / 2,
+            -(wy - cam.cy) * scale + H / 2
+          ];
+        }
+
+        function strokePolyline(pts) {
+          if (pts.length < 2) return;
+          ctx.beginPath();
+          const [sx, sy] = toScreen(pts[0][0], pts[0][1]);
+          ctx.moveTo(sx, sy);
+          for (let i = 1; i < pts.length; i++) {
+            const [px, py] = toScreen(pts[i][0], pts[i][1]);
+            ctx.lineTo(px, py);
+          }
+          ctx.stroke();
+        }
+
+        function updateFollow(samples, vis) {
+          const active = samples.filter((s, i) => s && !s.ended && vis[i]);
+          if (!active.length) return;
+          let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+          for (const s of active) {
+            if (s.x < minX) minX = s.x; if (s.x > maxX) maxX = s.x;
+            if (s.y < minY) minY = s.y; if (s.y > maxY) maxY = s.y;
+          }
+          const tx = (minX + maxX) / 2, ty = (minY + maxY) / 2;
+          const aspect = W > 0 && H > 0 ? W / H : 1;
+          const span = Math.max(maxX - minX, (maxY - minY) * aspect, 20) * 2.5;
+          if (Math.hypot(tx - cam.cx, ty - cam.cy) > cam.viewW) {
+            cam.cx = tx; cam.cy = ty; cam.viewW = span;
+          } else {
+            cam.cx += (tx - cam.cx) * 0.15;
+            cam.cy += (ty - cam.cy) * 0.15;
+            cam.viewW += (span - cam.viewW) * 0.08;
           }
         }
-        if (!isFinite(minX)) return;
-        const tx = (minX + maxX) / 2;
-        const ty = (minY + maxY) / 2;
-        const raw = Math.min(canvas.width / ((maxX - minX) || 1),
-                            canvas.height / ((maxY - minY) || 1)) * 0.85;
-        const ts = Math.max(2, Math.min(raw, 30));
-        if (smooth) {
-          const k = 0.08;
-          cam.cx += (tx - cam.cx) * k;
-          cam.cy += (ty - cam.cy) * k;
-          cam.scale += (ts - cam.scale) * k;
-        } else {
-          cam.cx = tx; cam.cy = ty; cam.scale = ts;
-        }
-      },
 
-      draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#1a1a2e';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        drawMap(this.data.map);
-        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        const frames = [];
-        for (let mi = 0; mi < this.data.models.length; mi++) {
-          if (!this.visible[mi]) continue;
-          const frame = closestFrame(this.data.models[mi].trajectories, this.currentTime);
-          if (!frame) { frames.push(null); continue; }
-          frames.push({ mi, hue: HUES[mi % HUES.length], pts: frame.points });
+        function drawMap() {
+          ctx.strokeStyle = '#c8c8c8'; ctx.lineWidth = 0.8; ctx.globalAlpha = 0.4;
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+          for (const ll of D.map.lanelets) {
+            strokePolyline(ll.left);
+            strokePolyline(ll.right);
+          }
+          for (const rm of D.map.road_markings) {
+            if (rm.type === 'stop_line') { ctx.strokeStyle = '#cc4444'; ctx.lineWidth = 2; }
+            else { ctx.strokeStyle = '#888888'; ctx.lineWidth = 1; }
+            ctx.globalAlpha = 0.5;
+            strokePolyline(rm.points);
+          }
+          ctx.globalAlpha = 1.0;
         }
-        ctx.lineWidth = 10;
-        for (const f of frames) {
-          if (!f) continue;
-          for (let i = 0; i < f.pts.length - 1; i++) {
-            ctx.strokeStyle = velColor(f.pts[i][2], f.hue, 0.2);
+
+        function drawTrajectories(vis) {
+          ctx.lineWidth = 1.5;
+          for (let i = 0; i < MODELS.length; i++) {
+            if (!vis[i]) continue;
+            const m = MODELS[i];
+            const nv = m.n_valid;
+            if (nv < 2) continue;
+            ctx.strokeStyle = m.color; ctx.globalAlpha = 0.3;
             ctx.beginPath();
-            ctx.moveTo(wx(f.pts[i][0]), wy(f.pts[i][1]));
-            ctx.lineTo(wx(f.pts[i+1][0]), wy(f.pts[i+1][1]));
+            const [sx, sy] = toScreen(m.x[0], m.y[0]);
+            ctx.moveTo(sx, sy);
+            for (let k = 1; k < nv; k++) {
+              const [px, py] = toScreen(m.x[k], m.y[k]);
+              ctx.lineTo(px, py);
+            }
             ctx.stroke();
           }
+          ctx.globalAlpha = 1.0;
         }
-        ctx.lineWidth = 2;
-        for (const f of frames) {
-          if (!f) continue;
-          for (let i = 0; i < f.pts.length - 1; i++) {
-            ctx.strokeStyle = velColor(f.pts[i][2], f.hue, 0.8);
-            ctx.beginPath();
-            ctx.moveTo(wx(f.pts[i][0]), wy(f.pts[i][1]));
-            ctx.lineTo(wx(f.pts[i+1][0]), wy(f.pts[i+1][1]));
-            ctx.stroke();
+
+        function drawPlanned(vis, curT) {
+          ctx.setLineDash([6, 4]); ctx.lineWidth = 1.5;
+          for (let i = 0; i < MODELS.length; i++) {
+            if (!vis[i]) continue;
+            const pf = closestPlanned(MODELS[i].planned, curT);
+            if (!pf) continue;
+            ctx.strokeStyle = MODELS[i].color; ctx.globalAlpha = 0.35;
+            strokePolyline(pf.points);
+          }
+          ctx.setLineDash([]); ctx.globalAlpha = 1.0;
+        }
+
+        function drawScaleBar(pxPerMeter) {
+          const sb = niceScaleBar(pxPerMeter);
+          const sbX = 20, sbY = H - 25;
+          ctx.strokeStyle = '#ccc'; ctx.lineWidth = 2; ctx.globalAlpha = 0.8;
+          ctx.beginPath(); ctx.moveTo(sbX, sbY); ctx.lineTo(sbX + sb.px, sbY); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(sbX, sbY - 5); ctx.lineTo(sbX, sbY + 5); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(sbX + sb.px, sbY - 5); ctx.lineTo(sbX + sb.px, sbY + 5); ctx.stroke();
+          ctx.fillStyle = '#ccc'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+          ctx.fillText(sb.meters >= 1000 ? (sb.meters / 1000) + 'km' : sb.meters + 'm', sbX + sb.px / 2, sbY - 8);
+          ctx.globalAlpha = 1.0;
+        }
+
+        function updateSvgOverlay(samples, vis, pxPerMeter) {
+          const svgNS = 'http://www.w3.org/2000/svg';
+          while (svg.firstChild) svg.removeChild(svg.firstChild);
+          const defs = document.createElementNS(svgNS, 'defs');
+          svg.appendChild(defs);
+
+          for (let i = 0; i < MODELS.length; i++) {
+            const s = samples[i];
+            if (!s || !vis[i]) continue;
+            const [px, py] = toScreen(s.x, s.y);
+            const color = MODELS[i].color;
+
+            if (Math.abs(s.v) > 0.05) {
+              const arrowLen = Math.abs(s.v) * 1.5 * pxPerMeter;
+              const ax = px + Math.cos(s.yaw) * arrowLen;
+              const ay = py - Math.sin(s.yaw) * arrowLen;
+              const line = document.createElementNS(svgNS, 'line');
+              line.setAttribute('x1', px); line.setAttribute('y1', py);
+              line.setAttribute('x2', ax); line.setAttribute('y2', ay);
+              line.setAttribute('stroke', color); line.setAttribute('stroke-width', '2');
+              line.setAttribute('opacity', '0.7');
+              svg.appendChild(line);
+              const headLen = 6, angle = Math.atan2(ay - py, ax - px);
+              const path = document.createElementNS(svgNS, 'polygon');
+              path.setAttribute('points', [
+                `${ax},${ay}`,
+                `${ax - headLen * Math.cos(angle - 0.4)},${ay - headLen * Math.sin(angle - 0.4)}`,
+                `${ax - headLen * Math.cos(angle + 0.4)},${ay - headLen * Math.sin(angle + 0.4)}`,
+              ].join(' '));
+              path.setAttribute('fill', color); path.setAttribute('opacity', '0.7');
+              svg.appendChild(path);
+            }
+
+            const circle = document.createElementNS(svgNS, 'circle');
+            circle.setAttribute('cx', px); circle.setAttribute('cy', py);
+            circle.setAttribute('r', i === mdl.baselineIdx ? 7 : 5.5);
+            circle.setAttribute('fill', color);
+            circle.setAttribute('stroke', '#fff'); circle.setAttribute('stroke-width', '2');
+            svg.appendChild(circle);
           }
         }
-      },
 
-      togglePlay() {
-        this.playing = !this.playing;
-        if (this.playing) { lastAnimTime = performance.now(); this.animate(); }
-        else if (animId) { cancelAnimationFrame(animId); animId = null; }
-      },
+        function draw() {
+          const dpr = window.devicePixelRatio || 1;
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          const vis = mdl.visible;
+          const scale = W / cam.viewW;
 
-      animate() {
-        if (!this.playing) return;
-        const now = performance.now();
-        this.currentTime += (now - lastAnimTime) / 1000;
-        lastAnimTime = now;
-        if (this.currentTime > this.maxTime) this.currentTime = 0;
-        this.fitToTrajectory(true);
-        this.draw();
-        animId = requestAnimationFrame(() => this.animate());
-      },
+          const samples = MODELS.map((m, i) => {
+            if (!vis[i] || m.n_valid < 2) return null;
+            return pb.mode === 'time' ? sampleAtT(m, pb.curT) : sampleAtS(m, pb.curS);
+          });
 
-      onMouseDown(e) {
-        drag.active = true;
-        drag.sx = e.clientX; drag.sy = e.clientY;
-        drag.cx0 = cam.cx; drag.cy0 = cam.cy;
-      },
-      onMouseMove(e) {
-        if (!drag.active) return;
-        cam.cx = drag.cx0 - (e.clientX - drag.sx) / cam.scale;
-        cam.cy = drag.cy0 + (e.clientY - drag.sy) / cam.scale;
-        this.draw();
-      },
-      onMouseUp() { drag.active = false; },
+          if (cam.follow) updateFollow(samples, vis);
 
-      onWheel(e) {
-        const f = e.deltaY > 0 ? 0.9 : 1.1;
-        const r = canvas.getBoundingClientRect();
-        const mx = e.clientX - r.left, my = e.clientY - r.top;
-        const wxx = (mx - canvas.width / 2) / cam.scale + cam.cx;
-        const wyy = -(my - canvas.height / 2) / cam.scale + cam.cy;
-        cam.scale *= f;
-        cam.cx = wxx - (mx - canvas.width / 2) / cam.scale;
-        cam.cy = wyy + (my - canvas.height / 2) / cam.scale;
-        this.draw();
-      },
-    };
-  }
+          ctx.clearRect(0, 0, W, H);
+          ctx.fillStyle = '#1a1e2e'; ctx.fillRect(0, 0, W, H);
+          drawMap();
+          drawTrajectories(vis);
+          if (ui.showPlanned) {
+            const curT = pb.mode === 'time' ? pb.curT : (samples[mdl.baselineIdx]?.t ?? 0);
+            drawPlanned(vis, curT);
+          }
+          drawScaleBar(scale);
+          updateSvgOverlay(samples, vis, scale);
+        }
+
+        let needsInitialFit = true;
+
+        function resize(wrap) {
+          W = wrap.clientWidth; H = wrap.clientHeight;
+          if (W <= 0 || H <= 0) return;
+          const dpr = window.devicePixelRatio || 1;
+          canvas.width = Math.round(W * dpr);
+          canvas.height = Math.round(H * dpr);
+          svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+          if (needsInitialFit) {
+            needsInitialFit = false;
+            const dx = D.bbox[2] - D.bbox[0], dy = D.bbox[3] - D.bbox[1];
+            cam.viewW = Math.max(dx, dy * (W / H), 10) * 1.1;
+          }
+          markDirty();
+        }
+
+        return {
+          init() {
+            canvas = this.$refs.mapCvs;
+            svg = this.$refs.mapSvg;
+            ctx = canvas.getContext('2d');
+            cam = this.$store.camera;
+            pb = this.$store.playback;
+            mdl = this.$store.models;
+            ui = this.$store.ui;
+            new ResizeObserver(() => resize(this.$refs.mapWrap)).observe(this.$refs.mapWrap);
+            (function loop() {
+              if (_dirty) { _dirty = false; draw(); }
+              requestAnimationFrame(loop);
+            })();
+          },
+          onMouseDown(e) {
+            drag.active = true;
+            drag.sx = e.clientX; drag.sy = e.clientY;
+            drag.cx0 = cam.cx; drag.cy0 = cam.cy;
+            cam.follow = false;
+          },
+          onMouseMove(e) {
+            if (!drag.active) return;
+            const scale = W / cam.viewW;
+            cam.cx = drag.cx0 - (e.clientX - drag.sx) / scale;
+            cam.cy = drag.cy0 + (e.clientY - drag.sy) / scale;
+            markDirty();
+          },
+          onMouseUp() { drag.active = false; },
+          onWheel(e) {
+            const f = e.deltaY > 0 ? 1.1 : 0.9;
+            const r = canvas.getBoundingClientRect();
+            const mx = e.clientX - r.left, my = e.clientY - r.top;
+            const scale = W / cam.viewW;
+            const wx = (mx - W / 2) / scale + cam.cx;
+            const wy = -(my - H / 2) / scale + cam.cy;
+            cam.viewW *= f;
+            const ns = W / cam.viewW;
+            cam.cx = wx - (mx - W / 2) / ns;
+            cam.cy = wy + (my - H / 2) / ns;
+            cam.follow = false;
+            markDirty();
+          },
+        };
+      });
+
+      // --- legend component ---
+      Alpine.data('legend', () => {
+        let pb, mdl;
+        return {
+          init() { pb = this.$store.playback; mdl = this.$store.models; },
+          setBaseline(i) {
+            const oldBase = MODELS[mdl.baselineIdx];
+            mdl.baselineIdx = i;
+            if (pb.mode === 'pos' && oldBase && oldBase.n_valid > 1) {
+              const st = sampleAtS(oldBase, pb.curS);
+              if (st) { const ns = sampleAtT(MODELS[i], st.t); pb.curS = ns ? ns.s : 0; }
+            }
+            markDirty();
+          },
+          getStats(i) {
+            const m = MODELS[i];
+            if (m.n_valid < 2) return '<span class="text-muted">no data</span>';
+            const s = pb.mode === 'time' ? sampleAtT(m, pb.curT) : sampleAtS(m, pb.curS);
+            if (!s) return '';
+            return `v=${s.v.toFixed(1)} m/s &nbsp; t=${s.t.toFixed(1)}s &nbsp; s=${s.s.toFixed(0)}m`;
+          },
+        };
+      });
+
+      // --- plotsPanel component ---
+      Alpine.data('plotsPanel', () => {
+        let plotSvgs = {};
+        let pb, mdl, ui;
+        const margin = { top: 8, right: 12, bottom: 28, left: 50 };
+        const plotH = 140;
+
+        function createPlotCell(ch) {
+          const cell = document.createElement('div');
+          cell.className = 'plot-cell';
+          const title = document.createElement('p');
+          title.className = 'plot-title';
+          title.textContent = CH_LABELS[ch];
+          cell.appendChild(title);
+
+          const w = 400, h = plotH + margin.top + margin.bottom;
+          const svgEl = d3.select(cell).append('svg')
+            .attr('viewBox', `0 0 ${w} ${h}`)
+            .attr('preserveAspectRatio', 'xMidYMid meet');
+          const g = svgEl.append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+          const clipId = 'clip-' + ch;
+          svgEl.append('defs').append('clipPath').attr('id', clipId)
+            .append('rect').attr('width', w - margin.left - margin.right).attr('height', plotH);
+
+          const pw = w - margin.left - margin.right;
+          const xScale = d3.scaleLinear().range([0, pw]);
+          const yScale = d3.scaleLinear().range([plotH, 0]);
+          const xAxis = g.append('g').attr('transform', `translate(0,${plotH})`);
+          const yAxis = g.append('g');
+          const linesG = g.append('g').attr('clip-path', `url(#${clipId})`);
+          const cursorLine = g.append('line')
+            .attr('y1', 0).attr('y2', plotH)
+            .attr('stroke', '#fff').attr('stroke-width', 1)
+            .attr('stroke-dasharray', '4,3').attr('opacity', 0.5);
+          const dotsG = g.append('g');
+
+          plotSvgs[ch] = { xScale, yScale, xAxis, yAxis, linesG, cursorLine, dotsG, pw };
+          return cell;
+        }
+
+        function updateChannel(ch, curT, vis) {
+          const p = plotSvgs[ch];
+          if (!p) return;
+          const windowS = ui.plotWindowS;
+
+          let xMin, xMax;
+          if (windowS > 0) { xMin = curT - windowS / 2; xMax = curT + windowS / 2; }
+          else { xMin = 0; xMax = pb.maxT; }
+          p.xScale.domain([xMin, xMax]);
+
+          let yMin = Infinity, yMax = -Infinity;
+          for (let i = 0; i < MODELS.length; i++) {
+            if (!vis[i]) continue;
+            const arr = MODELS[i].ch[ch];
+            if (!arr) continue;
+            for (let k = 0; k < MODELS[i].n_valid; k++) {
+              if (arr[k] !== null) {
+                if (arr[k] < yMin) yMin = arr[k];
+                if (arr[k] > yMax) yMax = arr[k];
+              }
+            }
+          }
+          if (!isFinite(yMin)) { yMin = -1; yMax = 1; }
+          const yPad = (yMax - yMin) * 0.08 || 0.5;
+          p.yScale.domain([yMin - yPad, yMax + yPad]);
+
+          p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(d => d.toFixed(0) + 's'))
+            .selectAll('text').attr('fill', '#aaa').attr('font-size', '12px');
+          p.xAxis.selectAll('line,path').attr('stroke', '#444');
+          const yRange = p.yScale.domain();
+          const ySpan = Math.abs(yRange[1] - yRange[0]);
+          const yPrec = ySpan < 0.01 ? 4 : ySpan < 0.1 ? 3 : ySpan < 1 ? 2 : 1;
+          p.yAxis.call(d3.axisLeft(p.yScale).ticks(4).tickFormat(d3.format('.' + yPrec + 'f')))
+            .selectAll('text').attr('fill', '#aaa').attr('font-size', '12px');
+          p.yAxis.selectAll('line,path').attr('stroke', '#444');
+
+          p.linesG.selectAll('*').remove();
+          for (let i = 0; i < MODELS.length; i++) {
+            if (!vis[i]) continue;
+            const arr = MODELS[i].ch[ch];
+            if (!arr) continue;
+            const nv = MODELS[i].n_valid;
+            const lineData = [];
+            for (let k = 0; k < nv; k++) lineData.push({ t: k / RATE, v: arr[k] });
+            const line = d3.line().defined(d => d.v !== null)
+              .x(d => p.xScale(d.t)).y(d => p.yScale(d.v));
+            p.linesG.append('path').datum(lineData)
+              .attr('fill', 'none').attr('stroke', MODELS[i].color)
+              .attr('stroke-width', 1.5).attr('d', line);
+          }
+
+          const cx = p.xScale(curT);
+          p.cursorLine.attr('x1', cx).attr('x2', cx)
+            .attr('opacity', cx >= 0 && cx <= p.pw ? 0.5 : 0);
+
+          p.dotsG.selectAll('*').remove();
+          for (let i = 0; i < MODELS.length; i++) {
+            if (!vis[i]) continue;
+            const val = sampleChannel(MODELS[i], ch, curT);
+            if (val === null) continue;
+            p.dotsG.append('circle')
+              .attr('cx', p.xScale(curT)).attr('cy', p.yScale(val)).attr('r', 3.5)
+              .attr('fill', MODELS[i].color).attr('stroke', '#fff').attr('stroke-width', 1);
+          }
+        }
+
+        function buildAll(row) {
+          row.innerHTML = '';
+          plotSvgs = {};
+          for (const ch of CHANNELS) row.appendChild(createPlotCell(ch));
+        }
+
+        function updateAll() {
+          if (!Object.keys(plotSvgs).length) return;
+          const vis = mdl.visible;
+          const curT = pb.mode === 'time' ? pb.curT :
+            (sampleAtS(MODELS[mdl.baselineIdx], pb.curS)?.t ?? 0);
+          for (const ch of CHANNELS) updateChannel(ch, curT, vis);
+        }
+
+        return {
+          init() {
+            pb = this.$store.playback;
+            mdl = this.$store.models;
+            ui = this.$store.ui;
+            const row = this.$refs.plotRow;
+            this.$watch('$store.ui.showPlots', (v) => {
+              if (v) this.$nextTick(() => buildAll(row));
+            });
+            this.$nextTick(() => buildAll(row));
+            (function loop() { if (ui.showPlots) updateAll(); requestAnimationFrame(loop); })();
+          },
+        };
+      });
+    });
+  })();
   </script>
+  <script>{{D3_JS}}</script>
   <script>{{ALPINE_JS}}</script>
 </body>
 </html>
