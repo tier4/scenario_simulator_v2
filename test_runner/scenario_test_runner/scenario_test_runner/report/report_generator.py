@@ -19,35 +19,56 @@ import json
 from pathlib import Path
 
 from alpine_js import ALPINE_JS
-from pico_css import PICO_CSS
+from chota_css import CHOTA_CSS
 
 HTML_TEMPLATE = """\
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Diffusion Planner Model Comparison</title>
-  <style>%(pico_css)s</style>
+  <style>%(chota_css)s</style>
   <style>
-    canvas { display: block; cursor: grab; background: #1a1a2e; }
+    :root {
+      --bg-color: #13161f;
+      --bg-secondary-color: #1a1e2e;
+      --font-color: #c9d1d9;
+      --color-grey: #8b949e;
+      --color-lightGrey: #30363d;
+      --color-darkGrey: #c9d1d9;
+      --color-primary: #58a6ff;
+      --color-error: #f85149;
+      --color-success: #3fb950;
+      --grid-maxWidth: 1200px;
+      color-scheme: dark;
+    }
+    canvas {
+      display: block; cursor: grab;
+      background: var(--bg-secondary-color); border-radius: 4px;
+    }
     canvas:active { cursor: grabbing; }
-    .controls { display: flex; align-items: center; gap: .5rem; }
-    .controls > * { margin-bottom: 0; }
-    .controls button { width: auto; }
-    .controls input[type=range],
-    .controls input[type=range]::-webkit-slider-runnable-track,
-    .controls input[type=range]::-webkit-slider-thumb { all: revert; }
-    .controls input[type=range] { flex: 1; }
-    .swatch { display: inline-block; width: .9em; height: .9em; border-radius: 3px; }
+    .controls {
+      display: flex; align-items: center; gap: .5rem;
+      margin: .5rem 0;
+    }
+    .controls input[type=range] { flex: 1; border: none; padding: 0; }
+    .controls small { color: var(--color-grey); white-space: nowrap; }
+    .model-list { display: flex; flex-wrap: wrap; gap: .5rem 1rem; }
+    .model-list label {
+      display: inline-flex; align-items: center; gap: .5rem;
+      cursor: pointer; padding: 0;
+    }
+    .swatch {
+      display: inline-block; width: .9em; height: .9em;
+      border-radius: 3px;
+    }
   </style>
 </head>
 <body>
   <main class="container" x-data="reportApp()" x-init="init()">
-    <hgroup>
-      <h1>Diffusion Planner Model Comparison</h1>
-      <p x-text="data.models.length + ' model(s)'"></p>
-    </hgroup>
+    <h1>Diffusion Planner Model Comparison</h1>
+    <p class="subtitle" x-text="data.models.length + ' model(s)'"></p>
 
     <canvas x-ref="canvas" height="600"
       @mousedown="onMouseDown($event)"
@@ -63,18 +84,20 @@ HTML_TEMPLATE = """\
         @pointerdown="if (playing) togglePlay()"
         @input="currentTime = +$event.target.value; draw()">
       <small x-text="currentTime.toFixed(1) + 's / ' + maxTime.toFixed(1) + 's'"></small>
-      <button class="secondary" @click="fitToView(); draw()">Fit</button>
+      <button @click="fitToTrajectory(); draw()">Fit</button>
     </div>
 
-    <template x-for="(model, mi) in data.models" :key="mi">
-      <label>
-        <input type="checkbox" checked
-          @change="visible[mi] = $el.checked; draw()">
-        <span class="swatch"
-          :style="'background:hsl(' + hues[mi %% hues.length] + ',80%%,50%%)'"></span>
-        <span x-text="model.name"></span>
-      </label>
-    </template>
+    <div class="model-list">
+      <template x-for="(model, mi) in data.models" :key="mi">
+        <label>
+          <input type="checkbox" checked
+            @change="visible[mi] = $el.checked; draw()">
+          <span class="swatch"
+            :style="'background:hsl(' + hues[mi %% hues.length] + ',80%%,50%%)'"></span>
+          <span x-text="model.name"></span>
+        </label>
+      </template>
+    </div>
   </main>
 
   <script>const REPORT_DATA = %(data_json)s;</script>
@@ -108,9 +131,9 @@ HTML_TEMPLATE = """\
       }
     }
 
-    function velColor(vel, hue) {
+    function velColor(vel, hue, alpha) {
       const l = 30 + Math.min(Math.abs(vel), 2.0) * 20;
-      return 'hsla(' + hue + ',80%%,' + Math.round(l) + '%%,0.55)';
+      return 'hsla(' + hue + ',80%%,' + Math.round(l) + '%%,' + (alpha ?? 0.55) + ')';
     }
 
     function closestFrame(trajs, t) {
@@ -137,9 +160,9 @@ HTML_TEMPLATE = """\
           if (t.length) this.maxTime = Math.max(this.maxTime, t[t.length - 1].t);
         }
         this.resizeCanvas();
-        this.fitToView();
+        this.fitToTrajectory();
         this.draw();
-        window.addEventListener('resize', () => { this.resizeCanvas(); this.fitToView(); this.draw(); });
+        window.addEventListener('resize', () => { this.resizeCanvas(); this.fitToTrajectory(); this.draw(); });
       },
 
       resizeCanvas() {
@@ -148,21 +171,31 @@ HTML_TEMPLATE = """\
         canvas.height = Math.max(Math.round(w * 0.55), 400);
       },
 
-      fitToView() {
+      fitToTrajectory(smooth) {
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        for (const ll of this.data.map.lanelets) {
-          for (const side of [ll.left, ll.right]) {
-            for (const p of side) {
-              if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0];
-              if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1];
-            }
+        for (let mi = 0; mi < this.data.models.length; mi++) {
+          if (!this.visible[mi]) continue;
+          const frame = closestFrame(this.data.models[mi].trajectories, this.currentTime);
+          if (!frame) continue;
+          for (const p of frame.points) {
+            if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0];
+            if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1];
           }
         }
         if (!isFinite(minX)) return;
-        cam.cx = (minX + maxX) / 2;
-        cam.cy = (minY + maxY) / 2;
-        cam.scale = Math.min(canvas.width / ((maxX - minX) || 1),
-                             canvas.height / ((maxY - minY) || 1)) * 0.9;
+        const tx = (minX + maxX) / 2;
+        const ty = (minY + maxY) / 2;
+        const raw = Math.min(canvas.width / ((maxX - minX) || 1),
+                            canvas.height / ((maxY - minY) || 1)) * 0.85;
+        const ts = Math.max(2, Math.min(raw, 30));
+        if (smooth) {
+          const k = 0.08;
+          cam.cx += (tx - cam.cx) * k;
+          cam.cy += (ty - cam.cy) * k;
+          cam.scale += (ts - cam.scale) * k;
+        } else {
+          cam.cx = tx; cam.cy = ty; cam.scale = ts;
+        }
       },
 
       draw() {
@@ -170,18 +203,33 @@ HTML_TEMPLATE = """\
         ctx.fillStyle = '#1a1a2e';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         drawMap(this.data.map);
-        ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        const frames = [];
         for (let mi = 0; mi < this.data.models.length; mi++) {
           if (!this.visible[mi]) continue;
           const frame = closestFrame(this.data.models[mi].trajectories, this.currentTime);
-          if (!frame) continue;
-          const hue = HUES[mi %% HUES.length];
-          const pts = frame.points;
-          for (let i = 0; i < pts.length - 1; i++) {
-            ctx.strokeStyle = velColor(pts[i][2], hue);
+          if (!frame) { frames.push(null); continue; }
+          frames.push({ mi, hue: HUES[mi %% HUES.length], pts: frame.points });
+        }
+        ctx.lineWidth = 10;
+        for (const f of frames) {
+          if (!f) continue;
+          for (let i = 0; i < f.pts.length - 1; i++) {
+            ctx.strokeStyle = velColor(f.pts[i][2], f.hue, 0.2);
             ctx.beginPath();
-            ctx.moveTo(wx(pts[i][0]), wy(pts[i][1]));
-            ctx.lineTo(wx(pts[i+1][0]), wy(pts[i+1][1]));
+            ctx.moveTo(wx(f.pts[i][0]), wy(f.pts[i][1]));
+            ctx.lineTo(wx(f.pts[i+1][0]), wy(f.pts[i+1][1]));
+            ctx.stroke();
+          }
+        }
+        ctx.lineWidth = 2;
+        for (const f of frames) {
+          if (!f) continue;
+          for (let i = 0; i < f.pts.length - 1; i++) {
+            ctx.strokeStyle = velColor(f.pts[i][2], f.hue, 0.8);
+            ctx.beginPath();
+            ctx.moveTo(wx(f.pts[i][0]), wy(f.pts[i][1]));
+            ctx.lineTo(wx(f.pts[i+1][0]), wy(f.pts[i+1][1]));
             ctx.stroke();
           }
         }
@@ -199,6 +247,7 @@ HTML_TEMPLATE = """\
         this.currentTime += (now - lastAnimTime) / 1000;
         lastAnimTime = now;
         if (this.currentTime > this.maxTime) this.currentTime = 0;
+        this.fitToTrajectory(true);
         this.draw();
         animId = requestAnimationFrame(() => this.animate());
       },
@@ -292,7 +341,7 @@ def generate_report(output_dir):
 
         data = {"map": map_data, "models": models}
         html = HTML_TEMPLATE % {
-            "pico_css": PICO_CSS,
+            "chota_css": CHOTA_CSS,
             "alpine_js": ALPINE_JS,
             "data_json": json.dumps(data, separators=(",", ":")),
         }

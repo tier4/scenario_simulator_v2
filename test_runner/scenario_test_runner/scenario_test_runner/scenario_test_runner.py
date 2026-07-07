@@ -375,6 +375,8 @@ class ScenarioTestRunner(LifecycleController):
             self.teardown_model_symlink()
 
         staging_link = final_dir / "staging"
+        if staging_link.is_symlink() or staging_link.exists():
+            staging_link.unlink()
         staging_link.symlink_to(staging_dir)
 
         build_webautobag(final_dir, staging_dir, comparison_topics, self.get_logger())

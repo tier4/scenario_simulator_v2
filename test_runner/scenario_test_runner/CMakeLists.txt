@@ -19,7 +19,7 @@ install(
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/rosbag_reader.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/report_generator.py
            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/alpine_js.py
-           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/pico_css.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/chota_css.py
   DESTINATION lib/${PROJECT_NAME})
 
 install(
