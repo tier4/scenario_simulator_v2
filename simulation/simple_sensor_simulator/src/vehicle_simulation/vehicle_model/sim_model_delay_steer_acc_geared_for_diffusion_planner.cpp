@@ -24,8 +24,7 @@ SimModelDelaySteerAccGearedForDiffusionPlanner::SimModelDelaySteerAccGearedForDi
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -41,14 +40,7 @@ SimModelDelaySteerAccGearedForDiffusionPlanner::SimModelDelaySteerAccGearedForDi
   steer_bias_(steer_bias),
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
-  k_us_(k_us),
-  // brake_time_constant <= 0 keeps the single-tau behaviour (== acc_time_constant).
-  brake_time_constant_(
-    brake_time_constant > 0.0 ? std::max(brake_time_constant, MIN_TIME_CONSTANT)
-                              : std::max(acc_time_constant, MIN_TIME_CONSTANT)),
-  lon_drag_c0_(lon_drag_c0),
-  lon_drag_c1_(lon_drag_c1),
-  lon_drag_c2_(lon_drag_c2)
+  k_us_(k_us)
 {
   initializeInputQueue(dt);
   initializeStateQueue(dt);
@@ -58,12 +50,6 @@ double SimModelDelaySteerAccGearedForDiffusionPlanner::calc_yaw_rate(double vel,
 {
   const double denom = wheelbase_ + k_us_ * vel * vel;
   return vel * std::tan(steer + steer_bias_) / denom;
-}
-
-double SimModelDelaySteerAccGearedForDiffusionPlanner::calc_drag(double vel) const
-{
-  // Steady-state running resistance / drag offset poly(v) added to the accel target.
-  return lon_drag_c0_ + lon_drag_c1_ * vel + lon_drag_c2_ * vel * vel;
 }
 
 double SimModelDelaySteerAccGearedForDiffusionPlanner::getX() { return state_(IDX::X); }
@@ -115,9 +101,6 @@ void SimModelDelaySteerAccGearedForDiffusionPlanner::update(const double & dt)
   pedal_state_queue_.push_back(state_(IDX::PEDAL_ACCX));
   delayed_pedal_state_ = pedal_state_queue_.front();
   pedal_state_queue_.pop_front();
-  vel_state_queue_.push_back(state_(IDX::VX));
-  delayed_vel_state_ = vel_state_queue_.front();
-  vel_state_queue_.pop_front();
 
   const auto prev_state = state_;
   // we cannot use updateRungeKutta() because the differentiability or the continuity
@@ -159,7 +142,6 @@ void SimModelDelaySteerAccGearedForDiffusionPlanner::initializeStateQueue(const 
 
   const size_t acc_state_queue_size = static_cast<size_t>(round(acc_delay_ / dt));
   pedal_state_queue_.assign(acc_state_queue_size, 0.0);
-  vel_state_queue_.assign(acc_state_queue_size, 0.0);
 }
 
 void SimModelDelaySteerAccGearedForDiffusionPlanner::resetStateQueues()
@@ -169,7 +151,6 @@ void SimModelDelaySteerAccGearedForDiffusionPlanner::resetStateQueues()
   // the warm-up transient the substep loop would otherwise have pushed.
   std::fill(steer_state_queue_.begin(), steer_state_queue_.end(), state_(IDX::STEER));
   std::fill(pedal_state_queue_.begin(), pedal_state_queue_.end(), state_(IDX::PEDAL_ACCX));
-  std::fill(vel_state_queue_.begin(), vel_state_queue_.end(), state_(IDX::VX));
 }
 
 void SimModelDelaySteerAccGearedForDiffusionPlanner::setInputQueues(
@@ -203,7 +184,6 @@ Eigen::VectorXd SimModelDelaySteerAccGearedForDiffusionPlanner::calcModel(
   // Delayed state feedback (frozen per update) — used by the steer / accel channel derivatives so
   // that their whole RHS is evaluated at t-d (full-RHS delay). Reduces to the current state when
   // the corresponding delay is 0.
-  const double vel_delayed = sat(delayed_vel_state_, vx_lim_, -vx_lim_);
   const double pedal_acc_delayed = sat(delayed_pedal_state_, vx_rate_lim_, -vx_rate_lim_);
   const double steer_delayed = delayed_steer_state_;
   const double pedal_acc_des =
@@ -214,13 +194,10 @@ Eigen::VectorXd SimModelDelaySteerAccGearedForDiffusionPlanner::calcModel(
   // Yaw rate (with k_us understeer and steer-bias β); un-delayed (yaw observation delay d_tt is out
   // of scope for this derivative and left for a future improvement).
   const double yaw_rate = calc_yaw_rate(vel, steer);
-  // Acceleration target with running-resistance offset poly(v) and corner coupling; the drag argument
-  // uses the delayed velocity so the accel channel's whole RHS lags by acc_delay. The actuator
-  // (PEDAL_ACCX) tracks this target with a first-order lag whose time constant is split between
-  // throttle (a_cmd >= 0) and brake (a_cmd < 0). All extra terms vanish when their coefficients
-  // are zero, leaving the original single-tau behaviour.
-  const double pedal_acc_target = pedal_acc_des + calc_drag(vel_delayed);
-  const double acc_tau = (pedal_acc_des >= 0.0) ? acc_time_constant_ : brake_time_constant_;
+  // Acceleration target: the actuator (PEDAL_ACCX) tracks the desired accel with a single-tau
+  // first-order lag (same form as wo_fall_guard).
+  const double pedal_acc_target = pedal_acc_des;
+  const double acc_tau = acc_time_constant_;
   // NOTE: `steer_des` is calculated by control from measured values, delayed by the command queue.
   // full-RHS delay: the measured steer that closes the tracking loop is also taken at t-steer_delay
   // (delayed_steer_state_), not the current steer, so the steer channel's whole RHS lags together.

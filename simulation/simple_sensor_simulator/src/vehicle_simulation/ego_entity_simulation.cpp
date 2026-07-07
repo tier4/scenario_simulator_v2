@@ -209,12 +209,6 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto acc_time_delay             = common::getParameter("acc_time_delay",             0.1);
   const auto acceleration_map_path      = common::getParameter("acceleration_map_path",      std::string(""));
   const auto k_us                       = common::getParameter("k_us",                       0.0);
-  // Longitudinal running-resistance / brake-split terms (DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER
-  // only). All default to neutral so models that do not set them keep the original single-tau dynamics.
-  const auto brake_time_constant        = common::getParameter("brake_time_constant",        0.0);
-  const auto lon_drag_c0                = common::getParameter("lon_drag_c0",                0.0);
-  const auto lon_drag_c1                = common::getParameter("lon_drag_c1",                0.0);
-  const auto lon_drag_c2                = common::getParameter("lon_drag_c2",                0.0);
   const auto debug_acc_scaling_factor   = common::getParameter("debug_acc_scaling_factor",   1.0);
   const auto debug_steer_scaling_factor = common::getParameter("debug_steer_scaling_factor", 1.0);
   const auto steer_bias                 = common::getParameter("steer_bias",                 0.0);
@@ -251,15 +245,14 @@ auto EgoEntitySimulation::makeSimulationModel(
         debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
 
     case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
-      // 差分はステア・加速度の遅延が full-RHS（状態フィードバックも t-d）になる点と、走行抵抗
-      // poly(v)・throttle/brake 分離 τ を保持する点。全パラメータが中立なら wo_fall_guard と bit 一致。
+      // 差分はステア・加速度の遅延が full-RHS（状態フィードバックも t-d）になる点。
+      // 全遅延が 0 なら wo_fall_guard と bit 一致。
       return std::make_shared<
         autoware::simulator::simple_planning_simulator::
           SimModelDelaySteerAccGearedForDiffusionPlanner>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
-        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
-        brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2);
+        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       if (!std::filesystem::exists(acceleration_map_path)) {

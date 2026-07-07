@@ -38,8 +38,7 @@ namespace autoware::simulator::simple_planning_simulator
  * 式が参照する「状態」も t−d でサンプリングする。すなわち各チャネル c の右辺全体を t−d_c で
  * 評価する（Python 側 vehicle_model_fitting の統一枠組みと 1:1 対応）。
  *   - ステア式(STEER): steer_rate = f(STEER(t−d_steer), steer_des(t−d_steer))
- *   - 加速度式(PEDAL_ACCX): -(pedal(t−d_acc) − a_target)/τ,
- *                          a_target = pedal_des(t−d_acc) + drag(VX(t−d_acc))
+ *   - 加速度式(PEDAL_ACCX): -(pedal(t−d_acc) − a_target)/τ, a_target = pedal_des(t−d_acc)
  * 位置式(X,Y)・ヨー式(YAW)・速度式(VX, ギア則) は遅延を持たない（現在状態で評価）。ヨー観測
  * 遅延 d_tt はこのフェーズの対象外（将来この派生へ追加）。
  *
@@ -71,22 +70,14 @@ public:
    * @param [in] debug_acc_scaling_factor scaling factor for accel command
    * @param [in] debug_steer_scaling_factor scaling factor for steering command
    * @param [in] k_us understeer coefficient [rad/(m/s²)]; 0 = ideal bicycle model
-   * @param [in] brake_time_constant time constant for accel dynamics while braking
-   *             (a_cmd < 0). <= 0 falls back to acc_time_constant (single-tau behaviour).
-   * @param [in] lon_drag_c0 constant longitudinal running-resistance offset added to the accel
-   *             target a_target [m/s²] (rolling resistance / standing slope). 0 disables.
-   * @param [in] lon_drag_c1 velocity-linear running-resistance coefficient [1/s]. 0 disables.
-   * @param [in] lon_drag_c2 velocity-quadratic (aero) running-resistance coefficient [1/m]. 0 disables.
    *
-   * @note 全パラメータが中立（遅延 0・単一 τ・オフセット無し）のとき wo_fall_guard と bit 一致。
+   * @note 全遅延 = 0 のとき wo_fall_guard と bit 一致。
    */
   SimModelDelaySteerAccGearedForDiffusionPlanner(
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, double steer_dead_band, double steer_bias,
-    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-    double brake_time_constant = 0.0, double lon_drag_c0 = 0.0, double lon_drag_c1 = 0.0,
-    double lon_drag_c2 = 0.0);
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us);
 
   /**
    * @brief default destructor
@@ -140,11 +131,9 @@ private:
   // dt 粒度（指令キューと同サイズ round(delay/dt)）で保持する。
   std::deque<double> steer_state_queue_;     //!< @brief buffer for STEER state (delayed feedback)
   std::deque<double> pedal_state_queue_;     //!< @brief buffer for PEDAL_ACCX state (delayed feedback)
-  std::deque<double> vel_state_queue_;       //!< @brief buffer for VX state (delayed drag argument)
   // update() 冒頭で 1 回だけ取り出し、calcModel が参照する凍結遅延状態。
   double delayed_steer_state_ = 0.0;         //!< @brief STEER at t−steer_delay (frozen per update)
   double delayed_pedal_state_ = 0.0;         //!< @brief PEDAL_ACCX at t−acc_delay (frozen per update)
-  double delayed_vel_state_ = 0.0;           //!< @brief VX at t−acc_delay (frozen per update)
   const double acc_delay_;                   //!< @brief time delay for accel command [s]
   const double acc_time_constant_;           //!< @brief time constant for accel dynamics
   const double steer_delay_;                 //!< @brief time delay for steering command [s]
@@ -154,10 +143,6 @@ private:
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
   const double k_us_;                        //!< @brief understeer coefficient [rad/(m/s²)]
-  const double brake_time_constant_;         //!< @brief accel time constant while braking [s]
-  const double lon_drag_c0_;                 //!< @brief running-resistance offset p0 [m/s²]
-  const double lon_drag_c1_;                 //!< @brief running-resistance velocity-linear p1 [1/s]
-  const double lon_drag_c2_;                 //!< @brief running-resistance velocity-quadratic p2 [1/m]
 
   /**
    * @brief steady-state yaw rate including understeer (k_us) and steer bias.
@@ -167,12 +152,6 @@ private:
    * Reduces to the ideal bicycle model when k_us = 0 and steer_bias = 0.
    */
   double calc_yaw_rate(double vel, double steer) const;
-
-  /**
-   * @brief steady-state running-resistance / drag offset poly(v) = p0 + p1·vx + p2·vx²
-   *        added to the accel target a_target. All-zero coefficients disable it.
-   */
-  double calc_drag(double vel) const;
 
   /**
    * @brief set queue buffer for input command

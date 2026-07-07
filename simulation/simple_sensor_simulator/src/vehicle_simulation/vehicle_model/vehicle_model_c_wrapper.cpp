@@ -157,21 +157,19 @@ VmModel * vm_create_delay_steer_acc_geared_wo_fall_guard(
 }
 
 // full-RHS delay 派生。差分はステア・加速度の遅延が指令のみ → 右辺全体 (状態フィードバックも t-d)
-// になった点と、走行抵抗 poly(v)・throttle/brake 分離 τ を保持する点。
+// になった点。全遅延が 0 なら wo_fall_guard と bit 一致。
 VmModel * vm_create_delay_steer_acc_geared_for_diffusion_planner(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
 {
   auto * m = new VmModel{};
   m->type = VmModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER;
   m->impl = std::make_unique<SimModelDelaySteerAccGearedForDiffusionPlanner>(
     vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
     acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
-    brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2);
+    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
   return m;
