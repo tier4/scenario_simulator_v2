@@ -190,11 +190,13 @@
   </style>
 </head>
 <body>
-  <main class="container" x-data="viewer"
-    @playback-pause.window="pausePlayback()"
-    @playback-resume.window="resumePlayback()">
+  <main class="container" x-data>
+  <template x-if="$store.data.map">
+    <div x-data="viewer"
+      @playback-pause.window="pausePlayback()"
+      @playback-resume.window="resumePlayback()">
     <h3 style="margin-bottom:.25rem">Trajectory Comparison</h3>
-    <p class="text-muted" style="margin-top:0" x-text="$store.models.list.length + ' model(s)'"></p>
+    <p class="text-muted" style="margin-top:0" x-text="$store.data.models.length + ' model(s)'"></p>
 
     <!-- Controls -->
     <div class="controls">
@@ -255,12 +257,12 @@
             Baseline
             <select x-model.number="$store.models.baselineIdx" @change="onBaselineChange()"
               style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">
-              <template x-for="(m, i) in $store.models.list" :key="'base'+i">
+              <template x-for="(m, i) in $store.data.models" :key="'base'+i">
                 <option :value="i" x-text="m.name"></option>
               </template>
             </select>
           </label>
-          <template x-for="(m, i) in $store.models.list" :key="i">
+          <template x-for="(m, i) in $store.data.models" :key="i">
             <div class="model-entry" :style="'--model-color:' + m.color">
               <div class="model-entry-header">
                 <label>
@@ -288,16 +290,24 @@
       </div>
       <div class="plot-row" x-ref="plotRow"></div>
     </div>
+    </div>
+  </template>
   </main>
 
-  <script>const REPORT_DATA = {{DATA_JSON}};</script>
+  <script>const REPORT_DATA_B64GZ = "{{DATA_B64GZ}}";</script>
   <script>
   (function() {
     "use strict";
-    const D = REPORT_DATA;
-    const RATE = D.rate_hz;
-    const N = D.n;
-    const MODELS = D.models;
+
+    function decodeData() {
+      const gz = Uint8Array.from(atob(REPORT_DATA_B64GZ), c => c.charCodeAt(0));
+      const ds = new DecompressionStream('gzip');
+      const writer = ds.writable.getWriter();
+      writer.write(gz);
+      writer.close();
+      return new Response(ds.readable).text().then(t => JSON.parse(t));
+    }
+
     const CHANNELS = ["velocity", "accel", "heading_rate", "steer"];
     const CH_LABELS = {velocity: "Velocity [m/s]", accel: "Accel [m/s²]",
                        heading_rate: "Heading Rate [rad/s]", steer: "Steer [deg]"};
@@ -306,51 +316,10 @@
     let _dirty = true;
     window.markDirty = function() { _dirty = true; };
 
-    // --- Interpolation helpers ---
-    function sampleAtT(run, t) {
-      const nv = run.n_valid;
-      if (nv < 2) return null;
-      const fi = Math.min(Math.max(t * RATE, 0), N - 1);
-      const i = Math.floor(fi);
-      const j = Math.min(i + 1, N - 1);
-      const f = fi - i;
-      const L = (a) => a[i] + (a[j] - a[i]) * f;
-      const tEnd = (nv - 1) / RATE;
-      const ended = t > tEnd + 1e-9;
-      return { x: L(run.x), y: L(run.y), yaw: L(run.yaw), s: L(run.s),
-               v: ended ? 0 : L(run.v), t: Math.min(t, tEnd), ended };
-    }
-
     function upperBound(arr, val, n) {
       let lo = 0, hi = n;
       while (lo < hi) { const m = (lo + hi) >> 1; arr[m] <= val ? lo = m + 1 : hi = m; }
       return lo;
-    }
-
-    function sampleAtS(run, s) {
-      const nv = run.n_valid;
-      if (nv < 2) return null;
-      const sc = Math.min(Math.max(s, 0), run.s_total);
-      let j = upperBound(run.s, sc, nv);
-      j = Math.min(Math.max(j, 1), nv - 1);
-      const i = j - 1;
-      const ds = run.s[j] - run.s[i];
-      const f = ds > 1e-9 ? (sc - run.s[i]) / ds : 0;
-      const L = (a) => a[i] + (a[j] - a[i]) * f;
-      const ended = sc >= run.s_total - 1e-9;
-      return { x: L(run.x), y: L(run.y), yaw: L(run.yaw), s: sc,
-               v: ended ? 0 : L(run.v), t: (i + f) / RATE, ended };
-    }
-
-    function sampleChannel(run, ch, t) {
-      const arr = run.ch[ch];
-      if (!arr || !arr.length) return null;
-      const fi = Math.min(Math.max(t * RATE, 0), arr.length - 1);
-      const i = Math.floor(fi);
-      const j = Math.min(i + 1, arr.length - 1);
-      if (arr[i] === null || arr[j] === null) return null;
-      const f = fi - i;
-      return arr[i] + (arr[j] - arr[i]) * f;
     }
 
     // --- Scale bar ---
@@ -375,42 +344,67 @@
 
     // --- Alpine stores ---
     document.addEventListener('alpine:init', () => {
-      const maxT = Math.max(...MODELS.map(m => m.n_valid > 0 ? (m.n_valid - 1) / RATE : 0));
-      const maxS = Math.max(...MODELS.map(m => m.s_total || 0));
-
+      Alpine.store('data', {
+        rate: 0, n: 0, models: [], map: null, bbox: null,
+        async init() {
+          const d = await decodeData();
+          this.rate = d.rate_hz; this.n = d.n;
+          this.models = d.models; this.map = d.map; this.bbox = d.bbox;
+        },
+        sampleAtT(run, t) {
+          const nv = run.n_valid;
+          if (nv < 2) return null;
+          const fi = Math.min(Math.max(t * this.rate, 0), this.n - 1);
+          const i = Math.floor(fi);
+          const j = Math.min(i + 1, this.n - 1);
+          const f = fi - i;
+          const L = (a) => a[i] + (a[j] - a[i]) * f;
+          const tEnd = (nv - 1) / this.rate;
+          const ended = t > tEnd + 1e-9;
+          return { x: L(run.x), y: L(run.y), yaw: L(run.yaw), s: L(run.s),
+                   v: ended ? 0 : L(run.v), t: Math.min(t, tEnd), ended };
+        },
+        sampleAtS(run, s) {
+          const nv = run.n_valid;
+          if (nv < 2) return null;
+          const sc = Math.min(Math.max(s, 0), run.s_total);
+          let j = upperBound(run.s, sc, nv);
+          j = Math.min(Math.max(j, 1), nv - 1);
+          const i = j - 1;
+          const ds = run.s[j] - run.s[i];
+          const f = ds > 1e-9 ? (sc - run.s[i]) / ds : 0;
+          const L = (a) => a[i] + (a[j] - a[i]) * f;
+          const ended = sc >= run.s_total - 1e-9;
+          return { x: L(run.x), y: L(run.y), yaw: L(run.yaw), s: sc,
+                   v: ended ? 0 : L(run.v), t: (i + f) / this.rate, ended };
+        },
+        sampleChannel(run, ch, t) {
+          const arr = run.ch[ch];
+          if (!arr || !arr.length) return null;
+          const fi = Math.min(Math.max(t * this.rate, 0), arr.length - 1);
+          const i = Math.floor(fi);
+          const j = Math.min(i + 1, arr.length - 1);
+          if (arr[i] === null || arr[j] === null) return null;
+          const f = fi - i;
+          return arr[i] + (arr[j] - arr[i]) * f;
+        },
+      });
       Alpine.store('playback', {
-        mode: 'time',
-        playing: false,
-        speedMul: 1,
-        curT: 0,
-        curS: 0,
-        maxT: maxT,
-        maxS: maxS,
+        mode: 'time', playing: false, speedMul: 1,
+        curT: 0, curS: 0, maxT: 0, maxS: 0,
       });
-
       Alpine.store('camera', {
-        cx: (D.bbox[0] + D.bbox[2]) / 2,
-        cy: (D.bbox[1] + D.bbox[3]) / 2,
-        viewW: Math.max(D.bbox[2] - D.bbox[0], D.bbox[3] - D.bbox[1], 10) * 1.1,
-        targetViewW: 0,
-        follow: true,
+        cx: 0, cy: 0, viewW: 10, targetViewW: 0, follow: true,
       });
-
       Alpine.store('models', {
-        list: MODELS,
-        visible: MODELS.map(() => true),
-        baselineIdx: 0,
+        visible: [], baselineIdx: 0,
       });
-
-      Alpine.store('ui', {
-        showPlanned: true,
-        plotWindowS: 10,
-      });
+      Alpine.store('ui', { showPlanned: true, plotWindowS: 10 });
 
       // --- viewer component (root) ---
       Alpine.data('viewer', () => {
         let animId = null, lastAnimTime = 0;
-        let pb, cam, mdl;
+        let d, pb, cam, mdl;
 
         function tick() {
           if (!pb.playing) return;
@@ -421,11 +415,11 @@
             pb.curT += dt;
             if (pb.curT > pb.maxT) pb.curT = 0;
           } else {
-            const base = MODELS[mdl.baselineIdx];
+            const base = d.models[mdl.baselineIdx];
             if (base && base.n_valid > 1) {
-              const st = sampleAtS(base, pb.curS);
+              const st = d.sampleAtS(base, pb.curS);
               if (st) {
-                const ns = sampleAtT(base, st.t + dt);
+                const ns = d.sampleAtT(base, st.t + dt);
                 pb.curS = ns ? ns.s : pb.maxS;
               }
             }
@@ -437,10 +431,18 @@
 
         return {
           init() {
+            d = this.$store.data;
             pb = this.$store.playback;
             cam = this.$store.camera;
             mdl = this.$store.models;
+            pb.maxT = Math.max(...d.models.map(m => m.n_valid > 0 ? (m.n_valid - 1) / d.rate : 0));
+            pb.maxS = Math.max(...d.models.map(m => m.s_total || 0));
+            cam.cx = (d.bbox[0] + d.bbox[2]) / 2;
+            cam.cy = (d.bbox[1] + d.bbox[3]) / 2;
+            cam.viewW = Math.max(d.bbox[2] - d.bbox[0], d.bbox[3] - d.bbox[1], 10) * 1.1;
+            mdl.visible = d.models.map(() => true);
             window.addEventListener('resize', () => { markDirty(); });
+            markDirty();
           },
           pausePlayback() {
             if (pb.playing) { pb.playing = false; if (animId) { cancelAnimationFrame(animId); animId = null; } }
@@ -454,17 +456,17 @@
             else if (animId) { cancelAnimationFrame(animId); animId = null; }
           },
           onModeChange() {
-            const base = MODELS[mdl.baselineIdx];
+            const base = d.models[mdl.baselineIdx];
             if (!base || base.n_valid < 2) return;
-            if (pb.mode === 'pos') { const st = sampleAtT(base, pb.curT); pb.curS = st ? st.s : 0; }
-            else { const st = sampleAtS(base, pb.curS); pb.curT = st ? st.t : 0; }
+            if (pb.mode === 'pos') { const st = d.sampleAtT(base, pb.curT); pb.curS = st ? st.s : 0; }
+            else { const st = d.sampleAtS(base, pb.curS); pb.curT = st ? st.t : 0; }
             markDirty();
           },
           onBaselineChange() {
             if (pb.mode === 'pos') {
-              const base = MODELS[mdl.baselineIdx];
+              const base = d.models[mdl.baselineIdx];
               if (base && base.n_valid > 1) {
-                const st = sampleAtS(MODELS[mdl.baselineIdx], pb.curS);
+                const st = d.sampleAtS(base, pb.curS);
                 if (st) pb.curS = st.s;
               }
             }
@@ -481,7 +483,7 @@
         let ctx = null, canvas = null, svg = null;
         const drag = { active: false, sx: 0, sy: 0, cx0: 0, cy0: 0 };
         let W = 800, H = 550;
-        let cam, pb, mdl, ui;
+        let d, cam, pb, mdl, ui;
 
         function toScreen(wx, wy) {
           const scale = W / cam.viewW;
@@ -523,11 +525,11 @@
         function drawMap() {
           ctx.strokeStyle = '#c8c8c8'; ctx.lineWidth = 0.8; ctx.globalAlpha = 0.4;
           ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-          for (const ll of D.map.lanelets) {
+          for (const ll of d.map.lanelets) {
             strokePolyline(ll.left);
             strokePolyline(ll.right);
           }
-          for (const rm of D.map.road_markings) {
+          for (const rm of d.map.road_markings) {
             if (rm.type === 'stop_line') { ctx.strokeStyle = '#cc4444'; ctx.lineWidth = 2; }
             else { ctx.strokeStyle = '#888888'; ctx.lineWidth = 1; }
             ctx.globalAlpha = 0.5;
@@ -538,9 +540,9 @@
 
         function drawTrajectories(vis) {
           ctx.lineWidth = 1.5;
-          for (let i = 0; i < MODELS.length; i++) {
+          for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
-            const m = MODELS[i];
+            const m = d.models[i];
             const nv = m.n_valid;
             if (nv < 2) continue;
             ctx.strokeStyle = m.color; ctx.globalAlpha = 0.3;
@@ -558,11 +560,11 @@
 
         function drawPlanned(vis, curT) {
           ctx.setLineDash([6, 4]); ctx.lineWidth = 1.5;
-          for (let i = 0; i < MODELS.length; i++) {
+          for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
-            const pf = closestPlanned(MODELS[i].planned, curT);
+            const pf = closestPlanned(d.models[i].planned, curT);
             if (!pf) continue;
-            ctx.strokeStyle = MODELS[i].color; ctx.globalAlpha = 0.35;
+            ctx.strokeStyle = d.models[i].color; ctx.globalAlpha = 0.35;
             strokePolyline(pf.points);
           }
           ctx.setLineDash([]); ctx.globalAlpha = 1.0;
@@ -586,11 +588,11 @@
           const defs = document.createElementNS(svgNS, 'defs');
           svg.appendChild(defs);
 
-          for (let i = 0; i < MODELS.length; i++) {
+          for (let i = 0; i < d.models.length; i++) {
             const s = samples[i];
             if (!s || !vis[i]) continue;
             const [px, py] = toScreen(s.x, s.y);
-            const color = MODELS[i].color;
+            const color = d.models[i].color;
 
             if (Math.abs(s.v) > 0.05) {
               const arrowLen = Math.abs(s.v) * 1.5 * pxPerMeter;
@@ -628,9 +630,9 @@
           const vis = mdl.visible;
           const scale = W / cam.viewW;
 
-          const samples = MODELS.map((m, i) => {
+          const samples = d.models.map((m, i) => {
             if (!vis[i] || m.n_valid < 2) return null;
-            return pb.mode === 'time' ? sampleAtT(m, pb.curT) : sampleAtS(m, pb.curS);
+            return pb.mode === 'time' ? d.sampleAtT(m, pb.curT) : d.sampleAtS(m, pb.curS);
           });
 
           if (cam.follow && pb.playing) updateFollow(samples, vis);
@@ -658,7 +660,7 @@
           svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
           if (needsInitialFit) {
             needsInitialFit = false;
-            const dx = D.bbox[2] - D.bbox[0], dy = D.bbox[3] - D.bbox[1];
+            const dx = d.bbox[2] - d.bbox[0], dy = d.bbox[3] - d.bbox[1];
             cam.viewW = Math.max(dx, dy * (W / H), 10) * 1.1;
           }
           markDirty();
@@ -666,6 +668,7 @@
 
         return {
           init() {
+            d = this.$store.data;
             canvas = this.$refs.mapCvs;
             svg = this.$refs.mapSvg;
             ctx = canvas.getContext('2d');
@@ -706,10 +709,10 @@
             markDirty();
           },
           doFitAll() {
-            const dx = D.bbox[2] - D.bbox[0], dy = D.bbox[3] - D.bbox[1];
+            const dx = d.bbox[2] - d.bbox[0], dy = d.bbox[3] - d.bbox[1];
             const aspect = W > 0 && H > 0 ? W / H : 1;
-            cam.cx = (D.bbox[0] + D.bbox[2]) / 2;
-            cam.cy = (D.bbox[1] + D.bbox[3]) / 2;
+            cam.cx = (d.bbox[0] + d.bbox[2]) / 2;
+            cam.cy = (d.bbox[1] + d.bbox[3]) / 2;
             cam.viewW = Math.max(dx, dy * aspect, 10) * 1.1;
             markDirty();
           },
@@ -718,14 +721,14 @@
 
       // --- legend component ---
       Alpine.data('legend', () => {
-        let pb, mdl;
+        let d, pb, mdl;
         return {
-          init() { pb = this.$store.playback; mdl = this.$store.models; },
+          init() { d = this.$store.data; pb = this.$store.playback; mdl = this.$store.models; },
           getStats(i) {
             if (!mdl.visible[i]) return '&mdash;';
-            const m = MODELS[i];
+            const m = d.models[i];
             if (m.n_valid < 2) return '<span class="text-muted">no data</span>';
-            const s = pb.mode === 'time' ? sampleAtT(m, pb.curT) : sampleAtS(m, pb.curS);
+            const s = pb.mode === 'time' ? d.sampleAtT(m, pb.curT) : d.sampleAtS(m, pb.curS);
             if (!s) return '&mdash;';
             return `v=${s.v.toFixed(1)} m/s &nbsp; t=${s.t.toFixed(1)}s &nbsp; s=${s.s.toFixed(0)}m`;
           },
@@ -735,7 +738,7 @@
       // --- plotsPanel component ---
       Alpine.data('plotsPanel', () => {
         let plotSvgs = {};
-        let pb, mdl, ui;
+        let d, pb, mdl, ui;
         const margin = { top: 8, right: 12, bottom: 28, left: 50 };
         const plotH = 200;
         let plotDrag = { active: false, wasPlaying: false, startClientX: 0, startT: 0, screenPxPerSec: 1 };
@@ -782,7 +785,7 @@
             plotDrag.wasPlaying = pb.playing;
             plotDrag.startClientX = e.clientX;
             plotDrag.startT = pb.mode === 'time' ? pb.curT
-              : (sampleAtS(MODELS[mdl.baselineIdx], pb.curS)?.t ?? 0);
+              : (d.sampleAtS(d.models[mdl.baselineIdx], pb.curS)?.t ?? 0);
             plotDrag.screenPxPerSec = ctm.a * pw / (domain[1] - domain[0]) * 0.5;
             if (pb.playing) window.dispatchEvent(new CustomEvent('playback-pause'));
             e.preventDefault();
@@ -795,9 +798,9 @@
             if (pb.mode === 'time') {
               pb.curT = t;
             } else {
-              const base = MODELS[mdl.baselineIdx];
+              const base = d.models[mdl.baselineIdx];
               if (base && base.n_valid > 1) {
-                const st = sampleAtT(base, t);
+                const st = d.sampleAtT(base, t);
                 if (st) pb.curS = st.s;
               }
             }
@@ -823,11 +826,11 @@
           p.xScale.domain([xMin, xMax]);
 
           let yMin = Infinity, yMax = -Infinity;
-          for (let i = 0; i < MODELS.length; i++) {
+          for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
-            const arr = MODELS[i].ch[ch];
+            const arr = d.models[i].ch[ch];
             if (!arr) continue;
-            for (let k = 0; k < MODELS[i].n_valid; k++) {
+            for (let k = 0; k < d.models[i].n_valid; k++) {
               if (arr[k] !== null) {
                 if (arr[k] < yMin) yMin = arr[k];
                 if (arr[k] > yMax) yMax = arr[k];
@@ -863,17 +866,17 @@
           });
 
           p.linesG.selectAll('*').remove();
-          for (let i = 0; i < MODELS.length; i++) {
+          for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
-            const arr = MODELS[i].ch[ch];
+            const arr = d.models[i].ch[ch];
             if (!arr) continue;
-            const nv = MODELS[i].n_valid;
+            const nv = d.models[i].n_valid;
             const lineData = [];
-            for (let k = 0; k < nv; k++) lineData.push({ t: k / RATE, v: arr[k] });
-            const line = d3.line().defined(d => d.v !== null)
-              .x(d => p.xScale(d.t)).y(d => p.yScale(d.v));
+            for (let k = 0; k < nv; k++) lineData.push({ t: k / d.rate, v: arr[k] });
+            const line = d3.line().defined(dd => dd.v !== null)
+              .x(dd => p.xScale(dd.t)).y(dd => p.yScale(dd.v));
             p.linesG.append('path').datum(lineData)
-              .attr('fill', 'none').attr('stroke', MODELS[i].color)
+              .attr('fill', 'none').attr('stroke', d.models[i].color)
               .attr('stroke-width', 1.5).attr('d', line);
           }
 
@@ -882,13 +885,13 @@
             .attr('opacity', cx >= 0 && cx <= p.pw ? 0.5 : 0);
 
           p.dotsG.selectAll('*').remove();
-          for (let i = 0; i < MODELS.length; i++) {
+          for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
-            const val = sampleChannel(MODELS[i], ch, curT);
+            const val = d.sampleChannel(d.models[i], ch, curT);
             if (val === null) continue;
             p.dotsG.append('circle')
               .attr('cx', p.xScale(curT)).attr('cy', p.yScale(val)).attr('r', 3.5)
-              .attr('fill', MODELS[i].color).attr('stroke', '#fff').attr('stroke-width', 1);
+              .attr('fill', d.models[i].color).attr('stroke', '#fff').attr('stroke-width', 1);
           }
         }
 
@@ -902,12 +905,13 @@
           if (!Object.keys(plotSvgs).length) return;
           const vis = mdl.visible;
           const curT = pb.mode === 'time' ? pb.curT :
-            (sampleAtS(MODELS[mdl.baselineIdx], pb.curS)?.t ?? 0);
+            (d.sampleAtS(d.models[mdl.baselineIdx], pb.curS)?.t ?? 0);
           for (const ch of CHANNELS) updateChannel(ch, curT, vis);
         }
 
         return {
           init() {
+            d = this.$store.data;
             pb = this.$store.playback;
             mdl = this.$store.models;
             ui = this.$store.ui;

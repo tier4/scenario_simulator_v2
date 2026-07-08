@@ -24,6 +24,8 @@ if __name__ == "__main__" and __package__ is None:
         _sys.path.insert(0, _pkg_parent)
     __package__ = "scenario_test_runner.report"
 
+import base64
+import gzip
 import json
 from pathlib import Path
 
@@ -129,7 +131,9 @@ def generate_report(output_dir):
             .replace("{{OPEN_PROPS_CSS}}", OPEN_PROPS_CSS)
             .replace("{{ALPINE_JS}}", ALPINE_JS)
             .replace("{{D3_JS}}", D3_JS)
-            .replace("{{DATA_JSON}}", json.dumps(data, separators=(",", ":")))
+            .replace("{{DATA_B64GZ}}", base64.b64encode(
+                gzip.compress(json.dumps(data, separators=(",", ":")).encode())
+            ).decode())
         )
 
         if len(scenario_bags) == 1:
