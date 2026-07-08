@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trajectory Comparison Report</title>
-  <style>{{OPEN_PROPS_CSS}}</style>
   <style>
     /* --- Theme tokens --- */
     :root {
@@ -1073,7 +1072,19 @@
     });
   })();
   </script>
-  <script>{{D3_JS}}</script>
-  <script>{{ALPINE_JS}}</script>
+  <script>
+  const _VGZ = {css:"{{OPEN_PROPS_GZ}}",d3:"{{D3_GZ}}",alpine:"{{ALPINE_GZ}}"};
+  (async function(){
+    function dec(b64){
+      const gz=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+      const ds=new DecompressionStream('gzip');
+      const w=ds.writable.getWriter();w.write(gz);w.close();
+      return new Response(ds.readable).text();
+    }
+    const st=document.createElement('style');st.textContent=await dec(_VGZ.css);document.head.appendChild(st);
+    const s1=document.createElement('script');s1.textContent=await dec(_VGZ.d3);document.body.appendChild(s1);
+    const s2=document.createElement('script');s2.textContent=await dec(_VGZ.alpine);document.body.appendChild(s2);
+  })();
+  </script>
 </body>
 </html>

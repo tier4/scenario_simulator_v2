@@ -169,6 +169,16 @@ def generate_report(output_dir):
     result_archive = output_dir / "result_archive"
     result_archive.mkdir(exist_ok=True)
 
+    def _b64gz(text):
+        return base64.b64encode(gzip.compress(text.encode())).decode()
+
+    vendor_template = (
+        _load_template()
+        .replace("{{OPEN_PROPS_GZ}}", _b64gz(OPEN_PROPS_CSS))
+        .replace("{{D3_GZ}}", _b64gz(D3_JS))
+        .replace("{{ALPINE_GZ}}", _b64gz(ALPINE_JS))
+    )
+
     report_paths = []
     for scenario_bag in scenario_bags:
         if model_dirs:
@@ -196,14 +206,11 @@ def generate_report(output_dir):
             "map": _clip_map_data(map_data, bbox),
             "models": models,
         }
-        html = (
-            _load_template()
-            .replace("{{OPEN_PROPS_CSS}}", OPEN_PROPS_CSS)
-            .replace("{{ALPINE_JS}}", ALPINE_JS)
-            .replace("{{D3_JS}}", D3_JS)
-            .replace("{{DATA_B64GZ}}", base64.b64encode(
+        html = vendor_template.replace(
+            "{{DATA_B64GZ}}",
+            base64.b64encode(
                 gzip.compress(json.dumps(data, separators=(",", ":")).encode())
-            ).decode())
+            ).decode(),
         )
 
         if len(scenario_bags) == 1:
