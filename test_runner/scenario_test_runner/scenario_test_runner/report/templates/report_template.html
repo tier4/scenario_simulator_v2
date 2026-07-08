@@ -8,16 +8,16 @@
   <style>
     /* --- Theme tokens --- */
     :root {
-      --surface-1: #13161f;
-      --surface-2: #1a1e2e;
-      --surface-3: #242a3a;
-      --text-1: #c9d1d9;
-      --text-2: #8b949e;
-      --border-dim: #30363d;
-      --accent: #58a6ff;
-      --danger: #f85149;
-      --success: #3fb950;
-      color-scheme: dark;
+      --surface-1: #ffffff;
+      --surface-2: #ffffff;
+      --surface-3: #f3f4f6;
+      --text-1: #1f2328;
+      --text-2: #656d76;
+      --border-dim: #d1d9e0;
+      --accent: #0969da;
+      --danger: #d1242f;
+      --success: #1a7f37;
+      color-scheme: light;
     }
 
     /* --- Reset + Base --- */
@@ -82,7 +82,7 @@
       -webkit-appearance: none;
       appearance: none;
       height: 6px;
-      background: var(--border-dim);
+      background: #ccd1d8;
       border-radius: var(--radius-round);
       outline: none;
     }
@@ -158,20 +158,51 @@
       color: var(--text-2); font-size: var(--font-size-0);
       margin-top: var(--size-1);
     }
+    .model-entry-stat.ended { color: #b05050; }
 
     /* --- Plots --- */
     .plot-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: var(--size-2);
+      gap: var(--size-3);
       margin-top: var(--size-2); font-size: var(--font-size-1);
     }
     @media (max-width: 768px) { .plot-row { grid-template-columns: 1fr; } }
-    .plot-cell { min-width: 0; }
+    .plot-cell {
+      min-width: 0;
+      background: var(--surface-2);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-2);
+      padding: var(--size-2) var(--size-2) var(--size-1);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
     .plot-cell svg { width: 100%; display: block; }
+    .plot-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 0 0 var(--size-1);
+    }
     .plot-title {
       font-size: var(--font-size-1); color: var(--text-2);
-      text-align: center; margin: 0;
+      margin: 0; font-weight: 600;
+    }
+    .unit-toggle {
+      font-size: 11px; color: var(--text-2); cursor: pointer;
+      padding: 1px 6px; border: 1px solid var(--border-dim);
+      border-radius: var(--radius-1); background: var(--surface-3);
+      user-select: none;
+    }
+    .unit-toggle:hover { background: var(--border-dim); }
+    .plot-tooltip {
+      position: absolute; pointer-events: none;
+      background: rgba(255,255,255,0.95); border: 1px solid var(--border-dim);
+      border-radius: var(--radius-1); padding: 4px 8px;
+      font-size: 11px; line-height: 1.5; white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      z-index: 10; display: none;
+    }
+    .plot-tooltip .tt-row { display: flex; align-items: center; gap: 6px; }
+    .plot-tooltip .tt-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
     }
 
     /* --- Select --- */
@@ -211,6 +242,7 @@
         <option value="1" selected>1x</option>
         <option value="2">2x</option>
         <option value="4">4x</option>
+        <option value="8">8x</option>
       </select>
       <button @click="$store.camera.follow = !$store.camera.follow"
         x-text="$store.camera.follow ? 'Unfollow' : 'Follow'"></button>
@@ -271,7 +303,7 @@
                   <span class="model-name" x-text="m.name" :title="m.name"></span>
                 </label>
               </div>
-              <div class="model-entry-stat" x-html="getStats(i)"></div>
+              <div class="model-entry-stat" :class="isEnded(i) && 'ended'" x-html="getStats(i)"></div>
             </div>
           </template>
         </div>
@@ -309,8 +341,15 @@
     }
 
     const CHANNELS = ["velocity", "accel", "heading_rate", "steer"];
-    const CH_LABELS = {velocity: "Velocity [m/s]", accel: "Accel [m/s²]",
-                       heading_rate: "Heading Rate [rad/s]", steer: "Steer [deg]"};
+    const CH_LABELS = {
+      velocity: {name: "Velocity", units: ["m/s"]},
+      accel: {name: "Accel", units: ["m/s²"]},
+      heading_rate: {name: "Yaw Rate", units: ["rad/s", "deg/s"], conv: [1, 180/Math.PI]},
+      steer: {name: "Steer", units: ["deg", "rad"], conv: [1, Math.PI/180]},
+    };
+    const CH_CMD = {velocity: "cmd_velocity", accel: "cmd_accel", steer: "cmd_steer"};
+    const chUnit = {}; // current unit index per channel
+    CHANNELS.forEach(ch => chUnit[ch] = 0);
 
     // Global dirty flag — shared between Alpine template expressions and JS components
     let _dirty = true;
@@ -523,16 +562,16 @@
         }
 
         function drawMap() {
-          ctx.strokeStyle = '#c8c8c8'; ctx.lineWidth = 0.8; ctx.globalAlpha = 0.4;
+          ctx.strokeStyle = '#d0d4da'; ctx.lineWidth = 1; ctx.globalAlpha = 0.6;
           ctx.lineCap = 'round'; ctx.lineJoin = 'round';
           for (const ll of d.map.lanelets) {
             strokePolyline(ll.left);
             strokePolyline(ll.right);
           }
           for (const rm of d.map.road_markings) {
-            if (rm.type === 'stop_line') { ctx.strokeStyle = '#cc4444'; ctx.lineWidth = 2; }
-            else { ctx.strokeStyle = '#888888'; ctx.lineWidth = 1; }
-            ctx.globalAlpha = 0.5;
+            if (rm.type === 'stop_line') { ctx.strokeStyle = '#daa'; ctx.lineWidth = 1.5; }
+            else { ctx.strokeStyle = '#d0d4da'; ctx.lineWidth = 1; }
+            ctx.globalAlpha = 0.6;
             strokePolyline(rm.points);
           }
           ctx.globalAlpha = 1.0;
@@ -540,6 +579,7 @@
 
         function drawTrajectories(vis) {
           ctx.lineWidth = 1.5;
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round';
           for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
             const m = d.models[i];
@@ -573,11 +613,11 @@
         function drawScaleBar(pxPerMeter) {
           const sb = niceScaleBar(pxPerMeter);
           const sbX = 20, sbY = H - 25;
-          ctx.strokeStyle = '#ccc'; ctx.lineWidth = 2; ctx.globalAlpha = 0.8;
+          ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.globalAlpha = 0.8;
           ctx.beginPath(); ctx.moveTo(sbX, sbY); ctx.lineTo(sbX + sb.px, sbY); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(sbX, sbY - 5); ctx.lineTo(sbX, sbY + 5); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(sbX + sb.px, sbY - 5); ctx.lineTo(sbX + sb.px, sbY + 5); ctx.stroke();
-          ctx.fillStyle = '#ccc'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+          ctx.fillStyle = '#555'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
           ctx.fillText(sb.meters >= 1000 ? (sb.meters / 1000) + 'km' : sb.meters + 'm', sbX + sb.px / 2, sbY - 8);
           ctx.globalAlpha = 1.0;
         }
@@ -602,7 +642,7 @@
               line.setAttribute('x1', px); line.setAttribute('y1', py);
               line.setAttribute('x2', ax); line.setAttribute('y2', ay);
               line.setAttribute('stroke', color); line.setAttribute('stroke-width', '2');
-              line.setAttribute('opacity', '0.7');
+              line.setAttribute('opacity', '0.8');
               svg.appendChild(line);
               const headLen = 6, angle = Math.atan2(ay - py, ax - px);
               const path = document.createElementNS(svgNS, 'polygon');
@@ -611,7 +651,7 @@
                 `${ax - headLen * Math.cos(angle - 0.4)},${ay - headLen * Math.sin(angle - 0.4)}`,
                 `${ax - headLen * Math.cos(angle + 0.4)},${ay - headLen * Math.sin(angle + 0.4)}`,
               ].join(' '));
-              path.setAttribute('fill', color); path.setAttribute('opacity', '0.7');
+              path.setAttribute('fill', color); path.setAttribute('opacity', '0.8');
               svg.appendChild(path);
             }
 
@@ -619,7 +659,7 @@
             circle.setAttribute('cx', px); circle.setAttribute('cy', py);
             circle.setAttribute('r', i === mdl.baselineIdx ? 7 : 5.5);
             circle.setAttribute('fill', color);
-            circle.setAttribute('stroke', '#fff'); circle.setAttribute('stroke-width', '2');
+            circle.setAttribute('stroke', '#fff'); circle.setAttribute('stroke-width', '2.5');
             svg.appendChild(circle);
           }
         }
@@ -638,7 +678,7 @@
           if (cam.follow && pb.playing) updateFollow(samples, vis);
 
           ctx.clearRect(0, 0, W, H);
-          ctx.fillStyle = '#1a1e2e'; ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
           drawMap();
           drawTrajectories(vis);
           if (ui.showPlanned) {
@@ -722,15 +762,26 @@
       // --- legend component ---
       Alpine.data('legend', () => {
         let d, pb, mdl;
+        function _sample(i) {
+          const m = d.models[i];
+          if (m.n_valid < 2) return null;
+          return pb.mode === 'time' ? d.sampleAtT(m, pb.curT) : d.sampleAtS(m, pb.curS);
+        }
         return {
           init() { d = this.$store.data; pb = this.$store.playback; mdl = this.$store.models; },
+          isEnded(i) {
+            if (!mdl.visible[i]) return false;
+            const s = _sample(i);
+            return s ? s.ended : false;
+          },
           getStats(i) {
             if (!mdl.visible[i]) return '&mdash;';
             const m = d.models[i];
             if (m.n_valid < 2) return '<span class="text-muted">no data</span>';
-            const s = pb.mode === 'time' ? d.sampleAtT(m, pb.curT) : d.sampleAtS(m, pb.curS);
+            const s = _sample(i);
             if (!s) return '&mdash;';
-            return `v=${s.v.toFixed(1)} m/s &nbsp; t=${s.t.toFixed(1)}s &nbsp; s=${s.s.toFixed(0)}m`;
+            const end = s.ended ? ' <span style="color:#b05050">[ended]</span>' : '';
+            return `v=${s.v.toFixed(1)} m/s &nbsp; t=${s.t.toFixed(1)}s &nbsp; s=${s.s.toFixed(0)}m${end}`;
           },
         };
       });
@@ -743,13 +794,55 @@
         const plotH = 200;
         let plotDrag = { active: false, wasPlaying: false, startClientX: 0, startT: 0, screenPxPerSec: 1 };
 
+        function chLabel(ch) {
+          const c = CH_LABELS[ch];
+          return c.name + ' [' + c.units[chUnit[ch]] + ']';
+        }
+        function chConv(ch) {
+          const c = CH_LABELS[ch];
+          return (c.conv && c.conv[chUnit[ch]]) || 1;
+        }
+
         function createPlotCell(ch) {
           const cell = document.createElement('div');
           cell.className = 'plot-cell';
+          cell.style.position = 'relative';
+
+          const header = document.createElement('div');
+          header.className = 'plot-header';
           const title = document.createElement('p');
           title.className = 'plot-title';
-          title.textContent = CH_LABELS[ch];
-          cell.appendChild(title);
+          title.textContent = chLabel(ch);
+          header.appendChild(title);
+
+          const info = CH_LABELS[ch];
+          if (info.units.length > 1) {
+            const tog = document.createElement('span');
+            tog.className = 'unit-toggle';
+            tog.textContent = info.units[chUnit[ch]];
+            tog.addEventListener('click', () => {
+              chUnit[ch] = (chUnit[ch] + 1) % info.units.length;
+              tog.textContent = info.units[chUnit[ch]];
+              title.textContent = chLabel(ch);
+              markDirty();
+            });
+            header.appendChild(tog);
+          }
+          cell.appendChild(header);
+
+          const hasData = d.models.some(m => m.ch[ch]);
+          if (!hasData) {
+            cell.style.opacity = '0.35';
+            const msg = document.createElement('div');
+            msg.textContent = 'No data';
+            msg.style.cssText = 'height:' + plotH + 'px;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px';
+            cell.appendChild(msg);
+            return cell;
+          }
+
+          const tooltip = document.createElement('div');
+          tooltip.className = 'plot-tooltip';
+          cell.appendChild(tooltip);
 
           const w = 600, h = plotH + margin.top + margin.bottom;
           const svgEl = d3.select(cell).append('svg')
@@ -770,9 +863,13 @@
           const linesG = g.append('g').attr('clip-path', `url(#${clipId})`);
           const cursorLine = g.append('line')
             .attr('y1', 0).attr('y2', plotH)
-            .attr('stroke', '#fff').attr('stroke-width', 1)
+            .attr('stroke', '#333').attr('stroke-width', 1)
             .attr('stroke-dasharray', '4,3').attr('opacity', 0.5);
           const dotsG = g.append('g');
+          const hoverLine = g.append('line')
+            .attr('y1', 0).attr('y2', plotH)
+            .attr('stroke', '#999').attr('stroke-width', 0.8)
+            .attr('opacity', 0).attr('pointer-events', 'none');
 
           const hitArea = g.append('rect')
             .attr('width', pw).attr('height', plotH)
@@ -789,6 +886,42 @@
             plotDrag.screenPxPerSec = ctm.a * pw / (domain[1] - domain[0]) * 0.5;
             if (pb.playing) window.dispatchEvent(new CustomEvent('playback-pause'));
             e.preventDefault();
+          });
+
+          hitArea.on('mousemove', (e) => {
+            const ctm = g.node().getScreenCTM();
+            const svgX = (e.clientX - ctm.e) / ctm.a;
+            const hoverT = xScale.invert(svgX);
+            const conv = chConv(ch);
+            const vis = mdl.visible;
+            let rows = '';
+            if (hoverT >= 0) {
+              for (let i = 0; i < d.models.length; i++) {
+                if (!vis[i]) continue;
+                const val = d.sampleChannel(d.models[i], ch, hoverT);
+                if (val === null) continue;
+                const v = (val * conv).toFixed(3);
+                rows += `<div class="tt-row"><span class="tt-dot" style="background:${d.models[i].color}"></span><span>${v}</span></div>`;
+              }
+            }
+            if (rows) {
+              const hx = xScale(hoverT);
+              hoverLine.attr('x1', hx).attr('x2', hx).attr('opacity', 0.6);
+              tooltip.innerHTML = `<div style="color:#999;margin-bottom:2px">${hoverT.toFixed(2)}s</div>` + rows;
+              tooltip.style.display = 'block';
+              const cellRect = cell.getBoundingClientRect();
+              let tx = e.clientX - cellRect.left + 12;
+              if (tx + 140 > cellRect.width) tx = e.clientX - cellRect.left - 140;
+              tooltip.style.left = tx + 'px';
+              tooltip.style.top = (e.clientY - cellRect.top - 10) + 'px';
+            } else {
+              tooltip.style.display = 'none';
+              hoverLine.attr('opacity', 0);
+            }
+          });
+          hitArea.on('mouseleave', () => {
+            tooltip.style.display = 'none';
+            hoverLine.attr('opacity', 0);
           });
 
           d3.select(window).on('mousemove.plot', (e) => {
@@ -819,21 +952,26 @@
           const p = plotSvgs[ch];
           if (!p) return;
           const windowS = ui.plotWindowS;
+          const conv = chConv(ch);
 
           let xMin, xMax;
           if (windowS > 0) { xMin = curT - windowS / 2; xMax = curT + windowS / 2; }
           else { xMin = 0; xMax = pb.maxT; }
           p.xScale.domain([xMin, xMax]);
 
+          const cmdCh = CH_CMD[ch] || null;
           let yMin = Infinity, yMax = -Infinity;
           for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
-            const arr = d.models[i].ch[ch];
-            if (!arr) continue;
-            for (let k = 0; k < d.models[i].n_valid; k++) {
-              if (arr[k] !== null) {
-                if (arr[k] < yMin) yMin = arr[k];
-                if (arr[k] > yMax) yMax = arr[k];
+            for (const key of [ch, cmdCh]) {
+              const arr = key && d.models[i].ch[key];
+              if (!arr) continue;
+              for (let k = 0; k < d.models[i].n_valid; k++) {
+                if (arr[k] !== null) {
+                  const cv = arr[k] * conv;
+                  if (cv < yMin) yMin = cv;
+                  if (cv > yMax) yMax = cv;
+                }
               }
             }
           }
@@ -842,42 +980,52 @@
           p.yScale.domain([yMin - yPad, yMax + yPad]);
 
           p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(d => d.toFixed(0) + 's'))
-            .selectAll('text').attr('fill', '#aaa').attr('font-size', '12px');
-          p.xAxis.selectAll('line,path').attr('stroke', '#444');
+            .selectAll('text').attr('fill', '#555').attr('font-size', '12px');
+          p.xAxis.selectAll('line,path').attr('stroke', '#ccc');
           const yRange = p.yScale.domain();
           const ySpan = Math.abs(yRange[1] - yRange[0]);
           const yPrec = ySpan < 0.01 ? 4 : ySpan < 0.1 ? 3 : ySpan < 1 ? 2 : 1;
           p.yAxis.call(d3.axisLeft(p.yScale).ticks(4).tickFormat(d3.format('.' + yPrec + 'f')))
-            .selectAll('text').attr('fill', '#aaa').attr('font-size', '12px');
-          p.yAxis.selectAll('line,path').attr('stroke', '#444');
+            .selectAll('text').attr('fill', '#555').attr('font-size', '12px');
+          p.yAxis.selectAll('line,path').attr('stroke', '#ccc');
 
           p.gridG.selectAll('*').remove();
           p.xScale.ticks(5).forEach(t => {
             p.gridG.append('line')
               .attr('x1', p.xScale(t)).attr('x2', p.xScale(t))
               .attr('y1', 0).attr('y2', plotH)
-              .attr('stroke', '#333').attr('stroke-dasharray', '2,3');
+              .attr('stroke', '#e0e0e0').attr('stroke-dasharray', '2,3');
           });
           p.yScale.ticks(4).forEach(t => {
             p.gridG.append('line')
               .attr('x1', 0).attr('x2', p.pw)
               .attr('y1', p.yScale(t)).attr('y2', p.yScale(t))
-              .attr('stroke', '#333').attr('stroke-dasharray', '2,3');
+              .attr('stroke', '#e0e0e0').attr('stroke-dasharray', '2,3');
           });
 
           p.linesG.selectAll('*').remove();
           for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
-            const arr = d.models[i].ch[ch];
-            if (!arr) continue;
             const nv = d.models[i].n_valid;
-            const lineData = [];
-            for (let k = 0; k < nv; k++) lineData.push({ t: k / d.rate, v: arr[k] });
-            const line = d3.line().defined(dd => dd.v !== null)
+            const lineFn = d3.line().defined(dd => dd.v !== null)
               .x(dd => p.xScale(dd.t)).y(dd => p.yScale(dd.v));
-            p.linesG.append('path').datum(lineData)
-              .attr('fill', 'none').attr('stroke', d.models[i].color)
-              .attr('stroke-width', 1.5).attr('d', line);
+            const arr = d.models[i].ch[ch];
+            if (arr) {
+              const lineData = [];
+              for (let k = 0; k < nv; k++) lineData.push({ t: k / d.rate, v: arr[k] !== null ? arr[k] * conv : null });
+              p.linesG.append('path').datum(lineData)
+                .attr('fill', 'none').attr('stroke', d.models[i].color)
+                .attr('stroke-width', 1.5).attr('d', lineFn);
+            }
+            const cmdArr = cmdCh && d.models[i].ch[cmdCh];
+            if (cmdArr) {
+              const cmdData = [];
+              for (let k = 0; k < nv; k++) cmdData.push({ t: k / d.rate, v: cmdArr[k] !== null ? cmdArr[k] * conv : null });
+              p.linesG.append('path').datum(cmdData)
+                .attr('fill', 'none').attr('stroke', d.models[i].color)
+                .attr('stroke-width', 1.2).attr('stroke-dasharray', '4,3')
+                .attr('opacity', 0.5).attr('d', lineFn);
+            }
           }
 
           const cx = p.xScale(curT);
@@ -890,8 +1038,8 @@
             const val = d.sampleChannel(d.models[i], ch, curT);
             if (val === null) continue;
             p.dotsG.append('circle')
-              .attr('cx', p.xScale(curT)).attr('cy', p.yScale(val)).attr('r', 3.5)
-              .attr('fill', d.models[i].color).attr('stroke', '#fff').attr('stroke-width', 1);
+              .attr('cx', p.xScale(curT)).attr('cy', p.yScale(val * conv)).attr('r', 3.5)
+              .attr('fill', d.models[i].color).attr('stroke', '#fff').attr('stroke-width', 1.5);
           }
         }
 
