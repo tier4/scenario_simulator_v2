@@ -64,6 +64,75 @@ def _compute_bbox(models):
     return [min(all_x), min(all_y), max(all_x), max(all_y)]
 
 
+MAP_CLIP_MARGIN = 50.0  # meters around trajectory bbox
+
+
+def _clip_segment(p1, p2, x0, y0, x1, y1):
+    """Liang-Barsky clip of segment p1-p2 against axis-aligned rect."""
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    t0, t1 = 0.0, 1.0
+    for p, q in [(-dx, p1[0] - x0), (dx, x1 - p1[0]),
+                 (-dy, p1[1] - y0), (dy, y1 - p1[1])]:
+        if abs(p) < 1e-12:
+            if q < 0:
+                return None
+        else:
+            r = q / p
+            if p < 0:
+                t0 = max(t0, r)
+            else:
+                t1 = min(t1, r)
+            if t0 > t1:
+                return None
+    return ([round(p1[0] + t0 * dx, 2), round(p1[1] + t0 * dy, 2)],
+            [round(p1[0] + t1 * dx, 2), round(p1[1] + t1 * dy, 2)])
+
+
+def _clip_polyline(pts, x0, y0, x1, y1):
+    """Clip polyline against rect. Returns list of sub-polylines."""
+    chains = []
+    cur = []
+    for k in range(len(pts) - 1):
+        seg = _clip_segment(pts[k], pts[k + 1], x0, y0, x1, y1)
+        if seg is None:
+            if cur:
+                chains.append(cur)
+                cur = []
+            continue
+        cp1, cp2 = seg
+        if not cur:
+            cur = [cp1]
+        elif cur[-1] != cp1:
+            chains.append(cur)
+            cur = [cp1]
+        cur.append(cp2)
+    if cur:
+        chains.append(cur)
+    return chains
+
+
+def _clip_map_data(map_data, bbox):
+    """Clip lanelets/markings to the trajectory bbox + margin."""
+    x0 = bbox[0] - MAP_CLIP_MARGIN
+    y0 = bbox[1] - MAP_CLIP_MARGIN
+    x1 = bbox[2] + MAP_CLIP_MARGIN
+    y1 = bbox[3] + MAP_CLIP_MARGIN
+
+    lanelet_lines = []
+    for ll in map_data["lanelets"]:
+        lanelet_lines.extend(_clip_polyline(ll["left"], x0, y0, x1, y1))
+        lanelet_lines.extend(_clip_polyline(ll["right"], x0, y0, x1, y1))
+
+    markings = []
+    for mk in map_data["road_markings"]:
+        clipped = _clip_polyline(mk["points"], x0, y0, x1, y1)
+        for line in clipped:
+            markings.append({"points": line, "type": mk["type"]})
+
+    return {"lanelet_lines": lanelet_lines, "road_markings": markings}
+
+
 def generate_report(output_dir):
     """Generate self-contained HTML comparison reports.
 
@@ -119,11 +188,12 @@ def generate_report(output_dir):
             models = [traj_data]
 
         n = max((len(m["x"]) for m in models), default=0)
+        bbox = _compute_bbox(models)
         data = {
             "rate_hz": RATE_HZ,
             "n": n,
-            "bbox": _compute_bbox(models),
-            "map": map_data,
+            "bbox": bbox,
+            "map": _clip_map_data(map_data, bbox),
             "models": models,
         }
         html = (
