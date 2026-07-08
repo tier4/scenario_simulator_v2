@@ -51,7 +51,7 @@ _MODEL_HUES = [210, 30, 150, 330, 60, 270, 0, 120]
 
 def _assign_color(index):
     hue = _MODEL_HUES[index % len(_MODEL_HUES)]
-    return f"hsl({hue},70%,55%)"
+    return f"hsl({hue},80%,60%)"
 
 
 def _compute_bbox(models):

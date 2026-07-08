@@ -26,6 +26,10 @@ import rosbag2_py
 
 from autoware_map_msgs.msg import LaneletMapBin
 from autoware_planning_msgs.msg import Trajectory
+from autoware_control_msgs.msg import Control
+from autoware_vehicle_msgs.msg import SteeringReport, VelocityReport
+from geometry_msgs.msg import AccelWithCovarianceStamped
+from nav_msgs.msg import Odometry
 from pathlib import Path
 from .rosbag_merger import find_driving_timestamp, quaternion_to_yaw
 
@@ -45,6 +49,11 @@ for _prefix in os.environ.get("AMENT_PREFIX_PATH", "").split(":"):
 
 MAP_TOPIC = "/map/vector_map"
 TRAJECTORY_TOPIC = "/planning/trajectory"
+VELOCITY_TOPIC = "/vehicle/status/velocity_status"
+ACCEL_TOPIC = "/localization/acceleration"
+STEERING_TOPIC = "/vehicle/status/steering_status"
+KINEMATIC_TOPIC = "/localization/kinematic_state"
+CONTROL_CMD_TOPIC = "/control/command/control_cmd"
 DOWNSAMPLE_INTERVAL_NS = 200_000_000  # 200ms → ~5Hz
 RATE_HZ = 10.0
 MARKING_TYPES = {"line_thin", "line_thick", "stop_line"}
@@ -78,10 +87,148 @@ def extract_map_data(bag_dir):
     }
 
 
-def _extract_ego_timeseries(bag_dir):
-    """Extract per-frame ego state from the first point of each trajectory message."""
-    driving_ts = find_driving_timestamp(bag_dir)
+def _extract_velocity_timeseries(bag_dir, driving_ts):
+    """Extract longitudinal velocity [m/s] from /vehicle/status/velocity_status."""
+    reader = rosbag2_py.SequentialReader()
+    reader.open(
+        rosbag2_py.StorageOptions(uri=str(bag_dir)),
+        rosbag2_py.ConverterOptions("", ""),
+    )
+    has_topic = any(t.name == VELOCITY_TOPIC for t in reader.get_all_topics_and_types())
+    if not has_topic:
+        return []
 
+    reader.set_filter(rosbag2_py.StorageFilter(topics=[VELOCITY_TOPIC]))
+    rows = []
+    base_ts = None
+    while reader.has_next():
+        _, data, ts = reader.read_next()
+        if driving_ts is not None and ts < driving_ts:
+            continue
+        if base_ts is None:
+            base_ts = driving_ts if driving_ts is not None else ts
+        msg = rclpy.serialization.deserialize_message(data, VelocityReport)
+        rows.append(((ts - base_ts) / 1e9, msg.longitudinal_velocity))
+    return rows
+
+
+def _extract_accel_timeseries(bag_dir, driving_ts):
+    """Extract longitudinal acceleration [m/s²] from /localization/acceleration."""
+    reader = rosbag2_py.SequentialReader()
+    reader.open(
+        rosbag2_py.StorageOptions(uri=str(bag_dir)),
+        rosbag2_py.ConverterOptions("", ""),
+    )
+    has_topic = any(t.name == ACCEL_TOPIC for t in reader.get_all_topics_and_types())
+    if not has_topic:
+        return []
+
+    reader.set_filter(rosbag2_py.StorageFilter(topics=[ACCEL_TOPIC]))
+    rows = []
+    base_ts = None
+    while reader.has_next():
+        _, data, ts = reader.read_next()
+        if driving_ts is not None and ts < driving_ts:
+            continue
+        if base_ts is None:
+            base_ts = driving_ts if driving_ts is not None else ts
+        msg = rclpy.serialization.deserialize_message(data, AccelWithCovarianceStamped)
+        rows.append(((ts - base_ts) / 1e9, msg.accel.accel.linear.x))
+    return rows
+
+
+def _extract_steering_timeseries(bag_dir, driving_ts):
+    """Extract steering tire angle [rad] from /vehicle/status/steering_status."""
+    reader = rosbag2_py.SequentialReader()
+    reader.open(
+        rosbag2_py.StorageOptions(uri=str(bag_dir)),
+        rosbag2_py.ConverterOptions("", ""),
+    )
+    has_topic = any(t.name == STEERING_TOPIC for t in reader.get_all_topics_and_types())
+    if not has_topic:
+        return []
+
+    reader.set_filter(rosbag2_py.StorageFilter(topics=[STEERING_TOPIC]))
+    rows = []
+    base_ts = None
+    while reader.has_next():
+        _, data, ts = reader.read_next()
+        if driving_ts is not None and ts < driving_ts:
+            continue
+        if base_ts is None:
+            base_ts = driving_ts if driving_ts is not None else ts
+        msg = rclpy.serialization.deserialize_message(data, SteeringReport)
+        rows.append(((ts - base_ts) / 1e9, msg.steering_tire_angle))
+    return rows
+
+
+def _extract_kinematic_state(bag_dir, driving_ts):
+    """Extract ego pose (t, x, y, yaw) and yaw rate from /localization/kinematic_state."""
+    reader = rosbag2_py.SequentialReader()
+    reader.open(
+        rosbag2_py.StorageOptions(uri=str(bag_dir)),
+        rosbag2_py.ConverterOptions("", ""),
+    )
+    has_topic = any(t.name == KINEMATIC_TOPIC for t in reader.get_all_topics_and_types())
+    if not has_topic:
+        return [], []
+
+    reader.set_filter(rosbag2_py.StorageFilter(topics=[KINEMATIC_TOPIC]))
+    ego_rows = []
+    wz_rows = []
+    base_ts = None
+    last_ts = 0
+    while reader.has_next():
+        _, data, ts = reader.read_next()
+        if driving_ts is not None and ts < driving_ts:
+            continue
+        if base_ts is None:
+            base_ts = driving_ts if driving_ts is not None else ts
+        msg = rclpy.serialization.deserialize_message(data, Odometry)
+        t_sec = (ts - base_ts) / 1e9
+        wz_rows.append((t_sec, msg.twist.twist.angular.z))
+        if ts - last_ts < DOWNSAMPLE_INTERVAL_NS:
+            continue
+        last_ts = ts
+        p = msg.pose.pose.position
+        o = msg.pose.pose.orientation
+        yaw = math.atan2(2 * (o.w * o.z + o.x * o.y), 1 - 2 * (o.y * o.y + o.z * o.z))
+        ego_rows.append((t_sec, p.x, p.y, yaw))
+    return ego_rows, wz_rows
+
+
+def _extract_control_cmd_timeseries(bag_dir, driving_ts):
+    """Extract control command (vel, accel, steer) from /control/command/control_cmd."""
+    reader = rosbag2_py.SequentialReader()
+    reader.open(
+        rosbag2_py.StorageOptions(uri=str(bag_dir)),
+        rosbag2_py.ConverterOptions("", ""),
+    )
+    has_topic = any(t.name == CONTROL_CMD_TOPIC for t in reader.get_all_topics_and_types())
+    if not has_topic:
+        return [], [], []
+
+    reader.set_filter(rosbag2_py.StorageFilter(topics=[CONTROL_CMD_TOPIC]))
+    cmd_vel_rows = []
+    cmd_accel_rows = []
+    cmd_steer_rows = []
+    base_ts = None
+    while reader.has_next():
+        _, data, ts = reader.read_next()
+        if driving_ts is not None and ts < driving_ts:
+            continue
+        if base_ts is None:
+            base_ts = driving_ts if driving_ts is not None else ts
+        msg = rclpy.serialization.deserialize_message(data, Control)
+        t_sec = (ts - base_ts) / 1e9
+        cmd_vel_rows.append((t_sec, msg.longitudinal.velocity))
+        cmd_accel_rows.append((t_sec, msg.longitudinal.acceleration))
+        cmd_steer_rows.append((t_sec, msg.lateral.steering_tire_angle))
+    return cmd_vel_rows, cmd_accel_rows, cmd_steer_rows
+
+
+def _extract_planned_frames(bag_dir, driving_ts):
+    """Extract planned trajectory snapshots from /planning/trajectory."""
     reader = rosbag2_py.SequentialReader()
     reader.open(
         rosbag2_py.StorageOptions(uri=str(bag_dir)),
@@ -89,43 +236,21 @@ def _extract_ego_timeseries(bag_dir):
     )
     has_topic = any(t.name == TRAJECTORY_TOPIC for t in reader.get_all_topics_and_types())
     if not has_topic:
-        return None, []
+        return []
 
     reader.set_filter(rosbag2_py.StorageFilter(topics=[TRAJECTORY_TOPIC]))
-
-    ego_ts = []
     planned_frames = []
-    last_ts = 0
     last_planned_t = -1.0
 
     while reader.has_next():
         _, data, ts = reader.read_next()
         if driving_ts is not None and ts < driving_ts:
             continue
-        if ts - last_ts < DOWNSAMPLE_INTERVAL_NS:
-            continue
-        last_ts = ts
-
         traj = rclpy.serialization.deserialize_message(data, Trajectory)
         if len(traj.points) < 2:
             continue
-
         base_ts = driving_ts if driving_ts is not None else ts
         t_sec = (ts - base_ts) / 1e9
-
-        p0 = traj.points[0]
-        yaw = quaternion_to_yaw(p0.pose.orientation)
-        ego_ts.append((
-            t_sec,
-            p0.pose.position.x,
-            p0.pose.position.y,
-            yaw,
-            p0.longitudinal_velocity_mps,
-            p0.acceleration_mps2,
-            p0.heading_rate_rps,
-            p0.front_wheel_angle_rad,
-        ))
-
         if t_sec - last_planned_t >= 0.5:
             last_planned_t = t_sec
             points = [
@@ -134,11 +259,37 @@ def _extract_ego_timeseries(bag_dir):
                 for p in traj.points[::3]
             ]
             planned_frames.append({"t": round(t_sec, 3), "points": points})
+    return planned_frames
 
-    return ego_ts, planned_frames
+
+def _extract_ego_timeseries(bag_dir):
+    """Extract ego state from dedicated status/localization topics."""
+    driving_ts = find_driving_timestamp(bag_dir)
+
+    ego_ts, wz_ts = _extract_kinematic_state(bag_dir, driving_ts)
+    if not ego_ts:
+        return None, [], [], [], [], [], [], [], []
+
+    planned_frames = _extract_planned_frames(bag_dir, driving_ts)
+    vel_ts = _extract_velocity_timeseries(bag_dir, driving_ts)
+    accel_ts = _extract_accel_timeseries(bag_dir, driving_ts)
+    steer_ts = _extract_steering_timeseries(bag_dir, driving_ts)
+    cmd_vel_ts, cmd_accel_ts, cmd_steer_ts = _extract_control_cmd_timeseries(bag_dir, driving_ts)
+
+    return (ego_ts, planned_frames, vel_ts, accel_ts, steer_ts, wz_ts,
+            cmd_vel_ts, cmd_accel_ts, cmd_steer_ts)
 
 
-def _resample_to_grid(ego_ts):
+def _interp_ts(t_grid, ts_rows):
+    """Interpolate a list of (t, value) onto t_grid. Returns zeros if empty."""
+    if not ts_rows:
+        return np.zeros_like(t_grid)
+    data = np.array(ts_rows, dtype=float)
+    return np.interp(t_grid, data[:, 0], data[:, 1])
+
+
+def _resample_to_grid(ego_ts, vel_ts, accel_ts, steer_ts, wz_ts,
+                      cmd_vel_ts, cmd_accel_ts, cmd_steer_ts):
     """Resample ego timeseries onto a uniform time grid."""
     if not ego_ts:
         return None
@@ -147,10 +298,6 @@ def _resample_to_grid(ego_ts):
     t_raw = data[:, 0]
     x_raw, y_raw = data[:, 1], data[:, 2]
     yaw_raw = data[:, 3]
-    v_raw = data[:, 4]
-    accel_raw = data[:, 5]
-    hr_raw = data[:, 6]
-    steer_raw = data[:, 7]
 
     t_max = t_raw[-1]
     n = int(np.floor(t_max * RATE_HZ)) + 1
@@ -159,10 +306,13 @@ def _resample_to_grid(ego_ts):
     x = np.interp(t_grid, t_raw, x_raw)
     y = np.interp(t_grid, t_raw, y_raw)
     yaw = np.interp(t_grid, t_raw, np.unwrap(yaw_raw))
-    v = np.interp(t_grid, t_raw, v_raw)
-    accel = np.interp(t_grid, t_raw, accel_raw)
-    hr = np.interp(t_grid, t_raw, hr_raw)
-    steer = np.interp(t_grid, t_raw, steer_raw)
+    v = _interp_ts(t_grid, vel_ts)
+    accel = _interp_ts(t_grid, accel_ts)
+    steer = _interp_ts(t_grid, steer_ts)
+    yaw_rate = _interp_ts(t_grid, wz_ts)
+    cmd_vel = _interp_ts(t_grid, cmd_vel_ts)
+    cmd_accel = _interp_ts(t_grid, cmd_accel_ts)
+    cmd_steer = _interp_ts(t_grid, cmd_steer_ts)
 
     n_valid = int(np.searchsorted(t_grid, t_raw[-1], side="right"))
     v[n_valid:] = 0.0
@@ -175,6 +325,25 @@ def _resample_to_grid(ego_ts):
         out.extend([None] * (n - n_valid))
         return out
 
+    def _has_data(arr):
+        return n_valid > 1 and np.max(np.abs(arr[:n_valid])) > 1e-8
+
+    ch = {}
+    if vel_ts:
+        ch["velocity"] = _to_list(v)
+    if accel_ts:
+        ch["accel"] = _to_list(accel)
+    if _has_data(yaw_rate):
+        ch["heading_rate"] = _to_list(yaw_rate, 4)
+    if _has_data(steer):
+        ch["steer"] = _to_list(np.degrees(steer))
+    if cmd_vel_ts:
+        ch["cmd_velocity"] = _to_list(cmd_vel)
+    if cmd_accel_ts:
+        ch["cmd_accel"] = _to_list(cmd_accel)
+    if cmd_steer_ts:
+        ch["cmd_steer"] = _to_list(np.degrees(cmd_steer))
+
     return {
         "x": [round(float(v), 2) for v in x],
         "y": [round(float(v), 2) for v in y],
@@ -183,24 +352,22 @@ def _resample_to_grid(ego_ts):
         "s": [round(float(v), 2) for v in s],
         "n_valid": n_valid,
         "s_total": round(s_total, 2),
-        "ch": {
-            "velocity": _to_list(v),
-            "accel": _to_list(accel),
-            "heading_rate": _to_list(hr, 3),
-            "steer": _to_list(np.degrees(steer)),
-        },
+        "ch": ch,
     }
 
 
 def extract_trajectories(bag_dir):
-    """Read /planning/trajectory from bag, return resampled ego data + planned frames."""
-    ego_ts, planned_frames = _extract_ego_timeseries(bag_dir)
+    """Read trajectory, steering, kinematic, and control command data from bag."""
+    (ego_ts, planned_frames, vel_ts, accel_ts, steer_ts, wz_ts,
+     cmd_vel_ts, cmd_accel_ts, cmd_steer_ts) = _extract_ego_timeseries(bag_dir)
     if not ego_ts:
         return {"x": [], "y": [], "yaw": [], "v": [], "s": [],
                 "n_valid": 0, "s_total": 0.0, "planned": [], "ch": {
                     "velocity": [], "accel": [], "heading_rate": [], "steer": []}}
 
-    result = _resample_to_grid(ego_ts)
+    result = _resample_to_grid(
+        ego_ts, vel_ts, accel_ts, steer_ts, wz_ts,
+        cmd_vel_ts, cmd_accel_ts, cmd_steer_ts)
     result["planned"] = planned_frames
     return result
 
