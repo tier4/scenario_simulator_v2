@@ -35,7 +35,8 @@
 
     /* --- Layout --- */
     .container { max-width: 1400px; margin: 0 auto; padding: 0 var(--size-3); }
-    .row { display: grid; grid-template-columns: 3fr 1fr; gap: var(--size-3); }
+    .row { display: grid; grid-template-columns: 3fr 1fr; gap: var(--size-3); min-width: 0; }
+    .row > * { min-width: 0; }
     @media (max-width: 768px) { .row { grid-template-columns: 1fr; } }
 
     /* --- Card --- */
@@ -52,7 +53,11 @@
       margin: var(--size-2) 0; flex-wrap: wrap;
     }
     .controls input[type=range] { flex: 1; min-width: 120px; border: none; padding: 0; }
-    .controls small { color: var(--text-2); white-space: nowrap; }
+    .controls small {
+      color: var(--text-2); white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      min-width: 10ch; text-align: right;
+    }
 
     /* --- Buttons --- */
     button {
@@ -64,18 +69,12 @@
       background: transparent;
       color: var(--text-1);
       cursor: pointer;
+      min-width: 6.5em;
     }
     button:hover { background: var(--surface-3); }
-
-    /* --- Select --- */
-    select {
-      font-family: inherit;
-      font-size: var(--font-size-1);
-      padding: var(--size-1) var(--size-2);
-      border: 1px solid var(--border-dim);
-      border-radius: var(--radius-2);
-      background: var(--surface-2);
-      color: var(--text-1);
+    button.active {
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     /* --- Range input --- */
@@ -135,28 +134,55 @@
     .legend-panel {
       display: flex; flex-direction: column; gap: var(--size-2);
       padding: var(--size-3); font-size: var(--font-size-1);
+      min-width: 0;
     }
-    .legend-item { display: flex; align-items: center; gap: var(--size-2); }
-    .legend-item label {
+    .model-entry {
+      padding: var(--size-2);
+      border-radius: var(--radius-2);
+      background: var(--surface-3);
+      border-left: 4px solid var(--model-color);
+    }
+    .model-entry-header {
+      display: flex; align-items: center;
+    }
+    .model-entry-header label {
       cursor: pointer; display: flex; align-items: center;
       gap: var(--size-1); margin: 0; padding: 0;
+      font-weight: 600;
+      min-width: 0;
     }
-    .swatch {
-      display: inline-block; width: .9em; height: .9em;
-      border-radius: var(--radius-1);
+    .model-name {
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .stat { color: var(--text-2); font-size: var(--font-size-0); margin-left: var(--size-4); }
+    .model-entry-stat {
+      color: var(--text-2); font-size: var(--font-size-0);
+      margin-top: var(--size-1);
+    }
 
     /* --- Plots --- */
     .plot-row {
-      display: flex; gap: var(--size-1); flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--size-2);
       margin-top: var(--size-2); font-size: var(--font-size-1);
     }
-    .plot-cell { flex: 1 1 200px; min-width: 180px; }
+    @media (max-width: 768px) { .plot-row { grid-template-columns: 1fr; } }
+    .plot-cell { min-width: 0; }
     .plot-cell svg { width: 100%; display: block; }
     .plot-title {
       font-size: var(--font-size-1); color: var(--text-2);
       text-align: center; margin: 0;
+    }
+
+    /* --- Select --- */
+    select {
+      font-family: inherit;
+      font-size: var(--font-size-1);
+      padding: var(--size-1) var(--size-2);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-2);
+      background: var(--surface-2);
+      color: var(--text-1);
     }
 
     /* --- Utilities --- */
@@ -164,18 +190,20 @@
   </style>
 </head>
 <body>
-  <main class="container" x-data="viewer">
+  <main class="container" x-data="viewer"
+    @playback-pause.window="pausePlayback()"
+    @playback-resume.window="resumePlayback()">
     <h3 style="margin-bottom:.25rem">Trajectory Comparison</h3>
     <p class="text-muted" style="margin-top:0" x-text="$store.models.list.length + ' model(s)'"></p>
 
     <!-- Controls -->
     <div class="controls">
-      <select x-model="$store.playback.mode" @change="onModeChange()">
+      <select x-model="$store.playback.mode" @change="onModeChange()" style="min-width:10em">
         <option value="time">Time Sync</option>
         <option value="pos">Position Sync</option>
       </select>
       <button @click="togglePlay()" x-text="$store.playback.playing ? 'Pause' : 'Play'"></button>
-      <select x-model.number="$store.playback.speedMul">
+      <select x-model.number="$store.playback.speedMul" style="min-width:5em">
         <option value="0.25">0.25x</option>
         <option value="0.5">0.5x</option>
         <option value="1" selected>1x</option>
@@ -185,9 +213,8 @@
       <button @click="$store.camera.follow = !$store.camera.follow"
         x-text="$store.camera.follow ? 'Unfollow' : 'Follow'"></button>
       <button @click="fitAll()">Fit All</button>
-      <label style="display:flex;align-items:center;gap:.3rem;cursor:pointer">
-        <input type="checkbox" x-model="$store.ui.showPlanned"> Planned
-      </label>
+      <button @click="$store.ui.showPlanned = !$store.ui.showPlanned; markDirty()"
+        :class="$store.ui.showPlanned && 'active'">Planned</button>
     </div>
 
     <!-- Seek bar -->
@@ -210,7 +237,7 @@
 
     <!-- Map + Legend -->
     <div class="row">
-      <div x-data="mapCanvas">
+      <div x-data="mapCanvas" @fit-all.window="doFitAll()">
         <div class="map-wrap" x-ref="mapWrap" style="height:550px">
           <canvas x-ref="mapCvs"
             @mousedown="onMouseDown($event)"
@@ -224,35 +251,34 @@
       <div x-data="legend">
         <div class="legend-panel card">
           <strong>Models</strong>
+          <label style="display:flex;align-items:center;gap:var(--size-1);font-size:var(--font-size-0);color:var(--text-2)">
+            Baseline
+            <select x-model.number="$store.models.baselineIdx" @change="onBaselineChange()"
+              style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">
+              <template x-for="(m, i) in $store.models.list" :key="'base'+i">
+                <option :value="i" x-text="m.name"></option>
+              </template>
+            </select>
+          </label>
           <template x-for="(m, i) in $store.models.list" :key="i">
-            <div class="legend-item">
-              <label>
-                <input type="checkbox" :checked="$store.models.visible[i]"
-                  @change="$store.models.visible[i] = $el.checked; markDirty()">
-                <span class="swatch" :style="'background:' + m.color"></span>
-                <span x-text="m.name"></span>
-              </label>
-              <div>
-                <input type="radio" :name="'baseline'" :value="i"
-                  :checked="$store.models.baselineIdx === i"
-                  @change="setBaseline(i)">
-                <small class="text-muted">base</small>
+            <div class="model-entry" :style="'--model-color:' + m.color">
+              <div class="model-entry-header">
+                <label>
+                  <input type="checkbox" :checked="$store.models.visible[i]"
+                    @change="$store.models.visible[i] = $el.checked; markDirty()">
+                  <span class="model-name" x-text="m.name" :title="m.name"></span>
+                </label>
               </div>
+              <div class="model-entry-stat" x-html="getStats(i)"></div>
             </div>
-          </template>
-          <template x-for="(m, i) in $store.models.list" :key="'stat'+i">
-            <div class="stat" x-show="$store.models.visible[i]" x-html="getStats(i)"></div>
           </template>
         </div>
       </div>
     </div>
 
     <!-- Time-series plots -->
-    <div x-data="plotsPanel" x-show="$store.ui.showPlots">
+    <div x-data="plotsPanel">
       <div class="controls" style="margin-top:.5rem">
-        <label style="display:flex;align-items:center;gap:.3rem;cursor:pointer">
-          <input type="checkbox" x-model="$store.ui.showPlots" checked> Charts
-        </label>
         <select x-model.number="$store.ui.plotWindowS" style="width:auto">
           <option value="5">5s window</option>
           <option value="10" selected>10s window</option>
@@ -261,11 +287,6 @@
         </select>
       </div>
       <div class="plot-row" x-ref="plotRow"></div>
-    </div>
-    <div class="controls" x-show="!$store.ui.showPlots">
-      <label style="display:flex;align-items:center;gap:.3rem;cursor:pointer">
-        <input type="checkbox" x-model="$store.ui.showPlots"> Charts
-      </label>
     </div>
   </main>
 
@@ -383,7 +404,6 @@
 
       Alpine.store('ui', {
         showPlanned: true,
-        showPlots: true,
         plotWindowS: 10,
       });
 
@@ -422,6 +442,12 @@
             mdl = this.$store.models;
             window.addEventListener('resize', () => { markDirty(); });
           },
+          pausePlayback() {
+            if (pb.playing) { pb.playing = false; if (animId) { cancelAnimationFrame(animId); animId = null; } }
+          },
+          resumePlayback() {
+            if (!pb.playing) { pb.playing = true; lastAnimTime = performance.now(); tick(); }
+          },
           togglePlay() {
             pb.playing = !pb.playing;
             if (pb.playing) { lastAnimTime = performance.now(); tick(); }
@@ -434,14 +460,18 @@
             else { const st = sampleAtS(base, pb.curS); pb.curT = st ? st.t : 0; }
             markDirty();
           },
-          fitAll() {
-            const dx = D.bbox[2] - D.bbox[0], dy = D.bbox[3] - D.bbox[1];
-            const aspect = W > 0 && H > 0 ? W / H : 1;
-            cam.cx = (D.bbox[0] + D.bbox[2]) / 2;
-            cam.cy = (D.bbox[1] + D.bbox[3]) / 2;
-            cam.viewW = Math.max(dx, dy * aspect, 10) * 1.1;
-            cam.follow = false;
+          onBaselineChange() {
+            if (pb.mode === 'pos') {
+              const base = MODELS[mdl.baselineIdx];
+              if (base && base.n_valid > 1) {
+                const st = sampleAtS(MODELS[mdl.baselineIdx], pb.curS);
+                if (st) pb.curS = st.s;
+              }
+            }
             markDirty();
+          },
+          fitAll() {
+            this.$dispatch('fit-all');
           },
         };
       });
@@ -482,14 +512,11 @@
             if (s.y < minY) minY = s.y; if (s.y > maxY) maxY = s.y;
           }
           const tx = (minX + maxX) / 2, ty = (minY + maxY) / 2;
-          const aspect = W > 0 && H > 0 ? W / H : 1;
-          const span = Math.max(maxX - minX, (maxY - minY) * aspect, 20) * 2.5;
           if (Math.hypot(tx - cam.cx, ty - cam.cy) > cam.viewW) {
-            cam.cx = tx; cam.cy = ty; cam.viewW = span;
+            cam.cx = tx; cam.cy = ty;
           } else {
             cam.cx += (tx - cam.cx) * 0.15;
             cam.cy += (ty - cam.cy) * 0.15;
-            cam.viewW += (span - cam.viewW) * 0.08;
           }
         }
 
@@ -606,7 +633,7 @@
             return pb.mode === 'time' ? sampleAtT(m, pb.curT) : sampleAtS(m, pb.curS);
           });
 
-          if (cam.follow) updateFollow(samples, vis);
+          if (cam.follow && pb.playing) updateFollow(samples, vis);
 
           ctx.clearRect(0, 0, W, H);
           ctx.fillStyle = '#1a1e2e'; ctx.fillRect(0, 0, W, H);
@@ -656,7 +683,6 @@
             drag.active = true;
             drag.sx = e.clientX; drag.sy = e.clientY;
             drag.cx0 = cam.cx; drag.cy0 = cam.cy;
-            cam.follow = false;
           },
           onMouseMove(e) {
             if (!drag.active) return;
@@ -677,7 +703,14 @@
             const ns = W / cam.viewW;
             cam.cx = wx - (mx - W / 2) / ns;
             cam.cy = wy + (my - H / 2) / ns;
-            cam.follow = false;
+            markDirty();
+          },
+          doFitAll() {
+            const dx = D.bbox[2] - D.bbox[0], dy = D.bbox[3] - D.bbox[1];
+            const aspect = W > 0 && H > 0 ? W / H : 1;
+            cam.cx = (D.bbox[0] + D.bbox[2]) / 2;
+            cam.cy = (D.bbox[1] + D.bbox[3]) / 2;
+            cam.viewW = Math.max(dx, dy * aspect, 10) * 1.1;
             markDirty();
           },
         };
@@ -688,20 +721,12 @@
         let pb, mdl;
         return {
           init() { pb = this.$store.playback; mdl = this.$store.models; },
-          setBaseline(i) {
-            const oldBase = MODELS[mdl.baselineIdx];
-            mdl.baselineIdx = i;
-            if (pb.mode === 'pos' && oldBase && oldBase.n_valid > 1) {
-              const st = sampleAtS(oldBase, pb.curS);
-              if (st) { const ns = sampleAtT(MODELS[i], st.t); pb.curS = ns ? ns.s : 0; }
-            }
-            markDirty();
-          },
           getStats(i) {
+            if (!mdl.visible[i]) return '&mdash;';
             const m = MODELS[i];
             if (m.n_valid < 2) return '<span class="text-muted">no data</span>';
             const s = pb.mode === 'time' ? sampleAtT(m, pb.curT) : sampleAtS(m, pb.curS);
-            if (!s) return '';
+            if (!s) return '&mdash;';
             return `v=${s.v.toFixed(1)} m/s &nbsp; t=${s.t.toFixed(1)}s &nbsp; s=${s.s.toFixed(0)}m`;
           },
         };
@@ -712,7 +737,8 @@
         let plotSvgs = {};
         let pb, mdl, ui;
         const margin = { top: 8, right: 12, bottom: 28, left: 50 };
-        const plotH = 140;
+        const plotH = 200;
+        let plotDrag = { active: false, wasPlaying: false, startClientX: 0, startT: 0, screenPxPerSec: 1 };
 
         function createPlotCell(ch) {
           const cell = document.createElement('div');
@@ -722,7 +748,7 @@
           title.textContent = CH_LABELS[ch];
           cell.appendChild(title);
 
-          const w = 400, h = plotH + margin.top + margin.bottom;
+          const w = 600, h = plotH + margin.top + margin.bottom;
           const svgEl = d3.select(cell).append('svg')
             .attr('viewBox', `0 0 ${w} ${h}`)
             .attr('preserveAspectRatio', 'xMidYMid meet');
@@ -735,6 +761,7 @@
           const pw = w - margin.left - margin.right;
           const xScale = d3.scaleLinear().range([0, pw]);
           const yScale = d3.scaleLinear().range([plotH, 0]);
+          const gridG = g.append('g');
           const xAxis = g.append('g').attr('transform', `translate(0,${plotH})`);
           const yAxis = g.append('g');
           const linesG = g.append('g').attr('clip-path', `url(#${clipId})`);
@@ -744,7 +771,44 @@
             .attr('stroke-dasharray', '4,3').attr('opacity', 0.5);
           const dotsG = g.append('g');
 
-          plotSvgs[ch] = { xScale, yScale, xAxis, yAxis, linesG, cursorLine, dotsG, pw };
+          const hitArea = g.append('rect')
+            .attr('width', pw).attr('height', plotH)
+            .attr('fill', 'transparent').attr('cursor', 'ew-resize');
+
+          hitArea.on('mousedown', (e) => {
+            const ctm = g.node().getScreenCTM();
+            const domain = xScale.domain();
+            plotDrag.active = true;
+            plotDrag.wasPlaying = pb.playing;
+            plotDrag.startClientX = e.clientX;
+            plotDrag.startT = pb.mode === 'time' ? pb.curT
+              : (sampleAtS(MODELS[mdl.baselineIdx], pb.curS)?.t ?? 0);
+            plotDrag.screenPxPerSec = ctm.a * pw / (domain[1] - domain[0]) * 0.5;
+            if (pb.playing) window.dispatchEvent(new CustomEvent('playback-pause'));
+            e.preventDefault();
+          });
+
+          d3.select(window).on('mousemove.plot', (e) => {
+            if (!plotDrag.active) return;
+            const dt = -(e.clientX - plotDrag.startClientX) / plotDrag.screenPxPerSec;
+            const t = Math.max(0, Math.min(plotDrag.startT + dt, pb.maxT));
+            if (pb.mode === 'time') {
+              pb.curT = t;
+            } else {
+              const base = MODELS[mdl.baselineIdx];
+              if (base && base.n_valid > 1) {
+                const st = sampleAtT(base, t);
+                if (st) pb.curS = st.s;
+              }
+            }
+            markDirty();
+          }).on('mouseup.plot', () => {
+            if (!plotDrag.active) return;
+            plotDrag.active = false;
+            if (plotDrag.wasPlaying) window.dispatchEvent(new CustomEvent('playback-resume'));
+          });
+
+          plotSvgs[ch] = { xScale, yScale, gridG, xAxis, yAxis, linesG, cursorLine, dotsG, pw };
           return cell;
         }
 
@@ -783,6 +847,20 @@
           p.yAxis.call(d3.axisLeft(p.yScale).ticks(4).tickFormat(d3.format('.' + yPrec + 'f')))
             .selectAll('text').attr('fill', '#aaa').attr('font-size', '12px');
           p.yAxis.selectAll('line,path').attr('stroke', '#444');
+
+          p.gridG.selectAll('*').remove();
+          p.xScale.ticks(5).forEach(t => {
+            p.gridG.append('line')
+              .attr('x1', p.xScale(t)).attr('x2', p.xScale(t))
+              .attr('y1', 0).attr('y2', plotH)
+              .attr('stroke', '#333').attr('stroke-dasharray', '2,3');
+          });
+          p.yScale.ticks(4).forEach(t => {
+            p.gridG.append('line')
+              .attr('x1', 0).attr('x2', p.pw)
+              .attr('y1', p.yScale(t)).attr('y2', p.yScale(t))
+              .attr('stroke', '#333').attr('stroke-dasharray', '2,3');
+          });
 
           p.linesG.selectAll('*').remove();
           for (let i = 0; i < MODELS.length; i++) {
@@ -834,11 +912,8 @@
             mdl = this.$store.models;
             ui = this.$store.ui;
             const row = this.$refs.plotRow;
-            this.$watch('$store.ui.showPlots', (v) => {
-              if (v) this.$nextTick(() => buildAll(row));
-            });
             this.$nextTick(() => buildAll(row));
-            (function loop() { if (ui.showPlots) updateAll(); requestAnimationFrame(loop); })();
+            (function loop() { updateAll(); requestAnimationFrame(loop); })();
           },
         };
       });
