@@ -901,7 +901,8 @@
                 const val = d.sampleChannel(d.models[i], ch, hoverT);
                 if (val === null) continue;
                 const v = (val * conv).toFixed(3);
-                rows += `<div class="tt-row"><span class="tt-dot" style="background:${d.models[i].color}"></span><span>${v}</span></div>`;
+                const unit = CH_LABELS[ch].units[chUnit[ch]];
+                rows += `<div class="tt-row"><span class="tt-dot" style="background:${d.models[i].color}"></span><span>${v} ${unit}</span></div>`;
               }
             }
             if (rows) {
