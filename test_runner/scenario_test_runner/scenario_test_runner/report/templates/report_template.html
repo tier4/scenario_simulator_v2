@@ -30,7 +30,10 @@
       color: var(--text-1);
       background: var(--surface-1);
     }
-    h3 { margin: var(--size-3) 0 var(--size-1); font-size: var(--font-size-3); }
+    h3 {
+      margin: var(--size-3) 0 var(--size-1); font-size: var(--font-size-3);
+      padding-bottom: var(--size-1); border-bottom: 1px solid var(--border-dim);
+    }
     img, svg, canvas { max-width: 100%; display: block; }
 
     /* --- Layout --- */
@@ -305,8 +308,7 @@
     <div x-data="viewer"
       @playback-pause.window="pausePlayback()"
       @playback-resume.window="resumePlayback()">
-    <h3 style="margin-bottom:.25rem">Trajectory Comparison</h3>
-    <p class="text-muted" style="margin-top:0" x-text="$store.data.models.length + ' model(s)'"></p>
+    <h3>Trajectory Comparison</h3>
 
     <!-- Controls -->
     <div class="controls">
@@ -408,8 +410,7 @@
 
     <!-- Static trajectory figures -->
     <div class="static-figures" x-data="staticFigures">
-      <h3 style="margin-bottom:.25rem">Trajectory Overview</h3>
-      <p class="text-muted" style="margin-top:0;margin-bottom:var(--size-3)">Full trajectory with overlaid metrics — one figure per model.</p>
+      <h3>Trajectory Overview</h3>
 
       <template x-for="(m, mi) in $store.data.models" :key="'sf'+mi">
         <div class="static-fig">
