@@ -140,7 +140,9 @@ def generate_report(output_dir):
     Falls back to single-model discovery when staging is absent.
     Reports are written to ``output_dir/result_archive/``.
     """
-    from .rosbag_reader import extract_map_data, extract_trajectories, RATE_HZ
+    from .rosbag_reader import (
+        extract_entities, extract_map_data, extract_trajectories, RATE_HZ,
+    )
 
     output_dir = Path(output_dir)
     staging = output_dir / "staging"
@@ -190,11 +192,13 @@ def generate_report(output_dir):
                     traj_data = extract_trajectories(bag)
                     traj_data["name"] = md.name
                     traj_data["color"] = _assign_color(i)
+                    traj_data["entities"] = extract_entities(bag)
                     models.append(traj_data)
         else:
             traj_data = extract_trajectories(scenario_bag)
             traj_data["name"] = output_dir.name
             traj_data["color"] = _assign_color(0)
+            traj_data["entities"] = extract_entities(scenario_bag)
             models = [traj_data]
 
         n = max((len(m["x"]) for m in models), default=0)

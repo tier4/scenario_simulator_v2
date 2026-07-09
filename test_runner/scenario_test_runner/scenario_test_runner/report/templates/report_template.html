@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Trajectory Comparison Report</title>
+  <title>Trajectory Report</title>
   <style>
     /* --- Theme tokens --- */
     :root {
@@ -16,6 +16,7 @@
       --accent: #0969da;
       --danger: #d1242f;
       --success: #1a7f37;
+      --sf-canvas-h: 380px;
       color-scheme: light;
     }
 
@@ -33,7 +34,7 @@
     img, svg, canvas { max-width: 100%; display: block; }
 
     /* --- Layout --- */
-    .container { max-width: 1400px; margin: 0 auto; padding: 0 var(--size-3); }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 var(--size-3) var(--size-7); }
     .row { display: grid; grid-template-columns: 3fr 1fr; gap: var(--size-3); min-width: 0; }
     .row > * { min-width: 0; }
     @media (max-width: 768px) { .row { grid-template-columns: 1fr; } }
@@ -75,6 +76,15 @@
       border-color: var(--accent);
       color: var(--accent);
     }
+    .toggle-label {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: var(--font-size-1); color: var(--text-1); cursor: pointer;
+      white-space: nowrap; user-select: none;
+    }
+    .toggle-label input { margin: 0; accent-color: var(--accent); }
+    .play-btn { color: var(--text-2); }
+    .play-btn:hover { color: var(--text-1); }
+    .play-btn.playing { color: var(--accent); border-color: var(--accent); }
 
     /* --- Range input --- */
     input[type=range] {
@@ -173,7 +183,6 @@
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
       padding: var(--size-2) var(--size-2) var(--size-1);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
     .plot-cell svg { width: 100%; display: block; }
     .plot-header {
@@ -217,6 +226,77 @@
 
     /* --- Utilities --- */
     .text-muted { color: var(--text-2); }
+
+    /* --- Static figures --- */
+    .static-figures {
+      margin-top: var(--size-5);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--size-3);
+    }
+    .static-figures > h3,
+    .static-figures > p {
+      grid-column: 1 / -1;
+    }
+    @media (max-width: 768px) {
+      .static-figures { grid-template-columns: 1fr; }
+    }
+    .static-fig {
+      background: var(--surface-2);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-2);
+      overflow: hidden;
+    }
+    .static-fig-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--size-2) var(--size-3);
+      border-bottom: 1px solid var(--border-dim);
+      background: var(--surface-3);
+      min-width: 0; gap: var(--size-2);
+    }
+    .static-fig-header > div:first-child {
+      min-width: 0; flex: 1;
+    }
+    .static-fig-title {
+      font-size: var(--font-size-2); font-weight: 600; margin: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      max-width: 100%;
+    }
+    .static-fig-subtitle {
+      font-size: var(--font-size-0); color: var(--text-2); margin: 0;
+    }
+    .static-fig-body { position: relative; }
+    .static-fig-body canvas { display: block; width: 100%; }
+    .static-fig-colorbar {
+      position: absolute; bottom: 12px; left: 16px;
+      background: rgba(255,255,255,0.9); border: 1px solid var(--border-dim);
+      border-radius: var(--radius-1); padding: 6px 10px;
+      font-size: 11px; color: var(--text-2);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .static-fig-colorbar canvas {
+      width: 120px; height: 12px; border-radius: 2px;
+      border: 1px solid var(--border-dim);
+    }
+    .static-fig-legend {
+      display: flex; flex-wrap: wrap; gap: var(--size-2) var(--size-3);
+      padding: var(--size-2) var(--size-3);
+      border-top: 1px solid var(--border-dim);
+      font-size: var(--font-size-0); color: var(--text-2);
+    }
+    .static-fig-legend-item {
+      display: flex; align-items: center; gap: 5px;
+    }
+    .static-fig-legend-dot {
+      width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+    }
+    .static-fig-legend-line {
+      width: 16px; height: 3px; border-radius: 1px; flex-shrink: 0;
+    }
+    .static-fig-legend-tri {
+      width: 0; height: 0; flex-shrink: 0;
+      border-left: 5px solid transparent; border-right: 5px solid transparent;
+    }
   </style>
 </head>
 <body>
@@ -234,7 +314,6 @@
         <option value="time">Time Sync</option>
         <option value="pos">Position Sync</option>
       </select>
-      <button @click="togglePlay()" x-text="$store.playback.playing ? 'Pause' : 'Play'"></button>
       <select x-model.number="$store.playback.speedMul" style="min-width:5em">
         <option value="0.25">0.25x</option>
         <option value="0.5">0.5x</option>
@@ -243,15 +322,19 @@
         <option value="4">4x</option>
         <option value="8">8x</option>
       </select>
-      <button @click="$store.camera.follow = !$store.camera.follow"
-        x-text="$store.camera.follow ? 'Unfollow' : 'Follow'"></button>
-      <button @click="fitAll()">Fit All</button>
-      <button @click="$store.ui.showPlanned = !$store.ui.showPlanned; markDirty()"
-        :class="$store.ui.showPlanned && 'active'">Planned</button>
+      <label class="toggle-label"><input type="checkbox" x-model="$store.camera.follow"> Follow</label>
+      <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPlanned" @change="markDirty()"> Planned</label>
     </div>
 
     <!-- Seek bar -->
     <div class="controls">
+      <button @click="togglePlay()" class="play-btn" :class="$store.playback.playing && 'playing'"
+        style="min-width:auto; padding:var(--size-1); width:32px; height:32px; display:flex; align-items:center; justify-content:center;">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"
+          x-show="!$store.playback.playing"><polygon points="2,0 14,7 2,14"/></svg>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"
+          x-show="$store.playback.playing"><rect x="1" y="0" width="4" height="14"/><rect x="9" y="0" width="4" height="14"/></svg>
+      </button>
       <template x-if="$store.playback.mode === 'time'">
         <input type="range" min="0" :max="$store.playback.maxT || 1" step="0.01"
           :value="$store.playback.curT"
@@ -277,6 +360,7 @@
             @mousemove="onMouseMove($event)"
             @mouseup="onMouseUp()"
             @mouseleave="onMouseUp()"
+            @dblclick="doFitAll()"
             @wheel.prevent="onWheel($event)"></canvas>
           <svg x-ref="mapSvg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
@@ -321,6 +405,51 @@
       </div>
       <div class="plot-row" x-ref="plotRow"></div>
     </div>
+
+    <!-- Static trajectory figures -->
+    <div class="static-figures" x-data="staticFigures">
+      <h3 style="margin-bottom:.25rem">Trajectory Overview</h3>
+      <p class="text-muted" style="margin-top:0;margin-bottom:var(--size-3)">Full trajectory with overlaid metrics — one figure per model.</p>
+
+      <template x-for="(m, mi) in $store.data.models" :key="'sf'+mi">
+        <div class="static-fig">
+          <div class="static-fig-header">
+            <div>
+              <p class="static-fig-title" x-text="m.name" :title="m.name"></p>
+              <p class="static-fig-subtitle">Speed-colored trajectory</p>
+            </div>
+            <div style="display:flex;gap:var(--size-2);align-items:center">
+              <label class="toggle-label" style="font-size:var(--font-size-0)">
+                <input type="checkbox" :checked="sfOpts[mi].showBraking" @change="sfOpts[mi].showBraking=$el.checked; drawFigure(mi)"> Braking
+              </label>
+              <label class="toggle-label" style="font-size:var(--font-size-0)">
+                <input type="checkbox" :checked="sfOpts[mi].showTurnCmd" @change="sfOpts[mi].showTurnCmd=$el.checked; drawFigure(mi)"> Turn Indicators
+              </label>
+            </div>
+          </div>
+          <div class="static-fig-body">
+            <canvas :data-sf-idx="mi" style="height:var(--sf-canvas-h)"></canvas>
+            <div class="static-fig-colorbar">
+              <span>0</span>
+              <canvas :data-sf-bar="mi" width="120" height="12"></canvas>
+              <span x-text="vMax(mi).toFixed(1) + ' m/s'"></span>
+            </div>
+          </div>
+          <div class="static-fig-legend">
+            <div class="static-fig-legend-item">
+              <span class="static-fig-legend-tri" style="border-right:10px solid #e88a2a;border-top:5px solid transparent;border-bottom:5px solid transparent"></span> LEFT indicator
+            </div>
+            <div class="static-fig-legend-item">
+              <span class="static-fig-legend-tri" style="border-left:10px solid #30b0c0;border-top:5px solid transparent;border-bottom:5px solid transparent"></span> RIGHT indicator
+            </div>
+            <div class="static-fig-legend-item">
+              <span class="static-fig-legend-tri" style="border-top:10px solid #c03030;border-left:5px solid transparent;border-right:5px solid transparent"></span> Strong braking (≤ −1.0 m/s²)
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
     </div>
   </template>
   </main>
@@ -621,6 +750,54 @@
           ctx.globalAlpha = 1.0;
         }
 
+        function sampleEntity(e, t) {
+          const pos = e.positions;
+          if (!pos.length) return null;
+          if (t <= pos[0].t) return pos[0];
+          if (t >= pos[pos.length - 1].t) return pos[pos.length - 1];
+          let lo = 0, hi = pos.length - 1;
+          while (lo < hi - 1) {
+            const mid = (lo + hi) >> 1;
+            if (pos[mid].t <= t) lo = mid; else hi = mid;
+          }
+          const a = pos[lo], b = pos[hi];
+          const f = (t - a.t) / (b.t - a.t);
+          return {
+            x: a.x + (b.x - a.x) * f,
+            y: a.y + (b.y - a.y) * f,
+            yaw: a.yaw + (b.yaw - a.yaw) * f,
+          };
+        }
+
+        function drawEntities(curT, pxPerMeter, vis) {
+          ctx.lineWidth = 1.5;
+          for (let mi = 0; mi < d.models.length; mi++) {
+            if (!vis[mi]) continue;
+            const ents = d.models[mi].entities;
+            if (!ents || !ents.length) continue;
+            const color = d.models[mi].color;
+            for (const e of ents) {
+              const s = sampleEntity(e, curT);
+              if (!s) continue;
+              const [cx, cy] = toScreen(s.x, s.y);
+              const lPx = e.bbox.length * pxPerMeter;
+              const wPx = e.bbox.width * pxPerMeter;
+              if (lPx < 1 && wPx < 1) continue;
+              ctx.save();
+              ctx.translate(cx, cy);
+              ctx.rotate(-s.yaw);
+              ctx.fillStyle = color;
+              ctx.globalAlpha = 0.35;
+              ctx.fillRect(-lPx / 2, -wPx / 2, lPx, wPx);
+              ctx.globalAlpha = 0.7;
+              ctx.strokeStyle = color;
+              ctx.strokeRect(-lPx / 2, -wPx / 2, lPx, wPx);
+              ctx.restore();
+            }
+          }
+          ctx.globalAlpha = 1.0;
+        }
+
         function updateSvgOverlay(samples, vis, pxPerMeter) {
           const svgNS = 'http://www.w3.org/2000/svg';
           while (svg.firstChild) svg.removeChild(svg.firstChild);
@@ -680,10 +857,9 @@
           ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
           drawMap();
           drawTrajectories(vis);
-          if (ui.showPlanned) {
-            const curT = pb.mode === 'time' ? pb.curT : (samples[mdl.baselineIdx]?.t ?? 0);
-            drawPlanned(vis, curT);
-          }
+          const curT = pb.mode === 'time' ? pb.curT : (samples[mdl.baselineIdx]?.t ?? 0);
+          if (ui.showPlanned) drawPlanned(vis, curT);
+          drawEntities(curT, scale, vis);
           drawScaleBar(scale);
           updateSvgOverlay(samples, vis, scale);
         }
@@ -748,6 +924,7 @@
             markDirty();
           },
           doFitAll() {
+            cam.follow = false;
             const dx = d.bbox[2] - d.bbox[0], dy = d.bbox[3] - d.bbox[1];
             const aspect = W > 0 && H > 0 ? W / H : 1;
             cam.cx = (d.bbox[0] + d.bbox[2]) / 2;
@@ -882,7 +1059,7 @@
             plotDrag.startClientX = e.clientX;
             plotDrag.startT = pb.mode === 'time' ? pb.curT
               : (d.sampleAtS(d.models[mdl.baselineIdx], pb.curS)?.t ?? 0);
-            plotDrag.screenPxPerSec = ctm.a * pw / (domain[1] - domain[0]) * 0.5;
+            plotDrag.screenPxPerSec = ctm.a * pw / (domain[1] - domain[0]);
             if (pb.playing) window.dispatchEvent(new CustomEvent('playback-pause'));
             e.preventDefault();
           });
@@ -1066,6 +1243,315 @@
             const row = this.$refs.plotRow;
             this.$nextTick(() => buildAll(row));
             (function loop() { updateAll(); requestAnimationFrame(loop); })();
+          },
+        };
+      });
+
+      // --- staticFigures component ---
+      Alpine.data('staticFigures', () => {
+        let d;
+        const BRAKE_THRESHOLD = -1.0;
+        const TURN_LEFT = 2, TURN_RIGHT = 3;
+
+        function speedToColor(v, vMax) {
+          const t = vMax > 0 ? Math.min(v / vMax, 1) : 0;
+          // RdYlBu_r: blue(low) → yellow(mid) → red(high)
+          let r, g, b;
+          if (t < 0.5) {
+            const s = t * 2;
+            r = Math.round(49 + (220 - 49) * s);
+            g = Math.round(130 + (210 - 130) * s);
+            b = Math.round(189 + (60 - 189) * s);
+          } else {
+            const s = (t - 0.5) * 2;
+            r = Math.round(220 + (192 - 220) * s);
+            g = Math.round(210 + (50 - 210) * s);
+            b = Math.round(60 + (50 - 60) * s);
+          }
+          return `rgb(${r},${g},${b})`;
+        }
+
+        function computeBBox(m) {
+          const nv = m.n_valid;
+          if (nv < 2) return [0, 0, 1, 1];
+          let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+          for (let k = 0; k < nv; k++) {
+            if (m.x[k] < xMin) xMin = m.x[k];
+            if (m.x[k] > xMax) xMax = m.x[k];
+            if (m.y[k] < yMin) yMin = m.y[k];
+            if (m.y[k] > yMax) yMax = m.y[k];
+          }
+          return [xMin, yMin, xMax, yMax];
+        }
+
+        function drawStaticMap(ctx, mapData, toScr) {
+          ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+          ctx.globalAlpha = 0.5;
+          for (const line of (mapData.lanelet_lines || [])) {
+            if (line.length < 2) continue;
+            ctx.strokeStyle = '#d0d4da'; ctx.lineWidth = 1;
+            ctx.beginPath();
+            let [sx, sy] = toScr(line[0][0], line[0][1]);
+            ctx.moveTo(sx, sy);
+            for (let i = 1; i < line.length; i++) {
+              [sx, sy] = toScr(line[i][0], line[i][1]);
+              ctx.lineTo(sx, sy);
+            }
+            ctx.stroke();
+          }
+          for (const rm of (mapData.road_markings || [])) {
+            ctx.strokeStyle = rm.type === 'stop_line' ? '#daa' : '#d0d4da';
+            ctx.lineWidth = rm.type === 'stop_line' ? 2 : 1;
+            if (rm.points.length < 2) continue;
+            ctx.beginPath();
+            let [sx, sy] = toScr(rm.points[0][0], rm.points[0][1]);
+            ctx.moveTo(sx, sy);
+            for (let i = 1; i < rm.points.length; i++) {
+              [sx, sy] = toScr(rm.points[i][0], rm.points[i][1]);
+              ctx.lineTo(sx, sy);
+            }
+            ctx.stroke();
+          }
+          ctx.globalAlpha = 1.0;
+        }
+
+        function drawSpeedTrajectory(ctx, m, vMax, toScr) {
+          const nv = m.n_valid;
+          if (nv < 2) return;
+          ctx.lineWidth = 3; ctx.lineCap = 'round';
+          for (let k = 0; k < nv - 1; k++) {
+            const v = m.v[k] != null ? Math.abs(m.v[k]) : 0;
+            ctx.strokeStyle = speedToColor(v, vMax);
+            ctx.beginPath();
+            const [x1, y1] = toScr(m.x[k], m.y[k]);
+            const [x2, y2] = toScr(m.x[k + 1], m.y[k + 1]);
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+          }
+        }
+
+        const MARKER_INTERVAL = 5;
+
+        function drawMarker(ctx, sx, sy, shape, color) {
+          ctx.fillStyle = color;
+          ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          if (shape === 'left') {
+            ctx.moveTo(sx - 7, sy);
+            ctx.lineTo(sx + 3, sy - 6);
+            ctx.lineTo(sx + 3, sy + 6);
+          } else if (shape === 'right') {
+            ctx.moveTo(sx + 7, sy);
+            ctx.lineTo(sx - 3, sy - 6);
+            ctx.lineTo(sx - 3, sy + 6);
+          } else {
+            ctx.moveTo(sx, sy + 7);
+            ctx.lineTo(sx - 6, sy - 3);
+            ctx.lineTo(sx + 6, sy - 3);
+          }
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        }
+
+        function drawTurnIndicators(ctx, m, toScr) {
+          const arr = m.ch && m.ch.turn_cmd;
+          if (!arr) return;
+          const nv = m.n_valid;
+          for (let k = 0; k < nv; k += MARKER_INTERVAL) {
+            const cmd = arr[k];
+            if (cmd !== TURN_LEFT && cmd !== TURN_RIGHT) continue;
+            const [sx, sy] = toScr(m.x[k], m.y[k]);
+            drawMarker(ctx, sx, sy,
+              cmd === TURN_LEFT ? 'left' : 'right',
+              cmd === TURN_LEFT ? '#e88a2a' : '#30b0c0');
+          }
+        }
+
+        function drawBrakingOverlay(ctx, m, toScr) {
+          const accel = m.ch && m.ch.accel;
+          if (!accel) return;
+          const nv = m.n_valid;
+          for (let k = 0; k < nv; k += MARKER_INTERVAL) {
+            if (accel[k] === null || accel[k] >= BRAKE_THRESHOLD) continue;
+            const [sx, sy] = toScr(m.x[k], m.y[k]);
+            drawMarker(ctx, sx, sy, 'down', '#c03030');
+          }
+        }
+
+        function drawScaleBar(ctx, pxPerMeter, W, H) {
+          const sb = niceScaleBar(pxPerMeter);
+          const sbX = 20, sbY = H - 20;
+          ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.globalAlpha = 0.8;
+          ctx.beginPath(); ctx.moveTo(sbX, sbY); ctx.lineTo(sbX + sb.px, sbY); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(sbX, sbY - 4); ctx.lineTo(sbX, sbY + 4); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(sbX + sb.px, sbY - 4); ctx.lineTo(sbX + sb.px, sbY + 4); ctx.stroke();
+          ctx.fillStyle = '#555'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+          ctx.fillText(sb.meters >= 1000 ? (sb.meters / 1000) + 'km' : sb.meters + 'm', sbX + sb.px / 2, sbY - 7);
+          ctx.globalAlpha = 1.0;
+        }
+
+        function drawColorbar(barCanvas, vMax) {
+          const ctx = barCanvas.getContext('2d');
+          const w = barCanvas.width, h = barCanvas.height;
+          for (let px = 0; px < w; px++) {
+            ctx.fillStyle = speedToColor((px / w) * vMax, vMax);
+            ctx.fillRect(px, 0, 1, h);
+          }
+        }
+
+        const SF_CANVAS_H = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sf-canvas-h')) || 380;
+        const cameras = [];
+
+        function initCamera(m, W, H) {
+          const bb = computeBBox(m);
+          const cx = (bb[0] + bb[2]) / 2, cy = (bb[1] + bb[3]) / 2;
+          const dx = bb[2] - bb[0], dy = bb[3] - bb[1];
+          const aspect = (W && H) ? W / H : 1.6;
+          const span = Math.max(dx, dy * aspect, 10) * 1.15;
+          return { cx, cy, span };
+        }
+
+        return {
+          sfOpts: [],
+
+          vMax(mi) {
+            const m = d.models[mi];
+            let mx = 0;
+            for (let k = 0; k < m.n_valid; k++) {
+              const v = m.v[k] != null ? Math.abs(m.v[k]) : 0;
+              if (v > mx) mx = v;
+            }
+            return mx || 1;
+          },
+
+          hasTurnCmd(mi) {
+            return !!(d.models[mi].ch && d.models[mi].ch.turn_cmd);
+          },
+
+          drawFigure(mi) {
+            const canvas = document.querySelector(`canvas[data-sf-idx="${mi}"]`);
+            const barCanvas = document.querySelector(`canvas[data-sf-bar="${mi}"]`);
+            if (!canvas) return;
+            const m = d.models[mi];
+            if (m.n_valid < 2) return;
+            const dpr = window.devicePixelRatio || 1;
+            const W = canvas.parentElement.clientWidth || canvas.offsetWidth || 800;
+            const H = SF_CANVAS_H;
+            if (!cameras[mi]) cameras[mi] = initCamera(m, W, H);
+            const cam = cameras[mi];
+            if (W < 10) return;
+            canvas.width = Math.round(W * dpr);
+            canvas.height = Math.round(H * dpr);
+            canvas.style.width = W + 'px';
+            canvas.style.height = H + 'px';
+
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+            const scale = W / cam.span;
+
+            function toScr(wx, wy) {
+              return [
+                (wx - cam.cx) * scale + W / 2,
+                -(wy - cam.cy) * scale + H / 2
+              ];
+            }
+
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, W, H);
+
+            drawStaticMap(ctx, d.map, toScr);
+
+            const vm = this.vMax(mi);
+
+            drawSpeedTrajectory(ctx, m, vm, toScr);
+            if (this.sfOpts[mi].showTurnCmd) drawTurnIndicators(ctx, m, toScr);
+            if (this.sfOpts[mi].showBraking) drawBrakingOverlay(ctx, m, toScr);
+
+            drawScaleBar(ctx, scale, W, H);
+            if (barCanvas) drawColorbar(barCanvas, vm);
+          },
+
+          drawAll() {
+            for (let mi = 0; mi < d.models.length; mi++) this.drawFigure(mi);
+          },
+
+          init() {
+            d = this.$store.data;
+            this.sfOpts = d.models.map(() => ({ showBraking: true, showTurnCmd: true }));
+            const self = this;
+
+            setTimeout(() => {
+              self.drawAll();
+
+              // Bind pan/zoom/fit to each canvas
+              document.querySelectorAll('canvas[data-sf-idx]').forEach(canvas => {
+                const mi = parseInt(canvas.dataset.sfIdx);
+                const drag = { active: false, sx: 0, sy: 0, cx0: 0, cy0: 0 };
+
+                canvas.style.cursor = 'grab';
+
+                canvas.addEventListener('mousedown', e => {
+                  const cam = cameras[mi];
+                  if (!cam) return;
+                  drag.active = true;
+                  drag.sx = e.clientX; drag.sy = e.clientY;
+                  drag.cx0 = cam.cx; drag.cy0 = cam.cy;
+                  canvas.style.cursor = 'grabbing';
+                  e.preventDefault();
+                });
+
+                canvas.addEventListener('mousemove', e => {
+                  if (!drag.active) return;
+                  const cam = cameras[mi];
+                  const W = canvas.clientWidth || 800;
+                  const scale = W / cam.span;
+                  cam.cx = drag.cx0 - (e.clientX - drag.sx) / scale;
+                  cam.cy = drag.cy0 + (e.clientY - drag.sy) / scale;
+                  self.drawFigure(mi);
+                });
+
+                canvas.addEventListener('mouseup', () => {
+                  drag.active = false;
+                  canvas.style.cursor = 'grab';
+                });
+                canvas.addEventListener('mouseleave', () => {
+                  drag.active = false;
+                  canvas.style.cursor = 'grab';
+                });
+
+                canvas.addEventListener('wheel', e => {
+                  e.preventDefault();
+                  const cam = cameras[mi];
+                  if (!cam) return;
+                  const W = canvas.clientWidth || 800;
+                  const H = SF_CANVAS_H;
+                  const rect = canvas.getBoundingClientRect();
+                  const mx = e.clientX - rect.left;
+                  const my = e.clientY - rect.top;
+                  const scale = W / cam.span;
+                  const wx = (mx - W / 2) / scale + cam.cx;
+                  const wy = -(my - H / 2) / scale + cam.cy;
+                  const f = e.deltaY > 0 ? 1.15 : 1 / 1.15;
+                  cam.span *= f;
+                  const ns = W / cam.span;
+                  cam.cx = wx - (mx - W / 2) / ns;
+                  cam.cy = wy + (my - H / 2) / ns;
+                  self.drawFigure(mi);
+                }, { passive: false });
+
+                canvas.addEventListener('dblclick', () => {
+                  const W = canvas.clientWidth || 800;
+                  cameras[mi] = initCamera(d.models[mi], W, SF_CANVAS_H);
+                  self.drawFigure(mi);
+                });
+              });
+            }, 100);
+
+            window.addEventListener('resize', () => self.drawAll());
           },
         };
       });
