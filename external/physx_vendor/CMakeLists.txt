@@ -23,6 +23,13 @@ set(PHYSX_VENDOR_GIT_TAG "107.3-physx-5.6.1"
 # GPU preset (linux-gcc / linux-clang) only if GPU acceleration is required.
 set(PHYSX_VENDOR_PRESET "linux-gcc-cpu-only"
     CACHE STRING "PhysX generate_projects.sh preset (e.g. linux-gcc-cpu-only | linux-clang-cpu-only | linux-gcc)")
+# The upstream preset enables Snippet demo binaries (OpenGL at link time) and
+# OmniPVD runtime, but taiga_x only needs SDK static libraries and snippet
+# sources. Disable both by default so headless CI can build physx_vendor.
+set(PHYSX_VENDOR_BUILD_SNIPPETS OFF
+    CACHE BOOL "Build PhysX Snippet demo executables (requires OpenGL at link time)")
+set(PHYSX_VENDOR_BUILD_PVD_RUNTIME OFF
+    CACHE BOOL "Build PhysX OmniPVD runtime (not needed for taiga_x vehicle model)")
 
 # Build PhysX from source via its own generate_projects.sh. This downloads
 # packman dependencies (requires network access) and compiles the SDK.
@@ -41,7 +48,8 @@ externalproject_add(physx-ext
   TIMEOUT 18000
   BUILD_IN_SOURCE 0
   # PhysX generates per-config CMake build trees under physx/compiler/.
-  CONFIGURE_COMMAND bash -c "cd '${_physx_root}' && ./generate_projects.sh ${PHYSX_VENDOR_PRESET}"
+  # Re-run cmake after generate_projects.sh to turn off Snippets/PVDRuntime.
+  CONFIGURE_COMMAND bash -c "cd '${_physx_root}' && ./generate_projects.sh ${PHYSX_VENDOR_PRESET} && cmake '${_physx_build}' -DPX_BUILDSNIPPETS=${PHYSX_VENDOR_BUILD_SNIPPETS} -DPX_BUILDPVDRUNTIME=${PHYSX_VENDOR_BUILD_PVD_RUNTIME}"
   BUILD_COMMAND ${CMAKE_COMMAND} --build "${_physx_build}" --config release --parallel
   # The source/build tree persists; the install(DIRECTORY) rules below copy the
   # SDK subtree directly (no intermediate staging step).

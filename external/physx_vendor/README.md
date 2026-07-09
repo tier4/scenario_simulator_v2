@@ -38,6 +38,8 @@ Relevant CMake cache variables (override with `--cmake-args -D...`):
 | `PHYSX_VENDOR_GIT_TAG` | `107.3-physx-5.6.1` | upstream commit/tag to build |
 | `PHYSX_VENDOR_PRESET` | `linux-gcc-cpu-only` | `generate_projects.sh` preset. CPU-only + gcc by default (no CUDA toolkit needed); the `taiga_x` vehicle solver runs on CPU. Use `linux-gcc` / `linux-clang` for the GPU build. |
 | `PHYSX_VENDOR_GIT_REPOSITORY` | NVIDIA-Omniverse/PhysX | source repository |
+| `PHYSX_VENDOR_BUILD_SNIPPETS` | `OFF` | Build Snippet demo executables (requires OpenGL; keep OFF for headless CI) |
+| `PHYSX_VENDOR_BUILD_PVD_RUNTIME` | `OFF` | Build OmniPVD runtime (not needed for `taiga_x`) |
 
 ## Notes
 
