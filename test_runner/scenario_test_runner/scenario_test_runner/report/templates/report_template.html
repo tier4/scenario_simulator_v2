@@ -31,8 +31,11 @@
       background: var(--surface-1);
     }
     h3 {
-      margin: var(--size-3) 0 var(--size-1); font-size: var(--font-size-3);
+      margin: var(--size-7) 0 var(--size-3); font-size: var(--font-size-3);
       padding-bottom: var(--size-1); border-bottom: 1px solid var(--border-dim);
+    }
+    h3:first-child {
+      margin-top: var(--size-3);
     }
     img, svg, canvas { max-width: 100%; display: block; }
 
@@ -54,6 +57,7 @@
     .controls {
       display: flex; align-items: center; gap: var(--size-2);
       margin: var(--size-2) 0; flex-wrap: wrap;
+      font-size: var(--font-size-0);
     }
     .controls input[type=range] { flex: 1; min-width: 120px; border: none; padding: 0; }
     .controls small {
@@ -65,7 +69,7 @@
     /* --- Buttons --- */
     button {
       font-family: inherit;
-      font-size: var(--font-size-1);
+      font-size: var(--font-size-0);
       padding: var(--size-1) var(--size-3);
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
@@ -81,20 +85,41 @@
     }
     .toggle-label {
       display: inline-flex; align-items: center; gap: 4px;
-      font-size: var(--font-size-1); color: var(--text-1); cursor: pointer;
+      font-size: var(--font-size-0); color: var(--text-1); cursor: pointer;
       white-space: nowrap; user-select: none;
     }
     .toggle-label input { margin: 0; accent-color: var(--accent); }
     .play-btn { color: var(--text-2); }
     .play-btn:hover { color: var(--text-1); }
     .play-btn.playing { color: var(--accent); border-color: var(--accent); }
+    .seg-group {
+      display: inline-flex; border: 1px solid var(--border-dim); border-radius: var(--radius-2);
+      overflow: hidden;
+    }
+    .seg-group button {
+      border: none; border-radius: 0; min-width: auto;
+      padding: var(--size-1) var(--size-2);
+      font-size: var(--font-size-0); color: var(--text-2);
+      background: transparent; line-height: var(--font-lineheight-3);
+    }
+    .seg-group button:hover { background: var(--surface-3); }
+    .seg-group button.active {
+      background: var(--accent); color: #fff; border-color: transparent;
+    }
+    .seg-group button + button { border-left: 1px solid var(--border-dim); }
+    .baseline-group {
+      display: flex; align-items: center; gap: var(--size-1);
+      font-size: var(--font-size-0); color: var(--text-2); white-space: nowrap;
+    }
+    .baseline-group.disabled { opacity: 0.35; pointer-events: none; }
 
     /* --- Range input --- */
     input[type=range] {
+      --pct: 0%;
       -webkit-appearance: none;
       appearance: none;
       height: 6px;
-      background: #ccd1d8;
+      background: linear-gradient(to right, var(--accent) var(--pct), #ccd1d8 var(--pct));
       border-radius: var(--radius-round);
       outline: none;
     }
@@ -115,7 +140,7 @@
     }
     input[type=range]::-moz-range-track {
       height: 6px;
-      background: var(--border-dim);
+      background: linear-gradient(to right, var(--accent) var(--pct), var(--border-dim) var(--pct));
       border-radius: var(--radius-round);
     }
 
@@ -132,27 +157,27 @@
       border-radius: var(--radius-2);
       overflow: hidden;
     }
-    .map-wrap canvas, .map-wrap svg {
+    .map-wrap canvas {
       display: block;
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
+      cursor: grab;
     }
-    .map-wrap canvas { cursor: grab; }
     .map-wrap canvas:active { cursor: grabbing; }
-    .map-wrap svg { pointer-events: none; }
 
     /* --- Legend --- */
     .legend-panel {
       display: flex; flex-direction: column; gap: var(--size-2);
-      padding: var(--size-3); font-size: var(--font-size-1);
+      padding: var(--size-2); font-size: var(--font-size-1);
       min-width: 0;
     }
     .model-entry {
       padding: var(--size-2);
       border-radius: var(--radius-2);
-      background: var(--surface-3);
-      border-left: 4px solid var(--model-color);
+      border: 1px solid var(--border-dim);
+      border-left: 5px solid var(--model-color);
+      cursor: pointer;
     }
     .model-entry-header {
       display: flex; align-items: center;
@@ -160,7 +185,7 @@
     .model-entry-header label {
       cursor: pointer; display: flex; align-items: center;
       gap: var(--size-1); margin: 0; padding: 0;
-      font-weight: 600;
+      font-weight: 500;
       min-width: 0;
     }
     .model-name {
@@ -219,7 +244,7 @@
     /* --- Select --- */
     select {
       font-family: inherit;
-      font-size: var(--font-size-1);
+      font-size: var(--font-size-0);
       padding: var(--size-1) var(--size-2);
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
@@ -236,10 +261,6 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--size-3);
-    }
-    .static-figures > h3,
-    .static-figures > p {
-      grid-column: 1 / -1;
     }
     @media (max-width: 768px) {
       .static-figures { grid-template-columns: 1fr; }
@@ -296,10 +317,6 @@
     .static-fig-legend-line {
       width: 16px; height: 3px; border-radius: 1px; flex-shrink: 0;
     }
-    .static-fig-legend-tri {
-      width: 0; height: 0; flex-shrink: 0;
-      border-left: 5px solid transparent; border-right: 5px solid transparent;
-    }
   </style>
 </head>
 <body>
@@ -310,52 +327,10 @@
       @playback-resume.window="resumePlayback()">
     <h3>Trajectory Comparison</h3>
 
-    <!-- Controls -->
-    <div class="controls">
-      <select x-model="$store.playback.mode" @change="onModeChange()" style="min-width:10em">
-        <option value="time">Time Sync</option>
-        <option value="pos">Position Sync</option>
-      </select>
-      <select x-model.number="$store.playback.speedMul" style="min-width:5em">
-        <option value="0.25">0.25x</option>
-        <option value="0.5">0.5x</option>
-        <option value="1" selected>1x</option>
-        <option value="2">2x</option>
-        <option value="4">4x</option>
-        <option value="8">8x</option>
-      </select>
-      <label class="toggle-label"><input type="checkbox" x-model="$store.camera.follow"> Follow</label>
-      <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPlanned" @change="markDirty()"> Planned</label>
-    </div>
-
-    <!-- Seek bar -->
-    <div class="controls">
-      <button @click="togglePlay()" class="play-btn" :class="$store.playback.playing && 'playing'"
-        style="min-width:auto; padding:var(--size-1); width:32px; height:32px; display:flex; align-items:center; justify-content:center;">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"
-          x-show="!$store.playback.playing"><polygon points="2,0 14,7 2,14"/></svg>
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"
-          x-show="$store.playback.playing"><rect x="1" y="0" width="4" height="14"/><rect x="9" y="0" width="4" height="14"/></svg>
-      </button>
-      <template x-if="$store.playback.mode === 'time'">
-        <input type="range" min="0" :max="$store.playback.maxT || 1" step="0.01"
-          :value="$store.playback.curT"
-          @input="$store.playback.curT = +$event.target.value; markDirty()">
-      </template>
-      <template x-if="$store.playback.mode === 'pos'">
-        <input type="range" min="0" :max="$store.playback.maxS || 1" step="0.1"
-          :value="$store.playback.curS"
-          @input="$store.playback.curS = +$event.target.value; markDirty()">
-      </template>
-      <small x-show="$store.playback.mode === 'time'"
-        x-text="$store.playback.curT.toFixed(1) + 's / ' + $store.playback.maxT.toFixed(1) + 's'"></small>
-      <small x-show="$store.playback.mode === 'pos'"
-        x-text="$store.playback.curS.toFixed(1) + 'm / ' + $store.playback.maxS.toFixed(1) + 'm'"></small>
-    </div>
-
-    <!-- Map + Legend -->
     <div class="row">
-      <div x-data="mapCanvas" @fit-all.window="doFitAll()">
+      <!-- Left: map + controls card -->
+      <div class="card" style="padding:0;overflow:hidden" x-data="mapCanvas" @fit-all.window="doFitAll()">
+        <!-- Map -->
         <div class="map-wrap" x-ref="mapWrap" style="height:550px">
           <canvas x-ref="mapCvs"
             @mousedown="onMouseDown($event)"
@@ -364,25 +339,77 @@
             @mouseleave="onMouseUp()"
             @dblclick="doFitAll()"
             @wheel.prevent="onWheel($event)"></canvas>
-          <svg x-ref="mapSvg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
-      </div>
-      <div x-data="legend">
-        <div class="legend-panel card">
-          <strong>Models</strong>
-          <label style="display:flex;align-items:center;gap:var(--size-1);font-size:var(--font-size-0);color:var(--text-2)">
-            Baseline
+
+        <!-- Controls -->
+        <div style="display:flex;flex-direction:column;gap:var(--size-2);padding:var(--size-2);border-top:1px solid var(--border-dim)">
+        <div class="controls" style="margin:0">
+          <button @click="togglePlay()" class="play-btn" :class="$store.playback.playing && 'playing'"
+            style="min-width:auto; padding:var(--size-1); width:32px; height:32px; display:flex; align-items:center; justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"
+              x-show="!$store.playback.playing"><polygon points="2,0 14,7 2,14"/></svg>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"
+              x-show="$store.playback.playing"><rect x="1" y="0" width="4" height="14"/><rect x="9" y="0" width="4" height="14"/></svg>
+          </button>
+          <template x-if="$store.playback.mode === 'time'">
+            <input type="range" min="0" :max="$store.playback.maxT || 1" step="0.01"
+              :value="$store.playback.curT"
+              :style="'--pct:' + (($store.playback.maxT ? $store.playback.curT / $store.playback.maxT : 0) * 100) + '%'"
+              @input="$store.playback.curT = +$event.target.value; markDirty()">
+          </template>
+          <template x-if="$store.playback.mode === 'pos'">
+            <input type="range" min="0" :max="$store.playback.maxS || 1" step="0.1"
+              :value="$store.playback.curS"
+              :style="'--pct:' + (($store.playback.maxS ? $store.playback.curS / $store.playback.maxS : 0) * 100) + '%'"
+              @input="$store.playback.curS = +$event.target.value; markDirty()">
+          </template>
+          <small x-show="$store.playback.mode === 'time'"
+            x-text="$store.playback.curT.toFixed(1) + 's / ' + $store.playback.maxT.toFixed(1) + 's'"></small>
+          <small x-show="$store.playback.mode === 'pos'"
+            x-text="$store.playback.curS.toFixed(1) + 'm / ' + $store.playback.maxS.toFixed(1) + 'm'"></small>
+          <select x-model.number="$store.playback.speedMul" style="min-width:5em">
+            <option value="0.25">0.25x</option>
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1x</option>
+            <option value="2">2x</option>
+            <option value="4">4x</option>
+            <option value="8">8x</option>
+          </select>
+        </div>
+
+        <div class="controls" style="margin:0">
+          <div class="seg-group">
+            <button :class="$store.playback.mode === 'time' && 'active'"
+              @click="$store.playback.mode = 'time'; onModeChange()">Time</button>
+            <button :class="$store.playback.mode === 'pos' && 'active'"
+              @click="$store.playback.mode = 'pos'; onModeChange()">Position</button>
+          </div>
+          <div class="baseline-group" :class="$store.playback.mode !== 'pos' && 'disabled'">
+            <span>Baseline</span>
             <select x-model.number="$store.models.baselineIdx" @change="onBaselineChange()"
-              style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">
+              style="min-width:0;max-width:14em;overflow:hidden;text-overflow:ellipsis">
               <template x-for="(m, i) in $store.data.models" :key="'base'+i">
                 <option :value="i" x-text="m.name"></option>
               </template>
             </select>
-          </label>
+          </div>
+          <label class="toggle-label"><input type="checkbox" x-model="$store.camera.follow"> Track Ego</label>
+          <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPlanned" @change="markDirty()"> Planned Trajectory</label>
+          <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showEntities" @change="markDirty()"> Entities</label>
+          <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPerceived" @change="markDirty()"> Object Recognition</label>
+        </div>
+        </div>
+      </div>
+
+      <!-- Right: model list -->
+      <div x-data="legend">
+        <div class="legend-panel card">
+          <strong>Models</strong>
           <template x-for="(m, i) in $store.data.models" :key="i">
-            <div class="model-entry" :style="'--model-color:' + m.color">
+            <div class="model-entry" :style="'--model-color:' + m.color"
+              @click="$store.models.visible[i] = !$store.models.visible[i]; markDirty()">
               <div class="model-entry-header">
-                <label>
+                <label @click.stop>
                   <input type="checkbox" :checked="$store.models.visible[i]"
                     @change="$store.models.visible[i] = $el.checked; markDirty()">
                   <span class="model-name" x-text="m.name" :title="m.name"></span>
@@ -397,21 +424,31 @@
 
     <!-- Time-series plots -->
     <div x-data="plotsPanel">
-      <div class="controls" style="margin-top:.5rem">
-        <select x-model.number="$store.ui.plotWindowS" style="width:auto">
-          <option value="5">5s window</option>
-          <option value="10" selected>10s window</option>
-          <option value="20">20s window</option>
-          <option value="0">Full range</option>
-        </select>
+      <div class="controls" style="margin-top:var(--size-3)">
+        <span style="color:var(--text-2)">Window</span>
+        <template x-if="$store.playback.mode === 'time'">
+          <select x-model.number="$store.ui.plotWindowS" style="width:auto">
+            <option value="5">5s</option>
+            <option value="10" selected>10s</option>
+            <option value="20">20s</option>
+            <option value="0">Full</option>
+          </select>
+        </template>
+        <template x-if="$store.playback.mode === 'pos'">
+          <select x-model.number="$store.ui.plotWindowM" style="width:auto">
+            <option value="20">20m</option>
+            <option value="50" selected>50m</option>
+            <option value="100">100m</option>
+            <option value="0">Full</option>
+          </select>
+        </template>
       </div>
       <div class="plot-row" x-ref="plotRow"></div>
     </div>
 
     <!-- Static trajectory figures -->
+    <h3>Trajectory Overview</h3>
     <div class="static-figures" x-data="staticFigures">
-      <h3>Trajectory Overview</h3>
-
       <template x-for="(m, mi) in $store.data.models" :key="'sf'+mi">
         <div class="static-fig">
           <div class="static-fig-header">
@@ -438,13 +475,13 @@
           </div>
           <div class="static-fig-legend">
             <div class="static-fig-legend-item">
-              <span class="static-fig-legend-tri" style="border-right:10px solid #e88a2a;border-top:5px solid transparent;border-bottom:5px solid transparent"></span> LEFT indicator
+              <svg width="10" height="10" viewBox="0 0 10 10" style="flex-shrink:0"><polygon points="0,0 10,5 0,10" fill="#e88a2a"/></svg><span>LEFT indicator</span>
             </div>
             <div class="static-fig-legend-item">
-              <span class="static-fig-legend-tri" style="border-left:10px solid #30b0c0;border-top:5px solid transparent;border-bottom:5px solid transparent"></span> RIGHT indicator
+              <svg width="10" height="10" viewBox="0 0 10 10" style="flex-shrink:0"><polygon points="10,0 0,5 10,10" fill="#30b0c0"/></svg><span>RIGHT indicator</span>
             </div>
             <div class="static-fig-legend-item">
-              <span class="static-fig-legend-tri" style="border-top:10px solid #c03030;border-left:5px solid transparent;border-right:5px solid transparent"></span> Strong braking (≤ −1.0 m/s²)
+              <svg width="10" height="10" viewBox="0 0 10 10" style="flex-shrink:0"><polygon points="0,0 10,0 5,10" fill="#c03030"/></svg><span>Strong braking (≤ −1.0 m/s²)</span>
             </div>
           </div>
         </div>
@@ -557,9 +594,23 @@
           const f = fi - i;
           return arr[i] + (arr[j] - arr[i]) * f;
         },
+        sampleChannelAtS(run, ch, s) {
+          const arr = run.ch[ch];
+          if (!arr || !arr.length) return null;
+          const nv = run.n_valid;
+          if (nv < 2) return null;
+          const sc = Math.min(Math.max(s, 0), run.s_total);
+          let j = upperBound(run.s, sc, nv);
+          j = Math.min(Math.max(j, 1), nv - 1);
+          const i = j - 1;
+          const ds = run.s[j] - run.s[i];
+          const f = ds > 1e-9 ? (sc - run.s[i]) / ds : 0;
+          if (arr[i] === null || arr[j] === null) return null;
+          return arr[i] + (arr[j] - arr[i]) * f;
+        },
       });
       Alpine.store('playback', {
-        mode: 'time', playing: false, speedMul: 1,
+        mode: 'pos', playing: false, speedMul: 1,
         curT: 0, curS: 0, maxT: 0, maxS: 0,
       });
       Alpine.store('camera', {
@@ -568,7 +619,7 @@
       Alpine.store('models', {
         visible: [], baselineIdx: 0,
       });
-      Alpine.store('ui', { showPlanned: true, plotWindowS: 10 });
+      Alpine.store('ui', { showPlanned: true, showEntities: true, showPerceived: true, plotWindowS: 10, plotWindowM: 50 });
 
       // --- viewer component (root) ---
       Alpine.data('viewer', () => {
@@ -649,7 +700,7 @@
 
       // --- mapCanvas component ---
       Alpine.data('mapCanvas', () => {
-        let ctx = null, canvas = null, svg = null;
+        let ctx = null, canvas = null;
         const drag = { active: false, sx: 0, sy: 0, cx0: 0, cy0: 0 };
         let W = 800, H = 550;
         let d, cam, pb, mdl, ui;
@@ -741,7 +792,7 @@
 
         function drawScaleBar(pxPerMeter) {
           const sb = niceScaleBar(pxPerMeter);
-          const sbX = 20, sbY = H - 25;
+          const sbX = W - 20 - sb.px, sbY = H - 25;
           ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.globalAlpha = 0.8;
           ctx.beginPath(); ctx.moveTo(sbX, sbY); ctx.lineTo(sbX + sb.px, sbY); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(sbX, sbY - 5); ctx.lineTo(sbX, sbY + 5); ctx.stroke();
@@ -770,15 +821,16 @@
           };
         }
 
-        function drawEntities(curT, pxPerMeter, vis) {
+        function drawEntities(samples, pxPerMeter, vis) {
           ctx.lineWidth = 1.5;
           for (let mi = 0; mi < d.models.length; mi++) {
-            if (!vis[mi]) continue;
+            if (!vis[mi] || !samples[mi]) continue;
             const ents = d.models[mi].entities;
             if (!ents || !ents.length) continue;
             const color = d.models[mi].color;
+            const t = samples[mi].t;
             for (const e of ents) {
-              const s = sampleEntity(e, curT);
+              const s = sampleEntity(e, t);
               if (!s) continue;
               const [cx, cy] = toScreen(s.x, s.y);
               const lPx = e.bbox.length * pxPerMeter;
@@ -799,45 +851,82 @@
           ctx.globalAlpha = 1.0;
         }
 
-        function updateSvgOverlay(samples, vis, pxPerMeter) {
-          const svgNS = 'http://www.w3.org/2000/svg';
-          while (svg.firstChild) svg.removeChild(svg.firstChild);
-          const defs = document.createElementNS(svgNS, 'defs');
-          svg.appendChild(defs);
+        function _samplePredictedObjects(snapshots, t) {
+          if (!snapshots || !snapshots.length) return [];
+          let lo = 0, hi = snapshots.length - 1;
+          while (lo < hi) {
+            const mid = (lo + hi + 1) >> 1;
+            if (snapshots[mid].t <= t) lo = mid; else hi = mid - 1;
+          }
+          return snapshots[lo].objects;
+        }
 
-          for (let i = 0; i < d.models.length; i++) {
+        function drawPerceivedObjects(samples, pxPerMeter, vis, key, dash) {
+          for (let mi = 0; mi < d.models.length; mi++) {
+            if (!vis[mi] || !samples[mi]) continue;
+            const snaps = d.models[mi][key];
+            if (!snaps || !snaps.length) continue;
+            const color = d.models[mi].color;
+            const t = samples[mi].t;
+            const objs = _samplePredictedObjects(snaps, t);
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash(dash);
+            for (const obj of objs) {
+              const [cx, cy] = toScreen(obj.x, obj.y);
+              const lPx = obj.length * pxPerMeter;
+              const wPx = obj.width * pxPerMeter;
+              if (lPx < 1 && wPx < 1) continue;
+              ctx.save();
+              ctx.translate(cx, cy);
+              ctx.rotate(-obj.yaw);
+              ctx.globalAlpha = 0.25;
+              ctx.fillStyle = color;
+              ctx.fillRect(-lPx / 2, -wPx / 2, lPx, wPx);
+              ctx.globalAlpha = 0.8;
+              ctx.strokeStyle = color;
+              ctx.strokeRect(-lPx / 2, -wPx / 2, lPx, wPx);
+              ctx.restore();
+            }
+          }
+          ctx.globalAlpha = 1.0;
+          ctx.setLineDash([]);
+        }
+
+        function drawEgo(samples, pxPerMeter, vis) {
+          for (let i = d.models.length - 1; i >= 0; i--) {
             const s = samples[i];
             if (!s || !vis[i]) continue;
-            const [px, py] = toScreen(s.x, s.y);
+            const [cx, cy] = toScreen(s.x, s.y);
             const color = d.models[i].color;
 
             if (Math.abs(s.v) > 0.05) {
-              const arrowLen = Math.abs(s.v) * 1.5 * pxPerMeter;
-              const ax = px + Math.cos(s.yaw) * arrowLen;
-              const ay = py - Math.sin(s.yaw) * arrowLen;
-              const line = document.createElementNS(svgNS, 'line');
-              line.setAttribute('x1', px); line.setAttribute('y1', py);
-              line.setAttribute('x2', ax); line.setAttribute('y2', ay);
-              line.setAttribute('stroke', color); line.setAttribute('stroke-width', '2');
-              line.setAttribute('opacity', '0.8');
-              svg.appendChild(line);
-              const headLen = 6, angle = Math.atan2(ay - py, ax - px);
-              const path = document.createElementNS(svgNS, 'polygon');
-              path.setAttribute('points', [
-                `${ax},${ay}`,
-                `${ax - headLen * Math.cos(angle - 0.4)},${ay - headLen * Math.sin(angle - 0.4)}`,
-                `${ax - headLen * Math.cos(angle + 0.4)},${ay - headLen * Math.sin(angle + 0.4)}`,
-              ].join(' '));
-              path.setAttribute('fill', color); path.setAttribute('opacity', '0.8');
-              svg.appendChild(path);
+              const dotR = 6;
+              const headLen = 14;
+              const shaftLen = Math.abs(s.v) * 1.5 * pxPerMeter;
+              const angle = Math.atan2(-Math.sin(s.yaw), Math.cos(s.yaw));
+              const dx = Math.cos(angle), dy = Math.sin(angle);
+              const ox = cx + dx * dotR, oy = cy + dy * dotR;
+              const bx = ox + dx * shaftLen, by = oy + dy * shaftLen;
+              const ax = bx + dx * headLen, ay = by + dy * headLen;
+              if (shaftLen > 1) {
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.globalAlpha = 0.5;
+                ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(bx, by); ctx.stroke();
+                ctx.strokeStyle = color; ctx.lineWidth = 2.5; ctx.globalAlpha = 1.0;
+                ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(bx, by); ctx.stroke();
+              }
+              ctx.globalAlpha = 1.0;
+              ctx.fillStyle = color;
+              ctx.beginPath();
+              ctx.moveTo(ax, ay);
+              ctx.lineTo(ax - headLen * Math.cos(angle - 0.3), ay - headLen * Math.sin(angle - 0.3));
+              ctx.lineTo(ax - headLen * Math.cos(angle + 0.3), ay - headLen * Math.sin(angle + 0.3));
+              ctx.closePath(); ctx.fill();
             }
 
-            const circle = document.createElementNS(svgNS, 'circle');
-            circle.setAttribute('cx', px); circle.setAttribute('cy', py);
-            circle.setAttribute('r', i === mdl.baselineIdx ? 7 : 5.5);
-            circle.setAttribute('fill', color);
-            circle.setAttribute('stroke', '#fff'); circle.setAttribute('stroke-width', '2.5');
-            svg.appendChild(circle);
+            ctx.globalAlpha = 1.0;
+            ctx.fillStyle = color;
+            ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
           }
         }
 
@@ -860,9 +949,11 @@
           drawTrajectories(vis);
           const curT = pb.mode === 'time' ? pb.curT : (samples[mdl.baselineIdx]?.t ?? 0);
           if (ui.showPlanned) drawPlanned(vis, curT);
-          drawEntities(curT, scale, vis);
+          if (ui.showEntities) drawEntities(samples, scale, vis);
+          if (ui.showPerceived)
+            drawPerceivedObjects(samples, scale, vis, 'perceived_objects', [4, 3]);
+          drawEgo(samples, scale, vis);
           drawScaleBar(scale);
-          updateSvgOverlay(samples, vis, scale);
         }
 
         let needsInitialFit = true;
@@ -873,7 +964,6 @@
           const dpr = window.devicePixelRatio || 1;
           canvas.width = Math.round(W * dpr);
           canvas.height = Math.round(H * dpr);
-          svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
           if (needsInitialFit) {
             needsInitialFit = false;
             const dx = d.bbox[2] - d.bbox[0], dy = d.bbox[3] - d.bbox[1];
@@ -886,7 +976,6 @@
           init() {
             d = this.$store.data;
             canvas = this.$refs.mapCvs;
-            svg = this.$refs.mapSvg;
             ctx = canvas.getContext('2d');
             cam = this.$store.camera;
             pb = this.$store.playback;
@@ -969,7 +1058,7 @@
         let d, pb, mdl, ui;
         const margin = { top: 8, right: 12, bottom: 28, left: 50 };
         const plotH = 200;
-        let plotDrag = { active: false, wasPlaying: false, startClientX: 0, startT: 0, screenPxPerSec: 1 };
+        let plotDrag = { active: false, wasPlaying: false, startClientX: 0, startX: 0, screenPxPerUnit: 1 };
 
         function chLabel(ch) {
           const c = CH_LABELS[ch];
@@ -1058,24 +1147,26 @@
             plotDrag.active = true;
             plotDrag.wasPlaying = pb.playing;
             plotDrag.startClientX = e.clientX;
-            plotDrag.startT = pb.mode === 'time' ? pb.curT
-              : (d.sampleAtS(d.models[mdl.baselineIdx], pb.curS)?.t ?? 0);
-            plotDrag.screenPxPerSec = ctm.a * pw / (domain[1] - domain[0]);
+            plotDrag.startX = pb.mode === 'pos' ? pb.curS : pb.curT;
+            plotDrag.screenPxPerUnit = ctm.a * pw / (domain[1] - domain[0]);
             if (pb.playing) window.dispatchEvent(new CustomEvent('playback-pause'));
             e.preventDefault();
           });
 
           hitArea.on('mousemove', (e) => {
+            const posMode = pb.mode === 'pos';
             const ctm = g.node().getScreenCTM();
             const svgX = (e.clientX - ctm.e) / ctm.a;
-            const hoverT = xScale.invert(svgX);
+            const hoverX = xScale.invert(svgX);
             const conv = chConv(ch);
             const vis = mdl.visible;
             let rows = '';
-            if (hoverT >= 0) {
+            if (hoverX >= 0) {
               for (let i = 0; i < d.models.length; i++) {
                 if (!vis[i]) continue;
-                const val = d.sampleChannel(d.models[i], ch, hoverT);
+                const val = posMode
+                  ? d.sampleChannelAtS(d.models[i], ch, hoverX)
+                  : d.sampleChannel(d.models[i], ch, hoverX);
                 if (val === null) continue;
                 const v = (val * conv).toFixed(3);
                 const unit = CH_LABELS[ch].units[chUnit[ch]];
@@ -1083,9 +1174,10 @@
               }
             }
             if (rows) {
-              const hx = xScale(hoverT);
+              const hx = xScale(hoverX);
               hoverLine.attr('x1', hx).attr('x2', hx).attr('opacity', 0.6);
-              tooltip.innerHTML = `<div style="color:#999;margin-bottom:2px">${hoverT.toFixed(2)}s</div>` + rows;
+              const label = posMode ? hoverX.toFixed(1) + 'm' : hoverX.toFixed(2) + 's';
+              tooltip.innerHTML = `<div style="color:#999;margin-bottom:2px">${label}</div>` + rows;
               tooltip.style.display = 'block';
               const cellRect = cell.getBoundingClientRect();
               let tx = e.clientX - cellRect.left + 12;
@@ -1104,16 +1196,11 @@
 
           d3.select(window).on('mousemove.plot', (e) => {
             if (!plotDrag.active) return;
-            const dt = -(e.clientX - plotDrag.startClientX) / plotDrag.screenPxPerSec;
-            const t = Math.max(0, Math.min(plotDrag.startT + dt, pb.maxT));
-            if (pb.mode === 'time') {
-              pb.curT = t;
+            const dx = -(e.clientX - plotDrag.startClientX) / plotDrag.screenPxPerUnit;
+            if (pb.mode === 'pos') {
+              pb.curS = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxS));
             } else {
-              const base = d.models[mdl.baselineIdx];
-              if (base && base.n_valid > 1) {
-                const st = d.sampleAtT(base, t);
-                if (st) pb.curS = st.s;
-              }
+              pb.curT = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxT));
             }
             markDirty();
           }).on('mouseup.plot', () => {
@@ -1126,15 +1213,21 @@
           return cell;
         }
 
-        function updateChannel(ch, curT, vis) {
+        function updateChannel(ch, curX, vis, posMode) {
           const p = plotSvgs[ch];
           if (!p) return;
-          const windowS = ui.plotWindowS;
           const conv = chConv(ch);
 
           let xMin, xMax;
-          if (windowS > 0) { xMin = curT - windowS / 2; xMax = curT + windowS / 2; }
-          else { xMin = 0; xMax = pb.maxT; }
+          if (posMode) {
+            const wm = ui.plotWindowM;
+            if (wm > 0) { xMin = curX - wm / 2; xMax = curX + wm / 2; }
+            else { xMin = 0; xMax = pb.maxS; }
+          } else {
+            const ws = ui.plotWindowS;
+            if (ws > 0) { xMin = curX - ws / 2; xMax = curX + ws / 2; }
+            else { xMin = 0; xMax = pb.maxT; }
+          }
           p.xScale.domain([xMin, xMax]);
 
           const cmdCh = CH_CMD[ch] || null;
@@ -1157,7 +1250,8 @@
           const yPad = (yMax - yMin) * 0.08 || 0.5;
           p.yScale.domain([yMin - yPad, yMax + yPad]);
 
-          p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(d => d.toFixed(0) + 's'))
+          const xUnit = posMode ? 'm' : 's';
+          p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(v => v.toFixed(0) + xUnit))
             .selectAll('text').attr('fill', '#555').attr('font-size', '12px');
           p.xAxis.selectAll('line,path').attr('stroke', '#ccc');
           const yRange = p.yScale.domain();
@@ -1182,41 +1276,50 @@
           });
 
           p.linesG.selectAll('*').remove();
+          const lineFn = d3.line().defined(dd => dd.v !== null)
+            .x(dd => p.xScale(dd.x)).y(dd => p.yScale(dd.v));
           for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
-            const nv = d.models[i].n_valid;
-            const lineFn = d3.line().defined(dd => dd.v !== null)
-              .x(dd => p.xScale(dd.t)).y(dd => p.yScale(dd.v));
-            const arr = d.models[i].ch[ch];
+            const m = d.models[i];
+            const nv = m.n_valid;
+            const arr = m.ch[ch];
             if (arr) {
               const lineData = [];
-              for (let k = 0; k < nv; k++) lineData.push({ t: k / d.rate, v: arr[k] !== null ? arr[k] * conv : null });
+              for (let k = 0; k < nv; k++) {
+                const xv = posMode ? m.s[k] : k / d.rate;
+                lineData.push({ x: xv, v: arr[k] !== null ? arr[k] * conv : null });
+              }
               p.linesG.append('path').datum(lineData)
-                .attr('fill', 'none').attr('stroke', d.models[i].color)
+                .attr('fill', 'none').attr('stroke', m.color)
                 .attr('stroke-width', 1.5).attr('d', lineFn);
             }
-            const cmdArr = cmdCh && d.models[i].ch[cmdCh];
+            const cmdArr = cmdCh && m.ch[cmdCh];
             if (cmdArr) {
               const cmdData = [];
-              for (let k = 0; k < nv; k++) cmdData.push({ t: k / d.rate, v: cmdArr[k] !== null ? cmdArr[k] * conv : null });
+              for (let k = 0; k < nv; k++) {
+                const xv = posMode ? m.s[k] : k / d.rate;
+                cmdData.push({ x: xv, v: cmdArr[k] !== null ? cmdArr[k] * conv : null });
+              }
               p.linesG.append('path').datum(cmdData)
-                .attr('fill', 'none').attr('stroke', d.models[i].color)
+                .attr('fill', 'none').attr('stroke', m.color)
                 .attr('stroke-width', 1.2).attr('stroke-dasharray', '4,3')
                 .attr('opacity', 0.5).attr('d', lineFn);
             }
           }
 
-          const cx = p.xScale(curT);
+          const cx = p.xScale(curX);
           p.cursorLine.attr('x1', cx).attr('x2', cx)
             .attr('opacity', cx >= 0 && cx <= p.pw ? 0.5 : 0);
 
           p.dotsG.selectAll('*').remove();
           for (let i = 0; i < d.models.length; i++) {
             if (!vis[i]) continue;
-            const val = d.sampleChannel(d.models[i], ch, curT);
+            const val = posMode
+              ? d.sampleChannelAtS(d.models[i], ch, curX)
+              : d.sampleChannel(d.models[i], ch, curX);
             if (val === null) continue;
             p.dotsG.append('circle')
-              .attr('cx', p.xScale(curT)).attr('cy', p.yScale(val * conv)).attr('r', 3.5)
+              .attr('cx', p.xScale(curX)).attr('cy', p.yScale(val * conv)).attr('r', 3.5)
               .attr('fill', d.models[i].color).attr('stroke', '#fff').attr('stroke-width', 1.5);
           }
         }
@@ -1230,9 +1333,9 @@
         function updateAll() {
           if (!Object.keys(plotSvgs).length) return;
           const vis = mdl.visible;
-          const curT = pb.mode === 'time' ? pb.curT :
-            (d.sampleAtS(d.models[mdl.baselineIdx], pb.curS)?.t ?? 0);
-          for (const ch of CHANNELS) updateChannel(ch, curT, vis);
+          const posMode = pb.mode === 'pos';
+          const curX = posMode ? pb.curS : pb.curT;
+          for (const ch of CHANNELS) updateChannel(ch, curX, vis, posMode);
         }
 
         return {
@@ -1254,22 +1357,18 @@
         const BRAKE_THRESHOLD = -1.0;
         const TURN_LEFT = 2, TURN_RIGHT = 3;
 
+        const _CB_RDYLBU_R = [
+          [49,54,149],[69,117,180],[116,173,209],[171,217,233],[224,243,248],
+          [255,255,191],[254,224,144],[253,174,97],[244,109,67],[215,48,39],[165,0,38]
+        ];
         function speedToColor(v, vMax) {
           const t = vMax > 0 ? Math.min(v / vMax, 1) : 0;
-          // RdYlBu_r: blue(low) → yellow(mid) → red(high)
-          let r, g, b;
-          if (t < 0.5) {
-            const s = t * 2;
-            r = Math.round(49 + (220 - 49) * s);
-            g = Math.round(130 + (210 - 130) * s);
-            b = Math.round(189 + (60 - 189) * s);
-          } else {
-            const s = (t - 0.5) * 2;
-            r = Math.round(220 + (192 - 220) * s);
-            g = Math.round(210 + (50 - 210) * s);
-            b = Math.round(60 + (50 - 60) * s);
-          }
-          return `rgb(${r},${g},${b})`;
+          const n = _CB_RDYLBU_R.length - 1;
+          const fi = t * n;
+          const i = Math.min(Math.floor(fi), n - 1);
+          const f = fi - i;
+          const a = _CB_RDYLBU_R[i], b = _CB_RDYLBU_R[i + 1];
+          return `rgb(${Math.round(a[0]+(b[0]-a[0])*f)},${Math.round(a[1]+(b[1]-a[1])*f)},${Math.round(a[2]+(b[2]-a[2])*f)})`;
         }
 
         function computeBBox(m) {
@@ -1319,7 +1418,7 @@
         function drawSpeedTrajectory(ctx, m, vMax, toScr) {
           const nv = m.n_valid;
           if (nv < 2) return;
-          ctx.lineWidth = 3; ctx.lineCap = 'round';
+          ctx.lineWidth = 5; ctx.lineCap = 'round';
           for (let k = 0; k < nv - 1; k++) {
             const v = m.v[k] != null ? Math.abs(m.v[k]) : 0;
             ctx.strokeStyle = speedToColor(v, vMax);
@@ -1384,7 +1483,7 @@
 
         function drawScaleBar(ctx, pxPerMeter, W, H) {
           const sb = niceScaleBar(pxPerMeter);
-          const sbX = 20, sbY = H - 20;
+          const sbX = W - 20 - sb.px, sbY = H - 20;
           ctx.strokeStyle = '#555'; ctx.lineWidth = 2; ctx.globalAlpha = 0.8;
           ctx.beginPath(); ctx.moveTo(sbX, sbY); ctx.lineTo(sbX + sb.px, sbY); ctx.stroke();
           ctx.beginPath(); ctx.moveTo(sbX, sbY - 4); ctx.lineTo(sbX, sbY + 4); ctx.stroke();

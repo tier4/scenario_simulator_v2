@@ -25,6 +25,7 @@ import rclpy.serialization
 import rosbag2_py
 
 from autoware_map_msgs.msg import LaneletMapBin
+from autoware_perception_msgs.msg import PredictedObjects
 from autoware_planning_msgs.msg import Trajectory
 from autoware_control_msgs.msg import Control
 from autoware_vehicle_msgs.msg import SteeringReport, TurnIndicatorsCommand, VelocityReport
@@ -57,6 +58,7 @@ KINEMATIC_TOPIC = "/localization/kinematic_state"
 CONTROL_CMD_TOPIC = "/control/command/control_cmd"
 TURN_CMD_TOPIC = "/control/command/turn_indicators_cmd"
 ENTITY_STATUS_TOPIC = "/simulation/entity/status"
+PERCEIVED_OBJECTS_TOPIC = "/perception/object_recognition/objects"
 ENTITY_TYPE_EGO = 0
 DOWNSAMPLE_INTERVAL_NS = 200_000_000  # 200ms → ~5Hz
 RATE_HZ = 10.0
@@ -69,11 +71,10 @@ _SUBTYPE_NAMES = {0: "unknown", 1: "car", 2: "truck", 3: "bus", 4: "trailer",
 
 
 def extract_entities(bag_dir):
-    """Extract non-ego entity trajectories from entity/status topic.
+    """Extract non-ego entity trajectories and ego bbox from entity/status.
 
-    Returns a list of dicts, one per entity:
-        {name, subtype, bbox: {length, width, height},
-         positions: [{t, x, y, yaw}, ...]}
+    Returns (entities, ego_bbox) where ego_bbox is
+    {length, width, height} or None.
     """
     reader = rosbag2_py.SequentialReader()
     reader.open(
@@ -83,12 +84,13 @@ def extract_entities(bag_dir):
     has_topic = any(t.name == ENTITY_STATUS_TOPIC
                     for t in reader.get_all_topics_and_types())
     if not has_topic:
-        return []
+        return [], None
 
     reader.set_filter(rosbag2_py.StorageFilter(topics=[ENTITY_STATUS_TOPIC]))
 
     driving_ts = find_driving_timestamp(bag_dir)
     entities = {}
+    ego_bbox = None
     base_ts = None
     last_sample_ts = {}
 
@@ -106,6 +108,13 @@ def extract_entities(bag_dir):
         for entry in msg.data:
             status = entry.status
             if status.type.type == ENTITY_TYPE_EGO:
+                if ego_bbox is None:
+                    dim = status.bounding_box.dimensions
+                    ego_bbox = {
+                        "length": round(dim.x, 2),
+                        "width": round(dim.y, 2),
+                        "height": round(dim.z, 2),
+                    }
                 continue
             name = status.name
             if name not in entities:
@@ -138,7 +147,61 @@ def extract_entities(bag_dir):
                 "yaw": round(yaw, 3),
             })
 
-    return list(entities.values())
+    return list(entities.values()), ego_bbox
+
+
+def extract_predicted_objects(bag_dir, topic):
+    """Extract object snapshots from a PredictedObjects topic.
+
+    Returns a list of snapshots: [{t, objects: [{x, y, yaw, label, length, width}]}].
+    Downsampled to ~5 Hz.
+    """
+    reader = rosbag2_py.SequentialReader()
+    reader.open(
+        rosbag2_py.StorageOptions(uri=str(bag_dir)),
+        rosbag2_py.ConverterOptions("", ""),
+    )
+    has_topic = any(t.name == topic for t in reader.get_all_topics_and_types())
+    if not has_topic:
+        return []
+
+    reader.set_filter(rosbag2_py.StorageFilter(topics=[topic]))
+
+    driving_ts = find_driving_timestamp(bag_dir)
+    base_ts = None
+    snapshots = []
+
+    while reader.has_next():
+        _, data, ts = reader.read_next()
+        if driving_ts is not None and ts < driving_ts:
+            continue
+        if base_ts is None:
+            base_ts = driving_ts if driving_ts is not None else ts
+
+        msg = rclpy.serialization.deserialize_message(data, PredictedObjects)
+        t_sec = (ts - base_ts) / 1e9
+        objs = []
+        for obj in msg.objects:
+            p = obj.kinematics.initial_pose_with_covariance.pose.position
+            o = obj.kinematics.initial_pose_with_covariance.pose.orientation
+            yaw = math.atan2(
+                2 * (o.w * o.z + o.x * o.y),
+                1 - 2 * (o.y * o.y + o.z * o.z))
+            label = 0
+            if obj.classification:
+                label = obj.classification[0].label
+            dim = obj.shape.dimensions
+            objs.append({
+                "x": round(p.x, 2),
+                "y": round(p.y, 2),
+                "yaw": round(yaw, 3),
+                "label": _SUBTYPE_NAMES.get(label, "unknown"),
+                "length": round(dim.x, 2),
+                "width": round(dim.y, 2),
+            })
+        snapshots.append({"t": round(t_sec, 3), "objects": objs})
+
+    return snapshots
 
 
 def extract_map_data(bag_dir):

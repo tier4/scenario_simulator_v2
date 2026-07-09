@@ -141,7 +141,9 @@ def generate_report(output_dir):
     Reports are written to ``output_dir/result_archive/``.
     """
     from .rosbag_reader import (
-        extract_entities, extract_map_data, extract_trajectories, RATE_HZ,
+        extract_entities, extract_map_data, extract_predicted_objects,
+        extract_trajectories,
+        PERCEIVED_OBJECTS_TOPIC, RATE_HZ,
     )
 
     output_dir = Path(output_dir)
@@ -192,13 +194,21 @@ def generate_report(output_dir):
                     traj_data = extract_trajectories(bag)
                     traj_data["name"] = md.name
                     traj_data["color"] = _assign_color(i)
-                    traj_data["entities"] = extract_entities(bag)
+                    entities, ego_bbox = extract_entities(bag)
+                    traj_data["entities"] = entities
+                    traj_data["ego_bbox"] = ego_bbox
+                    traj_data["perceived_objects"] = extract_predicted_objects(
+                        bag, PERCEIVED_OBJECTS_TOPIC)
                     models.append(traj_data)
         else:
             traj_data = extract_trajectories(scenario_bag)
             traj_data["name"] = output_dir.name
             traj_data["color"] = _assign_color(0)
-            traj_data["entities"] = extract_entities(scenario_bag)
+            entities, ego_bbox = extract_entities(scenario_bag)
+            traj_data["entities"] = entities
+            traj_data["ego_bbox"] = ego_bbox
+            traj_data["perceived_objects"] = extract_predicted_objects(
+                scenario_bag, PERCEIVED_OBJECTS_TOPIC)
             models = [traj_data]
 
         n = max((len(m["x"]) for m in models), default=0)
