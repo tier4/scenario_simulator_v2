@@ -138,7 +138,7 @@ def generate_report(output_dir):
 
     Discovers models from ``output_dir/staging/`` (symlink to raw bags).
     Falls back to single-model discovery when staging is absent.
-    Reports are written to ``output_dir/result_archive/``.
+    Reports are written to ``output_dir/comparison_report/``.
     """
     from .rosbag_reader import (
         extract_entities, extract_map_data, extract_predicted_objects,
@@ -170,7 +170,7 @@ def generate_report(output_dir):
 
     map_data = extract_map_data(scenario_bags[0])
 
-    result_archive = output_dir / "result_archive"
+    result_archive = output_dir / "comparison_report"
     result_archive.mkdir(exist_ok=True)
 
     def _b64gz(text):
