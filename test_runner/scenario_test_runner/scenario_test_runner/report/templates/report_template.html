@@ -7,16 +7,21 @@
   <style>
     /* --- Theme tokens --- */
     :root {
-      --surface-1: #ffffff;
+      --surface-1: #f6f8fa;
       --surface-2: #ffffff;
-      --surface-3: #f3f4f6;
+      --surface-3: #eaedf1;
       --text-1: #1f2328;
       --text-2: #656d76;
-      --border-dim: #d1d9e0;
+      --border-dim: #d8dee4;
       --accent: #0969da;
       --danger: #d1242f;
       --success: #1a7f37;
       --sf-canvas-h: 380px;
+      --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+      --fs-base: 1rem;
+      --fs-sm: 0.875rem;
+      --fs-xs: 0.75rem;
+      --fs-xxs: 0.6875rem;
       color-scheme: light;
     }
 
@@ -25,22 +30,28 @@
     body {
       margin: 0;
       font-family: var(--font-sans);
-      font-size: var(--font-size-1);
+      font-size: var(--fs-base);
       line-height: var(--font-lineheight-3);
       color: var(--text-1);
       background: var(--surface-1);
     }
     h3 {
-      margin: var(--size-7) 0 var(--size-3); font-size: var(--font-size-3);
-      padding-bottom: var(--size-1); border-bottom: 1px solid var(--border-dim);
+      margin: var(--size-5) 0 var(--size-2);
+      font-size: var(--fs-base);
+      font-weight: 600;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding-bottom: 0;
+      border-bottom: none;
     }
     h3:first-child {
-      margin-top: var(--size-3);
+      margin-top: 0;
     }
     img, svg, canvas { max-width: 100%; display: block; }
 
     /* --- Layout --- */
-    .container { max-width: 1400px; margin: 0 auto; padding: 0 var(--size-3) var(--size-7); }
+    .container { max-width: 1400px; margin: 0 auto; padding: var(--size-4) var(--size-3) var(--size-7); }
     .row { display: grid; grid-template-columns: 3fr 1fr; gap: var(--size-3); min-width: 0; }
     .row > * { min-width: 0; }
     @media (max-width: 768px) { .row { grid-template-columns: 1fr; } }
@@ -51,13 +62,14 @@
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
       padding: var(--size-3);
+      box-shadow: var(--card-shadow);
     }
 
     /* --- Controls --- */
     .controls {
       display: flex; align-items: center; gap: var(--size-2);
       margin: var(--size-2) 0; flex-wrap: wrap;
-      font-size: var(--font-size-0);
+      font-size: var(--fs-sm);
     }
     .controls input[type=range] { flex: 1; min-width: 120px; border: none; padding: 0; }
     .controls small {
@@ -69,7 +81,7 @@
     /* --- Buttons --- */
     button {
       font-family: inherit;
-      font-size: var(--font-size-0);
+      font-size: var(--fs-sm);
       padding: var(--size-1) var(--size-3);
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
@@ -85,7 +97,7 @@
     }
     .toggle-label {
       display: inline-flex; align-items: center; gap: 4px;
-      font-size: var(--font-size-0); color: var(--text-1); cursor: pointer;
+      font-size: var(--fs-sm); color: var(--text-1); cursor: pointer;
       white-space: nowrap; user-select: none;
     }
     .toggle-label input { margin: 0; accent-color: var(--accent); }
@@ -99,7 +111,7 @@
     .seg-group button {
       border: none; border-radius: 0; min-width: auto;
       padding: var(--size-1) var(--size-2);
-      font-size: var(--font-size-0); color: var(--text-2);
+      font-size: var(--fs-sm); color: var(--text-2);
       background: transparent; line-height: var(--font-lineheight-3);
     }
     .seg-group button:hover { background: var(--surface-3); }
@@ -109,7 +121,7 @@
     .seg-group button + button { border-left: 1px solid var(--border-dim); }
     .baseline-group {
       display: flex; align-items: center; gap: var(--size-1);
-      font-size: var(--font-size-0); color: var(--text-2); white-space: nowrap;
+      font-size: var(--fs-sm); color: var(--text-2); white-space: nowrap;
     }
     .baseline-group.disabled { opacity: 0.35; pointer-events: none; }
 
@@ -169,8 +181,11 @@
     /* --- Legend --- */
     .legend-panel {
       display: flex; flex-direction: column; gap: var(--size-2);
-      padding: var(--size-2); font-size: var(--font-size-1);
+      padding: var(--size-2); font-size: var(--fs-sm);
       min-width: 0;
+    }
+    .legend-panel > strong {
+      font-weight: 600; color: var(--text-2);
     }
     .model-entry {
       padding: var(--size-2);
@@ -192,7 +207,7 @@
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .model-entry-stat {
-      color: var(--text-2); font-size: var(--font-size-0);
+      color: var(--text-2); font-size: var(--fs-sm);
       margin-top: var(--size-1);
     }
     .model-entry-stat.ended { color: #b05050; }
@@ -202,7 +217,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--size-3);
-      margin-top: var(--size-2); font-size: var(--font-size-1);
+      margin-top: var(--size-2); font-size: var(--fs-sm);
     }
     @media (max-width: 768px) { .plot-row { grid-template-columns: 1fr; } }
     .plot-cell {
@@ -211,6 +226,7 @@
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
       padding: var(--size-2) var(--size-2) var(--size-1);
+      box-shadow: var(--card-shadow);
     }
     .plot-cell svg { width: 100%; display: block; }
     .plot-header {
@@ -218,11 +234,11 @@
       margin: 0 0 var(--size-1);
     }
     .plot-title {
-      font-size: var(--font-size-1); color: var(--text-2);
+      font-size: var(--fs-sm); color: var(--text-2);
       margin: 0; font-weight: 600;
     }
     .unit-toggle {
-      font-size: 11px; color: var(--text-2); cursor: pointer;
+      font-size: var(--fs-xxs); color: var(--text-2); cursor: pointer;
       padding: 1px 6px; border: 1px solid var(--border-dim);
       border-radius: var(--radius-1); background: var(--surface-3);
       user-select: none;
@@ -232,7 +248,7 @@
       position: absolute; pointer-events: none;
       background: rgba(255,255,255,0.95); border: 1px solid var(--border-dim);
       border-radius: var(--radius-1); padding: 4px 8px;
-      font-size: 11px; line-height: 1.5; white-space: nowrap;
+      font-size: var(--fs-xxs); line-height: 1.5; white-space: nowrap;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       z-index: 10; display: none;
     }
@@ -244,7 +260,7 @@
     /* --- Select --- */
     select {
       font-family: inherit;
-      font-size: var(--font-size-0);
+      font-size: var(--fs-sm);
       padding: var(--size-1) var(--size-2);
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
@@ -255,93 +271,97 @@
     /* --- Utilities --- */
     .text-muted { color: var(--text-2); }
 
-    /* --- Stats table --- */
-    .stats-table-wrap {
+    /* --- Numerical Comparison table --- */
+    .num-comp-wrap {
       overflow-x: auto;
       margin-top: var(--size-3);
-    }
-    .stats-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
-      font-size: var(--font-size-0);
+      box-shadow: var(--card-shadow);
+      background: var(--surface-2);
+    }
+    .num-comp {
+      width: max-content;
+      min-width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: var(--fs-xs);
       font-variant-numeric: tabular-nums;
     }
-    .stats-table th, .stats-table td {
-      padding: 6px 12px;
+    .num-comp th, .num-comp td {
+      padding: 8px 10px;
       border-right: 1px solid var(--border-dim);
       border-bottom: 1px solid var(--border-dim);
-      text-align: right;
-      white-space: nowrap;
+      text-align: left;
     }
-    .stats-table th:last-child, .stats-table td:last-child {
-      border-right: none;
-    }
-    .stats-table tbody tr:last-child td {
-      border-bottom: none;
-    }
-    .stats-table thead tr:first-child th:first-child {
-      border-top-left-radius: calc(var(--radius-2) - 1px);
-    }
-    .stats-table thead tr:first-child th:last-child {
-      border-top-right-radius: calc(var(--radius-2) - 1px);
-    }
-    .stats-table tbody tr:last-child td:first-child {
-      border-bottom-left-radius: calc(var(--radius-2) - 1px);
-    }
-    .stats-table tbody tr:last-child td:last-child {
-      border-bottom-right-radius: calc(var(--radius-2) - 1px);
-    }
-    .stats-table th {
+    .num-comp th, .num-comp td { white-space: nowrap; }
+    .num-comp th:last-child, .num-comp td:last-child { border-right: none; }
+    .num-comp tbody tr:last-child td { border-bottom: none; }
+    .num-comp th {
       background: var(--surface-3);
-      font-weight: 600;
-      color: var(--text-1);
+      font-weight: 500;
+      font-size: var(--fs-xxs);
+      color: var(--text-2);
     }
-    .stats-table th.group-header {
+    .num-comp tr.group-header th {
       text-align: center;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+      font-size: var(--fs-xxs);
       color: var(--text-2);
       border-bottom: 2px solid var(--border-dim);
     }
-    .stats-table th.metric-header {
-      font-weight: 500;
-      font-size: var(--font-size-0);
-      color: var(--text-2);
+    .num-comp tr.group-header th:empty {
+      background: var(--surface-2);
     }
-    .stats-table th.model-name-cell {
-      text-align: left;
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .stats-table td.model-name-cell {
-      text-align: left;
-      font-weight: 500;
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .stats-table tbody tr:hover {
-      background: color-mix(in srgb, var(--accent) 6%, transparent);
-    }
-    .stats-table .model-color-dot {
-      display: inline-block;
-      width: 10px; height: 10px;
-      border-radius: 50%;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
-    .stats-table .highlight-val {
+    .num-comp tr.highlight td {
+      background: color-mix(in srgb, var(--accent) 10%, var(--surface-2));
       font-weight: 600;
     }
+    /* Sticky model-name column */
+    .num-comp .nc-model {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+      min-width: 140px;
+      max-width: 200px;
+      width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .num-comp thead .nc-model { background: var(--surface-3); }
+    .num-comp tbody .nc-model { background: var(--surface-2); }
+    .num-comp tr.highlight .nc-model {
+      background: color-mix(in srgb, var(--accent) 10%, var(--surface-2));
+    }
+    .num-comp .nc-unit {
+      font-weight: 400;
+      opacity: 0.6;
+    }
+    .nc-hint {
+      text-decoration: underline dotted var(--text-2);
+      text-underline-offset: 3px;
+      cursor: help;
+    }
+    .nc-tip {
+      display: none;
+      position: fixed;
+      z-index: 20;
+      max-width: 280px;
+      padding: 6px 10px;
+      background: var(--surface-1);
+      color: var(--text-1);
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      font-size: var(--fs-xs);
+      font-weight: 400;
+      line-height: 1.5;
+      white-space: pre-line;
+      pointer-events: none;
+    }
+    .nc-tip.visible { display: block; }
 
     /* --- Static figures --- */
     .static-figures {
-      margin-top: var(--size-5);
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: var(--size-3);
@@ -354,6 +374,7 @@
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
       overflow: hidden;
+      box-shadow: var(--card-shadow);
     }
     .static-fig-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -366,12 +387,13 @@
       min-width: 0; flex: 1;
     }
     .static-fig-title {
-      font-size: var(--font-size-2); font-weight: 600; margin: 0;
+      font-size: var(--fs-sm); font-weight: 600; margin: 0;
+      color: var(--text-1);
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       max-width: 100%;
     }
     .static-fig-subtitle {
-      font-size: var(--font-size-0); color: var(--text-2); margin: 0;
+      font-size: var(--fs-xs); color: var(--text-2); margin: 0;
     }
     .static-fig-body { position: relative; }
     .static-fig-body canvas { display: block; width: 100%; }
@@ -379,7 +401,7 @@
       position: absolute; bottom: 12px; left: 16px;
       background: rgba(255,255,255,0.9); border: 1px solid var(--border-dim);
       border-radius: var(--radius-1); padding: 6px 10px;
-      font-size: 11px; color: var(--text-2);
+      font-size: var(--fs-xxs); color: var(--text-2);
       display: flex; align-items: center; gap: 8px;
     }
     .static-fig-colorbar canvas {
@@ -390,7 +412,7 @@
       display: flex; flex-wrap: wrap; gap: var(--size-2) var(--size-3);
       padding: var(--size-2) var(--size-3);
       border-top: 1px solid var(--border-dim);
-      font-size: var(--font-size-0); color: var(--text-2);
+      font-size: var(--fs-sm); color: var(--text-2);
     }
     .static-fig-legend-item {
       display: flex; align-items: center; gap: 5px;
@@ -530,48 +552,59 @@
       <div class="plot-row" x-ref="plotRow"></div>
     </div>
 
-    <!-- Summary statistics -->
-    <h3>Summary Statistics</h3>
-    <div class="stats-table-wrap" x-data="statsTable">
-      <table class="stats-table">
-        <thead>
-          <tr>
-            <th class="model-name-cell" rowspan="2">Model</th>
-            <th class="group-header" colspan="2">General</th>
-            <th class="group-header" colspan="3">Velocity</th>
-            <th class="group-header" colspan="3">Acceleration</th>
-            <th class="group-header" colspan="2">Steering</th>
-            <th class="group-header" colspan="2">Turn Indicator</th>
-          </tr>
-          <tr>
-            <th class="metric-header">Duration [s]</th>
-            <th class="metric-header">Distance [m]</th>
-            <th class="metric-header">Max [m/s]</th>
-            <th class="metric-header">Mean [m/s]</th>
-            <th class="metric-header">Min [m/s]</th>
-            <th class="metric-header">Max [m/s²]</th>
-            <th class="metric-header">Min [m/s²]</th>
-            <th class="metric-header">Strong Brakes</th>
-            <th class="metric-header">Max [deg]</th>
-            <th class="metric-header">Min [deg]</th>
-            <th class="metric-header">Left</th>
-            <th class="metric-header">Right</th>
-          </tr>
-        </thead>
-        <tbody>
-          <template x-for="(row, i) in rows" :key="'sr'+i">
-            <tr>
-              <td class="model-name-cell">
-                <span class="model-color-dot" :style="'background:'+$store.data.models[i].color"></span>
-                <span x-text="$store.data.models[i].name" :title="$store.data.models[i].name"></span>
-              </td>
-              <template x-for="(cell, ci) in row" :key="'sc'+i+'_'+ci">
-                <td x-text="cell.text" :class="cell.cls"></td>
+    <!-- Numerical Comparison -->
+    <h3>Numerical Comparison</h3>
+    <div x-data="numComp">
+      <div class="controls" style="margin:0 0 var(--size-2)">
+        <span style="color:var(--text-2)">Baseline</span>
+        <select x-model.number="baseIdx" style="min-width:0;max-width:14em;overflow:hidden;text-overflow:ellipsis">
+          <template x-for="(m, i) in $store.data.models" :key="'nb'+i">
+            <option :value="i" x-text="m.name"></option>
+          </template>
+        </select>
+      </div>
+      <div class="num-comp-wrap">
+        <table class="num-comp">
+          <thead>
+            <tr class="group-header">
+              <template x-for="(g, gi) in groups" :key="'g'+gi">
+                <th :colspan="g.cols.length" x-text="g.header"
+                    :class="g.cols[0].key === 'model' && 'nc-model'"></th>
               </template>
             </tr>
-          </template>
-        </tbody>
-      </table>
+            <tr>
+              <template x-for="(c, ci) in allCols" :key="'h'+ci">
+                <th :class="c.key === 'model' && 'nc-model'">
+                  <span :class="c.tip && 'nc-hint'" :data-tip="c.tip"
+                        @mouseenter="showTip" @mouseleave="hideTip"
+                        x-text="c.label"></span><br x-show="c.unit"><span class="nc-unit" x-show="c.unit" x-text="'[' + c.unit + ']'"></span>
+                </th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="(row, ri) in rows" :key="'r'+ri">
+              <tr :class="ri === baseIdx && 'highlight'">
+                <template x-for="(c, ci) in allCols" :key="'d'+ci">
+                  <td :class="c.key === 'model' && 'nc-model'"
+                      :style="c.key === 'model' ? 'border-left:4px solid ' + row.color : ''"
+                      :title="c.key === 'model' ? row.model : null">
+                    <template x-if="c.key === 'model'">
+                      <span x-text="row.model"></span>
+                    </template>
+                    <template x-if="c.key !== 'model'">
+                      <span x-text="fmt(row[c.key])"></span>
+                    </template>
+                  </td>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+      <div class="nc-tip" :class="{ visible: tipVisible }"
+           :style="`left:${tipX}px;top:${tipY}px`"
+           x-text="tipText"></div>
     </div>
 
     <!-- Static trajectory figures -->
@@ -585,10 +618,10 @@
               <p class="static-fig-subtitle">Speed-colored trajectory</p>
             </div>
             <div style="display:flex;gap:var(--size-2);align-items:center">
-              <label class="toggle-label" style="font-size:var(--font-size-0)">
+              <label class="toggle-label" style="font-size:var(--fs-sm)">
                 <input type="checkbox" :checked="sfOpts[mi].showBraking" @change="sfOpts[mi].showBraking=$el.checked; drawFigure(mi)"> Braking
               </label>
-              <label class="toggle-label" style="font-size:var(--font-size-0)">
+              <label class="toggle-label" style="font-size:var(--fs-sm)">
                 <input type="checkbox" :checked="sfOpts[mi].showTurnCmd" @change="sfOpts[mi].showTurnCmd=$el.checked; drawFigure(mi)"> Turn Indicators
               </label>
             </div>
@@ -1229,7 +1262,7 @@
             cell.style.opacity = '0.35';
             const msg = document.createElement('div');
             msg.textContent = 'No data';
-            msg.style.cssText = 'height:' + plotH + 'px;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px';
+            msg.style.cssText = 'height:' + plotH + 'px;display:flex;align-items:center;justify-content:center;color:#999;font-size:var(--fs-xs)';
             cell.appendChild(msg);
             return cell;
           }
@@ -1380,13 +1413,13 @@
 
           const xUnit = posMode ? 'm' : 's';
           p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(v => v.toFixed(0) + xUnit))
-            .selectAll('text').attr('fill', '#555').attr('font-size', '12px');
+            .selectAll('text').attr('fill', '#555').attr('font-size', '11px');
           p.xAxis.selectAll('line,path').attr('stroke', '#ccc');
           const yRange = p.yScale.domain();
           const ySpan = Math.abs(yRange[1] - yRange[0]);
           const yPrec = ySpan < 0.01 ? 4 : ySpan < 0.1 ? 3 : ySpan < 1 ? 2 : 1;
           p.yAxis.call(d3.axisLeft(p.yScale).ticks(4).tickFormat(d3.format('.' + yPrec + 'f')))
-            .selectAll('text').attr('fill', '#555').attr('font-size', '12px');
+            .selectAll('text').attr('fill', '#555').attr('font-size', '11px');
           p.yAxis.selectAll('line,path').attr('stroke', '#ccc');
 
           p.gridG.selectAll('*').remove();
@@ -1479,107 +1512,223 @@
         };
       });
 
-      // --- statsTable component ---
-      Alpine.data('statsTable', () => {
+      // --- numComp component ---
+      Alpine.data('numComp', () => {
+        const LATERAL_THRESH = 15.0;
         const BRAKE_THRESHOLD = -1.0;
         const TURN_LEFT = 2, TURN_RIGHT = 3;
 
-        function computeModelStats(m, rate) {
+        const GROUPS = [
+          { header: '', cols: [
+            { key: 'model', label: 'Model' },
+          ]},
+          { header: 'Correspondence', cols: [
+            { key: 'match_valid_pct', label: 'Valid', unit: '%',
+              tip: 'Share of samples with\nlateral distance ≤ ' + LATERAL_THRESH.toFixed(0) + ' m' },
+            { key: 'median_lateral_m', label: 'Median lateral', unit: 'm',
+              tip: 'Median lateral distance\nat arc-length matched points' },
+            { key: 'max_lateral_m', label: 'Max lateral', unit: 'm',
+              tip: 'Maximum lateral distance\nat arc-length matched points' },
+          ]},
+          { header: 'Speed vs baseline', cols: [
+            { key: 'mean_dv', label: 'Mean Δv', unit: 'm/s',
+              tip: 'Mean speed difference\n(model − baseline)' },
+            { key: 'median_dv', label: 'Median Δv', unit: 'm/s',
+              tip: 'Median speed difference\n(model − baseline)' },
+            { key: 'avg_over', label: 'Avg overspeed', unit: 'm/s',
+              tip: 'Mean of positive Δv\n(model faster than baseline)' },
+            { key: 'avg_under', label: 'Avg underspeed', unit: 'm/s',
+              tip: 'Mean of negative Δv\n(model slower than baseline)' },
+            { key: 'peak_over', label: 'Peak Δv+', unit: 'm/s',
+              tip: 'Largest positive Δv\n(max excess over baseline)' },
+            { key: 'peak_under', label: 'Peak Δv−', unit: 'm/s',
+              tip: 'Largest negative Δv\n(max deficit vs baseline)' },
+          ]},
+          { header: 'Turn indicator', cols: [
+            { key: 'ti_clusters', label: 'Clusters',
+              tip: 'Turn-indicator clusters\non the baseline path' },
+            { key: 'ti_missing', label: 'Missing',
+              tip: 'Baseline clusters with\nno matching model signal' },
+            { key: 'ti_mean_iou', label: 'Mean IoU',
+              tip: 'Arc-length IoU of matched\nturn-indicator clusters' },
+          ]},
+          { header: 'Operational', cols: [
+            { key: 'strong_brakes', label: 'Strong brakes',
+              tip: 'Consecutive intervals with\nacceleration ≤ −1.0 m/s²' },
+          ]},
+        ];
+
+        const ALL_COLS = GROUPS.flatMap(g => g.cols);
+
+        function fmtVal(v) {
+          if (v == null || (typeof v === 'number' && !isFinite(v))) return '—';
+          if (typeof v === 'number') {
+            if (Number.isInteger(v)) return String(v);
+            if (Math.abs(v) < 10) return v.toFixed(3);
+            return v.toFixed(1);
+          }
+          return String(v);
+        }
+
+        function interpAtS(m, s) {
           const nv = m.n_valid;
-          const duration = nv > 0 ? (nv - 1) / rate : 0;
-          const distance = m.s_total || 0;
+          if (nv < 2) return null;
+          const sc = Math.min(Math.max(s, 0), m.s_total);
+          let lo = 0, hi = nv;
+          while (lo < hi) { const mid = (lo + hi) >> 1; m.s[mid] <= sc ? lo = mid + 1 : hi = mid; }
+          let j = Math.min(Math.max(lo, 1), nv - 1);
+          const i = j - 1;
+          const ds = m.s[j] - m.s[i];
+          const f = ds > 1e-9 ? (sc - m.s[i]) / ds : 0;
+          return {
+            x: m.x[i] + (m.x[j] - m.x[i]) * f,
+            y: m.y[i] + (m.y[j] - m.y[i]) * f,
+            v: m.v[i] + (m.v[j] - m.v[i]) * f,
+          };
+        }
 
-          let vMax = 0, vSum = 0, vMin = Infinity, vCount = 0;
-          for (let k = 0; k < nv; k++) {
-            const v = m.v[k];
-            if (v != null) {
-              const av = Math.abs(v);
-              if (av > vMax) vMax = av;
-              if (av < vMin) vMin = av;
-              vSum += av;
-              vCount++;
+        function median(arr) {
+          if (!arr.length) return NaN;
+          const s = [...arr].sort((a, b) => a - b);
+          const m = Math.floor(s.length / 2);
+          return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+        }
+
+        function findTurnClusters(m) {
+          const cmd = m.ch && m.ch.turn_cmd;
+          if (!cmd) return [];
+          const clusters = [];
+          let cur = null;
+          for (let k = 0; k < m.n_valid; k++) {
+            const c = cmd[k];
+            if (c === TURN_LEFT || c === TURN_RIGHT) {
+              if (!cur || cur.dir !== c) {
+                if (cur) clusters.push(cur);
+                cur = { dir: c, s0: m.s[k], s1: m.s[k] };
+              } else { cur.s1 = m.s[k]; }
+            } else {
+              if (cur) { clusters.push(cur); cur = null; }
             }
           }
-          const vMean = vCount > 0 ? vSum / vCount : 0;
-          if (!isFinite(vMin)) vMin = 0;
+          if (cur) clusters.push(cur);
+          return clusters;
+        }
 
+        function compareTurnIndicators(baseClusters, candClusters) {
+          let matched = 0, missing = 0, iouSum = 0;
+          for (const bc of baseClusters) {
+            let bestIou = 0;
+            for (const cc of candClusters) {
+              if (cc.dir !== bc.dir) continue;
+              const i0 = Math.max(bc.s0, cc.s0), i1 = Math.min(bc.s1, cc.s1);
+              if (i1 <= i0) continue;
+              const inter = i1 - i0;
+              const union = (bc.s1 - bc.s0) + (cc.s1 - cc.s0) - inter;
+              const iou = union > 0 ? inter / union : 0;
+              if (iou > bestIou) bestIou = iou;
+            }
+            if (bestIou > 0) { matched++; iouSum += bestIou; }
+            else missing++;
+          }
+          return {
+            clusters: baseClusters.length,
+            missing: missing,
+            meanIou: matched > 0 ? iouSum / matched : NaN,
+          };
+        }
+
+        function countStrongBrakes(m) {
           const accel = m.ch && m.ch.accel;
-          let aMax = -Infinity, aMin = Infinity, brakeCount = 0;
-          if (accel) {
-            let braking = false;
-            for (let k = 0; k < nv; k++) {
-              if (accel[k] != null) {
-                if (accel[k] > aMax) aMax = accel[k];
-                if (accel[k] < aMin) aMin = accel[k];
-                if (accel[k] <= BRAKE_THRESHOLD) {
-                  if (!braking) { brakeCount++; braking = true; }
-                } else {
-                  braking = false;
-                }
-              }
-            }
+          if (!accel) return 0;
+          let count = 0, braking = false;
+          for (let k = 0; k < m.n_valid; k++) {
+            if (accel[k] != null && accel[k] <= BRAKE_THRESHOLD) {
+              if (!braking) { count++; braking = true; }
+            } else braking = false;
           }
-          if (!isFinite(aMax)) aMax = 0;
-          if (!isFinite(aMin)) aMin = 0;
+          return count;
+        }
 
-          const steer = m.ch && m.ch.steer;
-          let sMax = -Infinity, sMin = Infinity;
-          if (steer) {
-            for (let k = 0; k < nv; k++) {
-              if (steer[k] != null) {
-                if (steer[k] > sMax) sMax = steer[k];
-                if (steer[k] < sMin) sMin = steer[k];
-              }
-            }
+        function candidateRow(cand, base) {
+          const sMax = Math.min(base.s_total, cand.s_total);
+          const nBase = base.n_valid;
+          const laterals = [], deltaVs = [];
+          for (let k = 0; k < nBase; k++) {
+            const bs = base.s[k];
+            if (bs > sMax) break;
+            const cs = interpAtS(cand, bs);
+            if (!cs) continue;
+            const dx = cs.x - base.x[k], dy = cs.y - base.y[k];
+            laterals.push(Math.sqrt(dx * dx + dy * dy));
+            deltaVs.push(cs.v - (base.v[k] || 0));
           }
-          if (!isFinite(sMax)) sMax = 0;
-          if (!isFinite(sMin)) sMin = 0;
+          const n = deltaVs.length;
+          const validCnt = laterals.filter(l => l <= LATERAL_THRESH).length;
+          let overSum = 0, underSum = 0;
+          for (const dv of deltaVs) { if (dv > 0) overSum += dv; else underSum += dv; }
+          const ti = compareTurnIndicators(findTurnClusters(base), findTurnClusters(cand));
+          return {
+            model: cand.name, color: cand.color,
+            match_valid_pct: n > 0 ? (validCnt / n) * 100 : 0,
+            median_lateral_m: median(laterals),
+            max_lateral_m: laterals.length ? Math.max(...laterals) : NaN,
+            mean_dv: n > 0 ? deltaVs.reduce((a, b) => a + b, 0) / n : NaN,
+            median_dv: median(deltaVs),
+            avg_over: n > 0 ? overSum / n : 0,
+            avg_under: n > 0 ? underSum / n : 0,
+            peak_over: n > 0 ? Math.max(...deltaVs) : NaN,
+            peak_under: n > 0 ? Math.min(...deltaVs) : NaN,
+            ti_clusters: ti.clusters, ti_missing: ti.missing, ti_mean_iou: ti.meanIou,
+            strong_brakes: countStrongBrakes(cand),
+          };
+        }
 
-          const turnCmd = m.ch && m.ch.turn_cmd;
-          let leftCount = 0, rightCount = 0;
-          if (turnCmd) {
-            let prevCmd = 0;
-            for (let k = 0; k < nv; k++) {
-              const c = turnCmd[k];
-              if (c === TURN_LEFT && prevCmd !== TURN_LEFT) leftCount++;
-              if (c === TURN_RIGHT && prevCmd !== TURN_RIGHT) rightCount++;
-              prevCmd = c;
-            }
-          }
-
-          return [
-            { v: duration, fmt: v => v.toFixed(1) },
-            { v: distance, fmt: v => v.toFixed(1) },
-            { v: vMax, fmt: v => v.toFixed(2) },
-            { v: vMean, fmt: v => v.toFixed(2) },
-            { v: vMin, fmt: v => v.toFixed(2) },
-            { v: aMax, fmt: v => v.toFixed(2) },
-            { v: aMin, fmt: v => v.toFixed(2) },
-            { v: brakeCount, fmt: v => String(v) },
-            { v: sMax, fmt: v => v.toFixed(1) },
-            { v: sMin, fmt: v => v.toFixed(1) },
-            { v: leftCount, fmt: v => String(v) },
-            { v: rightCount, fmt: v => String(v) },
-          ];
+        function referenceRow(base) {
+          return {
+            model: base.name, color: base.color,
+            match_valid_pct: 100.0,
+            median_lateral_m: 0.0, max_lateral_m: 0.0,
+            mean_dv: 0.0, median_dv: 0.0,
+            avg_over: 0.0, avg_under: 0.0,
+            peak_over: 0.0, peak_under: 0.0,
+            ti_clusters: NaN, ti_missing: NaN, ti_mean_iou: NaN,
+            strong_brakes: countStrongBrakes(base),
+          };
         }
 
         return {
+          baseIdx: 0,
           rows: [],
-          init() {
-            const d = this.$store.data;
-            const allStats = d.models.map(m => computeModelStats(m, d.rate));
-            const nModels = allStats.length;
+          groups: GROUPS,
+          allCols: ALL_COLS,
+          tipVisible: false,
+          tipText: '',
+          tipX: 0,
+          tipY: 0,
+          fmt: fmtVal,
 
-            this.rows = allStats.map((stats, mi) =>
-              stats.map((s, ci) => {
-                let cls = '';
-                if (nModels > 1) {
-                  const allSame = allStats.every(st => Math.abs(st[ci].v - s.v) < 1e-6);
-                  if (!allSame) cls = 'highlight-val';
-                }
-                return { text: s.fmt(s.v), cls };
-              })
+          showTip(e) {
+            const tip = e.target.dataset.tip;
+            if (!tip) return;
+            this.tipText = tip;
+            const r = e.target.getBoundingClientRect();
+            this.tipX = r.left;
+            this.tipY = r.bottom + 6;
+            this.tipVisible = true;
+          },
+          hideTip() { this.tipVisible = false; },
+
+          computeRows() {
+            const d = this.$store.data;
+            const base = d.models[this.baseIdx];
+            this.rows = d.models.map((m, i) =>
+              i === this.baseIdx ? referenceRow(m) : candidateRow(m, base)
             );
+          },
+
+          init() {
+            this.$watch('baseIdx', () => this.computeRows());
+            this.$nextTick(() => this.computeRows());
           },
         };
       });
