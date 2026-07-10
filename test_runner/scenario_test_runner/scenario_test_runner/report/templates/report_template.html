@@ -359,10 +359,6 @@
       text-align: center;
       font-size: var(--fs-xs);
       color: var(--text);
-      border-bottom: 2px solid var(--border-dim);
-    }
-    .num-comp tr.group-header th:empty {
-      background: var(--surface-2);
     }
     .num-comp tr.highlight td {
       background: color-mix(in srgb, var(--accent) 10%, var(--surface-2));
@@ -1615,7 +1611,7 @@
             { key: 'max_lateral_m', label: 'Max lateral', unit: 'm',
               tip: 'Maximum lateral distance\nat arc-length matched points' },
           ]},
-          { header: 'Speed vs baseline', cols: [
+          { header: 'Speed difference', cols: [
             { key: 'mean_dv', label: 'Mean Δv', unit: 'm/s',
               tip: 'Mean speed difference\n(model − baseline)' },
             { key: 'median_dv', label: 'Median Δv', unit: 'm/s',
