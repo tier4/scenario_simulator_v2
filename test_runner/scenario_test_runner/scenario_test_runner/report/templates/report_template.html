@@ -10,8 +10,7 @@
       --surface-1: #f6f8fa;
       --surface-2: #ffffff;
       --surface-3: #eaedf1;
-      --text-1: #1f2328;
-      --text-2: #656d76;
+      --text: #4b5563;
       --border-dim: #d8dee4;
       --accent: #0969da;
       --danger: #d1242f;
@@ -32,14 +31,14 @@
       font-family: var(--font-sans);
       font-size: var(--fs-base);
       line-height: var(--font-lineheight-3);
-      color: var(--text-1);
+      color: var(--text);
       background: var(--surface-1);
     }
     h3 {
       margin: var(--size-5) 0 var(--size-2);
       font-size: var(--fs-base);
       font-weight: 600;
-      color: var(--text-2);
+      color: var(--text);
       text-transform: uppercase;
       letter-spacing: 0.04em;
       padding-bottom: 0;
@@ -69,11 +68,11 @@
     .controls {
       display: flex; align-items: center; gap: var(--size-2);
       margin: var(--size-2) 0; flex-wrap: wrap;
-      font-size: var(--fs-sm);
+      font-size: var(--fs-sm); color: var(--text);
     }
     .controls input[type=range] { flex: 1; min-width: 120px; border: none; padding: 0; }
     .controls small {
-      color: var(--text-2); white-space: nowrap;
+      color: var(--text); white-space: nowrap;
       font-variant-numeric: tabular-nums;
       min-width: 10ch; text-align: right;
     }
@@ -86,7 +85,7 @@
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
       background: transparent;
-      color: var(--text-1);
+      color: var(--text);
       cursor: pointer;
       min-width: 6.5em;
     }
@@ -97,12 +96,12 @@
     }
     .toggle-label {
       display: inline-flex; align-items: center; gap: 4px;
-      font-size: var(--fs-sm); color: var(--text-1); cursor: pointer;
+      font-size: var(--fs-sm); color: var(--text); cursor: pointer;
       white-space: nowrap; user-select: none;
     }
     .toggle-label input { margin: 0; accent-color: var(--accent); }
-    .play-btn { color: var(--text-2); }
-    .play-btn:hover { color: var(--text-1); }
+    .play-btn { color: var(--text); }
+    .play-btn:hover { color: var(--text); }
     .play-btn.playing { color: var(--accent); border-color: var(--accent); }
     .seg-group {
       display: inline-flex; border: 1px solid var(--border-dim); border-radius: var(--radius-2);
@@ -111,7 +110,7 @@
     .seg-group button {
       border: none; border-radius: 0; min-width: auto;
       padding: var(--size-1) var(--size-2);
-      font-size: var(--fs-sm); color: var(--text-2);
+      font-size: var(--fs-sm); color: var(--text);
       background: transparent; line-height: var(--font-lineheight-3);
     }
     .seg-group button:hover { background: var(--surface-3); }
@@ -121,9 +120,13 @@
     .seg-group button + button { border-left: 1px solid var(--border-dim); }
     .baseline-group {
       display: flex; align-items: center; gap: var(--size-1);
-      font-size: var(--fs-sm); color: var(--text-2); white-space: nowrap;
+      font-size: var(--fs-sm); color: var(--text); white-space: nowrap;
     }
     .baseline-group.disabled { opacity: 0.35; pointer-events: none; }
+    .toggle-group {
+      display: flex; align-items: center; gap: var(--size-2);
+      flex-wrap: wrap;
+    }
 
     /* --- Range input --- */
     input[type=range] {
@@ -183,9 +186,11 @@
       display: flex; flex-direction: column; gap: var(--size-2);
       padding: var(--size-2); font-size: var(--fs-sm);
       min-width: 0;
+      max-height: 550px;
+      overflow-y: auto;
     }
     .legend-panel > strong {
-      font-weight: 600; color: var(--text-2);
+      font-weight: 600; color: var(--text);
     }
     .model-entry {
       padding: var(--size-2);
@@ -205,9 +210,10 @@
     }
     .model-name {
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      color: var(--text);
     }
     .model-entry-stat {
-      color: var(--text-2); font-size: var(--fs-xs);
+      color: var(--text); font-size: var(--fs-xs);
       margin-top: var(--size-1);
     }
     .model-entry-stat.ended { color: var(--danger); }
@@ -226,26 +232,38 @@
       background: var(--surface-2);
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
-      padding: var(--size-2) var(--size-2) var(--size-1);
+      padding: 0;
       box-shadow: var(--card-shadow);
     }
-    .plot-cell svg { width: 100%; display: block; }
+    .plot-cell .plot-svg { width: 100%; display: block; }
     .plot-cell.no-data { opacity: 0.35; }
+    .plot-cell-legend {
+      display: flex; flex-wrap: wrap; gap: var(--size-2) var(--size-3);
+      padding: var(--size-2) var(--size-3);
+      border-top: 1px solid var(--border-dim);
+      font-size: var(--fs-xs); color: var(--text);
+    }
+    .plot-legend-item {
+      display: flex; align-items: center; gap: 5px;
+    }
+    .plot-legend-line {
+      display: block; width: 24px; height: 4px; flex-shrink: 0;
+    }
     .plot-nodata {
       height: 200px;
       display: flex; align-items: center; justify-content: center;
-      color: var(--text-2); font-size: var(--fs-xs);
+      color: var(--text); font-size: var(--fs-xs);
     }
     .plot-header {
       display: flex; align-items: center; justify-content: space-between;
-      margin: 0 0 var(--size-1);
+      padding: var(--size-2) var(--size-2) var(--size-1);
     }
     .plot-title {
-      font-size: var(--fs-sm); color: var(--text-2);
+      font-size: var(--fs-sm); color: var(--text);
       margin: 0; font-weight: 600;
     }
     .unit-toggle {
-      font-size: var(--fs-xs); color: var(--text-2); cursor: pointer;
+      font-size: var(--fs-xs); color: var(--text); cursor: pointer;
       padding: 1px 6px; border: 1px solid var(--border-dim);
       border-radius: var(--radius-1); background: var(--surface-3);
       user-select: none;
@@ -272,11 +290,11 @@
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
       background: var(--surface-2);
-      color: var(--text-1);
+      color: var(--text);
     }
 
     /* --- Utilities --- */
-    .text-muted { color: var(--text-2); }
+    .text-muted { color: var(--text); }
 
     /* --- Numerical Comparison table --- */
     .num-comp-wrap {
@@ -300,6 +318,7 @@
       border-right: 1px solid var(--border-dim);
       border-bottom: 1px solid var(--border-dim);
       text-align: left;
+      color: var(--text);
     }
     .num-comp th, .num-comp td { white-space: nowrap; }
     .num-comp th:last-child, .num-comp td:last-child { border-right: none; }
@@ -308,12 +327,12 @@
       background: var(--surface-3);
       font-weight: 500;
       font-size: var(--fs-xs);
-      color: var(--text-2);
+      color: var(--text);
     }
     .num-comp tr.group-header th {
       text-align: center;
       font-size: var(--fs-xs);
-      color: var(--text-2);
+      color: var(--text);
       border-bottom: 2px solid var(--border-dim);
     }
     .num-comp tr.group-header th:empty {
@@ -344,7 +363,7 @@
       opacity: 0.6;
     }
     .nc-hint {
-      text-decoration: underline dotted var(--text-2);
+      text-decoration: underline dotted var(--text);
       text-underline-offset: 3px;
       cursor: help;
     }
@@ -355,7 +374,7 @@
       max-width: 280px;
       padding: 6px 10px;
       background: var(--surface-1);
-      color: var(--text-1);
+      color: var(--text);
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
       box-shadow: 0 2px 8px rgba(0,0,0,0.12);
@@ -395,12 +414,12 @@
     }
     .static-fig-title {
       font-size: var(--fs-sm); font-weight: 600; margin: 0;
-      color: var(--text-1);
+      color: var(--text);
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       max-width: 100%;
     }
     .static-fig-subtitle {
-      font-size: var(--fs-xs); color: var(--text-2); margin: 0;
+      font-size: var(--fs-xs); color: var(--text); margin: 0;
     }
     .static-fig-body { position: relative; }
     .static-fig-body canvas { display: block; width: 100%; }
@@ -408,7 +427,7 @@
       position: absolute; bottom: 12px; left: 16px;
       background: rgba(255,255,255,0.9); border: 1px solid var(--border-dim);
       border-radius: var(--radius-1); padding: 6px 10px;
-      font-size: var(--fs-xs); color: var(--text-2);
+      font-size: var(--fs-xs); color: var(--text);
       display: flex; align-items: center; gap: 8px;
     }
     .static-fig-colorbar canvas {
@@ -419,7 +438,7 @@
       display: flex; flex-wrap: wrap; gap: var(--size-2) var(--size-3);
       padding: var(--size-2) var(--size-3);
       border-top: 1px solid var(--border-dim);
-      font-size: var(--fs-sm); color: var(--text-2);
+      font-size: var(--fs-sm); color: var(--text);
     }
     .static-fig-legend-item {
       display: flex; align-items: center; gap: 5px;
@@ -506,10 +525,12 @@
               </template>
             </select>
           </div>
-          <label class="toggle-label"><input type="checkbox" x-model="$store.camera.follow"> Track Ego</label>
-          <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPlanned" @change="markDirty()"> Planned Trajectory</label>
-          <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showEntities" @change="markDirty()"> Entities</label>
-          <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPerceived" @change="markDirty()"> Object Recognition</label>
+          <div class="toggle-group">
+            <label class="toggle-label"><input type="checkbox" x-model="$store.camera.follow"> Track Ego</label>
+            <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPlanned" @change="markDirty()"> Planned Trajectory</label>
+            <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showEntities" @change="markDirty()"> Entities</label>
+            <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPerceived" @change="markDirty()"> Object Recognition</label>
+          </div>
         </div>
         </div>
       </div>
@@ -550,7 +571,7 @@
     <!-- Time-series plots -->
     <div x-data="plotsPanel">
       <div class="controls" style="margin-top:var(--size-3)">
-        <span style="color:var(--text-2)">Window</span>
+        <span style="color:var(--text)">Window</span>
         <template x-if="$store.playback.mode === 'time'">
           <select x-model.number="$store.ui.plotWindowS" style="width:auto">
             <option value="5">5s</option>
@@ -580,8 +601,21 @@
               <div class="plot-nodata">No data</div>
             </template>
             <template x-if="hasData(ch)">
-              <div style="position:relative">
-                <div class="plot-tooltip"></div>
+              <div>
+                <div style="position:relative">
+                  <div class="plot-tooltip"></div>
+                </div>
+                <div class="plot-cell-legend">
+                  <template x-for="item in legendItems(ch)" :key="item.label">
+                    <div class="plot-legend-item">
+                      <svg class="plot-legend-line" viewBox="0 0 24 4">
+                        <line x1="0" y1="2" x2="24" y2="2" stroke="var(--text)"
+                              stroke-width="2" :stroke-dasharray="item.dash"/>
+                      </svg>
+                      <span x-text="item.label"></span>
+                    </div>
+                  </template>
+                </div>
               </div>
             </template>
           </div>
@@ -593,7 +627,7 @@
     <h3>Numerical Comparison</h3>
     <div x-data="numComp">
       <div class="controls" style="margin:0 0 var(--size-2)">
-        <span style="color:var(--text-2)">Baseline</span>
+        <span style="color:var(--text)">Baseline</span>
         <select x-model.number="baseIdx" style="min-width:0;max-width:14em;overflow:hidden;text-overflow:ellipsis">
           <template x-for="(m, i) in $store.data.models" :key="'nb'+i">
             <option :value="i" x-text="m.name"></option>
@@ -1262,6 +1296,7 @@
 
           const w = 600, h = plotH + margin.top + margin.bottom;
           const svgEl = d3.select(svgHost).append('svg')
+            .attr('class', 'plot-svg')
             .attr('viewBox', `0 0 ${w} ${h}`)
             .attr('preserveAspectRatio', 'xMidYMid meet');
           const g = svgEl.append('g')
@@ -1327,7 +1362,7 @@
               const hx = xScale(hoverX);
               hoverLine.attr('x1', hx).attr('x2', hx).attr('opacity', 0.6);
               const label = posMode ? hoverX.toFixed(1) + 'm' : hoverX.toFixed(2) + 's';
-              tooltip.innerHTML = `<div style="color:var(--text-2);margin-bottom:2px">${label}</div>` + rows;
+              tooltip.innerHTML = `<div style="color:var(--text);margin-bottom:2px">${label}</div>` + rows;
               tooltip.style.display = 'block';
               const cellRect = cell.getBoundingClientRect();
               let tx = e.clientX - cellRect.left + 12;
@@ -1407,15 +1442,17 @@
           p.yScale.domain([yMin - yPad, yMax + yPad]);
 
           const xUnit = posMode ? 'm' : 's';
+          const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
+          const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--border-dim').trim();
           p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(v => v.toFixed(0) + xUnit))
-            .selectAll('text').attr('fill', '#555').attr('font-size', '11px');
-          p.xAxis.selectAll('line,path').attr('stroke', '#ccc');
+            .selectAll('text').attr('fill', tickColor).style('font-size', 'var(--fs-xs)');
+          p.xAxis.selectAll('line,path').attr('stroke', lineColor);
           const yRange = p.yScale.domain();
           const ySpan = Math.abs(yRange[1] - yRange[0]);
           const yPrec = ySpan < 0.01 ? 4 : ySpan < 0.1 ? 3 : ySpan < 1 ? 2 : 1;
           p.yAxis.call(d3.axisLeft(p.yScale).ticks(4).tickFormat(d3.format('.' + yPrec + 'f')))
-            .selectAll('text').attr('fill', '#555').attr('font-size', '11px');
-          p.yAxis.selectAll('line,path').attr('stroke', '#ccc');
+            .selectAll('text').attr('fill', tickColor).style('font-size', 'var(--fs-xs)');
+          p.yAxis.selectAll('line,path').attr('stroke', lineColor);
 
           p.gridG.selectAll('*').remove();
           p.xScale.ticks(5).forEach(t => {
@@ -1493,6 +1530,11 @@
           units: Object.fromEntries(CHANNELS.map(ch => [ch, 0])),
 
           hasData(ch) { return d ? d.models.some(m => m.ch[ch]) : false; },
+          legendItems(ch) {
+            const items = [{label: 'Actual', dash: null}];
+            if (CH_CMD[ch]) items.push({label: 'Command', dash: '4,3'});
+            return items;
+          },
           hasMultiUnits(ch) { return CH_LABELS[ch].units.length > 1; },
           currentUnit(ch) { return CH_LABELS[ch].units[this.units[ch]]; },
           chLabel(ch) {
