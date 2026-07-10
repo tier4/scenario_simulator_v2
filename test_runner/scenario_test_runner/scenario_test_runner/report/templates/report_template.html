@@ -21,7 +21,7 @@
       --fs-base: 1rem;
       --fs-sm: 0.875rem;
       --fs-xs: 0.75rem;
-      --fs-xxs: 0.6875rem;
+
       color-scheme: light;
     }
 
@@ -207,10 +207,10 @@
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .model-entry-stat {
-      color: var(--text-2); font-size: var(--fs-sm);
+      color: var(--text-2); font-size: var(--fs-xs);
       margin-top: var(--size-1);
     }
-    .model-entry-stat.ended { color: #b05050; }
+    .model-entry-stat.ended { color: var(--danger); }
 
     /* --- Plots --- */
     .plot-row {
@@ -222,6 +222,7 @@
     @media (max-width: 768px) { .plot-row { grid-template-columns: 1fr; } }
     .plot-cell {
       min-width: 0;
+      position: relative;
       background: var(--surface-2);
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
@@ -229,6 +230,12 @@
       box-shadow: var(--card-shadow);
     }
     .plot-cell svg { width: 100%; display: block; }
+    .plot-cell.no-data { opacity: 0.35; }
+    .plot-nodata {
+      height: 200px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-2); font-size: var(--fs-xs);
+    }
     .plot-header {
       display: flex; align-items: center; justify-content: space-between;
       margin: 0 0 var(--size-1);
@@ -238,7 +245,7 @@
       margin: 0; font-weight: 600;
     }
     .unit-toggle {
-      font-size: var(--fs-xxs); color: var(--text-2); cursor: pointer;
+      font-size: var(--fs-xs); color: var(--text-2); cursor: pointer;
       padding: 1px 6px; border: 1px solid var(--border-dim);
       border-radius: var(--radius-1); background: var(--surface-3);
       user-select: none;
@@ -248,7 +255,7 @@
       position: absolute; pointer-events: none;
       background: rgba(255,255,255,0.95); border: 1px solid var(--border-dim);
       border-radius: var(--radius-1); padding: 4px 8px;
-      font-size: var(--fs-xxs); line-height: 1.5; white-space: nowrap;
+      font-size: var(--fs-xs); line-height: 1.5; white-space: nowrap;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       z-index: 10; display: none;
     }
@@ -300,12 +307,12 @@
     .num-comp th {
       background: var(--surface-3);
       font-weight: 500;
-      font-size: var(--fs-xxs);
+      font-size: var(--fs-xs);
       color: var(--text-2);
     }
     .num-comp tr.group-header th {
       text-align: center;
-      font-size: var(--fs-xxs);
+      font-size: var(--fs-xs);
       color: var(--text-2);
       border-bottom: 2px solid var(--border-dim);
     }
@@ -401,7 +408,7 @@
       position: absolute; bottom: 12px; left: 16px;
       background: rgba(255,255,255,0.9); border: 1px solid var(--border-dim);
       border-radius: var(--radius-1); padding: 6px 10px;
-      font-size: var(--fs-xxs); color: var(--text-2);
+      font-size: var(--fs-xs); color: var(--text-2);
       display: flex; align-items: center; gap: 8px;
     }
     .static-fig-colorbar canvas {
@@ -521,7 +528,19 @@
                   <span class="model-name" x-text="m.name" :title="m.name"></span>
                 </label>
               </div>
-              <div class="model-entry-stat" :class="isEnded(i) && 'ended'" x-html="getStats(i)"></div>
+              <div class="model-entry-stat" :class="isEnded(i) && 'ended'">
+                <template x-if="!$store.models.visible[i]"><span>&mdash;</span></template>
+                <template x-if="$store.models.visible[i] && !hasValidData(i)"><span class="text-muted">no data</span></template>
+                <template x-if="$store.models.visible[i] && hasValidData(i) && getSample(i)">
+                  <span>
+                    v=<span x-text="getSample(i).v.toFixed(1)"></span> m/s
+                    t=<span x-text="getSample(i).t.toFixed(1)"></span>s
+                    s=<span x-text="getSample(i).s.toFixed(0)"></span>m
+                    <span x-show="getSample(i).ended" style="color:var(--danger)">[ended]</span>
+                  </span>
+                </template>
+                <template x-if="$store.models.visible[i] && hasValidData(i) && !getSample(i)"><span>&mdash;</span></template>
+              </div>
             </div>
           </template>
         </div>
@@ -549,7 +568,25 @@
           </select>
         </template>
       </div>
-      <div class="plot-row" x-ref="plotRow"></div>
+      <div class="plot-row">
+        <template x-for="ch in channels" :key="ch">
+          <div class="plot-cell" :data-ch="ch" :class="!hasData(ch) && 'no-data'">
+            <div class="plot-header">
+              <p class="plot-title" x-text="chLabel(ch)"></p>
+              <span class="unit-toggle" x-show="hasMultiUnits(ch)"
+                    @click="toggleUnit(ch)" x-text="currentUnit(ch)"></span>
+            </div>
+            <template x-if="!hasData(ch)">
+              <div class="plot-nodata">No data</div>
+            </template>
+            <template x-if="hasData(ch)">
+              <div style="position:relative">
+                <div class="plot-tooltip"></div>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
     </div>
 
     <!-- Numerical Comparison -->
@@ -1196,19 +1233,12 @@
         }
         return {
           init() { d = this.$store.data; pb = this.$store.playback; mdl = this.$store.models; },
+          hasValidData(i) { return d.models[i].n_valid >= 2; },
+          getSample(i) { return _sample(i); },
           isEnded(i) {
             if (!mdl.visible[i]) return false;
             const s = _sample(i);
             return s ? s.ended : false;
-          },
-          getStats(i) {
-            if (!mdl.visible[i]) return '&mdash;';
-            const m = d.models[i];
-            if (m.n_valid < 2) return '<span class="text-muted">no data</span>';
-            const s = _sample(i);
-            if (!s) return '&mdash;';
-            const end = s.ended ? ' <span style="color:#b05050">[ended]</span>' : '';
-            return `v=${s.v.toFixed(1)} m/s &nbsp; t=${s.t.toFixed(1)}s &nbsp; s=${s.s.toFixed(0)}m${end}`;
           },
         };
       });
@@ -1221,58 +1251,17 @@
         const plotH = 200;
         let plotDrag = { active: false, wasPlaying: false, startClientX: 0, startX: 0, screenPxPerUnit: 1 };
 
-        function chLabel(ch) {
-          const c = CH_LABELS[ch];
-          return c.name + ' [' + c.units[chUnit[ch]] + ']';
-        }
         function chConv(ch) {
           const c = CH_LABELS[ch];
           return (c.conv && c.conv[chUnit[ch]]) || 1;
         }
 
-        function createPlotCell(ch) {
-          const cell = document.createElement('div');
-          cell.className = 'plot-cell';
-          cell.style.position = 'relative';
-
-          const header = document.createElement('div');
-          header.className = 'plot-header';
-          const title = document.createElement('p');
-          title.className = 'plot-title';
-          title.textContent = chLabel(ch);
-          header.appendChild(title);
-
-          const info = CH_LABELS[ch];
-          if (info.units.length > 1) {
-            const tog = document.createElement('span');
-            tog.className = 'unit-toggle';
-            tog.textContent = info.units[chUnit[ch]];
-            tog.addEventListener('click', () => {
-              chUnit[ch] = (chUnit[ch] + 1) % info.units.length;
-              tog.textContent = info.units[chUnit[ch]];
-              title.textContent = chLabel(ch);
-              markDirty();
-            });
-            header.appendChild(tog);
-          }
-          cell.appendChild(header);
-
-          const hasData = d.models.some(m => m.ch[ch]);
-          if (!hasData) {
-            cell.style.opacity = '0.35';
-            const msg = document.createElement('div');
-            msg.textContent = 'No data';
-            msg.style.cssText = 'height:' + plotH + 'px;display:flex;align-items:center;justify-content:center;color:#999;font-size:var(--fs-xs)';
-            cell.appendChild(msg);
-            return cell;
-          }
-
-          const tooltip = document.createElement('div');
-          tooltip.className = 'plot-tooltip';
-          cell.appendChild(tooltip);
+        function initPlotSvg(ch, cell) {
+          const tooltip = cell.querySelector('.plot-tooltip');
+          const svgHost = tooltip.parentElement;
 
           const w = 600, h = plotH + margin.top + margin.bottom;
-          const svgEl = d3.select(cell).append('svg')
+          const svgEl = d3.select(svgHost).append('svg')
             .attr('viewBox', `0 0 ${w} ${h}`)
             .attr('preserveAspectRatio', 'xMidYMid meet');
           const g = svgEl.append('g')
@@ -1338,7 +1327,7 @@
               const hx = xScale(hoverX);
               hoverLine.attr('x1', hx).attr('x2', hx).attr('opacity', 0.6);
               const label = posMode ? hoverX.toFixed(1) + 'm' : hoverX.toFixed(2) + 's';
-              tooltip.innerHTML = `<div style="color:#999;margin-bottom:2px">${label}</div>` + rows;
+              tooltip.innerHTML = `<div style="color:var(--text-2);margin-bottom:2px">${label}</div>` + rows;
               tooltip.style.display = 'block';
               const cellRect = cell.getBoundingClientRect();
               let tx = e.clientX - cellRect.left + 12;
@@ -1355,6 +1344,15 @@
             hoverLine.attr('opacity', 0);
           });
 
+          plotSvgs[ch] = { xScale, yScale, gridG, xAxis, yAxis, linesG, cursorLine, dotsG, pw };
+        }
+
+        function initAllPlots() {
+          plotSvgs = {};
+          document.querySelectorAll('.plot-cell[data-ch]').forEach(cell => {
+            const ch = cell.dataset.ch;
+            if (d.models.some(m => m.ch[ch])) initPlotSvg(ch, cell);
+          });
           d3.select(window).on('mousemove.plot', (e) => {
             if (!plotDrag.active) return;
             const dx = -(e.clientX - plotDrag.startClientX) / plotDrag.screenPxPerUnit;
@@ -1369,9 +1367,6 @@
             plotDrag.active = false;
             if (plotDrag.wasPlaying) window.dispatchEvent(new CustomEvent('playback-resume'));
           });
-
-          plotSvgs[ch] = { xScale, yScale, gridG, xAxis, yAxis, linesG, cursorLine, dotsG, pw };
-          return cell;
         }
 
         function updateChannel(ch, curX, vis, posMode) {
@@ -1485,12 +1480,6 @@
           }
         }
 
-        function buildAll(row) {
-          row.innerHTML = '';
-          plotSvgs = {};
-          for (const ch of CHANNELS) row.appendChild(createPlotCell(ch));
-        }
-
         function updateAll() {
           if (!Object.keys(plotSvgs).length) return;
           const vis = mdl.visible;
@@ -1500,13 +1489,29 @@
         }
 
         return {
+          channels: CHANNELS,
+          units: Object.fromEntries(CHANNELS.map(ch => [ch, 0])),
+
+          hasData(ch) { return d ? d.models.some(m => m.ch[ch]) : false; },
+          hasMultiUnits(ch) { return CH_LABELS[ch].units.length > 1; },
+          currentUnit(ch) { return CH_LABELS[ch].units[this.units[ch]]; },
+          chLabel(ch) {
+            const c = CH_LABELS[ch];
+            return c.name + ' [' + c.units[this.units[ch]] + ']';
+          },
+          toggleUnit(ch) {
+            const info = CH_LABELS[ch];
+            this.units[ch] = (this.units[ch] + 1) % info.units.length;
+            chUnit[ch] = this.units[ch];
+            markDirty();
+          },
+
           init() {
             d = this.$store.data;
             pb = this.$store.playback;
             mdl = this.$store.models;
             ui = this.$store.ui;
-            const row = this.$refs.plotRow;
-            this.$nextTick(() => buildAll(row));
+            this.$nextTick(() => initAllPlots());
             (function loop() { updateAll(); requestAnimationFrame(loop); })();
           },
         };
