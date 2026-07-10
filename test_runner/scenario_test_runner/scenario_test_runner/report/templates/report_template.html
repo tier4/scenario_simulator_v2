@@ -255,6 +255,90 @@
     /* --- Utilities --- */
     .text-muted { color: var(--text-2); }
 
+    /* --- Stats table --- */
+    .stats-table-wrap {
+      overflow-x: auto;
+      margin-top: var(--size-3);
+    }
+    .stats-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-2);
+      font-size: var(--font-size-0);
+      font-variant-numeric: tabular-nums;
+    }
+    .stats-table th, .stats-table td {
+      padding: 6px 12px;
+      border-right: 1px solid var(--border-dim);
+      border-bottom: 1px solid var(--border-dim);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .stats-table th:last-child, .stats-table td:last-child {
+      border-right: none;
+    }
+    .stats-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    .stats-table thead tr:first-child th:first-child {
+      border-top-left-radius: calc(var(--radius-2) - 1px);
+    }
+    .stats-table thead tr:first-child th:last-child {
+      border-top-right-radius: calc(var(--radius-2) - 1px);
+    }
+    .stats-table tbody tr:last-child td:first-child {
+      border-bottom-left-radius: calc(var(--radius-2) - 1px);
+    }
+    .stats-table tbody tr:last-child td:last-child {
+      border-bottom-right-radius: calc(var(--radius-2) - 1px);
+    }
+    .stats-table th {
+      background: var(--surface-3);
+      font-weight: 600;
+      color: var(--text-1);
+    }
+    .stats-table th.group-header {
+      text-align: center;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-2);
+      border-bottom: 2px solid var(--border-dim);
+    }
+    .stats-table th.metric-header {
+      font-weight: 500;
+      font-size: var(--font-size-0);
+      color: var(--text-2);
+    }
+    .stats-table th.model-name-cell {
+      text-align: left;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stats-table td.model-name-cell {
+      text-align: left;
+      font-weight: 500;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stats-table tbody tr:hover {
+      background: color-mix(in srgb, var(--accent) 6%, transparent);
+    }
+    .stats-table .model-color-dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .stats-table .highlight-val {
+      font-weight: 600;
+    }
+
     /* --- Static figures --- */
     .static-figures {
       margin-top: var(--size-5);
@@ -444,6 +528,50 @@
         </template>
       </div>
       <div class="plot-row" x-ref="plotRow"></div>
+    </div>
+
+    <!-- Summary statistics -->
+    <h3>Summary Statistics</h3>
+    <div class="stats-table-wrap" x-data="statsTable">
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th class="model-name-cell" rowspan="2">Model</th>
+            <th class="group-header" colspan="2">General</th>
+            <th class="group-header" colspan="3">Velocity</th>
+            <th class="group-header" colspan="3">Acceleration</th>
+            <th class="group-header" colspan="2">Steering</th>
+            <th class="group-header" colspan="2">Turn Indicator</th>
+          </tr>
+          <tr>
+            <th class="metric-header">Duration [s]</th>
+            <th class="metric-header">Distance [m]</th>
+            <th class="metric-header">Max [m/s]</th>
+            <th class="metric-header">Mean [m/s]</th>
+            <th class="metric-header">Min [m/s]</th>
+            <th class="metric-header">Max [m/s²]</th>
+            <th class="metric-header">Min [m/s²]</th>
+            <th class="metric-header">Strong Brakes</th>
+            <th class="metric-header">Max [deg]</th>
+            <th class="metric-header">Min [deg]</th>
+            <th class="metric-header">Left</th>
+            <th class="metric-header">Right</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-for="(row, i) in rows" :key="'sr'+i">
+            <tr>
+              <td class="model-name-cell">
+                <span class="model-color-dot" :style="'background:'+$store.data.models[i].color"></span>
+                <span x-text="$store.data.models[i].name" :title="$store.data.models[i].name"></span>
+              </td>
+              <template x-for="(cell, ci) in row" :key="'sc'+i+'_'+ci">
+                <td x-text="cell.text" :class="cell.cls"></td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
     </div>
 
     <!-- Static trajectory figures -->
@@ -1347,6 +1475,111 @@
             const row = this.$refs.plotRow;
             this.$nextTick(() => buildAll(row));
             (function loop() { updateAll(); requestAnimationFrame(loop); })();
+          },
+        };
+      });
+
+      // --- statsTable component ---
+      Alpine.data('statsTable', () => {
+        const BRAKE_THRESHOLD = -1.0;
+        const TURN_LEFT = 2, TURN_RIGHT = 3;
+
+        function computeModelStats(m, rate) {
+          const nv = m.n_valid;
+          const duration = nv > 0 ? (nv - 1) / rate : 0;
+          const distance = m.s_total || 0;
+
+          let vMax = 0, vSum = 0, vMin = Infinity, vCount = 0;
+          for (let k = 0; k < nv; k++) {
+            const v = m.v[k];
+            if (v != null) {
+              const av = Math.abs(v);
+              if (av > vMax) vMax = av;
+              if (av < vMin) vMin = av;
+              vSum += av;
+              vCount++;
+            }
+          }
+          const vMean = vCount > 0 ? vSum / vCount : 0;
+          if (!isFinite(vMin)) vMin = 0;
+
+          const accel = m.ch && m.ch.accel;
+          let aMax = -Infinity, aMin = Infinity, brakeCount = 0;
+          if (accel) {
+            let braking = false;
+            for (let k = 0; k < nv; k++) {
+              if (accel[k] != null) {
+                if (accel[k] > aMax) aMax = accel[k];
+                if (accel[k] < aMin) aMin = accel[k];
+                if (accel[k] <= BRAKE_THRESHOLD) {
+                  if (!braking) { brakeCount++; braking = true; }
+                } else {
+                  braking = false;
+                }
+              }
+            }
+          }
+          if (!isFinite(aMax)) aMax = 0;
+          if (!isFinite(aMin)) aMin = 0;
+
+          const steer = m.ch && m.ch.steer;
+          let sMax = -Infinity, sMin = Infinity;
+          if (steer) {
+            for (let k = 0; k < nv; k++) {
+              if (steer[k] != null) {
+                if (steer[k] > sMax) sMax = steer[k];
+                if (steer[k] < sMin) sMin = steer[k];
+              }
+            }
+          }
+          if (!isFinite(sMax)) sMax = 0;
+          if (!isFinite(sMin)) sMin = 0;
+
+          const turnCmd = m.ch && m.ch.turn_cmd;
+          let leftCount = 0, rightCount = 0;
+          if (turnCmd) {
+            let prevCmd = 0;
+            for (let k = 0; k < nv; k++) {
+              const c = turnCmd[k];
+              if (c === TURN_LEFT && prevCmd !== TURN_LEFT) leftCount++;
+              if (c === TURN_RIGHT && prevCmd !== TURN_RIGHT) rightCount++;
+              prevCmd = c;
+            }
+          }
+
+          return [
+            { v: duration, fmt: v => v.toFixed(1) },
+            { v: distance, fmt: v => v.toFixed(1) },
+            { v: vMax, fmt: v => v.toFixed(2) },
+            { v: vMean, fmt: v => v.toFixed(2) },
+            { v: vMin, fmt: v => v.toFixed(2) },
+            { v: aMax, fmt: v => v.toFixed(2) },
+            { v: aMin, fmt: v => v.toFixed(2) },
+            { v: brakeCount, fmt: v => String(v) },
+            { v: sMax, fmt: v => v.toFixed(1) },
+            { v: sMin, fmt: v => v.toFixed(1) },
+            { v: leftCount, fmt: v => String(v) },
+            { v: rightCount, fmt: v => String(v) },
+          ];
+        }
+
+        return {
+          rows: [],
+          init() {
+            const d = this.$store.data;
+            const allStats = d.models.map(m => computeModelStats(m, d.rate));
+            const nModels = allStats.length;
+
+            this.rows = allStats.map((stats, mi) =>
+              stats.map((s, ci) => {
+                let cls = '';
+                if (nModels > 1) {
+                  const allSame = allStats.every(st => Math.abs(st[ci].v - s.v) < 1e-6);
+                  if (!allSame) cls = 'highlight-val';
+                }
+                return { text: s.fmt(s.v), cls };
+              })
+            );
           },
         };
       });
