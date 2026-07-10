@@ -76,7 +76,6 @@
       background: var(--surface-2);
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
-      padding: var(--size-3);
       box-shadow: var(--card-shadow);
     }
 
@@ -199,40 +198,52 @@
 
     /* --- Legend --- */
     .legend-panel {
-      display: flex; flex-direction: column; gap: var(--size-2);
-      padding: var(--size-2); font-size: var(--fs-sm);
+      display: flex; flex-direction: column;
+      font-size: var(--fs-sm);
       min-width: 0;
       max-height: 550px;
       overflow-y: auto;
     }
     .legend-panel > strong {
       font-weight: 600; color: var(--text);
+      padding: var(--size-2);
+      border-bottom: 1px solid var(--border-dim);
     }
     .model-entry {
-      padding: var(--size-2);
-      border-radius: var(--radius-2);
-      border: 1px solid var(--border-dim);
-      border-left: 5px solid var(--model-color);
+      padding: var(--size-2) var(--size-2) var(--size-2) var(--size-1);
+      border-left: 10px solid var(--model-color);
+      border-bottom: 1px solid var(--border-dim);
       cursor: pointer;
     }
-    .model-entry-header {
-      display: flex; align-items: center;
+    .model-entry:last-child { border-bottom: none; }
+    .model-entry-inner {
+      display: grid; grid-template-columns: auto 1fr; gap: 0 var(--size-1);
+      align-items: center;
     }
-    .model-entry-header label {
-      cursor: pointer; display: flex; align-items: center;
-      gap: var(--size-1); margin: 0; padding: 0;
-      font-weight: 500;
-      min-width: 0;
+    .model-entry-inner input { grid-column: 1; }
+    .model-entry-inner label {
+      cursor: pointer; margin: 0; padding: 0;
+      font-weight: 500; min-width: 0;
     }
     .model-name {
+      display: block;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       color: var(--text);
     }
     .model-entry-stat {
+      grid-column: 2;
       color: var(--text); font-size: var(--fs-xs);
       margin-top: var(--size-1);
     }
-    .model-entry-stat.ended { color: var(--danger); }
+    .stat-row {
+      display: flex; gap: var(--size-3);
+      font-variant-numeric: tabular-nums;
+      opacity: 0.6;
+    }
+    .stat-unit { margin-left: 1px; }
+    .stat-ended {
+      color: var(--danger); font-weight: 600;
+    }
 
     /* --- Plots --- */
     .plot-row {
@@ -248,7 +259,6 @@
       background: var(--surface-2);
       border: 1px solid var(--border-dim);
       border-radius: var(--radius-2);
-      padding: 0;
       box-shadow: var(--card-shadow);
     }
     .plot-cell .plot-svg { width: 100%; display: block; }
@@ -422,6 +432,7 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: var(--size-2) var(--size-3);
       border-bottom: 1px solid var(--border-dim);
+      border-left: 10px solid var(--model-color);
       background: var(--surface-3);
       min-width: 0; gap: var(--size-2);
     }
@@ -477,7 +488,7 @@
 
     <div class="row">
       <!-- Left: map + controls card -->
-      <div class="card" style="padding:0;overflow:hidden" x-data="mapCanvas" @fit-all.window="doFitAll()">
+      <div class="card" style="overflow:hidden" x-data="mapCanvas" @fit-all.window="doFitAll()">
         <!-- Map -->
         <div class="map-wrap" x-ref="mapWrap" style="height:550px">
           <canvas x-ref="mapCvs"
@@ -558,25 +569,35 @@
           <template x-for="(m, i) in $store.data.models" :key="i">
             <div class="model-entry" :style="'--model-color:' + m.color"
               @click="$store.models.visible[i] = !$store.models.visible[i]; markDirty()">
-              <div class="model-entry-header">
-                <label @click.stop>
-                  <input type="checkbox" :checked="$store.models.visible[i]"
-                    @change="$store.models.visible[i] = $el.checked; markDirty()">
+              <div class="model-entry-inner">
+                <input type="checkbox" :checked="$store.models.visible[i]"
+                  @click.stop
+                  @change="$store.models.visible[i] = $el.checked; markDirty()">
+                <label>
                   <span class="model-name" x-text="m.name" :title="m.name"></span>
                 </label>
-              </div>
-              <div class="model-entry-stat" :class="isEnded(i) && 'ended'">
+              <div class="model-entry-stat">
                 <template x-if="!$store.models.visible[i]"><span>&mdash;</span></template>
                 <template x-if="$store.models.visible[i] && !hasValidData(i)"><span class="text-muted">no data</span></template>
                 <template x-if="$store.models.visible[i] && hasValidData(i) && getSample(i)">
-                  <span>
-                    v=<span x-text="getSample(i).v.toFixed(1)"></span> m/s
-                    t=<span x-text="getSample(i).t.toFixed(1)"></span>s
-                    s=<span x-text="getSample(i).s.toFixed(0)"></span>m
-                    <span x-show="getSample(i).ended" style="color:var(--danger)">[ended]</span>
-                  </span>
+                  <div class="stat-row">
+                    <span class="stat-item">
+                      <span class="stat-val" x-text="getSample(i).v.toFixed(1)"></span>
+                      <span class="stat-unit">m/s</span>
+                    </span>
+                    <span class="stat-item">
+                      <span class="stat-val" x-text="getSample(i).t.toFixed(1)"></span>
+                      <span class="stat-unit">s</span>
+                    </span>
+                    <span class="stat-item">
+                      <span class="stat-val" x-text="getSample(i).s.toFixed(0)"></span>
+                      <span class="stat-unit">m</span>
+                    </span>
+                    <span class="stat-ended" x-show="getSample(i).ended">ended</span>
+                  </div>
                 </template>
                 <template x-if="$store.models.visible[i] && hasValidData(i) && !getSample(i)"><span>&mdash;</span></template>
+              </div>
               </div>
             </div>
           </template>
@@ -674,7 +695,7 @@
               <tr :class="ri === baseIdx && 'highlight'">
                 <template x-for="(c, ci) in allCols" :key="'d'+ci">
                   <td :class="c.key === 'model' && 'nc-model'"
-                      :style="c.key === 'model' ? 'border-left:4px solid ' + row.color : ''"
+                      :style="c.key === 'model' ? 'border-left:10px solid ' + row.color : ''"
                       :title="c.key === 'model' ? row.model : null">
                     <template x-if="c.key === 'model'">
                       <span x-text="row.model"></span>
@@ -699,7 +720,7 @@
     <div class="static-figures" x-data="staticFigures">
       <template x-for="(m, mi) in $store.data.models" :key="'sf'+mi">
         <div class="static-fig">
-          <div class="static-fig-header">
+          <div class="static-fig-header" :style="'--model-color:' + m.color">
             <div>
               <p class="static-fig-title" x-text="m.name" :title="m.name"></p>
               <p class="static-fig-subtitle">Speed-colored trajectory</p>
@@ -740,13 +761,14 @@
   </template>
   </main>
 
-  <script>const REPORT_DATA_B64GZ = "{{DATA_B64GZ}}";</script>
+  <script type="application/gzip+base64" id="report-data">{{DATA_B64GZ}}</script>
   <script>
   (function() {
     "use strict";
 
     function decodeData() {
-      const gz = Uint8Array.from(atob(REPORT_DATA_B64GZ), c => c.charCodeAt(0));
+      const b64 = document.getElementById('report-data').textContent.trim();
+      const gz = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
       const ds = new DecompressionStream('gzip');
       const writer = ds.writable.getWriter();
       writer.write(gz);
@@ -2103,17 +2125,18 @@
     });
   })();
   </script>
+  <script type="application/gzip+base64" id="vendor-d3">{{D3_GZ}}</script>
+  <script type="application/gzip+base64" id="vendor-alpine">{{ALPINE_GZ}}</script>
   <script>
-  const _VGZ = {d3:"{{D3_GZ}}",alpine:"{{ALPINE_GZ}}"};
   (async function(){
-    function dec(b64){
-      const gz=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+    function dec(id){
+      const gz=Uint8Array.from(atob(document.getElementById(id).textContent.trim()),c=>c.charCodeAt(0));
       const ds=new DecompressionStream('gzip');
       const w=ds.writable.getWriter();w.write(gz);w.close();
       return new Response(ds.readable).text();
     }
-    const s1=document.createElement('script');s1.textContent=await dec(_VGZ.d3);document.body.appendChild(s1);
-    const s2=document.createElement('script');s2.textContent=await dec(_VGZ.alpine);document.body.appendChild(s2);
+    const s1=document.createElement('script');s1.textContent=await dec('vendor-d3');document.body.appendChild(s1);
+    const s2=document.createElement('script');s2.textContent=await dec('vendor-alpine');document.body.appendChild(s2);
   })();
   </script>
 </body>
