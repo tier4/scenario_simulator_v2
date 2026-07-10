@@ -33,7 +33,6 @@ from ament_index_python.packages import get_package_share_directory
 
 from .alpine_js import ALPINE_JS
 from .d3_js import D3_JS
-from .open_props import OPEN_PROPS_CSS
 
 _TEMPLATE_PATH = (
     Path(get_package_share_directory("scenario_test_runner"))
@@ -182,7 +181,6 @@ def generate_report(output_dir, report_output_directory=None):
 
     vendor_template = (
         _load_template()
-        .replace("{{OPEN_PROPS_GZ}}", _b64gz(OPEN_PROPS_CSS))
         .replace("{{D3_GZ}}", _b64gz(D3_JS))
         .replace("{{ALPINE_GZ}}", _b64gz(ALPINE_JS))
     )

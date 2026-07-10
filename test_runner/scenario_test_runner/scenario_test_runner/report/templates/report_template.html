@@ -5,8 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Trajectory Report</title>
   <style>
-    /* --- Theme tokens --- */
+    /* --- Design tokens --- */
     :root {
+      /* Spacing (OpenProps --size-* equivalents) */
+      --size-1: 0.25rem;
+      --size-2: 0.5rem;
+      --size-3: 1rem;
+      --size-4: 1.25rem;
+      --size-5: 1.5rem;
+      --size-7: 2.5rem;
+      /* Radius */
+      --radius-1: 2px;
+      --radius-2: 5px;
+      --radius-round: 1e5px;
+      /* Typography */
+      --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      --font-lineheight-3: 1.7;
+      --fs-base: 1rem;
+      --fs-sm: 0.875rem;
+      --fs-xs: 0.75rem;
+      /* Surfaces & colors */
       --surface-1: #f6f8fa;
       --surface-2: #ffffff;
       --surface-3: #eaedf1;
@@ -15,11 +33,9 @@
       --accent: #0969da;
       --danger: #d1242f;
       --success: #1a7f37;
+      /* Components */
       --sf-canvas-h: 380px;
       --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
-      --fs-base: 1rem;
-      --fs-sm: 0.875rem;
-      --fs-xs: 0.75rem;
 
       color-scheme: light;
     }
@@ -2088,7 +2104,7 @@
   })();
   </script>
   <script>
-  const _VGZ = {css:"{{OPEN_PROPS_GZ}}",d3:"{{D3_GZ}}",alpine:"{{ALPINE_GZ}}"};
+  const _VGZ = {d3:"{{D3_GZ}}",alpine:"{{ALPINE_GZ}}"};
   (async function(){
     function dec(b64){
       const gz=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
@@ -2096,7 +2112,6 @@
       const w=ds.writable.getWriter();w.write(gz);w.close();
       return new Response(ds.readable).text();
     }
-    const st=document.createElement('style');st.textContent=await dec(_VGZ.css);document.head.appendChild(st);
     const s1=document.createElement('script');s1.textContent=await dec(_VGZ.d3);document.body.appendChild(s1);
     const s2=document.createElement('script');s2.textContent=await dec(_VGZ.alpine);document.body.appendChild(s2);
   })();
