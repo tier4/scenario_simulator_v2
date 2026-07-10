@@ -126,6 +126,7 @@ def launch_setup(context, *args, **kwargs):
     # Model comparison options
     comparison_model_paths                      = LaunchConfiguration("comparison_model_paths",                      default="")
     comparison_topics                           = LaunchConfiguration("comparison_topics",                           default="/planning/trajectory")
+    report_output_directory                     = LaunchConfiguration("report_output_directory",                     default="")
     # fmt: on
     vehicle_model_name = vehicle_model.perform(context)
     use_carla = vehicle_model_name.endswith("_carla")
@@ -219,6 +220,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"vehicle_id                                  := {vehicle_id.perform(context)}")
     print(f"comparison_model_paths                      := {comparison_model_paths.perform(context)}")
     print(f"comparison_topics                           := {comparison_topics.perform(context)}")
+    print(f"report_output_directory                     := {report_output_directory.perform(context)}")
 
     def make_launch_prefix():
         if enable_perf.perform(context) == "True":
@@ -432,6 +434,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("carla_path",                                  default_value=carla_path                                 ),  # e.g. /home/user/Carla-0.10.0-Linux-Shipping
         DeclareLaunchArgument("comparison_model_paths",                      default_value=comparison_model_paths                     ),
         DeclareLaunchArgument("comparison_topics",                           default_value=comparison_topics                          ),
+        DeclareLaunchArgument("report_output_directory",                    default_value=report_output_directory                    ),
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -448,8 +451,9 @@ def launch_setup(context, *args, **kwargs):
                 "--output-directory",        output_directory,
                 "--override-parameters",     override_parameters,
                 "--scenario",                scenario,
-                "--comparison-model-paths",  comparison_model_paths,
-                "--comparison-topics",       comparison_topics,
+                "--comparison-model-paths",      comparison_model_paths,
+                "--comparison-topics",           comparison_topics,
+                "--report-output-directory",     report_output_directory,
                 # fmt: on
             ],
         ),

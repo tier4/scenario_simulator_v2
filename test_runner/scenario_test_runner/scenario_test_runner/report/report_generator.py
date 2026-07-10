@@ -133,12 +133,13 @@ def _clip_map_data(map_data, bbox):
     return {"lanelet_lines": lanelet_lines, "road_markings": markings}
 
 
-def generate_report(output_dir):
+def generate_report(output_dir, report_output_directory=None):
     """Generate self-contained HTML comparison reports.
 
     Discovers models from ``output_dir/staging/`` (symlink to raw bags).
     Falls back to single-model discovery when staging is absent.
-    Reports are written to ``output_dir/comparison_report/``.
+    Reports are written to ``report_output_directory`` if given,
+    otherwise ``output_dir/comparison_report/``.
     """
     from .rosbag_reader import (
         extract_entities, extract_map_data, extract_predicted_objects,
@@ -170,8 +171,11 @@ def generate_report(output_dir):
 
     map_data = extract_map_data(scenario_bags[0])
 
-    result_archive = output_dir / "comparison_report"
-    result_archive.mkdir(exist_ok=True)
+    if report_output_directory:
+        result_archive = Path(report_output_directory)
+    else:
+        result_archive = output_dir / "comparison_report"
+    result_archive.mkdir(parents=True, exist_ok=True)
 
     def _b64gz(text):
         return base64.b64encode(gzip.compress(text.encode())).decode()

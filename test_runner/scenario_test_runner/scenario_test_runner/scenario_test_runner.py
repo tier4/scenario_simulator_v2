@@ -108,6 +108,7 @@ class ScenarioTestRunner(LifecycleController):
         output_directory: Path,
         override_parameters: str,
         comparison_model_paths: list = None,
+        report_output_directory: Path = None,
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -179,6 +180,7 @@ class ScenarioTestRunner(LifecycleController):
                     exit(1)
 
         self.comparison_model_paths = comparison_model_paths or []
+        self.report_output_directory = report_output_directory
         self.model_backup_path = None  # MODEL_SYMLINK_PATH workaround
 
     def spin(self):
@@ -382,7 +384,7 @@ class ScenarioTestRunner(LifecycleController):
 
         build_webautobag(final_dir, staging_dir, comparison_topics, self.get_logger())
 
-        report_paths = generate_report(final_dir)
+        report_paths = generate_report(final_dir, self.report_output_directory)
         for p in report_paths:
             self.get_logger().info(f"[Model Compare] Report: {p}")
 
@@ -418,10 +420,19 @@ def main(args=None):
         help="Comma-separated topic names to merge from comparison model rosbags",
     )
 
+    parser.add_argument(
+        "--report-output-directory", default="", type=str,
+        help="Directory to write comparison report. Defaults to <output_directory>/scenario_test_runner/comparison_report/",
+    )
+
     parser.add_argument("--ros-args", nargs="*")  # XXX DIRTY HACK
     parser.add_argument("-r", nargs="*")  # XXX DIRTY HACK
 
     args = parser.parse_args()
+
+    report_output_directory = (
+        Path(args.report_output_directory) if args.report_output_directory else None
+    )
 
     test_runner = ScenarioTestRunner(
         global_frame_rate=args.global_frame_rate,
@@ -432,6 +443,7 @@ def main(args=None):
         comparison_model_paths=[
             Path(p.strip()) for p in args.comparison_model_paths.split(",") if p.strip()
         ],
+        report_output_directory=report_output_directory,
     )
 
     if args.scenario != Path("/dev/null"):
