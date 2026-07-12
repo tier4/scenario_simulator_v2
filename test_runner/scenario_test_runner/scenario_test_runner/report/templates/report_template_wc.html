@@ -165,12 +165,12 @@
 
   function decodeData() {
     const b64 = document.getElementById('report-data').textContent.trim();
-    const gz = Uint8Array.from(atob(b64), function(c) { return c.charCodeAt(0); });
+    const gz = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
     const ds = new DecompressionStream('gzip');
     const writer = ds.writable.getWriter();
     writer.write(gz);
     writer.close();
-    return new Response(ds.readable).text().then(function(t) { return JSON.parse(t); });
+    return new Response(ds.readable).text().then(t => JSON.parse(t));
   }
 
   const CHANNELS = ["velocity", "accel", "heading_rate", "steer"];
@@ -182,7 +182,7 @@
   };
   const CH_CMD = {velocity: "cmd_velocity", accel: "cmd_accel", steer: "cmd_steer"};
   const chUnit = {};
-  CHANNELS.forEach(function(ch) { chUnit[ch] = 0; });
+  CHANNELS.forEach(ch => { chUnit[ch] = 0; });
 
   let _dirty = true;
   function markDirty() { _dirty = true; }
@@ -234,7 +234,7 @@
   }
 
   // --- Alpine stores ---
-  document.addEventListener('alpine:init', function() {
+  document.addEventListener('alpine:init', () => {
 
     Alpine.store('data', {
       rate: 0, n: 0, models: [], map: null, bbox: null,
@@ -245,12 +245,12 @@
         const pb = Alpine.store('playback');
         const cam = Alpine.store('camera');
         const mdl = Alpine.store('models');
-        pb.maxT = Math.max.apply(null, this.models.map(function(m) { return m.n_valid > 0 ? (m.n_valid - 1) / raw.rate_hz : 0; }));
-        pb.maxS = Math.max.apply(null, this.models.map(function(m) { return m.s_total || 0; }));
+        pb.maxT = Math.max(...this.models.map(m => m.n_valid > 0 ? (m.n_valid - 1) / raw.rate_hz : 0));
+        pb.maxS = Math.max(...this.models.map(m => m.s_total || 0));
         cam.cx = (this.bbox[0] + this.bbox[2]) / 2;
         cam.cy = (this.bbox[1] + this.bbox[3]) / 2;
         cam.viewW = Math.max(this.bbox[2] - this.bbox[0], this.bbox[3] - this.bbox[1], 10) * 1.1;
-        mdl.visible = this.models.map(function() { return true; });
+        mdl.visible = this.models.map(() => true);
         markDirty();
       },
       sampleAtT(run, t) {
@@ -261,7 +261,7 @@
         const i = Math.floor(fi);
         const j = Math.min(i + 1, last);
         const f = fi - i;
-        const L = function(a) { return a[i] + (a[j] - a[i]) * f; };
+        const L = a => a[i] + (a[j] - a[i]) * f;
         const tEnd = (nv - 1) / this.rate;
         const ended = t > tEnd + 1e-9;
         return { x: L(run.x), y: L(run.y), yaw: L(run.yaw), s: L(run.s),
@@ -276,7 +276,7 @@
         const ii = j - 1;
         const ds = run.s[j] - run.s[ii];
         const f = ds > 1e-9 ? (sc - run.s[ii]) / ds : 0;
-        const L = function(a) { return a[ii] + (a[j] - a[ii]) * f; };
+        const L = a => a[ii] + (a[j] - a[ii]) * f;
         const ended = sc >= run.s_total - 1e-9;
         return { x: L(run.x), y: L(run.y), yaw: L(run.yaw), s: sc,
                  v: ended ? 0 : L(run.v), t: (ii + f) / this.rate, ended: ended };
@@ -349,7 +349,7 @@
           if (pb.curS >= pb.maxS) pb.curS = 0;
         }
         markDirty();
-        pb._animId = requestAnimationFrame(function() { pb._tick(); });
+        pb._animId = requestAnimationFrame(() => { pb._tick(); });
       },
       onModeChange() {
         const pb = Alpine.store('playback');
@@ -552,12 +552,16 @@
   </template>
 
   <script>
-  document.addEventListener('alpine:init', function() {
+  document.addEventListener('alpine:init', () => {
     Alpine.data('mapCanvas', function() {
       let ctx = null, canvas = null;
       const drag = { active: false, sx: 0, sy: 0, cx0: 0, cy0: 0 };
       let W = 800, H = 550;
-      let d, cam, pb, mdl, ui;
+      const d = this.$store.data;
+      const cam = this.$store.camera;
+      const pb = this.$store.playback;
+      const mdl = this.$store.models;
+      const ui = this.$store.ui;
 
       function toScreen(wx, wy) {
         const scale = W / cam.viewW;
@@ -580,7 +584,7 @@
       }
 
       function updateFollow(samples, vis) {
-        const active = samples.filter(function(s, i) { return s && !s.ended && vis[i]; });
+        const active = samples.filter((s, i) => s && !s.ended && vis[i]);
         if (!active.length) return;
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         for (let k = 0; k < active.length; k++) {
@@ -783,7 +787,7 @@
         const vis = mdl.visible;
         const scale = W / cam.viewW;
 
-        const samples = d.models.map(function(m, i) {
+        const samples = d.models.map((m, i) => {
           if (!vis[i] || m.n_valid < 2) return null;
           return pb.mode === 'time' ? d.sampleAtT(m, pb.curT) : d.sampleAtS(m, pb.curS);
         });
@@ -821,14 +825,9 @@
 
       return {
         init() {
-          d = Alpine.store('data');
           canvas = this.$refs.mapCvs;
           ctx = canvas.getContext('2d');
-          cam = Alpine.store('camera');
-          pb = Alpine.store('playback');
-          mdl = Alpine.store('models');
-          ui = Alpine.store('ui');
-          new ResizeObserver(function() { resize(canvas.parentElement); }).observe(canvas.parentElement);
+          new ResizeObserver(() => { resize(canvas.parentElement); }).observe(canvas.parentElement);
           (function loop() {
             if (_dirty) { _dirty = false; draw(); }
             requestAnimationFrame(loop);
@@ -966,20 +965,17 @@
   </template>
 
   <script>
-  document.addEventListener('alpine:init', function() {
+  document.addEventListener('alpine:init', () => {
     Alpine.data('legend', function() {
-      let d, pb, mdl;
+      const d = this.$store.data;
+      const pb = this.$store.playback;
+      const mdl = this.$store.models;
       function _sample(i) {
         const m = d.models[i];
         if (m.n_valid < 2) return null;
         return pb.mode === 'time' ? d.sampleAtT(m, pb.curT) : d.sampleAtS(m, pb.curS);
       }
       return {
-        init() {
-          d = Alpine.store('data');
-          pb = Alpine.store('playback');
-          mdl = Alpine.store('models');
-        },
         hasValidData(i) { return d.models[i].n_valid >= 2; },
         getSample(i) { return _sample(i); },
         isEnded(i) {
@@ -1106,10 +1102,13 @@
   </template>
 
   <script>
-  document.addEventListener('alpine:init', function() {
+  document.addEventListener('alpine:init', () => {
     Alpine.data('plotsPanel', function() {
       let plotSvgs = {};
-      let d, pb, mdl, ui;
+      const d = this.$store.data;
+      const pb = this.$store.playback;
+      const mdl = this.$store.models;
+      const ui = this.$store.ui;
       const margin = { top: 8, right: 12, bottom: 28, left: 50 };
       const plotH = 200;
       const plotDrag = { active: false, wasPlaying: false, startClientX: 0, startX: 0, screenPxPerUnit: 1 };
@@ -1156,7 +1155,7 @@
           .attr('width', pw).attr('height', plotH)
           .attr('fill', 'transparent').attr('cursor', 'ew-resize');
 
-        hitArea.on('mousedown', function(e) {
+        hitArea.on('mousedown', e => {
           const ctm = g.node().getScreenCTM();
           const domain = xScale.domain();
           plotDrag.active = true;
@@ -1168,7 +1167,7 @@
           e.preventDefault();
         });
 
-        hitArea.on('mousemove', function(e) {
+        hitArea.on('mousemove', e => {
           const posMode = pb.mode === 'pos';
           const ctm = g.node().getScreenCTM();
           const svgX = (e.clientX - ctm.e) / ctm.a;
@@ -1204,7 +1203,7 @@
             hoverLine.attr('opacity', 0);
           }
         });
-        hitArea.on('mouseleave', function() {
+        hitArea.on('mouseleave', () => {
           tooltip.style.display = 'none';
           hoverLine.attr('opacity', 0);
         });
@@ -1214,11 +1213,11 @@
 
       function initAllPlots() {
         plotSvgs = {};
-        rootEl.querySelectorAll('.plot-cell[data-ch]').forEach(function(cell) {
+        rootEl.querySelectorAll('.plot-cell[data-ch]').forEach(cell => {
           const ch = cell.dataset.ch;
-          if (d.models.some(function(m) { return m.ch[ch]; })) initPlotSvg(ch, cell);
+          if (d.models.some(m => m.ch[ch])) initPlotSvg(ch, cell);
         });
-        d3.select(window).on('mousemove.plot', function(e) {
+        d3.select(window).on('mousemove.plot', e => {
           if (!plotDrag.active) return;
           const dx = -(e.clientX - plotDrag.startClientX) / plotDrag.screenPxPerUnit;
           if (pb.mode === 'pos') {
@@ -1227,7 +1226,7 @@
             pb.curT = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxT));
           }
           markDirty();
-        }).on('mouseup.plot', function() {
+        }).on('mouseup.plot', () => {
           if (!plotDrag.active) return;
           plotDrag.active = false;
           if (plotDrag.wasPlaying) pb.resume();
@@ -1275,7 +1274,7 @@
         const xUnit = posMode ? 'm' : 's';
         const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
         const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--border-dim').trim();
-        p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(function(v) { return v.toFixed(0) + xUnit; }))
+        p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(v => v.toFixed(0) + xUnit))
           .selectAll('text').attr('fill', tickColor).style('font-size', 'var(--fs-xs)');
         p.xAxis.selectAll('line,path').attr('stroke', lineColor);
         const yRange = p.yScale.domain();
@@ -1286,13 +1285,13 @@
         p.yAxis.selectAll('line,path').attr('stroke', lineColor);
 
         p.gridG.selectAll('*').remove();
-        p.xScale.ticks(5).forEach(function(t) {
+        p.xScale.ticks(5).forEach(t => {
           p.gridG.append('line')
             .attr('x1', p.xScale(t)).attr('x2', p.xScale(t))
             .attr('y1', 0).attr('y2', plotH)
             .attr('stroke', '#e0e0e0').attr('stroke-dasharray', '2,3');
         });
-        p.yScale.ticks(4).forEach(function(t) {
+        p.yScale.ticks(4).forEach(t => {
           p.gridG.append('line')
             .attr('x1', 0).attr('x2', p.pw)
             .attr('y1', p.yScale(t)).attr('y2', p.yScale(t))
@@ -1300,8 +1299,8 @@
         });
 
         p.linesG.selectAll('*').remove();
-        const lineFn = d3.line().defined(function(dd) { return dd.v !== null; })
-          .x(function(dd) { return p.xScale(dd.x); }).y(function(dd) { return p.yScale(dd.v); });
+        const lineFn = d3.line().defined(dd => dd.v !== null)
+          .x(dd => p.xScale(dd.x)).y(dd => p.yScale(dd.v));
         for (let i = 0; i < d.models.length; i++) {
           if (!vis[i]) continue;
           const m = d.models[i];
@@ -1360,7 +1359,7 @@
         channels: CHANNELS,
         units: {},
 
-        hasData(ch) { return d ? d.models.some(function(m) { return m.ch[ch]; }) : false; },
+        hasData(ch) { return d ? d.models.some(m => m.ch[ch]) : false; },
         legendItems(ch) {
           const items = [{label: 'Actual', dash: null}];
           if (CH_CMD[ch]) items.push({label: 'Command', dash: '4,3'});
@@ -1380,15 +1379,11 @@
         },
 
         init() {
-          d = Alpine.store('data');
-          pb = Alpine.store('playback');
-          mdl = Alpine.store('models');
-          ui = Alpine.store('ui');
           rootEl = this.$el;
           this.units = {};
-          CHANNELS.forEach(function(ch) { this.units[ch] = 0; }.bind(this));
-          this.$nextTick(function() { initAllPlots(); });
-          (function loop() { updateAll(); requestAnimationFrame(loop); })();
+          CHANNELS.forEach(ch => { this.units[ch] = 0; });
+          this.$nextTick(() => { initAllPlots(); });
+          (function loop() { if (_dirty) updateAll(); requestAnimationFrame(loop); })();
         },
       };
     });
@@ -1513,9 +1508,9 @@
   </template>
 
   <script>
-  document.addEventListener('alpine:init', function() {
+  document.addEventListener('alpine:init', () => {
     Alpine.data('numComp', function() {
-      let d;
+      const d = this.$store.data;
       const LATERAL_THRESH = 15.0;
       const BRAKE_THRESHOLD = -1.0;
       const TURN_LEFT = 2, TURN_RIGHT = 3;
@@ -1560,8 +1555,7 @@
         ]},
       ];
 
-      let ALL_COLS = [];
-      GROUPS.forEach(function(g) { ALL_COLS = ALL_COLS.concat(g.cols); });
+      const ALL_COLS = GROUPS.flatMap(g => g.cols);
 
       function fmtVal(v) {
         if (v == null || (typeof v === 'number' && !isFinite(v))) return '—';
@@ -1592,7 +1586,7 @@
 
       function median(arr) {
         if (!arr.length) return NaN;
-        const s = arr.slice().sort(function(a, b) { return a - b; });
+        const s = arr.slice().sort((a, b) => a - b);
         const m = Math.floor(s.length / 2);
         return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
       }
@@ -1668,7 +1662,7 @@
           deltaVs.push(cs.v - (base.v[k] || 0));
         }
         const n = deltaVs.length;
-        const validCnt = laterals.filter(function(l) { return l <= LATERAL_THRESH; }).length;
+        const validCnt = laterals.filter(l => l <= LATERAL_THRESH).length;
         let overSum = 0, underSum = 0;
         for (let di = 0; di < deltaVs.length; di++) {
           if (deltaVs[di] > 0) overSum += deltaVs[di]; else underSum += deltaVs[di];
@@ -1678,13 +1672,13 @@
           model: cand.name, color: cand.color,
           match_valid_pct: n > 0 ? (validCnt / n) * 100 : 0,
           median_lateral_m: median(laterals),
-          max_lateral_m: laterals.length ? Math.max.apply(null, laterals) : NaN,
-          mean_dv: n > 0 ? deltaVs.reduce(function(a, b) { return a + b; }, 0) / n : NaN,
+          max_lateral_m: laterals.length ? Math.max(...laterals) : NaN,
+          mean_dv: n > 0 ? deltaVs.reduce((a, b) => a + b, 0) / n : NaN,
           median_dv: median(deltaVs),
           avg_over: n > 0 ? overSum / n : 0,
           avg_under: n > 0 ? underSum / n : 0,
-          peak_over: n > 0 ? Math.max.apply(null, deltaVs) : NaN,
-          peak_under: n > 0 ? Math.min.apply(null, deltaVs) : NaN,
+          peak_over: n > 0 ? Math.max(...deltaVs) : NaN,
+          peak_under: n > 0 ? Math.min(...deltaVs) : NaN,
           ti_clusters: ti.clusters, ti_missing: ti.missing, ti_mean_iou: ti.meanIou,
           strong_brakes: countStrongBrakes(cand),
         };
@@ -1727,15 +1721,14 @@
 
         computeRows() {
           const base = d.models[this.baseIdx];
-          this.rows = d.models.map(function(m, i) {
+          this.rows = d.models.map((m, i) => {
             return i === this.baseIdx ? referenceRow(m) : candidateRow(m, base);
-          }.bind(this));
+          });
         },
 
         init() {
-          d = Alpine.store('data');
-          this.$watch('baseIdx', function() { this.computeRows(); }.bind(this));
-          this.$nextTick(function() { this.computeRows(); }.bind(this));
+          this.$watch('baseIdx', () => { this.computeRows(); });
+          this.$nextTick(() => { this.computeRows(); });
         },
       };
     });
@@ -1843,9 +1836,9 @@
   </template>
 
   <script>
-  document.addEventListener('alpine:init', function() {
+  document.addEventListener('alpine:init', () => {
     Alpine.data('staticFigures', function() {
-      let d;
+      const d = this.$store.data;
       const BRAKE_THRESHOLD = -1.0;
       const TURN_LEFT = 2, TURN_RIGHT = 3;
       let rootEl;
@@ -2075,21 +2068,20 @@
         },
 
         init() {
-          d = Alpine.store('data');
           rootEl = this.$el;
-          this.sfOpts = d.models.map(function() { return { showBraking: true, showTurnCmd: true }; });
+          this.sfOpts = d.models.map(() => ({ showBraking: true, showTurnCmd: true }));
           const self = this;
 
-          setTimeout(function() {
+          setTimeout(() => {
             self.drawAll();
 
-            rootEl.querySelectorAll('canvas[data-sf-idx]').forEach(function(canvas) {
+            rootEl.querySelectorAll('canvas[data-sf-idx]').forEach(canvas => {
               const mi = parseInt(canvas.dataset.sfIdx);
               const drag = { active: false, sx: 0, sy: 0, cx0: 0, cy0: 0 };
 
               canvas.style.cursor = 'grab';
 
-              canvas.addEventListener('mousedown', function(e) {
+              canvas.addEventListener('mousedown', e => {
                 const cam = cameras[mi];
                 if (!cam) return;
                 drag.active = true;
@@ -2099,7 +2091,7 @@
                 e.preventDefault();
               });
 
-              canvas.addEventListener('mousemove', function(e) {
+              canvas.addEventListener('mousemove', e => {
                 if (!drag.active) return;
                 const cam = cameras[mi];
                 const W = canvas.clientWidth || 800;
@@ -2109,14 +2101,14 @@
                 self.drawFigure(mi);
               });
 
-              canvas.addEventListener('mouseup', function() {
+              canvas.addEventListener('mouseup', () => {
                 drag.active = false; canvas.style.cursor = 'grab';
               });
-              canvas.addEventListener('mouseleave', function() {
+              canvas.addEventListener('mouseleave', () => {
                 drag.active = false; canvas.style.cursor = 'grab';
               });
 
-              canvas.addEventListener('wheel', function(e) {
+              canvas.addEventListener('wheel', e => {
                 e.preventDefault();
                 const cam = cameras[mi];
                 if (!cam) return;
@@ -2136,7 +2128,7 @@
                 self.drawFigure(mi);
               }, { passive: false });
 
-              canvas.addEventListener('dblclick', function() {
+              canvas.addEventListener('dblclick', () => {
                 const W = canvas.clientWidth || 800;
                 cameras[mi] = initCamera(d.models[mi], W, SF_CANVAS_H);
                 self.drawFigure(mi);
@@ -2144,7 +2136,7 @@
             });
           }, 100);
 
-          window.addEventListener('resize', function() { self.drawAll(); });
+          window.addEventListener('resize', () => { self.drawAll(); });
         },
       };
     });
@@ -2159,7 +2151,7 @@
   <script>
   (async function(){
     function dec(id){
-      const gz=Uint8Array.from(atob(document.getElementById(id).textContent.trim()),function(c){return c.charCodeAt(0);});
+      const gz=Uint8Array.from(atob(document.getElementById(id).textContent.trim()),c=>c.charCodeAt(0));
       const ds=new DecompressionStream('gzip');
       const w=ds.writable.getWriter();w.write(gz);w.close();
       return new Response(ds.readable).text();
