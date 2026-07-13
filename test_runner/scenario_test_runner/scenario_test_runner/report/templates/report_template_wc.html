@@ -65,8 +65,8 @@
     @media (max-width: 768px) { .row { grid-template-columns: 1fr; } }
   </style>
 
-  <!-- Shared styles adopted by all Shadow DOM roots via adoptedStyleSheets -->
-  <style id="shared-wc-styles" media="not all">
+  <!-- Shared styles: applied globally AND adopted into Shadow DOM via adoptedStyleSheets -->
+  <style id="shared-wc-styles">
     :host { display: block; }
 
     .controls {
@@ -146,6 +146,12 @@
     .seg-group button:hover { background: var(--surface-3); }
     .seg-group button.active { background: var(--accent); color: #fff; border-color: transparent; }
     .seg-group button + button { border-left: 1px solid var(--border-dim); }
+
+    .baseline-group {
+      display: inline-flex; align-items: center; gap: var(--size-1);
+      font-size: var(--fs-sm); color: var(--text); white-space: nowrap;
+    }
+    .baseline-group.disabled { opacity: 0.35; pointer-events: none; }
   </style>
 </head>
 <body>
@@ -157,6 +163,23 @@
   <template x-if="$store.data.map">
     <div>
     <h3>Trajectory Comparison</h3>
+    <div class="controls" style="margin:0 0 var(--size-2)">
+      <div class="seg-group">
+        <button :class="$store.playback.mode === 'time' && 'active'"
+          @click="$store.playback.mode = 'time'; $store.playback.onModeChange()">Time</button>
+        <button :class="$store.playback.mode === 'pos' && 'active'"
+          @click="$store.playback.mode = 'pos'; $store.playback.onModeChange()">Position</button>
+      </div>
+      <div class="baseline-group" :class="$store.playback.mode !== 'pos' && 'disabled'">
+        <span>Baseline</span>
+        <select x-model.number="$store.models.baselineIdx" @change="$store.playback.onBaselineChange()"
+          style="min-width:0;max-width:14em;overflow:hidden;text-overflow:ellipsis">
+          <template x-for="(m, i) in $store.data.models" :key="'base'+i">
+            <option :value="i" x-text="m.name"></option>
+          </template>
+        </select>
+      </div>
+    </div>
     <div class="row">
       <map-canvas></map-canvas>
       <legend-panel></legend-panel>
@@ -433,26 +456,6 @@
       .play-btn { color: var(--text); }
       .play-btn:hover { color: var(--text); }
       .play-btn.playing { color: var(--accent); border-color: var(--accent); }
-      .seg-group {
-        display: inline-flex;
-        border: 1px solid var(--border-dim);
-        border-radius: var(--radius-2);
-        overflow: hidden;
-      }
-      .seg-group button {
-        border: none; border-radius: 0; min-width: auto;
-        padding: var(--size-1) var(--size-2);
-        font-size: var(--fs-sm); color: var(--text);
-        background: transparent; line-height: var(--font-lineheight-3);
-      }
-      .seg-group button:hover { background: var(--surface-3); }
-      .seg-group button.active { background: var(--accent); color: #fff; border-color: transparent; }
-      .seg-group button + button { border-left: 1px solid var(--border-dim); }
-      .baseline-group {
-        display: flex; align-items: center; gap: var(--size-1);
-        font-size: var(--fs-sm); color: var(--text); white-space: nowrap;
-      }
-      .baseline-group.disabled { opacity: 0.35; pointer-events: none; }
       .toggle-group {
         display: flex; align-items: center; gap: var(--size-2); flex-wrap: wrap;
       }
@@ -539,21 +542,6 @@
           </select>
         </div>
         <div class="controls" style="margin:0">
-          <div class="seg-group">
-            <button :class="$store.playback.mode === 'time' && 'active'"
-              @click="$store.playback.mode = 'time'; $store.playback.onModeChange()">Time</button>
-            <button :class="$store.playback.mode === 'pos' && 'active'"
-              @click="$store.playback.mode = 'pos'; $store.playback.onModeChange()">Position</button>
-          </div>
-          <div class="baseline-group" :class="$store.playback.mode !== 'pos' && 'disabled'">
-            <span>Baseline</span>
-            <select x-model.number="$store.models.baselineIdx" @change="$store.playback.onBaselineChange()"
-              style="min-width:0;max-width:14em;overflow:hidden;text-overflow:ellipsis">
-              <template x-for="(m, i) in $store.data.models" :key="'base'+i">
-                <option :value="i" x-text="m.name"></option>
-              </template>
-            </select>
-          </div>
           <div class="toggle-group">
             <label class="toggle-label"><input type="checkbox" x-model="$store.camera.follow"> Track Ego</label>
             <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPlanned" @change="markDirty()"> Planned Trajectory</label>
