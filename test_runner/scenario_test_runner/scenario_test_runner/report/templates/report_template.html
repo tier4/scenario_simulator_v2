@@ -570,11 +570,12 @@
                 <path x-show="!showLayers" d="M4 1 L8 5 L4 9"/>
               </svg>
             </button>
-            <canvas x-ref="mapCvs"
-              @mousedown="onMouseDown($event)"
-              @mousemove="onMouseMove($event)"
-              @mouseup="onMouseUp()"
-              @mouseleave="onMouseUp()"
+            <canvas x-ref="mapCvs" style="touch-action:none"
+              @pointerdown="onPointerDown($event)"
+              @pointermove="onPointerMove($event)"
+              @pointerup="onPointerUp($event)"
+              @pointercancel="onPointerUp($event)"
+              @pointerleave="onPointerUp($event)"
               @dblclick="doFitAll()"
               @wheel.prevent="onWheel($event)"></canvas>
           </div>
@@ -629,6 +630,7 @@
   document.addEventListener('alpine:init', () => {
     Alpine.data('mapCanvas', function() {
       let ctx = null, canvas = null;
+      const ptrs = new Map();
       const drag = { active: false, sx: 0, sy: 0, cx0: 0, cy0: 0 };
       let W = 800, H = 550;
       const d = this.$store.data;
@@ -911,19 +913,60 @@
             requestAnimationFrame(loop);
           })();
         },
-        onMouseDown(e) {
-          drag.active = true;
-          drag.sx = e.clientX; drag.sy = e.clientY;
-          drag.cx0 = cam.cx; drag.cy0 = cam.cy;
+        onPointerDown(e) {
+          canvas.setPointerCapture(e.pointerId);
+          ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          if (ptrs.size === 1) {
+            drag.active = true;
+            drag.sx = e.clientX; drag.sy = e.clientY;
+            drag.cx0 = cam.cx; drag.cy0 = cam.cy;
+          } else if (ptrs.size === 2) {
+            drag.active = false;
+            const [a, b] = [...ptrs.values()];
+            drag.pinchDist = Math.hypot(b.x - a.x, b.y - a.y);
+            drag.pinchViewW = cam.viewW;
+            drag.pinchCx = cam.cx; drag.pinchCy = cam.cy;
+            const r = canvas.getBoundingClientRect();
+            drag.pinchMx = (a.x + b.x) / 2 - r.left;
+            drag.pinchMy = (a.y + b.y) / 2 - r.top;
+          }
         },
-        onMouseMove(e) {
-          if (!drag.active) return;
-          const scale = W / cam.viewW;
-          cam.cx = drag.cx0 - (e.clientX - drag.sx) / scale;
-          cam.cy = drag.cy0 + (e.clientY - drag.sy) / scale;
-          markDirty();
+        onPointerMove(e) {
+          if (!ptrs.has(e.pointerId)) return;
+          ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          if (ptrs.size === 1 && drag.active) {
+            const scale = W / cam.viewW;
+            cam.cx = drag.cx0 - (e.clientX - drag.sx) / scale;
+            cam.cy = drag.cy0 + (e.clientY - drag.sy) / scale;
+            markDirty();
+          } else if (ptrs.size === 2) {
+            const [a, b] = [...ptrs.values()];
+            const r = canvas.getBoundingClientRect();
+            const mx = (a.x + b.x) / 2 - r.left;
+            const my = (a.y + b.y) / 2 - r.top;
+            const dist = Math.hypot(b.x - a.x, b.y - a.y);
+            const f = drag.pinchDist / dist;
+            const scale = W / drag.pinchViewW;
+            const wx = (drag.pinchMx - W / 2) / scale + drag.pinchCx;
+            const wy = -(drag.pinchMy - H / 2) / scale + drag.pinchCy;
+            cam.viewW = drag.pinchViewW * f;
+            const ns = W / cam.viewW;
+            cam.cx = wx - (mx - W / 2) / ns;
+            cam.cy = wy + (my - H / 2) / ns;
+            markDirty();
+          }
         },
-        onMouseUp() { drag.active = false; },
+        onPointerUp(e) {
+          ptrs.delete(e.pointerId);
+          if (ptrs.size === 1) {
+            const [p] = [...ptrs.values()];
+            drag.active = true;
+            drag.sx = p.x; drag.sy = p.y;
+            drag.cx0 = cam.cx; drag.cy0 = cam.cy;
+          } else if (ptrs.size === 0) {
+            drag.active = false;
+          }
+        },
         onWheel(e) {
           const f = e.deltaY > 0 ? 1.1 : 0.9;
           const r = canvas.getBoundingClientRect();
@@ -1240,7 +1283,9 @@
           .attr('width', pw).attr('height', plotH)
           .attr('fill', 'transparent').attr('cursor', 'ew-resize');
 
-        hitArea.on('mousedown', e => {
+        svgEl.style('touch-action', 'none');
+        hitArea.on('pointerdown', e => {
+          hitArea.node().setPointerCapture(e.pointerId);
           const isFull = ui.plotViewMode === 'full';
           if (isFull) {
             const ctm = g.node().getScreenCTM();
@@ -1270,7 +1315,22 @@
           e.preventDefault();
         });
 
-        hitArea.on('mousemove', e => {
+        hitArea.on('pointermove', e => {
+          if (plotDrag.active) {
+            if (plotDrag.fullMode) {
+              const ctm = g.node().getScreenCTM();
+              const svgX = (e.clientX - ctm.e) / ctm.a;
+              const dragX = xScale.invert(svgX);
+              if (pb.mode === 'pos') pb.curS = Math.max(0, Math.min(dragX, pb.maxS));
+              else pb.curT = Math.max(0, Math.min(dragX, pb.maxT));
+            } else {
+              const dx = -(e.clientX - plotDrag.startClientX) / plotDrag.screenPxPerUnit;
+              if (pb.mode === 'pos') pb.curS = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxS));
+              else pb.curT = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxT));
+            }
+            markDirty();
+            return;
+          }
           const posMode = pb.mode === 'pos';
           const ctm = g.node().getScreenCTM();
           const svgX = (e.clientX - ctm.e) / ctm.a;
@@ -1305,9 +1365,16 @@
             hoverLine.attr('opacity', 0);
           }
         });
-        hitArea.on('mouseleave', () => {
-          tooltip.style.display = 'none';
-          hoverLine.attr('opacity', 0);
+        hitArea.on('pointerup pointercancel', () => {
+          if (!plotDrag.active) return;
+          plotDrag.active = false;
+          if (plotDrag.wasPlaying) pb.resume();
+        });
+        hitArea.on('pointerleave', () => {
+          if (!plotDrag.active) {
+            tooltip.style.display = 'none';
+            hoverLine.attr('opacity', 0);
+          }
         });
 
         plotSvgs[ch] = { svgEl: svgEl, clipRect: clipRect, hitArea: hitArea, xScale: xScale, yScale: yScale, gridG: gridG, xAxis: xAxis, yAxis: yAxis, linesG: linesG, cursorLine: cursorLine, dotsG: dotsG, pw: pw };
@@ -1318,33 +1385,6 @@
         rootEl.querySelectorAll('.plot-cell[data-ch]').forEach(cell => {
           const ch = cell.dataset.ch;
           if (d.models.some(m => m.ch[ch])) initPlotSvg(ch, cell);
-        });
-        d3.select(window).on('mousemove.plot', e => {
-          if (!plotDrag.active) return;
-          if (plotDrag.fullMode) {
-            const first = Object.values(plotSvgs)[0];
-            if (!first) return;
-            const ctm = first.linesG.node().getScreenCTM();
-            const svgX = (e.clientX - ctm.e) / ctm.a;
-            const dragX = first.xScale.invert(svgX);
-            if (pb.mode === 'pos') {
-              pb.curS = Math.max(0, Math.min(dragX, pb.maxS));
-            } else {
-              pb.curT = Math.max(0, Math.min(dragX, pb.maxT));
-            }
-          } else {
-            const dx = -(e.clientX - plotDrag.startClientX) / plotDrag.screenPxPerUnit;
-            if (pb.mode === 'pos') {
-              pb.curS = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxS));
-            } else {
-              pb.curT = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxT));
-            }
-          }
-          markDirty();
-        }).on('mouseup.plot', () => {
-          if (!plotDrag.active) return;
-          plotDrag.active = false;
-          if (plotDrag.wasPlaying) pb.resume();
         });
         markDirty();
         new ResizeObserver(() => {
@@ -2215,35 +2255,80 @@
 
             rootEl.querySelectorAll('canvas[data-sf-idx]').forEach(canvas => {
               const mi = parseInt(canvas.dataset.sfIdx);
+              const ptrs = new Map();
               const drag = { active: false, sx: 0, sy: 0, cx0: 0, cy0: 0 };
 
               canvas.style.cursor = 'grab';
+              canvas.style.touchAction = 'none';
 
-              canvas.addEventListener('mousedown', e => {
+              canvas.addEventListener('pointerdown', e => {
+                canvas.setPointerCapture(e.pointerId);
+                ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
                 const cam = cameras[mi];
                 if (!cam) return;
-                drag.active = true;
-                drag.sx = e.clientX; drag.sy = e.clientY;
-                drag.cx0 = cam.cx; drag.cy0 = cam.cy;
-                canvas.style.cursor = 'grabbing';
-                e.preventDefault();
+                if (ptrs.size === 1) {
+                  drag.active = true;
+                  drag.sx = e.clientX; drag.sy = e.clientY;
+                  drag.cx0 = cam.cx; drag.cy0 = cam.cy;
+                  canvas.style.cursor = 'grabbing';
+                } else if (ptrs.size === 2) {
+                  drag.active = false;
+                  const [a, b] = [...ptrs.values()];
+                  drag.pinchDist = Math.hypot(b.x - a.x, b.y - a.y);
+                  drag.pinchSpan = cam.span;
+                  drag.pinchCx = cam.cx; drag.pinchCy = cam.cy;
+                  const rect = canvas.getBoundingClientRect();
+                  drag.pinchMx = (a.x + b.x) / 2 - rect.left;
+                  drag.pinchMy = (a.y + b.y) / 2 - rect.top;
+                }
               });
 
-              canvas.addEventListener('mousemove', e => {
-                if (!drag.active) return;
+              canvas.addEventListener('pointermove', e => {
+                if (!ptrs.has(e.pointerId)) return;
+                ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
                 const cam = cameras[mi];
-                const W = canvas.clientWidth || 800;
-                const scale = W / cam.span;
-                cam.cx = drag.cx0 - (e.clientX - drag.sx) / scale;
-                cam.cy = drag.cy0 + (e.clientY - drag.sy) / scale;
-                self.drawFigure(mi);
+                if (!cam) return;
+                if (ptrs.size === 1 && drag.active) {
+                  const W = canvas.clientWidth || 800;
+                  const scale = W / cam.span;
+                  cam.cx = drag.cx0 - (e.clientX - drag.sx) / scale;
+                  cam.cy = drag.cy0 + (e.clientY - drag.sy) / scale;
+                  self.drawFigure(mi);
+                } else if (ptrs.size === 2) {
+                  const [a, b] = [...ptrs.values()];
+                  const rect = canvas.getBoundingClientRect();
+                  const mx = (a.x + b.x) / 2 - rect.left;
+                  const my = (a.y + b.y) / 2 - rect.top;
+                  const dist = Math.hypot(b.x - a.x, b.y - a.y);
+                  const f = drag.pinchDist / dist;
+                  const W = canvas.clientWidth || 800;
+                  const H = SF_CANVAS_H;
+                  const scale = W / drag.pinchSpan;
+                  const wx = (drag.pinchMx - W / 2) / scale + drag.pinchCx;
+                  const wy = -(drag.pinchMy - H / 2) / scale + drag.pinchCy;
+                  cam.span = drag.pinchSpan * f;
+                  const ns = W / cam.span;
+                  cam.cx = wx - (mx - W / 2) / ns;
+                  cam.cy = wy + (my - H / 2) / ns;
+                  self.drawFigure(mi);
+                }
               });
 
-              canvas.addEventListener('mouseup', () => {
-                drag.active = false; canvas.style.cursor = 'grab';
+              canvas.addEventListener('pointerup', e => {
+                ptrs.delete(e.pointerId);
+                const cam = cameras[mi];
+                if (ptrs.size === 1 && cam) {
+                  const [p] = [...ptrs.values()];
+                  drag.active = true;
+                  drag.sx = p.x; drag.sy = p.y;
+                  drag.cx0 = cam.cx; drag.cy0 = cam.cy;
+                } else if (ptrs.size === 0) {
+                  drag.active = false; canvas.style.cursor = 'grab';
+                }
               });
-              canvas.addEventListener('mouseleave', () => {
-                drag.active = false; canvas.style.cursor = 'grab';
+              canvas.addEventListener('pointercancel', e => {
+                ptrs.delete(e.pointerId);
+                if (ptrs.size === 0) { drag.active = false; canvas.style.cursor = 'grab'; }
               });
 
               canvas.addEventListener('wheel', e => {
