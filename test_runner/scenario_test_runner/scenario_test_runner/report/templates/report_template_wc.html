@@ -163,15 +163,16 @@
   <script>
   "use strict";
 
-  function decodeData() {
-    const b64 = document.getElementById('report-data').textContent.trim();
-    const gz = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  function decodeGz(id) {
+    const gz = Uint8Array.from(atob(document.getElementById(id).textContent.trim()), c => c.charCodeAt(0));
     const ds = new DecompressionStream('gzip');
-    const writer = ds.writable.getWriter();
-    writer.write(gz);
-    writer.close();
-    return new Response(ds.readable).text().then(t => JSON.parse(t));
+    const w = ds.writable.getWriter();
+    w.write(gz);
+    w.close();
+    return new Response(ds.readable).text();
   }
+
+  const reportData = decodeGz('report-data').then(t => JSON.parse(t));
 
   const CHANNELS = ["velocity", "accel", "heading_rate", "steer"];
   const CH_LABELS = {
@@ -237,20 +238,13 @@
   document.addEventListener('alpine:init', () => {
 
     Alpine.store('data', {
-      rate: 0, n: 0, models: [], map: null, bbox: null,
+      rate: 0, models: [], map: null, bbox: null,
       async init() {
-        const raw = await decodeData();
-        this.rate = raw.rate_hz; this.n = raw.n;
-        this.models = raw.models; this.map = raw.map; this.bbox = raw.bbox;
-        const pb = Alpine.store('playback');
-        const cam = Alpine.store('camera');
-        const mdl = Alpine.store('models');
-        pb.maxT = Math.max(...this.models.map(m => m.n_valid > 0 ? (m.n_valid - 1) / raw.rate_hz : 0));
-        pb.maxS = Math.max(...this.models.map(m => m.s_total || 0));
-        cam.cx = (this.bbox[0] + this.bbox[2]) / 2;
-        cam.cy = (this.bbox[1] + this.bbox[3]) / 2;
-        cam.viewW = Math.max(this.bbox[2] - this.bbox[0], this.bbox[3] - this.bbox[1], 10) * 1.1;
-        mdl.visible = this.models.map(() => true);
+        const raw = await reportData;
+        this.rate = raw.rate_hz;
+        this.models = raw.models;
+        this.map = raw.map;
+        this.bbox = raw.bbox;
         markDirty();
       },
       sampleAtT(run, t) {
@@ -312,64 +306,64 @@
       curT: 0, curS: 0, maxT: 0, maxS: 0,
       _animId: null, _lastTime: 0,
 
+      async init() {
+        const { models, rate_hz } = await reportData;
+        this.maxT = Math.max(...models.map(m => m.n_valid > 0 ? (m.n_valid - 1) / rate_hz : 0));
+        this.maxS = Math.max(...models.map(m => m.s_total || 0));
+      },
+
       toggle() {
-        const pb = Alpine.store('playback');
-        pb.playing = !pb.playing;
-        if (pb.playing) { pb._lastTime = performance.now(); pb._tick(); }
-        else if (pb._animId) { cancelAnimationFrame(pb._animId); pb._animId = null; }
+        this.playing = !this.playing;
+        if (this.playing) { this._lastTime = performance.now(); this._tick(); }
+        else if (this._animId) { cancelAnimationFrame(this._animId); this._animId = null; }
       },
       pause() {
-        const pb = Alpine.store('playback');
-        if (pb.playing) { pb.playing = false; if (pb._animId) { cancelAnimationFrame(pb._animId); pb._animId = null; } }
+        if (this.playing) { this.playing = false; if (this._animId) { cancelAnimationFrame(this._animId); this._animId = null; } }
       },
       resume() {
-        const pb = Alpine.store('playback');
-        if (!pb.playing) { pb.playing = true; pb._lastTime = performance.now(); pb._tick(); }
+        if (!this.playing) { this.playing = true; this._lastTime = performance.now(); this._tick(); }
       },
       _tick() {
-        const pb = Alpine.store('playback');
-        if (!pb.playing) return;
+        if (!this.playing) return;
         const now = performance.now();
-        const dt = (now - pb._lastTime) / 1000 * pb.speedMul;
-        pb._lastTime = now;
-        if (pb.mode === 'time') {
-          pb.curT += dt;
-          if (pb.curT > pb.maxT) pb.curT = 0;
+        const dt = (now - this._lastTime) / 1000 * this.speedMul;
+        this._lastTime = now;
+        if (this.mode === 'time') {
+          this.curT += dt;
+          if (this.curT > this.maxT) this.curT = 0;
         } else {
           const d = Alpine.store('data');
           const mdl = Alpine.store('models');
           const base = d.models[mdl.baselineIdx];
           if (base && base.n_valid > 1) {
-            const st = d.sampleAtS(base, pb.curS);
+            const st = d.sampleAtS(base, this.curS);
             if (st) {
               const ns = d.sampleAtT(base, st.t + dt);
-              pb.curS = ns ? ns.s : pb.maxS;
+              this.curS = ns ? ns.s : this.maxS;
             }
           }
-          if (pb.curS >= pb.maxS) pb.curS = 0;
+          if (this.curS >= this.maxS) this.curS = 0;
         }
         markDirty();
-        pb._animId = requestAnimationFrame(() => { pb._tick(); });
+        this._animId = requestAnimationFrame(() => { this._tick(); });
       },
       onModeChange() {
-        const pb = Alpine.store('playback');
         const d = Alpine.store('data');
         const mdl = Alpine.store('models');
         const base = d.models[mdl.baselineIdx];
         if (!base || base.n_valid < 2) return;
-        if (pb.mode === 'pos') { const st = d.sampleAtT(base, pb.curT); pb.curS = st ? st.s : 0; }
-        else { const st2 = d.sampleAtS(base, pb.curS); pb.curT = st2 ? st2.t : 0; }
+        if (this.mode === 'pos') { const st = d.sampleAtT(base, this.curT); this.curS = st ? st.s : 0; }
+        else { const st2 = d.sampleAtS(base, this.curS); this.curT = st2 ? st2.t : 0; }
         markDirty();
       },
       onBaselineChange() {
-        const pb = Alpine.store('playback');
-        if (pb.mode === 'pos') {
+        if (this.mode === 'pos') {
           const d = Alpine.store('data');
           const mdl = Alpine.store('models');
           const base = d.models[mdl.baselineIdx];
           if (base && base.n_valid > 1) {
-            const st = d.sampleAtS(base, pb.curS);
-            if (st) pb.curS = st.s;
+            const st = d.sampleAtS(base, this.curS);
+            if (st) this.curS = st.s;
           }
         }
         markDirty();
@@ -378,9 +372,19 @@
 
     Alpine.store('camera', {
       cx: 0, cy: 0, viewW: 10, targetViewW: 0, follow: true,
+      async init() {
+        const { bbox } = await reportData;
+        this.cx = (bbox[0] + bbox[2]) / 2;
+        this.cy = (bbox[1] + bbox[3]) / 2;
+        this.viewW = Math.max(bbox[2] - bbox[0], bbox[3] - bbox[1], 10) * 1.1;
+      },
     });
     Alpine.store('models', {
       visible: [], baselineIdx: 0,
+      async init() {
+        const { models } = await reportData;
+        this.visible = models.map(() => true);
+      },
     });
     Alpine.store('ui', {
       showPlanned: true, showEntities: true, showPerceived: true,
@@ -2150,14 +2154,9 @@
   <script type="application/gzip+base64" id="vendor-alpine">{{ALPINE_GZ}}</script>
   <script>
   (async function(){
-    function dec(id){
-      const gz=Uint8Array.from(atob(document.getElementById(id).textContent.trim()),c=>c.charCodeAt(0));
-      const ds=new DecompressionStream('gzip');
-      const w=ds.writable.getWriter();w.write(gz);w.close();
-      return new Response(ds.readable).text();
-    }
-    const s1=document.createElement('script');s1.textContent=await dec('vendor-d3');document.body.appendChild(s1);
-    const s2=document.createElement('script');s2.textContent=await dec('vendor-alpine');document.body.appendChild(s2);
+    const [d3Text, alpineText] = await Promise.all([decodeGz('vendor-d3'), decodeGz('vendor-alpine')]);
+    const s1=document.createElement('script');s1.textContent=d3Text;document.body.appendChild(s1);
+    const s2=document.createElement('script');s2.textContent=alpineText;document.body.appendChild(s2);
   })();
   </script>
 </body>
