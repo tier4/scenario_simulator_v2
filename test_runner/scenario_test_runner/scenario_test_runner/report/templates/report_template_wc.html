@@ -128,6 +128,24 @@
       border-radius: var(--radius-2);
       box-shadow: var(--card-shadow);
     }
+
+    .seg-group {
+      display: inline-flex;
+      border: 1px solid var(--border-dim);
+      border-radius: var(--radius-2);
+      overflow: hidden;
+    }
+    .seg-group button {
+      border: none; border-radius: 0; min-width: auto;
+      padding: var(--size-1) var(--size-2);
+      font-family: inherit;
+      font-size: var(--fs-sm); color: var(--text);
+      background: transparent; line-height: var(--font-lineheight-3);
+      cursor: pointer;
+    }
+    .seg-group button:hover { background: var(--surface-3); }
+    .seg-group button.active { background: var(--accent); color: #fff; border-color: transparent; }
+    .seg-group button + button { border-left: 1px solid var(--border-dim); }
   </style>
 </head>
 <body>
@@ -179,7 +197,8 @@
   // ── Render loop ────────────────────────────────────────────────
 
   let _dirty = true;
-  function markDirty() { _dirty = true; }
+  let _plotsDirty = true;
+  function markDirty() { _dirty = true; _plotsDirty = true; }
 
   // ── Shared utilities ───────────────────────────────────────────
 
@@ -378,6 +397,7 @@
     });
     Alpine.store('ui', {
       showPlanned: true, showEntities: true, showPerceived: true,
+      plotViewMode: 'windowed',
       plotWindowS: 10, plotWindowM: 50,
     });
 
@@ -1010,7 +1030,7 @@
         border-radius: var(--radius-2);
         box-shadow: var(--card-shadow);
       }
-      .plot-cell .plot-svg { width: 100%; display: block; }
+      .plot-cell .plot-svg { width: 100%; height: 200px; display: block; }
       .plot-cell.no-data { opacity: 0.35; }
       .plot-cell-legend {
         display: flex; flex-wrap: wrap; gap: var(--size-2) var(--size-3);
@@ -1050,21 +1070,26 @@
     </style>
     <div id="root" x-data="plotsPanel">
       <div class="controls" style="margin-top:var(--size-3)">
-        <span style="color:var(--text)">Window</span>
+        <div class="seg-group">
+          <button :class="$store.ui.plotViewMode === 'full' && 'active'"
+            @click="$store.ui.plotViewMode = 'full'; markDirty()">Full</button>
+          <button :class="$store.ui.plotViewMode === 'windowed' && 'active'"
+            @click="$store.ui.plotViewMode = 'windowed'; markDirty()">Windowed</button>
+        </div>
         <template x-if="$store.playback.mode === 'time'">
-          <select x-model.number="$store.ui.plotWindowS" style="width:auto">
+          <select x-model.number="$store.ui.plotWindowS" @change="markDirty()" style="width:auto"
+            :disabled="$store.ui.plotViewMode === 'full'">
             <option value="5">5s</option>
             <option value="10" selected>10s</option>
             <option value="20">20s</option>
-            <option value="0">Full</option>
           </select>
         </template>
         <template x-if="$store.playback.mode === 'pos'">
-          <select x-model.number="$store.ui.plotWindowM" style="width:auto">
+          <select x-model.number="$store.ui.plotWindowM" @change="markDirty()" style="width:auto"
+            :disabled="$store.ui.plotViewMode === 'full'">
             <option value="20">20m</option>
             <option value="50" selected>50m</option>
             <option value="100">100m</option>
-            <option value="0">Full</option>
           </select>
         </template>
       </div>
@@ -1122,9 +1147,9 @@
       const pb = this.$store.playback;
       const mdl = this.$store.models;
       const ui = this.$store.ui;
-      const margin = { top: 8, right: 12, bottom: 28, left: 50 };
+      const margin = { top: 0, right: 0, bottom: 0, left: 0 };
       const plotH = 200;
-      const plotDrag = { active: false, wasPlaying: false, startClientX: 0, startX: 0, screenPxPerUnit: 1 };
+      const plotDrag = { active: false, fullMode: false, wasPlaying: false, startClientX: 0, startX: 0, screenPxPerUnit: 1 };
       let rootEl;
 
       function chConv(ch) {
@@ -1136,18 +1161,17 @@
         const tooltip = cell.querySelector('.plot-tooltip');
         const svgHost = tooltip.parentElement;
 
-        const w = 600, h = plotH + margin.top + margin.bottom;
+        const initW = svgHost.clientWidth || 600;
         const svgEl = d3.select(svgHost).append('svg')
           .attr('class', 'plot-svg')
-          .attr('viewBox', '0 0 ' + w + ' ' + h)
-          .attr('preserveAspectRatio', 'xMidYMid meet');
-        const g = svgEl.append('g')
-          .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+          .attr('viewBox', '0 0 ' + initW + ' ' + plotH)
+          .attr('preserveAspectRatio', 'none');
+        const g = svgEl.append('g');
         const clipId = 'clip-' + ch;
-        svgEl.append('defs').append('clipPath').attr('id', clipId)
-          .append('rect').attr('width', w - margin.left - margin.right).attr('height', plotH);
+        const clipRect = svgEl.append('defs').append('clipPath').attr('id', clipId)
+          .append('rect').attr('width', initW).attr('height', plotH);
 
-        const pw = w - margin.left - margin.right;
+        let pw = initW;
         const xScale = d3.scaleLinear().range([0, pw]);
         const yScale = d3.scaleLinear().range([plotH, 0]);
         const gridG = g.append('g');
@@ -1157,7 +1181,8 @@
         const cursorLine = g.append('line')
           .attr('y1', 0).attr('y2', plotH)
           .attr('stroke', '#333').attr('stroke-width', 1)
-          .attr('stroke-dasharray', '4,3').attr('opacity', 0.5);
+          .attr('stroke-dasharray', '4,3').attr('opacity', 0.5)
+          .attr('vector-effect', 'non-scaling-stroke');
         const dotsG = g.append('g');
         const hoverLine = g.append('line')
           .attr('y1', 0).attr('y2', plotH)
@@ -1169,14 +1194,32 @@
           .attr('fill', 'transparent').attr('cursor', 'ew-resize');
 
         hitArea.on('mousedown', e => {
-          const ctm = g.node().getScreenCTM();
-          const domain = xScale.domain();
-          plotDrag.active = true;
-          plotDrag.wasPlaying = pb.playing;
-          plotDrag.startClientX = e.clientX;
-          plotDrag.startX = pb.mode === 'pos' ? pb.curS : pb.curT;
-          plotDrag.screenPxPerUnit = ctm.a * pw / (domain[1] - domain[0]);
-          if (pb.playing) pb.pause();
+          const isFull = ui.plotViewMode === 'full';
+          if (isFull) {
+            const ctm = g.node().getScreenCTM();
+            const svgX = (e.clientX - ctm.e) / ctm.a;
+            const clickX = xScale.invert(svgX);
+            plotDrag.wasPlaying = pb.playing;
+            if (pb.playing) pb.pause();
+            if (pb.mode === 'pos') {
+              pb.curS = Math.max(0, Math.min(clickX, pb.maxS));
+            } else {
+              pb.curT = Math.max(0, Math.min(clickX, pb.maxT));
+            }
+            plotDrag.active = true;
+            plotDrag.fullMode = true;
+            markDirty();
+          } else {
+            const ctm = g.node().getScreenCTM();
+            const domain = xScale.domain();
+            plotDrag.active = true;
+            plotDrag.fullMode = false;
+            plotDrag.wasPlaying = pb.playing;
+            plotDrag.startClientX = e.clientX;
+            plotDrag.startX = pb.mode === 'pos' ? pb.curS : pb.curT;
+            plotDrag.screenPxPerUnit = ctm.a * (plotSvgs[ch] ? plotSvgs[ch].pw : pw) / (domain[1] - domain[0]);
+            if (pb.playing) pb.pause();
+          }
           e.preventDefault();
         });
 
@@ -1187,7 +1230,8 @@
           const hoverX = xScale.invert(svgX);
           const conv = chConv(ch);
           const vis = mdl.visible;
-          const rows = '';
+          const unit = CH_LABELS[ch].units[chUnit[ch]];
+          const rows = [];
           if (hoverX >= 0) {
             for (let i = 0; i < d.models.length; i++) {
               if (!vis[i]) continue;
@@ -1195,16 +1239,14 @@
                 ? d.sampleChannelAtS(d.models[i], ch, hoverX)
                 : d.sampleChannel(d.models[i], ch, hoverX);
               if (val === null) continue;
-              const v = (val * conv).toFixed(3);
-              const unit = CH_LABELS[ch].units[chUnit[ch]];
-              rows += '<div class="tt-row"><span class="tt-dot" style="background:' + d.models[i].color + '"></span><span>' + v + ' ' + unit + '</span></div>';
+              rows.push(`<div class="tt-row"><span class="tt-dot" style="background:${d.models[i].color}"></span><span>${(val * conv).toFixed(3)} ${unit}</span></div>`);
             }
           }
-          if (rows) {
+          if (rows.length) {
             const hx = xScale(hoverX);
             hoverLine.attr('x1', hx).attr('x2', hx).attr('opacity', 0.6);
-            const label = posMode ? hoverX.toFixed(1) + 'm' : hoverX.toFixed(2) + 's';
-            tooltip.innerHTML = '<div style="color:var(--text);margin-bottom:2px">' + label + '</div>' + rows;
+            const label = posMode ? `${hoverX.toFixed(1)}m` : `${hoverX.toFixed(2)}s`;
+            tooltip.innerHTML = `<div style="color:var(--text);margin-bottom:2px">${label}</div>${rows.join('')}`;
             tooltip.style.display = 'block';
             const cellRect = cell.getBoundingClientRect();
             let tx = e.clientX - cellRect.left + 12;
@@ -1221,7 +1263,7 @@
           hoverLine.attr('opacity', 0);
         });
 
-        plotSvgs[ch] = { xScale: xScale, yScale: yScale, gridG: gridG, xAxis: xAxis, yAxis: yAxis, linesG: linesG, cursorLine: cursorLine, dotsG: dotsG, pw: pw };
+        plotSvgs[ch] = { svgEl: svgEl, clipRect: clipRect, hitArea: hitArea, xScale: xScale, yScale: yScale, gridG: gridG, xAxis: xAxis, yAxis: yAxis, linesG: linesG, cursorLine: cursorLine, dotsG: dotsG, pw: pw };
       }
 
       function initAllPlots() {
@@ -1232,11 +1274,24 @@
         });
         d3.select(window).on('mousemove.plot', e => {
           if (!plotDrag.active) return;
-          const dx = -(e.clientX - plotDrag.startClientX) / plotDrag.screenPxPerUnit;
-          if (pb.mode === 'pos') {
-            pb.curS = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxS));
+          if (plotDrag.fullMode) {
+            const first = Object.values(plotSvgs)[0];
+            if (!first) return;
+            const ctm = first.linesG.node().getScreenCTM();
+            const svgX = (e.clientX - ctm.e) / ctm.a;
+            const dragX = first.xScale.invert(svgX);
+            if (pb.mode === 'pos') {
+              pb.curS = Math.max(0, Math.min(dragX, pb.maxS));
+            } else {
+              pb.curT = Math.max(0, Math.min(dragX, pb.maxT));
+            }
           } else {
-            pb.curT = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxT));
+            const dx = -(e.clientX - plotDrag.startClientX) / plotDrag.screenPxPerUnit;
+            if (pb.mode === 'pos') {
+              pb.curS = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxS));
+            } else {
+              pb.curT = Math.max(0, Math.min(plotDrag.startX + dx, pb.maxT));
+            }
           }
           markDirty();
         }).on('mouseup.plot', () => {
@@ -1244,6 +1299,21 @@
           plotDrag.active = false;
           if (plotDrag.wasPlaying) pb.resume();
         });
+        markDirty();
+        new ResizeObserver(() => {
+          for (const ch of CHANNELS) {
+            const p = plotSvgs[ch];
+            if (!p) continue;
+            const w = p.svgEl.node().getBoundingClientRect().width;
+            if (w <= 0 || Math.abs(w - p.pw) < 1) continue;
+            p.pw = w;
+            p.svgEl.attr('viewBox', '0 0 ' + w + ' ' + plotH);
+            p.xScale.range([0, w]);
+            p.clipRect.attr('width', w);
+            p.hitArea.attr('width', w);
+          }
+          markDirty();
+        }).observe(rootEl);
       }
 
       function updateChannel(ch, curX, vis, posMode) {
@@ -1252,14 +1322,20 @@
         const conv = chConv(ch);
 
         let xMin, xMax;
-        if (posMode) {
-          const wm = ui.plotWindowM;
-          if (wm > 0) { xMin = curX - wm / 2; xMax = curX + wm / 2; }
-          else { xMin = 0; xMax = pb.maxS; }
+        const isFull = ui.plotViewMode === 'full';
+        if (isFull) {
+          xMin = 0;
+          xMax = posMode ? pb.maxS : pb.maxT;
+          p.xScale.range([50, p.pw - 10]);
         } else {
-          const ws = ui.plotWindowS;
-          if (ws > 0) { xMin = curX - ws / 2; xMax = curX + ws / 2; }
-          else { xMin = 0; xMax = pb.maxT; }
+          if (posMode) {
+            const wm = ui.plotWindowM;
+            xMin = curX - wm / 2; xMax = curX + wm / 2;
+          } else {
+            const ws = ui.plotWindowS;
+            xMin = curX - ws / 2; xMax = curX + ws / 2;
+          }
+          p.xScale.range([0, p.pw]);
         }
         p.xScale.domain([xMin, xMax]);
 
@@ -1286,16 +1362,19 @@
 
         const xUnit = posMode ? 'm' : 's';
         const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim();
-        const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--border-dim').trim();
-        p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(v => v.toFixed(0) + xUnit))
-          .selectAll('text').attr('fill', tickColor).style('font-size', 'var(--fs-xs)');
-        p.xAxis.selectAll('line,path').attr('stroke', lineColor);
+        p.xAxis.call(d3.axisBottom(p.xScale).ticks(5).tickFormat(v => v.toFixed(0) + xUnit).tickSize(0));
+        p.xAxis.select('.domain').remove();
+        p.xAxis.selectAll('text').attr('fill', tickColor).attr('y', -10).attr('opacity', 0.55)
+          .style('font-size', '10px')
+          .style('text-shadow', '0 0 3px var(--surface-2), 0 0 3px var(--surface-2)');
         const yRange = p.yScale.domain();
         const ySpan = Math.abs(yRange[1] - yRange[0]);
         const yPrec = ySpan < 0.01 ? 4 : ySpan < 0.1 ? 3 : ySpan < 1 ? 2 : 1;
-        p.yAxis.call(d3.axisLeft(p.yScale).ticks(4).tickFormat(d3.format('.' + yPrec + 'f')))
-          .selectAll('text').attr('fill', tickColor).style('font-size', 'var(--fs-xs)');
-        p.yAxis.selectAll('line,path').attr('stroke', lineColor);
+        p.yAxis.call(d3.axisLeft(p.yScale).ticks(4).tickFormat(d3.format('.' + yPrec + 'f')).tickSize(0));
+        p.yAxis.select('.domain').remove();
+        p.yAxis.selectAll('text').attr('fill', tickColor).attr('x', 40).attr('text-anchor', 'end').attr('opacity', 0.55)
+          .style('font-size', '10px')
+          .style('text-shadow', '0 0 3px var(--surface-2), 0 0 3px var(--surface-2)');
 
         p.gridG.selectAll('*').remove();
         p.xScale.ticks(5).forEach(t => {
@@ -1396,7 +1475,7 @@
           this.units = {};
           CHANNELS.forEach(ch => { this.units[ch] = 0; });
           this.$nextTick(() => { initAllPlots(); });
-          (function loop() { if (_dirty) updateAll(); requestAnimationFrame(loop); })();
+          (function loop() { if (_plotsDirty) { _plotsDirty = false; updateAll(); } requestAnimationFrame(loop); })();
         },
       };
     });
