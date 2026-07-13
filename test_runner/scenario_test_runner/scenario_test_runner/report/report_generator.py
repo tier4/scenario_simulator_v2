@@ -34,14 +34,16 @@ from ament_index_python.packages import get_package_share_directory
 from .alpine_js import ALPINE_JS
 from .d3_js import D3_JS
 
-_TEMPLATE_PATH = (
-    Path(get_package_share_directory("scenario_test_runner"))
-    / "templates"
-    / "report_template.html"
+_TEMPLATES_DIR = (
+    Path(get_package_share_directory("scenario_test_runner")) / "templates"
 )
+
+_TEMPLATE_PATH = _TEMPLATES_DIR / "report_template.html"
 
 
 def _load_template():
+    if not _TEMPLATE_PATH.exists():
+        raise FileNotFoundError(f"Template not found: {_TEMPLATE_PATH}")
     return _TEMPLATE_PATH.read_text()
 
 
@@ -241,12 +243,16 @@ def generate_report(output_dir, report_output_directory=None):
 
 
 if __name__ == "__main__":
+    import argparse
     import sys
 
-    output_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("/tmp/scenario_test_runner")
-    paths = generate_report(output_dir)
+    parser = argparse.ArgumentParser(description="Generate trajectory comparison report")
+    parser.add_argument("output_dir", nargs="?", default="/tmp/scenario_test_runner")
+    args = parser.parse_args()
+
+    paths = generate_report(Path(args.output_dir))
     if not paths:
-        print(f"No bags found in {output_dir}")
+        print(f"No bags found in {args.output_dir}")
         sys.exit(1)
     for p in paths:
         print(f"Report generated: {p}")

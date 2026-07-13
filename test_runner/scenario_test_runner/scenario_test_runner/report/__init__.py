@@ -38,4 +38,4 @@
 # Key files:
 #   report_generator.py          — entry point; reads bags, fills template
 #   rosbag_reader.py             — extracts ego trajectory + map from rosbags
-#   templates/report_template.html — the single-file HTML template
+#   templates/report_template.html    — Alpine.js + Web Components template
