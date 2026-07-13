@@ -899,7 +899,7 @@
         border-bottom: 1px solid var(--border-dim);
       }
       .model-entry {
-        padding: var(--size-2) var(--size-2) var(--size-2) var(--size-1);
+        padding: var(--size-1) var(--size-2) var(--size-1) var(--size-1);
         border-left: 10px solid var(--model-color);
         border-bottom: 1px solid var(--border-dim);
         cursor: pointer;
@@ -917,18 +917,18 @@
       .model-name {
         display: block;
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        color: var(--text);
+        color: var(--text); font-size: var(--fs-xs);
       }
       .model-entry-stat {
         grid-column: 2;
         color: var(--text); font-size: var(--fs-xs);
-        margin-top: var(--size-1);
+        opacity: 0.6;
       }
       .stat-row {
-        display: flex; gap: var(--size-3);
-        font-variant-numeric: tabular-nums; opacity: 0.6;
+        display: flex; gap: var(--size-2);
+        font-variant-numeric: tabular-nums;
       }
-      .stat-unit { margin-left: 1px; }
+      .stat-item { white-space: nowrap; }
       .stat-ended { color: var(--danger); font-weight: 600; }
       .text-muted { color: var(--text); }
     </style>
@@ -950,18 +950,9 @@
               <template x-if="$store.models.visible[i] && !hasValidData(i)"><span class="text-muted">no data</span></template>
               <template x-if="$store.models.visible[i] && hasValidData(i) && getSample(i)">
                 <div class="stat-row">
-                  <span class="stat-item">
-                    <span class="stat-val" x-text="getSample(i).v.toFixed(1)"></span>
-                    <span class="stat-unit">m/s</span>
-                  </span>
-                  <span class="stat-item">
-                    <span class="stat-val" x-text="getSample(i).t.toFixed(1)"></span>
-                    <span class="stat-unit">s</span>
-                  </span>
-                  <span class="stat-item">
-                    <span class="stat-val" x-text="getSample(i).s.toFixed(0)"></span>
-                    <span class="stat-unit">m</span>
-                  </span>
+                  <span class="stat-item" x-text="getSample(i).v.toFixed(1) + ' m/s'"></span>
+                  <span class="stat-item" x-text="getSample(i).t.toFixed(1) + ' s'"></span>
+                  <span class="stat-item" x-text="getSample(i).s.toFixed(1) + ' m'"></span>
                   <span class="stat-ended" x-show="getSample(i).ended">ended</span>
                 </div>
               </template>
@@ -1021,13 +1012,13 @@
       .plot-cell .plot-svg { width: 100%; height: 200px; display: block; }
       .plot-cell.no-data { opacity: 0.35; }
       .plot-cell-legend {
-        display: flex; flex-wrap: wrap; gap: var(--size-2) var(--size-3);
-        padding: var(--size-2) var(--size-3);
+        display: flex; flex-wrap: wrap; gap: var(--size-1) var(--size-2);
+        padding: var(--size-1) var(--size-2);
         border-top: 1px solid var(--border-dim);
         font-size: var(--fs-xs); color: var(--text);
       }
-      .plot-legend-item { display: flex; align-items: center; gap: 5px; }
-      .plot-legend-line { display: block; width: 24px; height: 4px; flex-shrink: 0; }
+      .plot-legend-item { display: flex; align-items: center; gap: 3px; }
+      .plot-legend-line { display: block; width: 16px; height: 3px; flex-shrink: 0; }
       .plot-nodata {
         height: 200px;
         display: flex; align-items: center; justify-content: center;
@@ -1523,14 +1514,15 @@
       }
       .nc-tip {
         display: none; position: fixed; z-index: 20;
-        max-width: 280px; padding: 6px 10px;
+        max-width: 200px; padding: 6px 10px;
         background: var(--surface-1); color: var(--text);
         border: 1px solid var(--border-dim);
         border-radius: var(--radius-2);
         box-shadow: 0 2px 8px rgba(0,0,0,0.12);
         font-size: var(--fs-xs); font-weight: 400;
-        line-height: 1.5; white-space: pre-line; pointer-events: none;
+        line-height: 1.5; pointer-events: none;
       }
+      .nc-tip .nb { white-space: nowrap; }
       .nc-tip.visible { display: block; }
     </style>
     <div id="root" x-data="numComp">
@@ -1583,7 +1575,7 @@
       </div>
       <div class="nc-tip" :class="{ visible: tipVisible }"
            :style="'left:' + tipX + 'px;top:' + tipY + 'px'"
-           x-text="tipText"></div>
+           x-html="tipText"></div>
     </div>
   </template>
 
@@ -1601,37 +1593,37 @@
         ]},
         { header: 'Correspondence', cols: [
           { key: 'match_valid_pct', label: 'Valid', unit: '%',
-            tip: 'Share of samples with\nlateral distance ≤ ' + LATERAL_THRESH.toFixed(0) + ' m' },
+            tip: 'Share of samples with <span class="nb">lateral distance ≤ ' + LATERAL_THRESH.toFixed(0) + ' m</span>' },
           { key: 'median_lateral_m', label: 'Median lateral', unit: 'm',
-            tip: 'Median lateral distance\nat arc-length matched points' },
+            tip: 'Median lateral distance at arc-length matched points' },
           { key: 'max_lateral_m', label: 'Max lateral', unit: 'm',
-            tip: 'Maximum lateral distance\nat arc-length matched points' },
+            tip: 'Maximum lateral distance at arc-length matched points' },
         ]},
         { header: 'Speed difference', cols: [
           { key: 'mean_dv', label: 'Mean Δv', unit: 'm/s',
-            tip: 'Mean speed difference\n(model − baseline)' },
+            tip: 'Mean speed difference <span class="nb">(model − baseline)</span>' },
           { key: 'median_dv', label: 'Median Δv', unit: 'm/s',
-            tip: 'Median speed difference\n(model − baseline)' },
+            tip: 'Median speed difference <span class="nb">(model − baseline)</span>' },
           { key: 'avg_over', label: 'Avg overspeed', unit: 'm/s',
-            tip: 'Mean of positive Δv\n(model faster than baseline)' },
+            tip: 'Mean of positive Δv <span class="nb">(model faster than baseline)</span>' },
           { key: 'avg_under', label: 'Avg underspeed', unit: 'm/s',
-            tip: 'Mean of negative Δv\n(model slower than baseline)' },
+            tip: 'Mean of negative Δv <span class="nb">(model slower than baseline)</span>' },
           { key: 'peak_over', label: 'Peak Δv+', unit: 'm/s',
-            tip: 'Largest positive Δv\n(max excess over baseline)' },
+            tip: 'Largest positive Δv <span class="nb">(max excess over baseline)</span>' },
           { key: 'peak_under', label: 'Peak Δv−', unit: 'm/s',
-            tip: 'Largest negative Δv\n(max deficit vs baseline)' },
+            tip: 'Largest negative Δv <span class="nb">(max deficit vs baseline)</span>' },
         ]},
         { header: 'Turn indicator', cols: [
           { key: 'ti_clusters', label: 'Clusters',
-            tip: 'Turn-indicator clusters\non the baseline path' },
+            tip: 'Turn-indicator clusters on the baseline path' },
           { key: 'ti_missing', label: 'Missing',
-            tip: 'Baseline clusters with\nno matching model signal' },
+            tip: 'Baseline clusters with no matching model signal' },
           { key: 'ti_mean_iou', label: 'Mean IoU',
-            tip: 'Arc-length IoU of matched\nturn-indicator clusters' },
+            tip: 'Arc-length IoU of matched turn-indicator clusters' },
         ]},
         { header: 'Operational', cols: [
           { key: 'strong_brakes', label: 'Strong brakes',
-            tip: 'Consecutive intervals with\nacceleration ≤ −1.0 m/s²' },
+            tip: 'Consecutive intervals with <span class="nb">acceleration ≤ −1.0 m/s²</span>' },
         ]},
       ];
 
@@ -1863,14 +1855,14 @@
         border: 1px solid var(--border-dim);
       }
       .static-fig-legend {
-        display: flex; flex-wrap: wrap; gap: var(--size-2) var(--size-3);
-        padding: var(--size-2) var(--size-3);
+        display: flex; flex-wrap: wrap; gap: var(--size-1) var(--size-2);
+        padding: var(--size-1) var(--size-2);
         border-top: 1px solid var(--border-dim);
-        font-size: var(--fs-sm); color: var(--text);
+        font-size: var(--fs-xs); color: var(--text);
       }
-      .static-fig-legend-item { display: flex; align-items: center; gap: 5px; }
-      .static-fig-legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-      .static-fig-legend-line { width: 16px; height: 3px; border-radius: 1px; flex-shrink: 0; }
+      .static-fig-legend-item { display: flex; align-items: center; gap: 3px; }
+      .static-fig-legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+      .static-fig-legend-line { width: 12px; height: 2px; border-radius: 1px; flex-shrink: 0; }
     </style>
     <div id="root" x-data="staticFigures">
       <div class="static-figures">
