@@ -158,10 +158,12 @@
   <script type="application/gzip+base64" id="report-data">{{DATA_B64GZ}}</script>
 
   <!-- ============================================================
-       Shared: utilities, constants, stores, shared stylesheet
+       Shared: bootstrap, render loop, utilities, WC infra, stores
        ============================================================ -->
   <script>
   "use strict";
+
+  // ── Bootstrap: gzip decode & data ──────────────────────────────
 
   function decodeGz(id) {
     const gz = Uint8Array.from(atob(document.getElementById(id).textContent.trim()), c => c.charCodeAt(0));
@@ -174,19 +176,12 @@
 
   const reportData = decodeGz('report-data').then(t => JSON.parse(t));
 
-  const CHANNELS = ["velocity", "accel", "heading_rate", "steer"];
-  const CH_LABELS = {
-    velocity: {name: "Velocity", units: ["m/s"]},
-    accel: {name: "Accel", units: ["m/s²"]},
-    heading_rate: {name: "Yaw Rate", units: ["rad/s", "deg/s"], conv: [1, 180/Math.PI]},
-    steer: {name: "Steer", units: ["deg", "rad"], conv: [1, Math.PI/180]},
-  };
-  const CH_CMD = {velocity: "cmd_velocity", accel: "cmd_accel", steer: "cmd_steer"};
-  const chUnit = {};
-  CHANNELS.forEach(ch => { chUnit[ch] = 0; });
+  // ── Render loop ────────────────────────────────────────────────
 
   let _dirty = true;
   function markDirty() { _dirty = true; }
+
+  // ── Shared utilities ───────────────────────────────────────────
 
   function upperBound(arr, val, n) {
     let lo = 0, hi = n;
@@ -205,14 +200,8 @@
     return { meters: best, px: best * pxPerMeter };
   }
 
-  function closestPlanned(planned, t) {
-    if (!planned || !planned.length) return null;
-    let lo = 0, hi = planned.length - 1;
-    while (lo < hi) { const m = (lo + hi + 1) >> 1; planned[m].t <= t ? lo = m : hi = m - 1; }
-    return planned[lo];
-  }
+  // ── WebComponent infrastructure ────────────────────────────────
 
-  // --- Shared CSSStyleSheet adopted by all shadow roots ---
   const _sharedSheet = new CSSStyleSheet();
   _sharedSheet.replaceSync(
     document.getElementById('shared-wc-styles').textContent
@@ -234,7 +223,8 @@
     });
   }
 
-  // --- Alpine stores ---
+  // ── Alpine stores ──────────────────────────────────────────────
+
   document.addEventListener('alpine:init', () => {
 
     Alpine.store('data', {
@@ -393,7 +383,8 @@
 
   });
 
-  // --- Custom element registration ---
+  // ── Custom element registration ─────────────────────────────────
+
   defineAlpineElement('map-canvas', 'map-canvas-tmpl');
   defineAlpineElement('legend-panel', 'legend-panel-tmpl');
   defineAlpineElement('plots-panel', 'plots-panel-tmpl');
@@ -556,6 +547,13 @@
   </template>
 
   <script>
+  function closestPlanned(planned, t) {
+    if (!planned || !planned.length) return null;
+    let lo = 0, hi = planned.length - 1;
+    while (lo < hi) { const m = (lo + hi + 1) >> 1; planned[m].t <= t ? lo = m : hi = m - 1; }
+    return planned[lo];
+  }
+
   document.addEventListener('alpine:init', () => {
     Alpine.data('mapCanvas', function() {
       let ctx = null, canvas = null;
@@ -1106,6 +1104,17 @@
   </template>
 
   <script>
+  const CHANNELS = ["velocity", "accel", "heading_rate", "steer"];
+  const CH_LABELS = {
+    velocity: {name: "Velocity", units: ["m/s"]},
+    accel: {name: "Accel", units: ["m/s²"]},
+    heading_rate: {name: "Yaw Rate", units: ["rad/s", "deg/s"], conv: [1, 180/Math.PI]},
+    steer: {name: "Steer", units: ["deg", "rad"], conv: [1, Math.PI/180]},
+  };
+  const CH_CMD = {velocity: "cmd_velocity", accel: "cmd_accel", steer: "cmd_steer"};
+  const chUnit = {};
+  CHANNELS.forEach(ch => { chUnit[ch] = 0; });
+
   document.addEventListener('alpine:init', () => {
     Alpine.data('plotsPanel', function() {
       let plotSvgs = {};
