@@ -456,9 +456,6 @@
       .play-btn { color: var(--text); }
       .play-btn:hover { color: var(--text); }
       .play-btn.playing { color: var(--accent); border-color: var(--accent); }
-      .toggle-group {
-        display: flex; align-items: center; gap: var(--size-2); flex-wrap: wrap;
-      }
       input[type=range] {
         --pct: 0%;
         -webkit-appearance: none; appearance: none;
@@ -495,20 +492,103 @@
         cursor: grab;
       }
       .map-wrap canvas:active { cursor: grabbing; }
+      .map-body {
+        display: flex; height: 550px;
+      }
+      .map-body .map-wrap { flex: 1; height: 100%; }
+      .layer-tree {
+        display: flex; flex-direction: column;
+        width: 160px; flex-shrink: 0;
+        border-right: 1px solid var(--border-dim);
+        font-size: var(--fs-sm);
+        overflow-y: auto;
+      }
+      .layer-tree[hidden] { display: none; }
+      .sidebar-toggle {
+        position: absolute; top: 0; left: 0; z-index: 2;
+        width: 20px; height: 48px; padding: 0;
+        display: flex; align-items: center; justify-content: center;
+        background: var(--surface-3); border: none;
+        border-right: 1px solid var(--border-dim);
+        border-bottom: 1px solid var(--border-dim);
+        border-radius: 0 0 var(--radius-2) 0; cursor: pointer;
+        color: var(--text); opacity: 0.7;
+        line-height: 1; min-width: auto;
+      }
+      .sidebar-toggle:hover { opacity: 1; background: var(--surface-2); }
+      .layer-tree ~ .map-wrap .sidebar-toggle { left: 0; }
+      .layer-tree[hidden] ~ .map-wrap .sidebar-toggle {
+        border-right: 1px solid var(--border-dim);
+      }
+      .layer-cat {
+        display: flex; flex-direction: column; gap: 2px;
+        padding: var(--size-1) var(--size-2);
+        border-bottom: 1px solid var(--border-dim);
+      }
+      .layer-cat:last-child { border-bottom: none; }
+      .layer-cat-label {
+        display: flex; align-items: center; justify-content: space-between;
+        font-size: var(--fs-xs); font-weight: 600;
+        color: var(--text); opacity: 0.5;
+        text-transform: uppercase; letter-spacing: 0.04em;
+        cursor: pointer; user-select: none;
+      }
+      .layer-cat-label input { margin: 0; }
+      .layer-tree .toggle-label { justify-content: space-between; }
     </style>
     <div id="root" x-data="mapCanvas">
       <div class="card" style="overflow:hidden">
-        <div class="map-wrap" x-ref="mapWrap" style="height:550px">
-          <canvas x-ref="mapCvs"
-            @mousedown="onMouseDown($event)"
-            @mousemove="onMouseMove($event)"
-            @mouseup="onMouseUp()"
-            @mouseleave="onMouseUp()"
-            @dblclick="doFitAll()"
-            @wheel.prevent="onWheel($event)"></canvas>
+        <div class="map-body">
+          <div class="layer-tree" :hidden="!showLayers">
+            <div class="layer-cat">
+              <span class="layer-cat-label">Camera</span>
+              <label class="toggle-label">Track Ego <input type="checkbox" x-model="$store.camera.follow"></label>
+            </div>
+            <div class="layer-cat">
+              <label class="layer-cat-label"
+                >Trajectory <input type="checkbox" checked
+                  @change="$store.ui.showPlanned = $event.target.checked; markDirty()"
+                  x-effect="$el.querySelector('input').checked = $store.ui.showPlanned"
+                ></label>
+              <label class="toggle-label">Planned <input type="checkbox" x-model="$store.ui.showPlanned" @change="markDirty()"></label>
+            </div>
+            <div class="layer-cat">
+              <label class="layer-cat-label"
+                >Objects <input type="checkbox" checked
+                  @change="let v=$event.target.checked; $store.ui.showEntities=v; $store.ui.showPerceived=v; markDirty()"
+                  x-effect="$el.querySelector('input').checked = $store.ui.showEntities || $store.ui.showPerceived"
+                ></label>
+              <label class="toggle-label">Entities <input type="checkbox" x-model="$store.ui.showEntities" @change="markDirty()"></label>
+              <label class="toggle-label">Recognition <input type="checkbox" x-model="$store.ui.showPerceived" @change="markDirty()"></label>
+            </div>
+          </div>
+          <div class="map-wrap" x-ref="mapWrap" style="position:relative">
+            <button class="sidebar-toggle" @click="showLayers = !showLayers"
+              :title="showLayers ? 'Hide sidebar' : 'Show sidebar'">
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path x-show="showLayers" d="M6 1 L2 5 L6 9"/>
+                <path x-show="!showLayers" d="M4 1 L8 5 L4 9"/>
+              </svg>
+            </button>
+            <canvas x-ref="mapCvs"
+              @mousedown="onMouseDown($event)"
+              @mousemove="onMouseMove($event)"
+              @mouseup="onMouseUp()"
+              @mouseleave="onMouseUp()"
+              @dblclick="doFitAll()"
+              @wheel.prevent="onWheel($event)"></canvas>
+          </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:var(--size-2);padding:var(--size-2);border-top:1px solid var(--border-dim)">
         <div class="controls" style="margin:0">
+          <select x-model.number="$store.playback.speedMul" style="min-width:5em">
+            <option value="0.25">0.25x</option>
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1x</option>
+            <option value="2">2x</option>
+            <option value="4">4x</option>
+            <option value="8">8x</option>
+          </select>
           <button @click="$store.playback.toggle()" class="play-btn" :class="$store.playback.playing && 'playing'"
             style="min-width:auto; padding:var(--size-1); width:32px; height:32px; display:flex; align-items:center; justify-content:center;">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"
@@ -532,22 +612,6 @@
             x-text="$store.playback.curT.toFixed(1) + 's / ' + $store.playback.maxT.toFixed(1) + 's'"></small>
           <small x-show="$store.playback.mode === 'pos'"
             x-text="$store.playback.curS.toFixed(1) + 'm / ' + $store.playback.maxS.toFixed(1) + 'm'"></small>
-          <select x-model.number="$store.playback.speedMul" style="min-width:5em">
-            <option value="0.25">0.25x</option>
-            <option value="0.5">0.5x</option>
-            <option value="1" selected>1x</option>
-            <option value="2">2x</option>
-            <option value="4">4x</option>
-            <option value="8">8x</option>
-          </select>
-        </div>
-        <div class="controls" style="margin:0">
-          <div class="toggle-group">
-            <label class="toggle-label"><input type="checkbox" x-model="$store.camera.follow"> Track Ego</label>
-            <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPlanned" @change="markDirty()"> Planned Trajectory</label>
-            <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showEntities" @change="markDirty()"> Entities</label>
-            <label class="toggle-label"><input type="checkbox" x-model="$store.ui.showPerceived" @change="markDirty()"> Object Recognition</label>
-          </div>
         </div>
         </div>
       </div>
@@ -820,6 +884,7 @@
       let needsInitialFit = true;
 
       function resize(wrap) {
+        const prevW = W;
         W = wrap.clientWidth; H = wrap.clientHeight;
         if (W <= 0 || H <= 0) return;
         const dpr = window.devicePixelRatio || 1;
@@ -829,11 +894,14 @@
           needsInitialFit = false;
           const dx = d.bbox[2] - d.bbox[0], dy = d.bbox[3] - d.bbox[1];
           cam.viewW = Math.max(dx, dy * (W / H), 10) * 1.1;
+        } else if (prevW > 0) {
+          cam.viewW *= W / prevW;
         }
         markDirty();
       }
 
       return {
+        showLayers: true,
         init() {
           canvas = this.$refs.mapCvs;
           ctx = canvas.getContext('2d');
@@ -899,20 +967,20 @@
         border-bottom: 1px solid var(--border-dim);
       }
       .model-entry {
-        padding: var(--size-1) var(--size-2) var(--size-1) var(--size-1);
+        padding: var(--size-1) var(--size-2) var(--size-1) var(--size-2);
         border-left: 10px solid var(--model-color);
         border-bottom: 1px solid var(--border-dim);
         cursor: pointer;
       }
       .model-entry:last-child { border-bottom: none; }
       .model-entry-inner {
-        display: grid; grid-template-columns: auto 1fr;
+        display: grid; grid-template-columns: 1fr auto;
         gap: 0 var(--size-1); align-items: center;
       }
-      .model-entry-inner input { grid-column: 1; }
+      .model-entry-inner input { grid-column: 2; grid-row: 1 / -1; }
       .model-entry-inner label {
         cursor: pointer; margin: 0; padding: 0;
-        font-weight: 500; min-width: 0;
+        font-weight: 500; min-width: 0; grid-column: 1;
       }
       .model-name {
         display: block;
@@ -920,7 +988,7 @@
         color: var(--text); font-size: var(--fs-xs);
       }
       .model-entry-stat {
-        grid-column: 2;
+        grid-column: 1;
         color: var(--text); font-size: var(--fs-xs);
         opacity: 0.6;
       }
@@ -939,12 +1007,12 @@
           <div class="model-entry" :style="'--model-color:' + m.color"
             @click="$store.models.visible[i] = !$store.models.visible[i]; markDirty()">
             <div class="model-entry-inner">
-              <input type="checkbox" :checked="$store.models.visible[i]"
-                @click.stop
-                @change="$store.models.visible[i] = $el.checked; markDirty()">
               <label>
                 <span class="model-name" x-text="m.name" :title="m.name"></span>
               </label>
+              <input type="checkbox" :checked="$store.models.visible[i]"
+                @click.stop
+                @change="$store.models.visible[i] = $el.checked; markDirty()">
             <div class="model-entry-stat">
               <template x-if="!$store.models.visible[i]"><span>&mdash;</span></template>
               <template x-if="$store.models.visible[i] && !hasValidData(i)"><span class="text-muted">no data</span></template>
@@ -1826,21 +1894,20 @@
         box-shadow: var(--card-shadow);
       }
       .static-fig-header {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: var(--size-2) var(--size-3);
+        display: flex; flex-direction: column; gap: 2px;
+        padding: var(--size-1) var(--size-3);
         border-bottom: 1px solid var(--border-dim);
         border-left: 10px solid var(--model-color);
         background: var(--surface-3);
-        min-width: 0; gap: var(--size-2);
+        min-width: 0;
       }
-      .static-fig-header > div:first-child { min-width: 0; flex: 1; }
+      .static-fig-header > div:first-child { min-width: 0; }
       .static-fig-title {
         font-size: var(--fs-sm); font-weight: 600; margin: 0;
         color: var(--text);
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         max-width: 100%;
       }
-      .static-fig-subtitle { font-size: var(--fs-xs); color: var(--text); margin: 0; }
       .static-fig-body { position: relative; }
       .static-fig-body canvas { display: block; width: 100%; }
       .static-fig-colorbar {
@@ -1871,13 +1938,12 @@
             <div class="static-fig-header" :style="'--model-color:' + m.color">
               <div>
                 <p class="static-fig-title" x-text="m.name" :title="m.name"></p>
-                <p class="static-fig-subtitle">Speed-colored trajectory</p>
               </div>
               <div style="display:flex;gap:var(--size-2);align-items:center">
-                <label class="toggle-label" style="font-size:var(--fs-sm)">
+                <label class="toggle-label" style="font-size:var(--fs-xs)">
                   <input type="checkbox" :checked="sfOpts[mi].showBraking" @change="sfOpts[mi].showBraking=$el.checked; drawFigure(mi)"> Braking
                 </label>
-                <label class="toggle-label" style="font-size:var(--fs-sm)">
+                <label class="toggle-label" style="font-size:var(--fs-xs)">
                   <input type="checkbox" :checked="sfOpts[mi].showTurnCmd" @change="sfOpts[mi].showTurnCmd=$el.checked; drawFigure(mi)"> Turn Indicators
                 </label>
               </div>
