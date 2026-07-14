@@ -21,7 +21,6 @@ install(
   DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config
             ${CMAKE_CURRENT_SOURCE_DIR}/launch
             ${CMAKE_CURRENT_SOURCE_DIR}/scenario
-            ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/report/templates
   DESTINATION share/${PROJECT_NAME})
 
 if(BUILD_TESTING)

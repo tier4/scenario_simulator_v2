@@ -22,12 +22,7 @@ import sys
 import tempfile
 import time
 
-# This script's name collides with the installed Python package.
-# Temporarily remove sys.path[0] (the script's directory) so the
-# package import resolves to the ament-installed package, not this file.
-_sp0 = sys.path.pop(0)
-from scenario_test_runner.report.report_generator import generate_report
-sys.path.insert(0, _sp0)
+from simulation_report.report_generator import generate_report
 
 import rclpy
 from argparse import ArgumentParser
