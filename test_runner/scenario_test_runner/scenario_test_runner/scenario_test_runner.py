@@ -27,7 +27,6 @@ import time
 # package import resolves to the ament-installed package, not this file.
 _sp0 = sys.path.pop(0)
 from scenario_test_runner.report.report_generator import generate_report
-from scenario_test_runner.report.rosbag_merger import merge_single_rosbag
 sys.path.insert(0, _sp0)
 
 import rclpy
@@ -41,7 +40,7 @@ from openscenario_preprocessor_msgs.srv import SetParameter
 from openscenario_utility.conversion import convert
 from pathlib import Path
 from rclpy.executors import ExternalShutdownException
-from shutil import copytree, rmtree
+from shutil import rmtree
 from subprocess import run as subprocess_run
 from sys import exit
 from typing import List
@@ -67,24 +66,6 @@ def convert_scenario_to_xosc(scenario: Scenario, output_directory: Path):
             result.append(Scenario(path, scenario.frame_rate))
 
     return result
-
-
-def build_webautobag(final_dir, staging_dir, topics, logger):
-    models = sorted(d for d in staging_dir.iterdir() if d.is_dir())
-    if not models:
-        return
-
-    first_model = models[0]
-    copytree(str(first_model), str(final_dir), dirs_exist_ok=True)
-
-    for model_dir in models[1:]:
-        for xosc in sorted(first_model.rglob("*.xosc")):
-            rel = xosc.relative_to(first_model)
-            target_bag = final_dir / rel.parent / xosc.stem
-            run_bag = model_dir / rel.parent / xosc.stem
-            if not target_bag.is_dir() or not run_bag.is_dir():
-                continue
-            merge_single_rosbag(target_bag, run_bag, model_dir.name, topics, logger)
 
 
 class ScenarioTestRunner(LifecycleController):
@@ -358,7 +339,7 @@ class ScenarioTestRunner(LifecycleController):
 
     # --- MODEL_SYMLINK_PATH workaround: end ---
 
-    def run_scenario_with_comparison(self, scenario, comparison_topics):
+    def run_scenario_with_comparison(self, scenario):
         self.validate_comparison_models()
         final_dir = self.output_directory
 
@@ -381,8 +362,6 @@ class ScenarioTestRunner(LifecycleController):
         if staging_link.is_symlink() or staging_link.exists():
             staging_link.unlink()
         staging_link.symlink_to(staging_dir)
-
-        build_webautobag(final_dir, staging_dir, comparison_topics, self.get_logger())
 
         report_paths = generate_report(final_dir, self.report_output_directory)
         for p in report_paths:
@@ -413,11 +392,6 @@ def main(args=None):
     parser.add_argument(
         "--comparison-model-paths", default="", type=str,
         help="Comma-separated paths to model directories. First is the host bag.",
-    )
-
-    parser.add_argument(
-        "--comparison-topics", default="/planning/trajectory", type=str,
-        help="Comma-separated topic names to merge from comparison model rosbags",
     )
 
     parser.add_argument(
@@ -452,8 +426,7 @@ def main(args=None):
             args.global_frame_rate,
         )
         if args.comparison_model_paths:
-            comparison_topics = [t.strip() for t in args.comparison_topics.split(",") if t.strip()]
-            test_runner.run_scenario_with_comparison(scenario, comparison_topics)
+            test_runner.run_scenario_with_comparison(scenario)
         else:
             test_runner.run_scenario(scenario)
     else:

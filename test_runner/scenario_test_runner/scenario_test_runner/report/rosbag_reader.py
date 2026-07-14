@@ -33,7 +33,6 @@ from geometry_msgs.msg import AccelWithCovarianceStamped
 from nav_msgs.msg import Odometry
 from traffic_simulator_msgs.msg import EntityStatusWithTrajectoryArray
 from pathlib import Path
-from .rosbag_merger import find_driving_timestamp, quaternion_to_yaw
 
 import lanelet2  # noqa: F401 — needed for loadRobust
 from lanelet2.io import Origin, loadRobust
@@ -64,6 +63,27 @@ DOWNSAMPLE_INTERVAL_NS = 200_000_000  # 200ms → ~5Hz
 RATE_HZ = 10.0
 MARKING_TYPES = {"line_thin", "line_thick", "stop_line"}
 
+AUTOWARE_STATE_TOPIC = "/autoware/state"
+AUTOWARE_STATE_DRIVING = 5
+
+
+def find_driving_timestamp(bag_dir):
+    reader = rosbag2_py.SequentialReader()
+    reader.open(
+        rosbag2_py.StorageOptions(uri=str(bag_dir)),
+        rosbag2_py.ConverterOptions("", ""),
+    )
+    has_topic = any(
+        t.name == AUTOWARE_STATE_TOPIC for t in reader.get_all_topics_and_types()
+    )
+    if not has_topic:
+        return None
+    reader.set_filter(rosbag2_py.StorageFilter(topics=[AUTOWARE_STATE_TOPIC]))
+    while reader.has_next():
+        _, data, ts = reader.read_next()
+        if len(data) >= 13 and data[12] == AUTOWARE_STATE_DRIVING:
+            return ts
+    return None
 
 
 _SUBTYPE_NAMES = {0: "unknown", 1: "car", 2: "truck", 3: "bus", 4: "trailer",

@@ -125,7 +125,6 @@ def launch_setup(context, *args, **kwargs):
     carla_path                                  = LaunchConfiguration("carla_path",                                  default="")
     # Model comparison options
     comparison_model_paths                      = LaunchConfiguration("comparison_model_paths",                      default="")
-    comparison_topics                           = LaunchConfiguration("comparison_topics",                           default="/planning/trajectory")
     report_output_directory                     = LaunchConfiguration("report_output_directory",                     default="")
     # fmt: on
     vehicle_model_name = vehicle_model.perform(context)
@@ -219,7 +218,6 @@ def launch_setup(context, *args, **kwargs):
     print(f"vehicle_model                               := {vehicle_model_name}")
     print(f"vehicle_id                                  := {vehicle_id.perform(context)}")
     print(f"comparison_model_paths                      := {comparison_model_paths.perform(context)}")
-    print(f"comparison_topics                           := {comparison_topics.perform(context)}")
     print(f"report_output_directory                     := {report_output_directory.perform(context)}")
 
     def make_launch_prefix():
@@ -433,7 +431,6 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("godot_executable",                            default_value=godot_executable                           ),
         DeclareLaunchArgument("carla_path",                                  default_value=carla_path                                 ),  # e.g. /home/user/Carla-0.10.0-Linux-Shipping
         DeclareLaunchArgument("comparison_model_paths",                      default_value=comparison_model_paths                     ),
-        DeclareLaunchArgument("comparison_topics",                           default_value=comparison_topics                          ),
         DeclareLaunchArgument("report_output_directory",                    default_value=report_output_directory                    ),
         # fmt: on
         Node(
@@ -452,7 +449,6 @@ def launch_setup(context, *args, **kwargs):
                 "--override-parameters",     override_parameters,
                 "--scenario",                scenario,
                 "--comparison-model-paths",      comparison_model_paths,
-                "--comparison-topics",           comparison_topics,
                 "--report-output-directory",     report_output_directory,
                 # fmt: on
             ],
