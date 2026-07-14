@@ -22,7 +22,7 @@ import sys
 import tempfile
 import time
 
-from simulation_report.report_generator import generate_report
+from simulation_report import generate_report
 
 import rclpy
 from argparse import ArgumentParser
@@ -353,14 +353,35 @@ class ScenarioTestRunner(LifecycleController):
         finally:
             self.teardown_model_symlink()
 
-        staging_link = final_dir / "staging"
-        if staging_link.is_symlink() or staging_link.exists():
-            staging_link.unlink()
-        staging_link.symlink_to(staging_dir)
+        first_model_dir = staging_dir / self.comparison_model_paths[0].name
+        scenario_bags = sorted(
+            d for xosc in first_model_dir.rglob("*.xosc")
+            if (d := xosc.parent / xosc.stem).is_dir()
+        )
 
-        report_paths = generate_report(final_dir, self.report_output_directory)
-        for p in report_paths:
-            self.get_logger().info(f"[Model Compare] Report: {p}")
+        if not scenario_bags:
+            self.get_logger().warn("[Model Compare] No scenario bags found")
+            self.shutdown()
+            self.destroy_node()
+            return
+
+        report_dir = self.report_output_directory or final_dir / "comparison_report"
+        report_dir.mkdir(parents=True, exist_ok=True)
+
+        for scenario_bag in scenario_bags:
+            rel = scenario_bag.relative_to(first_model_dir)
+            models = {
+                mp.name: staging_dir / mp.name / rel
+                for mp in self.comparison_model_paths
+                if (staging_dir / mp.name / rel).is_dir()
+            }
+            if len(scenario_bags) == 1:
+                out = report_dir / "report.html"
+            else:
+                out = report_dir / f"report_{scenario_bag.name}.html"
+
+            path = generate_report(models, out)
+            self.get_logger().info(f"[Model Compare] Report: {path}")
 
         self.shutdown()
         self.destroy_node()
