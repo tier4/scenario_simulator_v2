@@ -16,11 +16,15 @@
 # limitations under the License.
 
 
-import os
-import rclpy
-import time
 import json
+import os
+import tempfile
+import time
 
+from simulation_report import generate_report
+from subprocess import run as subprocess_run
+
+import rclpy
 from argparse import ArgumentParser
 from glob import glob
 from lifecycle_controller import LifecycleController
@@ -36,6 +40,8 @@ from sys import exit
 from typing import List
 from scenario import Scenario
 from scenario import substitute_ros_package
+
+MODEL_SYMLINK_PATH = Path("/opt/autoware/mlmodels/diffusion_planner_for_x2")
 
 
 def convert_scenario_to_xosc(scenario: Scenario, output_directory: Path):
@@ -71,7 +77,9 @@ class ScenarioTestRunner(LifecycleController):
         global_real_time_factor: float,
         global_timeout: int,  # [sec]
         output_directory: Path,
-        override_parameters: str
+        override_parameters: str,
+        comparison_model_paths: list = None,
+        report_output_directory: Path = None,
     ):
         """
         Initialize the class ScenarioTestRunner.
@@ -142,6 +150,9 @@ class ScenarioTestRunner(LifecycleController):
                     self.print_debug('/simulation/openscenario_preprocessor/set_parameter: timeout')
                     exit(1)
 
+        self.comparison_model_paths = comparison_model_paths or []
+        self.report_output_directory = report_output_directory
+        self._model_backup = None
 
     def spin(self):
         """Run scenario."""
@@ -159,7 +170,7 @@ class ScenarioTestRunner(LifecycleController):
                 else:
                     time.sleep(self.SLEEP_RATE)
 
-    def run_scenario(self, scenario: Scenario):
+    def run_scenario(self, scenario: Scenario, *, _shutdown=True):
 
         # convert t4v2/xosc to xosc
         xosc_scenarios = convert_scenario_to_xosc(scenario, self.output_directory)
@@ -186,8 +197,9 @@ class ScenarioTestRunner(LifecycleController):
             else:
                 exit(1)
 
-        self.shutdown()
-        self.destroy_node()
+        if _shutdown:
+            self.shutdown()
+            self.destroy_node()
 
     def run_preprocessed_scenarios(self, scenarios: List[Scenario]):
         """
@@ -274,6 +286,66 @@ class ScenarioTestRunner(LifecycleController):
     def print_debug(self, message: str):
         self.get_logger().info(message)
 
+    def _switch_model(self, model_path):
+        s = MODEL_SYMLINK_PATH
+        if self._model_backup is None and s.exists() and not s.is_symlink():
+            self._model_backup = Path("/tmp") / (s.name + ".backup")
+            subprocess_run(["sudo", "mv", str(s), str(self._model_backup)], check=True)
+        if s.is_symlink():
+            subprocess_run(["sudo", "rm", str(s)], check=True)
+        subprocess_run(["sudo", "ln", "-s", str(model_path), str(s)], check=True)
+        self.get_logger().info(f"[Model Switch] {s} -> {model_path}")
+
+    def _restore_model(self):
+        s = MODEL_SYMLINK_PATH
+        if s.is_symlink():
+            subprocess_run(["sudo", "rm", str(s)], check=True)
+        if self._model_backup and self._model_backup.exists():
+            subprocess_run(["sudo", "mv", str(self._model_backup), str(s)], check=True)
+            self._model_backup = None
+
+    def run_scenario_with_comparison(self, scenario):
+        for p in self.comparison_model_paths:
+            if not p.is_dir():
+                raise RuntimeError(f"Comparison model path does not exist: {p}")
+
+        final_dir = self.output_directory
+        staging = Path(tempfile.mkdtemp(prefix="scenario_staging_"))
+        try:
+            for mp in self.comparison_model_paths:
+                self.get_logger().info(f"[Model Compare] Running model: {mp.name}")
+                self._switch_model(mp)
+                self.output_directory = staging / mp.name
+                self.output_directory.mkdir(exist_ok=True)
+                try:
+                    self.run_scenario(scenario, _shutdown=False)
+                finally:
+                    self.output_directory = final_dir
+        finally:
+            self._restore_model()
+
+        first = staging / self.comparison_model_paths[0].name
+        scenario_bags = sorted(
+            d for xosc in first.rglob("*.xosc")
+            if (d := xosc.parent / xosc.stem).is_dir()
+        )
+        if scenario_bags:
+            report_dir = self.report_output_directory or final_dir / "comparison_report"
+            report_dir.mkdir(parents=True, exist_ok=True)
+            for bag in scenario_bags:
+                rel = bag.relative_to(first)
+                models = {
+                    mp.name: staging / mp.name / rel
+                    for mp in self.comparison_model_paths
+                    if (staging / mp.name / rel).is_dir()
+                }
+                out = report_dir / ("report.html" if len(scenario_bags) == 1
+                                    else f"report_{bag.name}.html")
+                self.get_logger().info(f"[Model Compare] Report: {generate_report(models, out)}")
+
+        self.shutdown()
+        self.destroy_node()
+
 
 def main(args=None):
 
@@ -293,6 +365,10 @@ def main(args=None):
 
     parser.add_argument("-s", "--scenario", default="/dev/null", type=Path)
 
+    parser.add_argument("--comparison-model-paths", default="", type=str)
+
+    parser.add_argument("--report-output-directory", default="", type=str)
+
     parser.add_argument("--ros-args", nargs="*")  # XXX DIRTY HACK
     parser.add_argument("-r", nargs="*")  # XXX DIRTY HACK
 
@@ -304,15 +380,23 @@ def main(args=None):
         global_timeout=args.global_timeout,
         output_directory=args.output_directory / "scenario_test_runner",
         override_parameters=args.override_parameters,
+        comparison_model_paths=[
+            Path(p.strip()) for p in args.comparison_model_paths.split(",") if p.strip()
+        ],
+        report_output_directory=(
+            Path(args.report_output_directory) if args.report_output_directory else None
+        ),
     )
 
     if args.scenario != Path("/dev/null"):
-        test_runner.run_scenario(
-            Scenario(
-                substitute_ros_package(args.scenario).resolve(),
-                args.global_frame_rate,
-            )
+        scenario = Scenario(
+            substitute_ros_package(args.scenario).resolve(),
+            args.global_frame_rate,
         )
+        if args.comparison_model_paths:
+            test_runner.run_scenario_with_comparison(scenario)
+        else:
+            test_runner.run_scenario(scenario)
     else:
         print("No scenario is specified. Specify one.")
 

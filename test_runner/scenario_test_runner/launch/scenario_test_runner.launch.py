@@ -123,6 +123,9 @@ def launch_setup(context, *args, **kwargs):
     godot_executable                            = LaunchConfiguration("godot_executable",                            default="/home/kotaroyoshimoto/Downloads/godot_autoware_simulator.x86_64")
     # CARLA options
     carla_path                                  = LaunchConfiguration("carla_path",                                  default="")
+    # Model comparison options
+    comparison_model_paths                      = LaunchConfiguration("comparison_model_paths",                      default="")
+    report_output_directory                     = LaunchConfiguration("report_output_directory",                     default="")
     # fmt: on
     vehicle_model_name = vehicle_model.perform(context)
     use_carla = vehicle_model_name.endswith("_carla")
@@ -214,6 +217,8 @@ def launch_setup(context, *args, **kwargs):
     print(f"use_trajectory_based_front_entity_detection := {use_trajectory_based_front_entity_detection.perform(context)}")
     print(f"vehicle_model                               := {vehicle_model_name}")
     print(f"vehicle_id                                  := {vehicle_id.perform(context)}")
+    print(f"comparison_model_paths                      := {comparison_model_paths.perform(context)}")
+    print(f"report_output_directory                     := {report_output_directory.perform(context)}")
 
     def make_launch_prefix():
         if enable_perf.perform(context) == "True":
@@ -425,6 +430,8 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("vehicle_model",                               default_value=vehicle_model                              ),
         DeclareLaunchArgument("godot_executable",                            default_value=godot_executable                           ),
         DeclareLaunchArgument("carla_path",                                  default_value=carla_path                                 ),  # e.g. /home/user/Carla-0.10.0-Linux-Shipping
+        DeclareLaunchArgument("comparison_model_paths",                      default_value=comparison_model_paths                     ),
+        DeclareLaunchArgument("report_output_directory",                     default_value=report_output_directory                    ),
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -441,6 +448,8 @@ def launch_setup(context, *args, **kwargs):
                 "--output-directory",        output_directory,
                 "--override-parameters",     override_parameters,
                 "--scenario",                scenario,
+                "--comparison-model-paths",  comparison_model_paths,
+                "--report-output-directory", report_output_directory,
                 # fmt: on
             ],
         ),

@@ -30,6 +30,7 @@
   <exec_depend>topic_tools</exec_depend>
   <depend>tf2_ros</depend>
   <depend>simple_sensor_simulator</depend>
+  <depend>simulation_report</depend>
   <depend>std_srvs</depend>
   <test_depend>replay_testing</test_depend>
   <export>
