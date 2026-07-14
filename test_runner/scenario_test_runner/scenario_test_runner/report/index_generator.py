@@ -24,6 +24,8 @@ if __name__ == "__main__" and __package__ is None:
 
 import json
 import math
+import os
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -122,32 +124,46 @@ def _derive_suite_status(scenarios: list[dict[str, Any]]) -> str:
     return "unknown"
 
 
+def _scan_scenario_safe(
+    args: tuple[str, str, str, Path],
+) -> tuple[str, dict[str, Any]]:
+    """Thread-safe wrapper: scan one scenario and return (suite_name, result)."""
+    suite_name, scenario_name, status, sc_dir = args
+    if sc_dir.is_dir():
+        sc = _scan_scenario(sc_dir, status)
+        if sc is not None:
+            return suite_name, sc
+    return suite_name, {
+        "name": scenario_name,
+        "status": status,
+        "has_report": False,
+        "numcomp_raw": [],
+    }
+
+
 def _scan_output_dir(
     output_dir: Path,
     statuses: dict[str, dict[str, str]],
+    *,
+    max_workers: int | None = None,
 ) -> dict[str, dict[str, Any]]:
+    if max_workers is None:
+        max_workers = min(os.cpu_count() or 4, 16)
+
+    tasks = [
+        (suite_name, scenario_name, status, output_dir / suite_name / scenario_name)
+        for suite_name, sc_statuses in sorted(statuses.items())
+        for scenario_name, status in sorted(sc_statuses.items())
+    ]
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        results = list(executor.map(_scan_scenario_safe, tasks))
+
     suites: dict[str, dict[str, Any]] = {}
-    for suite_name, sc_statuses in sorted(statuses.items()):
-        scenarios = []
-        suite_dir = output_dir / suite_name
-        for scenario_name, status in sorted(sc_statuses.items()):
-            sc_dir = suite_dir / scenario_name
-            if sc_dir.is_dir():
-                sc = _scan_scenario(sc_dir, status)
-                if sc is not None:
-                    scenarios.append(sc)
-                else:
-                    scenarios.append({
-                        "name": scenario_name,
-                        "status": status,
-                        "has_report": False,
-                        "numcomp_raw": [],
-                    })
-        if scenarios:
-            suites[suite_name] = {
-                "status": _derive_suite_status(scenarios),
-                "scenarios": scenarios,
-            }
+    for suite_name, sc in results:
+        suites.setdefault(suite_name, {"scenarios": []})["scenarios"].append(sc)
+    for suite in suites.values():
+        suite["status"] = _derive_suite_status(suite["scenarios"])
     return suites
 
 
@@ -210,11 +226,12 @@ def generate_indices(
     statuses: dict[str, dict[str, str]],
     suite_ids: dict[str, str] | None = None,
     catalog_name: str = "",
+    max_workers: int | None = None,
 ) -> None:
     """Build index.html files from scratch (called after downloading reports)."""
     template = _prepared_template()
 
-    suites = _scan_output_dir(output_dir, statuses)
+    suites = _scan_output_dir(output_dir, statuses, max_workers=max_workers)
     cat_name = catalog_name or output_dir.name
 
     cat_data = _catalog_data(cat_name, suites, job_id)
