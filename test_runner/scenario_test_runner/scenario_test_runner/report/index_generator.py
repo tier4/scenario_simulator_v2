@@ -182,6 +182,7 @@ def _catalog_data(
 
 def _suite_data(
     catalog_name: str, suite_name: str, suite: dict[str, Any],
+    suite_id: str = "",
 ) -> dict[str, Any]:
     items = []
     for sc in suite["scenarios"]:
@@ -194,7 +195,7 @@ def _suite_data(
     return {
         "mode": "suite",
         "title": suite_name,
-        "subtitle": "",
+        "subtitle": suite_id,
         "breadcrumbs": [{"label": catalog_name, "href": "../index.html"}],
         "items": items,
         "numcomp": _clean_rows(numcomp),
@@ -207,12 +208,14 @@ def generate_indices(
     *,
     job_id: str,
     statuses: dict[str, dict[str, str]],
+    suite_ids: dict[str, str] | None = None,
+    catalog_name: str = "",
 ) -> None:
     """Build index.html files from scratch (called after downloading reports)."""
     template = _prepared_template()
 
     suites = _scan_output_dir(output_dir, statuses)
-    cat_name = output_dir.name
+    cat_name = catalog_name or output_dir.name
 
     cat_data = _catalog_data(cat_name, suites, job_id)
     (output_dir / "index.html").write_text(
@@ -222,7 +225,8 @@ def generate_indices(
     for suite_name, suite in suites.items():
         suite_dir = output_dir / suite_name
         suite_dir.mkdir(parents=True, exist_ok=True)
-        s_data = _suite_data(cat_name, suite_name, suite)
+        sid = (suite_ids or {}).get(suite_name, "")
+        s_data = _suite_data(cat_name, suite_name, suite, suite_id=sid)
         (suite_dir / "index.html").write_text(
             _render(template, s_data), encoding="utf-8",
         )

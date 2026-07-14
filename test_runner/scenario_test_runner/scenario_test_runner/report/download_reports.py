@@ -123,15 +123,28 @@ def _find_report_in_zip(zf: zipfile.ZipFile) -> str | None:
     return None
 
 
+def _fetch_catalog_name(project_id: str, job_id: str) -> str:
+    """Fetch the catalog display name for an evaluation job."""
+    result = _webauto_json([
+        "ci", "evaluation-job-report", "describe",
+        "--project-id", project_id,
+        "--evaluation-job-id", job_id,
+    ])
+    return result.get("catalog", {}).get("display_name", "")
+
+
 def download_job_reports(
     project_id: str, job_id: str, output_dir: Path,
-) -> dict[str, dict[str, str]]:
+) -> tuple[dict[str, dict[str, str]], dict[str, str], str]:
     """Download all reports for a job.
 
-    Returns a status map: ``{suite/scenario: status}`` keyed by the relative
-    path from *output_dir* (e.g. ``"SuiteA/scenario1"``).
+    Returns ``(statuses, suite_ids, catalog_name)`` where *statuses* maps
+    ``{suite_name: {scenario_name: status}}``, *suite_ids* maps
+    ``{suite_name: suite_uuid}``, and *catalog_name* is the evaluation
+    catalog's display name.
     """
     output_dir.mkdir(parents=True, exist_ok=True)
+    catalog_name = _fetch_catalog_name(project_id, job_id)
     print(f"Fetching suite reports for job {job_id}...", flush=True)
     suites = _webauto_list(
         "evaluation-job-suite-report", project_id,
@@ -139,10 +152,12 @@ def download_job_reports(
     )
 
     statuses: dict[str, dict[str, str]] = {}
+    suite_ids: dict[str, str] = {}
 
     for suite_report in suites:
         suite_id = suite_report["id"]
         suite_name = _sanitize(suite_report.get("suite", {}).get("display_name", suite_id))
+        suite_ids[suite_name] = suite_id
 
         print(f"\nFetching specs for suite '{suite_name}'...", flush=True)
         specs = _webauto_list(
@@ -193,7 +208,7 @@ def download_job_reports(
             else:
                 print(f"  -> No simulation_archive for {scenario_name}", flush=True)
 
-    return statuses
+    return statuses, suite_ids, catalog_name
 
 
 def main() -> None:
@@ -205,8 +220,14 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=Path("./reports"))
     args = parser.parse_args()
 
-    statuses = download_job_reports(args.project_id, args.evaluation_job_id, args.output_dir)
-    generate_indices(args.output_dir, job_id=args.evaluation_job_id, statuses=statuses)
+    statuses, suite_ids, catalog_name = download_job_reports(args.project_id, args.evaluation_job_id, args.output_dir)
+    generate_indices(
+        args.output_dir,
+        job_id=args.evaluation_job_id,
+        statuses=statuses,
+        suite_ids=suite_ids,
+        catalog_name=catalog_name,
+    )
     print(f"\nDone. Open {args.output_dir / 'index.html'} to browse.", flush=True)
 
 
