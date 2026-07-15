@@ -1,4 +1,0 @@
-# Build artifacts (PhysX source checkout, generated build trees, staged SDK).
-build/
-install/
-log/
