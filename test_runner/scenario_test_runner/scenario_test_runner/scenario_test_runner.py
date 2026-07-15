@@ -18,7 +18,6 @@
 
 import json
 import os
-import tempfile
 import time
 
 from simulation_report import generate_report
@@ -35,7 +34,7 @@ from openscenario_preprocessor_msgs.srv import SetParameter
 from openscenario_utility.conversion import convert
 from pathlib import Path
 from rclpy.executors import ExternalShutdownException
-from shutil import rmtree
+from shutil import copytree, rmtree
 from sys import exit
 from typing import List
 from scenario import Scenario
@@ -310,12 +309,18 @@ class ScenarioTestRunner(LifecycleController):
                 raise RuntimeError(f"Comparison model path does not exist: {p}")
 
         final_dir = self.output_directory
-        staging = Path(tempfile.mkdtemp(prefix="scenario_staging_"))
+        for item in final_dir.iterdir():
+            if item.is_dir():
+                rmtree(item)
+            else:
+                item.unlink()
+        runs_dir = final_dir / "_runs"
+        runs_dir.mkdir()
         try:
             for mp in self.comparison_model_paths:
                 self.get_logger().info(f"[Model Compare] Running model: {mp.name}")
                 self._switch_model(mp)
-                self.output_directory = staging / mp.name
+                self.output_directory = runs_dir / mp.name
                 self.output_directory.mkdir(exist_ok=True)
                 try:
                     self.run_scenario(scenario, _shutdown=False)
@@ -324,20 +329,24 @@ class ScenarioTestRunner(LifecycleController):
         finally:
             self._restore_model()
 
-        first = staging / self.comparison_model_paths[0].name
+        # Promote baseline to final_dir so wasim's lexical WalkDir
+        # finds its .db3 after _runs/ and picks it up.
+        baseline_dir = runs_dir / self.comparison_model_paths[0].name
+        copytree(baseline_dir, final_dir, copy_function=os.link, dirs_exist_ok=True)
+
         scenario_bags = sorted(
-            d for xosc in first.rglob("*.xosc")
+            d for xosc in baseline_dir.rglob("*.xosc")
             if (d := xosc.parent / xosc.stem).is_dir()
         )
         if scenario_bags:
             report_dir = self.report_output_directory or final_dir / "comparison_report"
             report_dir.mkdir(parents=True, exist_ok=True)
             for bag in scenario_bags:
-                rel = bag.relative_to(first)
+                rel = bag.relative_to(baseline_dir)
                 models = {
-                    mp.name: staging / mp.name / rel
+                    mp.name: runs_dir / mp.name / rel
                     for mp in self.comparison_model_paths
-                    if (staging / mp.name / rel).is_dir()
+                    if (runs_dir / mp.name / rel).is_dir()
                 }
                 out = report_dir / ("report.html" if len(scenario_bags) == 1
                                     else f"report_{bag.name}.html")
