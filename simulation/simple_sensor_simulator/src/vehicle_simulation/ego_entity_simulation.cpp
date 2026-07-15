@@ -265,7 +265,9 @@ auto EgoEntitySimulation::makeSimulationModel(
         common::getParameter<double>(ns + "steer_bias", 0.0),
         common::getParameter<double>(ns + "debug_acc_scaling_factor", 1.0),
         common::getParameter<double>(ns + "debug_steer_scaling_factor", 1.0),
-        common::getParameter<double>(ns + "k_us", 0.0));
+        common::getParameter<double>(ns + "k_us", 0.0),
+        common::getParameter<double>(ns + "xy_heading_rate_coeff", 0.0),
+        common::getParameter<bool>(ns + "use_rk4", false));
     }
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:

@@ -24,7 +24,8 @@ SimModelDelaySteerAccGearedForDiffusionPlanner::SimModelDelaySteerAccGearedForDi
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+  double xy_heading_rate_coeff, bool use_rk4)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -40,7 +41,9 @@ SimModelDelaySteerAccGearedForDiffusionPlanner::SimModelDelaySteerAccGearedForDi
   steer_bias_(steer_bias),
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
-  k_us_(k_us)
+  k_us_(k_us),
+  xy_heading_rate_coeff_(xy_heading_rate_coeff),
+  use_rk4_(use_rk4)
 {
   initializeInputQueue(dt);
   initializeStateQueue(dt);
@@ -103,9 +106,11 @@ void SimModelDelaySteerAccGearedForDiffusionPlanner::update(const double & dt)
   pedal_state_queue_.pop_front();
 
   const auto prev_state = state_;
-  // we cannot use updateRungeKutta() because the differentiability or the continuity
-  // condition is not satisfied, but we can use Runge-Kutta method with code reconstruction.
-  updateEuler(dt, delayed_input);
+  if (use_rk4_) {
+    updateRungeKutta(dt, delayed_input);
+  } else {
+    updateEuler(dt, delayed_input);
+  }
   // take velocity limit
   state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
 
@@ -216,8 +221,8 @@ Eigen::VectorXd SimModelDelaySteerAccGearedForDiffusionPlanner::calcModel(
 
   Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
 
-  d_state(IDX::X) = vel * cos(yaw);
-  d_state(IDX::Y) = vel * sin(yaw);
+  d_state(IDX::X) = vel * cos(yaw - xy_heading_rate_coeff_ * vel * yaw_rate);
+  d_state(IDX::Y) = vel * sin(yaw - xy_heading_rate_coeff_ * vel * yaw_rate);
   d_state(IDX::YAW) = yaw_rate;
   d_state(IDX::VX) = [&] {
     if (pedal_acc >= 0.0) {

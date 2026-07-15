@@ -176,14 +176,16 @@ VmModel * vm_create_delay_steer_acc_geared_for_diffusion_planner(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+  double xy_heading_rate_coeff, double use_rk4)
 {
   auto * m = new VmModel{};
   m->type = VmModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER;
   m->impl = std::make_unique<SimModelDelaySteerAccGearedForDiffusionPlanner>(
     vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
     acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
+    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
+    xy_heading_rate_coeff, use_rk4 > 0.5);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
   return m;

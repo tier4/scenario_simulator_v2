@@ -77,7 +77,8 @@ public:
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, double steer_dead_band, double steer_bias,
-    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us);
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+    double xy_heading_rate_coeff, bool use_rk4);
 
   /**
    * @brief default destructor
@@ -143,6 +144,8 @@ private:
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
   const double k_us_;                        //!< @brief understeer coefficient [rad/(m/s²)]
+  const double xy_heading_rate_coeff_;       //!< @brief xy heading rate coefficient
+  const bool use_rk4_;                       //!< @brief whether to use Runge-Kutta integration
 
   /**
    * @brief steady-state yaw rate including understeer (k_us) and steer bias.
