@@ -174,14 +174,13 @@ BT::NodeStatus LaneChangeAction::doAction()
       entity_status_updated.lanelet_pose_valid = false;
       entity_status_updated.action_status = canonicalized_entity_status_->getActionStatus();
       setCanonicalizedEntityStatus(entity_status_updated);
-      const auto waypoints = calculateWaypoints();
-      if (waypoints.waypoints.empty()) {
+      if (const auto waypoints = calculateWaypoints(); waypoints.waypoints.empty()) {
         return BT::NodeStatus::FAILURE;
+      } else {
+        setOutput("waypoints", waypoints);
+        setOutput("obstacle", calculateObstacle(waypoints));
+        return BT::NodeStatus::RUNNING;
       }
-      const auto obstacle = calculateObstacle(waypoints);
-      setOutput("waypoints", waypoints);
-      setOutput("obstacle", obstacle);
-      return BT::NodeStatus::RUNNING;
     } else {
       const auto waypoints = calculateWaypoints();
       if (waypoints.waypoints.empty()) {
