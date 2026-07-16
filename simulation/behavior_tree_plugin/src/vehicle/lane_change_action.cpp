@@ -166,6 +166,14 @@ BT::NodeStatus LaneChangeAction::doAction()
         current_s_ = current_s_ + canonicalized_entity_status_->getTwist().linear.x * step_time_;
         break;
     }
+
+    if (const auto waypoints = calculateWaypoints(); waypoints.waypoints.empty()) {
+      return BT::NodeStatus::FAILURE;
+    } else {
+      setOutput("waypoints", waypoints);
+      setOutput("obstacle", calculateObstacle(waypoints));
+    }
+
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
       auto entity_status_updated =
@@ -174,21 +182,8 @@ BT::NodeStatus LaneChangeAction::doAction()
       entity_status_updated.lanelet_pose_valid = false;
       entity_status_updated.action_status = canonicalized_entity_status_->getActionStatus();
       setCanonicalizedEntityStatus(entity_status_updated);
-      if (const auto waypoints = calculateWaypoints(); waypoints.waypoints.empty()) {
-        return BT::NodeStatus::FAILURE;
-      } else {
-        setOutput("waypoints", waypoints);
-        setOutput("obstacle", calculateObstacle(waypoints));
-        return BT::NodeStatus::RUNNING;
-      }
+      return BT::NodeStatus::RUNNING;
     } else {
-      const auto waypoints = calculateWaypoints();
-      if (waypoints.waypoints.empty()) {
-        return BT::NodeStatus::FAILURE;
-      }
-      const auto obstacle = calculateObstacle(waypoints);
-      setOutput("waypoints", waypoints);
-      setOutput("obstacle", obstacle);
       double s = (current_s_ - curve_->getLength()) + target_s_;
       curve_ = std::nullopt;
       current_s_ = 0;
