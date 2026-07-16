@@ -123,8 +123,18 @@ BT::NodeStatus LaneChangeAction::doAction()
     }
   }
 
+  auto clamp_acceleration = [this](auto value) {
+    return target_speed_ < canonicalized_entity_status_->getTwist().linear.x
+             ? std::clamp(value, -behavior_parameter_.dynamic_constraints.max_deceleration, 0.0)
+             : std::clamp(value, 0.0, +behavior_parameter_.dynamic_constraints.max_acceleration);
+  };
+
+  auto clamp_velocity = [this](auto value) {
+    /// @note Hard coded parameter, -10.0 is a minimum linear velocity of the entity.
+    return std::clamp(value, -10.0, vehicle_parameters.performance.max_speed);
+  };
+
   if (curve_) {
-    double target_accel = 0;
     switch (lane_change_parameters_->constraint.policy) {
       /**
        * @brief Force changing speed in order to fulfill constraint.
@@ -133,35 +143,22 @@ BT::NodeStatus LaneChangeAction::doAction()
         canonicalized_entity_status_->setTwist(geometry_msgs::msg::Twist());
         canonicalized_entity_status_->setAccel(geometry_msgs::msg::Accel());
         canonicalized_entity_status_->setLinearVelocity(lane_change_velocity_);
-        current_s_ = current_s_ + canonicalized_entity_status_->getTwist().linear.x * step_time_;
         break;
       /**
        * @brief Changing linear speed and try to fulfill constraint.
        */
       case traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT:
-        target_accel =
-          (lane_change_velocity_ - canonicalized_entity_status_->getTwist().linear.x) / step_time_;
-        if (canonicalized_entity_status_->getTwist().linear.x > target_speed_) {
-          target_accel = std::clamp(
-            target_accel, behavior_parameter_.dynamic_constraints.max_deceleration * -1.0, 0.0);
-        } else {
-          target_accel =
-            std::clamp(target_accel, 0.0, behavior_parameter_.dynamic_constraints.max_acceleration);
-        }
-        geometry_msgs::msg::Accel accel_new;
-        accel_new.linear.x = target_accel;
-        geometry_msgs::msg::Twist twist_new;
-        /**
-         * @note Hard coded parameter, -10.0 is a minimum linear velocity of the entity.
-        */
-        twist_new.linear.x = std::clamp(
-          canonicalized_entity_status_->getTwist().linear.x + accel_new.linear.x * step_time_,
-          -10.0, vehicle_parameters.performance.max_speed);
-        canonicalized_entity_status_->setTwist(twist_new);
-        canonicalized_entity_status_->setAccel(accel_new);
-        current_s_ = current_s_ + canonicalized_entity_status_->getTwist().linear.x * step_time_;
+        canonicalized_entity_status_->setLinearAcceleration(clamp_acceleration(
+          (lane_change_velocity_ - canonicalized_entity_status_->getTwist().linear.x) /
+          step_time_));
+
+        canonicalized_entity_status_->setLinearVelocity(clamp_velocity(
+          canonicalized_entity_status_->getTwist().linear.x +
+          canonicalized_entity_status_->getAccel().linear.x * step_time_));
         break;
     }
+
+    current_s_ = current_s_ + canonicalized_entity_status_->getTwist().linear.x * step_time_;
 
     if (const auto waypoints = calculateWaypoints(); waypoints.waypoints.empty()) {
       return BT::NodeStatus::FAILURE;
@@ -180,7 +177,7 @@ BT::NodeStatus LaneChangeAction::doAction()
     } else {
       entity_status_updated.lanelet_pose = canonicalized_entity_status_->getLaneletPose();
       entity_status_updated.lanelet_pose.offset = 0;
-      entity_status_updated.lanelet_pose.rpy = {};
+      entity_status_updated.lanelet_pose.rpy = geometry_msgs::msg::Vector3();
       entity_status_updated.lanelet_pose_valid = true;
       entity_status_updated.pose =
         traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_pose);
