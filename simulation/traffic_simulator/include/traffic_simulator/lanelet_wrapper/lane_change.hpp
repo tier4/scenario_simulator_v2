@@ -53,15 +53,38 @@ auto laneChangeTrajectory(
   const Pose & from_pose, const LaneletPose & to_lanelet_pose,
   const TrajectoryShape & trajectory_shape, const double tangent_vector_size) -> Curve;
 
+inline namespace v1
+{
+[[deprecated("Use traffic_simulator::lanelet_wrapper::lane_change::v2::laneChangeTrajectory")]]  //
+auto laneChangeTrajectory(
+  const LaneletPose & from_lanelet_pose, const Parameter & lane_change_parameter)
+  -> std::optional<std::pair<Curve, double>>;
+}  // namespace v1
+
+namespace v2
+{
 auto laneChangeTrajectory(
   const LaneletPose & from_lanelet_pose, const Parameter & lane_change_parameter)
   -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>;
+}  // namespace v2
 
+inline namespace v1
+{
+[[deprecated("Use traffic_simulator::lanelet_wrapper::lane_change::v2::laneChangeTrajectory")]]  //
+auto laneChangeTrajectory(
+  const Pose & from_pose, const Parameter & lane_change_parameter,
+  const double maximum_curvature_threshold, const double target_trajectory_length,
+  const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>;
+}  // namespace v1
+
+namespace v2
+{
 auto laneChangeTrajectory(
   const Pose & from_pose, const Parameter & lane_change_parameter,
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold)
   -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>;
+}  // namespace v2
 }  // namespace lane_change
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

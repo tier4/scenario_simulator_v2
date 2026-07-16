@@ -135,6 +135,22 @@ auto laneChangeAlongLaneletPose(
   return pose::quietNaNLaneletPose();
 }
 
+inline namespace v1
+{
+auto laneChangeTrajectory(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const lane_change::Parameter & parameter) -> std::optional<std::pair<Curve, double>>
+{
+  if (auto result = v2::laneChangeTrajectory(canonicalized_lanelet_pose, parameter)) {
+    return std::make_pair(result->first, result->second.getLaneletPose().s);
+  } else {
+    return std::nullopt;
+  }
+}
+}  // namespace v1
+
+namespace v2
+{
 auto laneChangeTrajectory(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const lane_change::Parameter & parameter)
@@ -151,20 +167,21 @@ auto laneChangeTrajectory(
         1.0 is a forward_distance_threshold (If the goal x position in the cartesian coordinate was under 1.0, the goal was rejected.)
       */
       case lane_change::Constraint::Type::NONE:
-        return lanelet_wrapper::lane_change::laneChangeTrajectory(
+        return lanelet_wrapper::lane_change::v2::laneChangeTrajectory(
           pose::toMapPose(lanelet_pose), parameter, 10.0, 20.0, 1.0);
       case lane_change::Constraint::Type::LATERAL_VELOCITY:
-        return lanelet_wrapper::lane_change::laneChangeTrajectory(lanelet_pose, parameter);
+        return lanelet_wrapper::lane_change::v2::laneChangeTrajectory(lanelet_pose, parameter);
       case lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
-        return lanelet_wrapper::lane_change::laneChangeTrajectory(lanelet_pose, parameter);
+        return lanelet_wrapper::lane_change::v2::laneChangeTrajectory(lanelet_pose, parameter);
       case lane_change::Constraint::Type::TIME:
-        return lanelet_wrapper::lane_change::laneChangeTrajectory(lanelet_pose, parameter);
+        return lanelet_wrapper::lane_change::v2::laneChangeTrajectory(lanelet_pose, parameter);
       default:
         throw std::invalid_argument("Unknown lane change constraint type");
     }
   }
   return std::nullopt;
 }
+}  // namespace v2
 
 auto laneChangePoints(const Curve & curve, const double current_s) -> std::vector<Point>
 {

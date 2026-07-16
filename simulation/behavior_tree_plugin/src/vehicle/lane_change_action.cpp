@@ -89,7 +89,7 @@ BT::NodeStatus LaneChangeAction::doAction()
         !canonicalized_lanelet_pose) {
       return BT::NodeStatus::FAILURE;
     } else if (
-      const auto traj_with_goal = traffic_simulator::route::laneChangeTrajectory(
+      const auto traj_with_goal = traffic_simulator::route::v2::laneChangeTrajectory(
         canonicalized_lanelet_pose.value(), lane_change_parameters_.value())) {
       const auto along_pose = traffic_simulator::route::laneChangeAlongLaneletPose(
         canonicalized_lanelet_pose.value(), lane_change_parameters_.value());
