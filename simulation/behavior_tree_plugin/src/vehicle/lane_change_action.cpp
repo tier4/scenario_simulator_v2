@@ -151,14 +151,11 @@ BT::NodeStatus LaneChangeAction::doAction()
         canonicalized_entity_status_->setLinearAcceleration(clamp_acceleration(
           (lane_change_velocity_ - canonicalized_entity_status_->getTwist().linear.x) /
           step_time_));
-
         canonicalized_entity_status_->setLinearVelocity(clamp_velocity(
           canonicalized_entity_status_->getTwist().linear.x +
           canonicalized_entity_status_->getAccel().linear.x * step_time_));
         break;
     }
-
-    current_s_ = current_s_ + canonicalized_entity_status_->getTwist().linear.x * step_time_;
 
     if (const auto waypoints = calculateWaypoints(); waypoints.waypoints.empty()) {
       return BT::NodeStatus::FAILURE;
@@ -167,14 +164,17 @@ BT::NodeStatus LaneChangeAction::doAction()
       setOutput("obstacle", calculateObstacle(waypoints));
     }
 
-    if (auto entity_status_updated =
-          static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
+    if (current_s_ += canonicalized_entity_status_->getTwist().linear.x * step_time_;
         current_s_ < curve_->getLength()) {
+      auto entity_status_updated =
+        static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
       entity_status_updated.pose = curve_->getPose(current_s_, true);
       entity_status_updated.lanelet_pose_valid = false;
       setCanonicalizedEntityStatus(entity_status_updated);
       return BT::NodeStatus::RUNNING;
     } else {
+      auto entity_status_updated =
+        static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
       entity_status_updated.lanelet_pose = canonicalized_entity_status_->getLaneletPose();
       entity_status_updated.lanelet_pose.offset = 0;
       entity_status_updated.lanelet_pose.rpy = geometry_msgs::msg::Vector3();
