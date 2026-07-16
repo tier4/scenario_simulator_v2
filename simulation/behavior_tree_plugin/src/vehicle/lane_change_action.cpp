@@ -95,12 +95,9 @@ BT::NodeStatus LaneChangeAction::doAction()
         canonicalized_lanelet_pose.value(), lane_change_parameters_.value());
       curve_ = traj_with_goal->first;
       target_s_ = traj_with_goal->second.getLaneletPose().s;
-      traffic_simulator::LaneletPose goal_pose;
-      goal_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
-      goal_pose.s = traj_with_goal->second.getLaneletPose().s;
       const double offset = std::fabs(math::geometry::getRelativePose(
                                         traffic_simulator::pose::toMapPose(along_pose),
-                                        traffic_simulator::pose::toMapPose(goal_pose))
+                                        traffic_simulator::pose::toMapPose(traj_with_goal->second.getLaneletPose()))
                                         .position.y);
       switch (lane_change_parameters_->constraint.type) {
         case traffic_simulator::lane_change::Constraint::Type::NONE:
@@ -200,7 +197,7 @@ BT::NodeStatus LaneChangeAction::doAction()
       auto entity_status_updated =
         static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
       traffic_simulator::LaneletPose lanelet_pose;
-      lanelet_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
+      lanelet_pose.lanelet_id = canonicalized_entity_status_->getLaneletPose().lanelet_id;
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;
       entity_status_updated.lanelet_pose = lanelet_pose;
