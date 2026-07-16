@@ -88,7 +88,8 @@ auto laneChangeAlongLaneletPose(
 
 auto laneChangeTrajectory(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const lane_change::Parameter & parameter) -> std::optional<std::pair<Curve, double>>;
+  const lane_change::Parameter & parameter)
+  -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>;
 
 auto laneChangePoints(const Curve & curve, const double current_s) -> std::vector<Point>;
 

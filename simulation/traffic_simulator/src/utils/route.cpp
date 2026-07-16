@@ -137,7 +137,8 @@ auto laneChangeAlongLaneletPose(
 
 auto laneChangeTrajectory(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const lane_change::Parameter & parameter) -> std::optional<std::pair<Curve, double>>
+  const lane_change::Parameter & parameter)
+  -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>
 {
   if (lanelet_wrapper::lane_change::canChangeLane(
         canonicalized_lanelet_pose.getLaneletId(), parameter.target.lanelet_id)) {

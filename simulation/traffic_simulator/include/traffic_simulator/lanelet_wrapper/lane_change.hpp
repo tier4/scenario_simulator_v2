@@ -55,12 +55,13 @@ auto laneChangeTrajectory(
 
 auto laneChangeTrajectory(
   const LaneletPose & from_lanelet_pose, const Parameter & lane_change_parameter)
-  -> std::optional<std::pair<Curve, double>>;
+  -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>;
 
 auto laneChangeTrajectory(
   const Pose & from_pose, const Parameter & lane_change_parameter,
   const double maximum_curvature_threshold, const double target_trajectory_length,
-  const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>;
+  const double forward_distance_threshold)
+  -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>;
 }  // namespace lane_change
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

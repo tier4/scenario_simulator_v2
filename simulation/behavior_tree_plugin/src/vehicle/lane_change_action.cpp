@@ -94,10 +94,10 @@ BT::NodeStatus LaneChangeAction::doAction()
       const auto along_pose = traffic_simulator::route::laneChangeAlongLaneletPose(
         canonicalized_lanelet_pose.value(), lane_change_parameters_.value());
       curve_ = traj_with_goal->first;
-      target_s_ = traj_with_goal->second;
+      target_s_ = traj_with_goal->second.getLaneletPose().s;
       traffic_simulator::LaneletPose goal_pose;
       goal_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
-      goal_pose.s = traj_with_goal->second;
+      goal_pose.s = traj_with_goal->second.getLaneletPose().s;
       const double offset = std::fabs(math::geometry::getRelativePose(
                                         traffic_simulator::pose::toMapPose(along_pose),
                                         traffic_simulator::pose::toMapPose(goal_pose))
