@@ -25,12 +25,37 @@
 #include <stdexcept>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
+#include <type_traits>
 #include <unordered_set>
 
 namespace simple_sensor_simulator
 {
 inline namespace experimental
 {
+namespace
+{
+/// @note rosbag2_storage::SerializedBagMessage renamed `time_stamp` (Humble) to `recv_timestamp`
+/// (Jazzy and later). Detect the available member at compile time so this file builds on both.
+template <typename T, typename = void>
+struct has_recv_timestamp : std::false_type
+{
+};
+template <typename T>
+struct has_recv_timestamp<T, std::void_t<decltype(std::declval<T>().recv_timestamp)>>
+: std::true_type
+{
+};
+
+template <typename T>
+auto bagMessageTimestamp(const T & message)
+{
+  if constexpr (has_recv_timestamp<T>::value) {
+    return message.recv_timestamp;
+  } else {
+    return message.time_stamp;
+  }
+}
+}  // namespace
 
 auto TFStreamFromOdometry::pushMessage(
   double time_s, const std::shared_ptr<rcutils_uint8_array_t> & data) -> void
@@ -138,7 +163,7 @@ auto PerceptionReproducerSensor::loadAllBagData(
   while (reader->has_next()) {
     try {
       auto bag_message = reader->read_next();
-      const rclcpp::Time msg_time(bag_message->time_stamp, RCL_ROS_TIME);
+      const rclcpp::Time msg_time(bagMessageTimestamp(*bag_message), RCL_ROS_TIME);
       const double shifted_time_s = (msg_time - first_time).seconds() - start_time_s;
       if (shifted_time_s < 0.0) continue;
 
