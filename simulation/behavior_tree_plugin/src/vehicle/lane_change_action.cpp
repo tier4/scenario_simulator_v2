@@ -157,11 +157,6 @@ BT::NodeStatus LaneChangeAction::doAction()
         twist_new.linear.x = std::clamp(
           canonicalized_entity_status_->getTwist().linear.x + accel_new.linear.x * step_time_,
           -10.0, vehicle_parameters.performance.max_speed);
-        twist_new.linear.y = 0.0;
-        twist_new.linear.z = 0.0;
-        twist_new.angular.x = 0.0;
-        twist_new.angular.y = 0.0;
-        twist_new.angular.z = 0.0;
         canonicalized_entity_status_->setTwist(twist_new);
         canonicalized_entity_status_->setAccel(accel_new);
         current_s_ = current_s_ + canonicalized_entity_status_->getTwist().linear.x * step_time_;
@@ -175,31 +170,20 @@ BT::NodeStatus LaneChangeAction::doAction()
       setOutput("obstacle", calculateObstacle(waypoints));
     }
 
-    if (current_s_ < curve_->getLength()) {
-      auto entity_status_updated =
-        static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
+    if (auto entity_status_updated =
+          static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
+        current_s_ < curve_->getLength()) {
       entity_status_updated.pose = curve_->getPose(current_s_, true);
       entity_status_updated.lanelet_pose_valid = false;
-      entity_status_updated.action_status = canonicalized_entity_status_->getActionStatus();
       setCanonicalizedEntityStatus(entity_status_updated);
       return BT::NodeStatus::RUNNING;
     } else {
-      curve_ = std::nullopt;
-      current_s_ = 0;
-      lane_change_velocity_ = 0;
-      auto entity_status_updated =
-        static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
-      entity_status_updated.lanelet_pose = [&]() {
-        auto lanelet_pose = traffic_simulator::LaneletPose();
-        lanelet_pose.lanelet_id = canonicalized_entity_status_->getLaneletPose().lanelet_id;
-        lanelet_pose.s = current_s_ - curve_->getLength() + target_s_;
-        lanelet_pose.offset = 0;
-        return lanelet_pose;
-      }();
+      entity_status_updated.lanelet_pose = canonicalized_entity_status_->getLaneletPose();
+      entity_status_updated.lanelet_pose.offset = 0;
+      entity_status_updated.lanelet_pose.rpy = {};
       entity_status_updated.lanelet_pose_valid = true;
       entity_status_updated.pose =
         traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_pose);
-      entity_status_updated.action_status = canonicalized_entity_status_->getActionStatus();
       setCanonicalizedEntityStatus(entity_status_updated);
       return BT::NodeStatus::SUCCESS;
     }
