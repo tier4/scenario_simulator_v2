@@ -225,7 +225,7 @@ FieldOperatorApplication::~FieldOperatorApplication()
              timeout period.
           */
           RCLCPP_ERROR_STREAM(get_logger(), "Autoware launch process does not respond. Kill it.");
-          killpg(process_id, SIGKILL);
+          ::kill(process_id, SIGTERM);
           break;
 
         default:
