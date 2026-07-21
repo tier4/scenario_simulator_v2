@@ -2,6 +2,9 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.22 (2026-07-17)
+--------------------
+
 25.0.21 (2026-06-08)
 --------------------
 * Merge pull request `#1847 <https://github.com/tier4/scenario_simulator_v2/issues/1847>`_ from tier4/open-simulation-interface
