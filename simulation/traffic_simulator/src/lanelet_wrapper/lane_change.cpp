@@ -182,15 +182,6 @@ auto laneChangeTrajectory(
       ? lane_change_parameter.constraint.value
       : Parameter::default_lanechange_distance;
 
-  const auto along_lanelet_pose = pose::alongLaneletPose(from_lanelet_pose, longitudinal_distance);
-  auto left_boundary_lanelet_pose = along_lanelet_pose;
-  left_boundary_lanelet_pose.offset += 5.0;
-  auto right_boundary_lanelet_pose = along_lanelet_pose;
-  right_boundary_lanelet_pose.offset -= 5.0;
-
-  const auto left_boundary_point = pose::toMapPose(left_boundary_lanelet_pose).pose.position;
-  const auto right_boundary_point = pose::toMapPose(right_boundary_lanelet_pose).pose.position;
-
   const auto to_lanelet_pose = CanonicalizedLaneletPose([&]() {
     auto lanelet_pose = LaneletPose();
     lanelet_pose.lanelet_id = lane_change_parameter.target.lanelet_id;
@@ -199,20 +190,13 @@ auto laneChangeTrajectory(
     return lanelet_pose;
   }());
 
-  if (const auto to_lanelet_pose_s =
-        lanelet_map::centerPointsSpline(to_lanelet_pose.getLaneletPose().lanelet_id)
-          ->getCollisionPointIn2D(left_boundary_point, right_boundary_point);
-      !to_lanelet_pose_s) {
-    return std::nullopt;
-  } else {
-    const auto from_pose = pose::toMapPose(from_lanelet_pose).pose;
-    const auto to_pose = pose::toMapPose(to_lanelet_pose.getLaneletPose()).pose;
-    const auto euclidean_distance = math::geometry::hypot(from_pose.position, to_pose.position);
-    const auto lane_change_trajectory = lane_change::laneChangeTrajectory(
-      from_pose, to_lanelet_pose.getLaneletPose(), lane_change_parameter.trajectory_shape,
-      euclidean_distance * 0.5);
-    return std::make_pair(lane_change_trajectory, to_lanelet_pose);
-  }
+  const auto from_pose = pose::toMapPose(from_lanelet_pose).pose;
+  const auto to_pose = pose::toMapPose(to_lanelet_pose.getLaneletPose()).pose;
+  const auto euclidean_distance = math::geometry::hypot(from_pose.position, to_pose.position);
+  const auto lane_change_trajectory = lane_change::laneChangeTrajectory(
+    from_pose, to_lanelet_pose.getLaneletPose(), lane_change_parameter.trajectory_shape,
+    euclidean_distance * 0.5);
+  return std::make_pair(lane_change_trajectory, to_lanelet_pose);
 }
 }  // namespace v2
 
