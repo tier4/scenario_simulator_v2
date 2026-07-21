@@ -94,7 +94,7 @@ BT::NodeStatus LaneChangeAction::doAction()
       const auto along_pose = traffic_simulator::route::laneChangeAlongLaneletPose(
         canonicalized_lanelet_pose.value(), lane_change_parameters_.value());
       curve_ = traj_with_goal->first;
-      target_s_ = traj_with_goal->second.getLaneletPose().s;
+      target_canonicalized_lanelet_pose_ = traj_with_goal->second;
       const double offset =
         std::fabs(math::geometry::getRelativePose(
                     traffic_simulator::pose::toMapPose(along_pose),
@@ -164,8 +164,9 @@ BT::NodeStatus LaneChangeAction::doAction()
       setOutput("obstacle", calculateObstacle(waypoints));
     }
 
-    if (current_s_ += canonicalized_entity_status_->getTwist().linear.x * step_time_;
-        current_s_ < curve_->getLength()) {
+    current_s_ += canonicalized_entity_status_->getTwist().linear.x * step_time_;
+
+    if (current_s_ < curve_->getLength()) {
       auto entity_status_updated =
         static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
       entity_status_updated.pose = curve_->getPose(current_s_, true);
@@ -175,7 +176,7 @@ BT::NodeStatus LaneChangeAction::doAction()
     } else {
       auto entity_status_updated =
         static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
-      entity_status_updated.lanelet_pose = canonicalized_entity_status_->getLaneletPose();
+      entity_status_updated.lanelet_pose = target_canonicalized_lanelet_pose_->getLaneletPose();
       entity_status_updated.lanelet_pose.offset = 0;
       entity_status_updated.lanelet_pose.rpy = geometry_msgs::msg::Vector3();
       entity_status_updated.lanelet_pose_valid = true;
