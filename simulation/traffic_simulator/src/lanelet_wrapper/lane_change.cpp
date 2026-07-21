@@ -157,53 +157,86 @@ auto laneChangeTrajectory(
       .z(to_vector.z * tangent_vector_size_in_curve));
 }
 
+inline namespace v1
+{
 auto laneChangeTrajectory(
   const LaneletPose & from_lanelet_pose, const Parameter & lane_change_parameter)
   -> std::optional<std::pair<Curve, double>>
+{
+  if (auto result = v2::laneChangeTrajectory(from_lanelet_pose, lane_change_parameter)) {
+    return std::make_pair(result->first, result->second.getLaneletPose().s);
+  } else {
+    return std::nullopt;
+  }
+}
+}  // namespace v1
+
+namespace v2
+{
+auto laneChangeTrajectory(
+  const LaneletPose & from_lanelet_pose, const Parameter & lane_change_parameter)
+  -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>
 {
   const double longitudinal_distance =
     lane_change_parameter.constraint.type == Constraint::Type::LONGITUDINAL_DISTANCE
       ? lane_change_parameter.constraint.value
       : Parameter::default_lanechange_distance;
 
-  const auto along_lanelet_pose = pose::alongLaneletPose(from_lanelet_pose, longitudinal_distance);
-  auto left_boundary_lanelet_pose = along_lanelet_pose;
-  left_boundary_lanelet_pose.offset += 5.0;
-  auto right_boundary_lanelet_pose = along_lanelet_pose;
-  right_boundary_lanelet_pose.offset -= 5.0;
+  const auto to_lanelet_pose = CanonicalizedLaneletPose([&]() {
+    auto lanelet_pose = LaneletPose();
+    lanelet_pose.lanelet_id = lane_change_parameter.target.lanelet_id;
+    lanelet_pose.s = from_lanelet_pose.s + longitudinal_distance;  // FIXME: DIRTY HACK!!!
+    lanelet_pose.offset = lane_change_parameter.target.offset;
+    return lanelet_pose;
+  }());
 
-  const auto left_boundary_point = pose::toMapPose(left_boundary_lanelet_pose).pose.position;
-  const auto right_boundary_point = pose::toMapPose(right_boundary_lanelet_pose).pose.position;
-  if (const auto to_lanelet_pose_s =
-        lanelet_map::centerPointsSpline(lane_change_parameter.target.lanelet_id)
-          ->getCollisionPointIn2D(left_boundary_point, right_boundary_point);
-      !to_lanelet_pose_s) {
-    return std::nullopt;
-  } else {
-    const auto to_lanelet_pose = helper::constructLaneletPose(
-      lane_change_parameter.target.lanelet_id, to_lanelet_pose_s.value(),
-      lane_change_parameter.target.offset);
-    const auto from_pose = pose::toMapPose(from_lanelet_pose).pose;
-    const auto to_pose = pose::toMapPose(to_lanelet_pose).pose;
-    const auto euclidean_distance = math::geometry::hypot(from_pose.position, to_pose.position);
-    const auto lane_change_trajectory = laneChangeTrajectory(
-      from_pose, to_lanelet_pose, lane_change_parameter.trajectory_shape, euclidean_distance * 0.5);
-    return std::make_pair(lane_change_trajectory, to_lanelet_pose_s.value());
-  }
+  const auto from_pose = pose::toMapPose(from_lanelet_pose).pose;
+  const auto to_pose = pose::toMapPose(to_lanelet_pose.getLaneletPose()).pose;
+  const auto euclidean_distance = math::geometry::hypot(from_pose.position, to_pose.position);
+  const auto lane_change_trajectory = lane_change::laneChangeTrajectory(
+    from_pose, to_lanelet_pose.getLaneletPose(), lane_change_parameter.trajectory_shape,
+    euclidean_distance * 0.5);
+  return std::make_pair(lane_change_trajectory, to_lanelet_pose);
 }
+}  // namespace v2
 
+inline namespace v1
+{
 auto laneChangeTrajectory(
   const Pose & from_pose, const Parameter & lane_change_parameter,
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>
+{
+  if (
+    auto result = v2::laneChangeTrajectory(
+      from_pose, lane_change_parameter, maximum_curvature_threshold, target_trajectory_length,
+      forward_distance_threshold)) {
+    return std::make_pair(result->first, result->second.getLaneletPose().s);
+  } else {
+    return std::nullopt;
+  }
+}
+}  // namespace v1
+
+namespace v2
+{
+auto laneChangeTrajectory(
+  const Pose & from_pose, const Parameter & lane_change_parameter,
+  const double maximum_curvature_threshold, const double target_trajectory_length,
+  const double forward_distance_threshold)
+  -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>
 {
   std::vector<double> candidates_evaluation;
   std::vector<double> candidates_s;
   std::vector<Curve> candidates_curves;
 
   const auto lanelet_length = lanelet_map::laneletLength(lane_change_parameter.target.lanelet_id);
+
+  auto to_lanelet_pose =
+    helper::constructLaneletPose(lane_change_parameter.target.lanelet_id, 0.0, 0.0);
+
   for (double to_lanelet_pose_s = 0; to_lanelet_pose_s < lanelet_length; to_lanelet_pose_s += 1.0) {
-    const auto to_lanelet_pose =
+    to_lanelet_pose =
       helper::constructLaneletPose(lane_change_parameter.target.lanelet_id, to_lanelet_pose_s, 0.0);
     // skip those poses that are too close
     if (const auto to_pose = pose::toMapPose(to_lanelet_pose).pose;
@@ -212,7 +245,7 @@ auto laneChangeTrajectory(
       continue;
     } else {
       const auto euclidean_distance = math::geometry::hypot(from_pose.position, to_pose.position);
-      if (const auto lane_change_trajectory = laneChangeTrajectory(
+      if (const auto lane_change_trajectory = lane_change::laneChangeTrajectory(
             from_pose, to_lanelet_pose, lane_change_parameter.trajectory_shape,
             euclidean_distance * 0.5);
           lane_change_trajectory.getMaximum2DCurvature() < maximum_curvature_threshold) {
@@ -230,9 +263,10 @@ auto laneChangeTrajectory(
     const auto min_iterator =
       std::min_element(candidates_evaluation.begin(), candidates_evaluation.end());
     const auto min_index = std::distance(candidates_evaluation.begin(), min_iterator);
-    return std::make_pair(candidates_curves[min_index], candidates_s[min_index]);
+    return std::make_pair(candidates_curves[min_index], CanonicalizedLaneletPose(to_lanelet_pose));
   }
 }
+}  // namespace v2
 }  // namespace lane_change
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
