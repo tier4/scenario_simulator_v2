@@ -265,13 +265,17 @@ struct DummyLongRunningAction : public CustomCommand, private SimulatorCore::Con
       if (auto e = scope.ref(scope.name); e.is_also<StoryboardElement>()) {
         e.as<StoryboardElement>().addTransitionCallback(
           StoryboardElementState::runningState, [name = scope.name](auto &&) {
-            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
-                      << " transitions to runningState" << std::endl;
+            RCLCPP_INFO_STREAM(
+              rclcpp::get_logger("DummyLongRunningAction"),
+              "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
+                  << " transitions to runningState");
           });
         e.as<StoryboardElement>().addTransitionCallback(
           StoryboardElementState::completeState, [name = scope.name](auto &&) {
-            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
-                      << " transitions to completeState" << std::endl;
+            RCLCPP_INFO_STREAM(
+              rclcpp::get_logger("DummyLongRunningAction"),
+              "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
+                  << " transitions to completeState");
           });
       }
     }
@@ -299,7 +303,8 @@ struct PrintParameter : public CustomCommand
   auto start(const Scope & scope) -> void override
   {
     for (auto && parameter : parameters) {
-      std::cout << parameter << " = " << scope.ref(parameter) << std::endl;
+      RCLCPP_INFO_STREAM(
+        rclcpp::get_logger("PrintParameter"), parameter << " = " << scope.ref(parameter));
     }
   }
 };
@@ -310,11 +315,12 @@ struct TestCommand : public CustomCommand
 
   auto start(const Scope &) -> void override
   {
-    std::cout << "test" << std::endl;
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("TestCommand"), "test");
 
     for (auto iter = std::cbegin(parameters); iter != std::cend(parameters); ++iter) {
-      std::cout << "  parameters[" << std::distance(std::cbegin(parameters), iter)
-                << "] = " << *iter << std::endl;
+      RCLCPP_INFO_STREAM(
+        rclcpp::get_logger("TestCommand"),
+        "  parameters[" << std::distance(std::cbegin(parameters), iter) << "] = " << *iter);
     }
   }
 };

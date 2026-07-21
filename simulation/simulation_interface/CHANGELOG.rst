@@ -2,6 +2,52 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.22 (2026-07-17)
+--------------------
+
+25.0.21 (2026-06-08)
+--------------------
+* Merge pull request `#1847 <https://github.com/tier4/scenario_simulator_v2/issues/1847>`_ from tier4/open-simulation-interface
+  Open simulation interface
+* Change the repository to fetch from `open_simulation_interface` to `osi-cpp`
+* Update `open-simulation-interface` version to `v3.8.0` from `v3.7.0`
+* Update `CMakeLists.txt` to install shared-object into `lib`
+* Specify word `wonkycase` to be ignored from cSpell
+* Ignore `ament_lint_cmake` rule `readability/wonkycase`
+* Cleanup
+* Add new function template `to` and its specialization `to<osi3::Timestamp>`
+* Add `OpenSimulationInterface/open-simulation-interface` to dependency
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
+25.0.20 (2026-05-07)
+--------------------
+
+25.0.19 (2026-04-30)
+--------------------
+* Merge branch 'master' into fix/rviz-config
+* Contributors: Kotaro Yoshimoto
+
+25.0.18 (2026-04-30)
+--------------------
+
+25.0.17 (2026-03-27)
+--------------------
+
+25.0.16 (2026-03-27)
+--------------------
+* Merge branch 'master' into feature/arm-docker
+* Merge branch 'master' into feature/arm-docker
+* Merge branch 'master' into feature/arm-docker
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+25.0.15 (2026-03-27)
+--------------------
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
 25.0.14 (2026-03-25)
 --------------------
 * Merge branch 'master' into dependabot/github_actions/mshick/add-pr-comment-3

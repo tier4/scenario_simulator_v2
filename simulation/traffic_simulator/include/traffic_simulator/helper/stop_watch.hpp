@@ -50,16 +50,19 @@ public:
         double elapsed =
           std::chrono::duration_cast<T>(end_time.value() - start_time.value()).count();
         if (typeid(T) == typeid(std::chrono::microseconds)) {
-          std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " microseconds"
-                    << std::endl;
+          RCLCPP_INFO_STREAM(
+            rclcpp::get_logger(name),
+            "elapsed time in stop watch " << name << " : " << elapsed << " microseconds");
         }
         if (typeid(T) == typeid(std::chrono::milliseconds)) {
-          std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " milliseconds"
-                    << std::endl;
+          RCLCPP_INFO_STREAM(
+            rclcpp::get_logger(name),
+            "elapsed time in stop watch " << name << " : " << elapsed << " milliseconds");
         }
         if (typeid(T) == typeid(std::chrono::seconds)) {
-          std::cout << "elapsed time in stop watch " << name << " : " << elapsed << " seconds"
-                    << std::endl;
+          RCLCPP_INFO_STREAM(
+            rclcpp::get_logger(name),
+            "elapsed time in stop watch " << name << " : " << elapsed << " seconds");
         }
       }
     } else {

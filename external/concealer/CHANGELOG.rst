@@ -2,6 +2,41 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.22 (2026-07-17)
+--------------------
+
+25.0.21 (2026-06-08)
+--------------------
+
+25.0.20 (2026-05-07)
+--------------------
+
+25.0.19 (2026-04-30)
+--------------------
+* Merge branch 'master' into fix/rviz-config
+* Contributors: Kotaro Yoshimoto
+
+25.0.18 (2026-04-30)
+--------------------
+
+25.0.17 (2026-03-27)
+--------------------
+
+25.0.16 (2026-03-27)
+--------------------
+* Merge branch 'master' into feature/arm-docker
+* Merge branch 'master' into feature/arm-docker
+* Merge branch 'master' into feature/arm-docker
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+25.0.15 (2026-03-27)
+--------------------
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
 25.0.14 (2026-03-25)
 --------------------
 * Merge branch 'master' into dependabot/github_actions/mshick/add-pr-comment-3

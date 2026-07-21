@@ -2,6 +2,56 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.0.22 (2026-07-17)
+--------------------
+
+25.0.21 (2026-06-08)
+--------------------
+
+25.0.20 (2026-05-07)
+--------------------
+* Merge pull request `#1839 <https://github.com/tier4/scenario_simulator_v2/issues/1839>`_ from mitsudome-r/ignore-unused-local-typedefs
+  fix(traffic_simulator): ignore unused-local-typedefs warning
+* fix(traffic_simulator): ignore unused-local-typedefs warning
+* Contributors: Kotaro Yoshimoto, Ryohsuke Mitsudome
+
+25.0.19 (2026-04-30)
+--------------------
+* Merge pull request `#1837 <https://github.com/tier4/scenario_simulator_v2/issues/1837>`_ from mitsudome-r/fix/rviz-config
+  fix: remove deleted MrmSummaryOverlayDisplay
+* Merge branch 'master' into fix/rviz-config
+* fix: remove deleted MrmSummaryOverlayDisplay
+* Contributors: Kotaro Yoshimoto, Ryohsuke Mitsudome
+
+25.0.18 (2026-04-30)
+--------------------
+* Merge pull request `#1838 <https://github.com/tier4/scenario_simulator_v2/issues/1838>`_ from mitsudome-r/feat/support-jazzy-docker
+  feat: add jazzy support for docker image
+* ignore overloaded-virtual for arm64
+* Contributors: Kotaro Yoshimoto, Ryohsuke Mitsudome
+
+25.0.17 (2026-03-27)
+--------------------
+
+25.0.16 (2026-03-27)
+--------------------
+* Merge branch 'master' into feature/arm-docker
+* Merge branch 'master' into feature/arm-docker
+* Merge branch 'master' into feature/arm-docker
+* Contributors: Kotaro Yoshimoto, ぐるぐる
+
+25.0.15 (2026-03-27)
+--------------------
+* Merge pull request `#1786 <https://github.com/tier4/scenario_simulator_v2/issues/1786>`_ from tier4/refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* Merge branch 'master' into refactor/stdout
+* apply formatter
+* Merge branch 'master' into refactor/stdout
+* formatting message out
+* replace cout
+* Contributors: Kotaro Yoshimoto, f0reachARR, ぐるぐる
+
 25.0.14 (2026-03-25)
 --------------------
 * Merge branch 'master' into dependabot/github_actions/mshick/add-pr-comment-3

@@ -14,6 +14,7 @@
 
 #include <geometry/distance.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <rclcpp/logging.hpp>
 #include <std_msgs/msg/header.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
@@ -123,8 +124,9 @@ auto EntityManager::updateNpcLogic(
   const std::string & name, const double current_time, const double step_time,
   const std::shared_ptr<EuclideanDistancesMap> & distances) -> const CanonicalizedEntityStatus &
 {
+  /// @note Maybe replaced by RCLCPP_DEBUG and ROS logging level
   if (configuration_.verbose) {
-    std::cout << "update " << name << " behavior" << std::endl;
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("EntityManager"), "update " << name << " behavior");
   }
   auto & entity = getEntity(name);
   // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego

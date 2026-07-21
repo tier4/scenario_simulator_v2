@@ -94,7 +94,7 @@ int main(const int argc, char const * const * const argv)
       message.value = boost::lexical_cast<decltype(message.value)>(++count);
     }
 
-    std::cout << "message.value = " << message.value << std::endl;
+    RCLCPP_INFO_STREAM(node->get_logger(), "message.value = " << message.value);
 
     return message;
   };
