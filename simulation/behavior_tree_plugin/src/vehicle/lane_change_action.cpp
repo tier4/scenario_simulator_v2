@@ -169,16 +169,14 @@ BT::NodeStatus LaneChangeAction::doAction()
     if (current_s_ < curve_->getLength()) {
       auto entity_status_updated =
         static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
-      entity_status_updated.pose = curve_->getPose(current_s_, true);
       entity_status_updated.lanelet_pose_valid = false;
+      entity_status_updated.pose = curve_->getPose(current_s_, true);
       setCanonicalizedEntityStatus(entity_status_updated);
       return BT::NodeStatus::RUNNING;
     } else {
       auto entity_status_updated =
         static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
       entity_status_updated.lanelet_pose = target_canonicalized_lanelet_pose_->getLaneletPose();
-      entity_status_updated.lanelet_pose.offset = 0;
-      entity_status_updated.lanelet_pose.rpy = geometry_msgs::msg::Vector3();
       entity_status_updated.lanelet_pose_valid = true;
       entity_status_updated.pose =
         traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_pose);

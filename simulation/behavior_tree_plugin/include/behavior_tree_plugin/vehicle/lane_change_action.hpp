@@ -52,7 +52,8 @@ private:
   double current_s_;
   double lane_change_velocity_;
   std::optional<traffic_simulator::lane_change::Parameter> lane_change_parameters_;
-  std::optional<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose> target_canonicalized_lanelet_pose_;
+  std::optional<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose>
+    target_canonicalized_lanelet_pose_;
 };
 }  // namespace vehicle
 }  // namespace entity_behavior
