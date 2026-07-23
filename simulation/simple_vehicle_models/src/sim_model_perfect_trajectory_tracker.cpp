@@ -16,7 +16,7 @@
 #include <cmath>
 #include <limits>
 #include <rclcpp/duration.hpp>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_perfect_trajectory_tracker.hpp>
+#include <simple_vehicle_models/sim_model_perfect_trajectory_tracker.hpp>
 
 namespace
 {
@@ -203,8 +203,8 @@ void SimModelPerfectTrajectoryTracker::update(const double & dt)
   cy += v * std::sin(cyaw_map) * dt;
 
   // 6. Write back to model-relative state.
-  //    Z is carried through state_z_initial_frame_ (set by EgoEntitySimulation from the
-  //    lanelet-corrected altitude before each update()), so cz from step 2 is used as-is.
+  //    Z is carried through state_z_initial_frame_ (set by EgoEntity from the lanelet-corrected
+  //    altitude before each update()), so cz from step 2 is used as-is.
   const Eigen::Vector3d p_world_new(
     cx - initial_pose_.position.x, cy - initial_pose_.position.y, p_world.z());
   const Eigen::Vector3d p_rel_new = initial_rotation_matrix_.transpose() * p_world_new;

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_EXTERNAL_HPP_
-#define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_EXTERNAL_HPP_
+#ifndef SIMPLE_VEHICLE_MODELS__SIM_MODEL_EXTERNAL_HPP_
+#define SIMPLE_VEHICLE_MODELS__SIM_MODEL_EXTERNAL_HPP_
 
 #include <mutex>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
+#include <simple_vehicle_models/sim_model_interface.hpp>
 
 /**
  * @class SimModelExternal
@@ -145,4 +145,4 @@ private:
   } external_state_;
 };
 
-#endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_EXTERNAL_HPP_
+#endif  // SIMPLE_VEHICLE_MODELS__SIM_MODEL_EXTERNAL_HPP_

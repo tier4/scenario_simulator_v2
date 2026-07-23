@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_ACC_HPP_
-#define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_ACC_HPP_
+#ifndef SIMPLE_VEHICLE_MODELS__SIM_MODEL_DELAY_STEER_ACC_GEARED_HPP_
+#define SIMPLE_VEHICLE_MODELS__SIM_MODEL_DELAY_STEER_ACC_GEARED_HPP_
 
 #include <deque>
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/LU>
 #include <iostream>
 #include <queue>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
+#include <simple_vehicle_models/sim_model_interface.hpp>
 
-class SimModelDelaySteerAcc : public SimModelInterface
+class SimModelDelaySteerAccGeared : public SimModelInterface
 {
 public:
   /**
@@ -41,7 +41,7 @@ public:
    * @param [in] debug_acc_scaling_factor scaling factor for accel command
    * @param [in] debug_steer_scaling_factor scaling factor for steering command
    */
-  SimModelDelaySteerAcc(
+  SimModelDelaySteerAccGeared(
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, double steer_dead_band, double debug_acc_scaling_factor,
@@ -50,7 +50,7 @@ public:
   /**
    * @brief default destructor
    */
-  ~SimModelDelaySteerAcc() = default;
+  ~SimModelDelaySteerAccGeared() = default;
 
 private:
   const double MIN_TIME_CONSTANT;  //!< @brief minimum time constant
@@ -143,6 +143,17 @@ private:
    * @param [in] input input vector to model
    */
   Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
+
+  /**
+   * @brief update state considering current gear
+   * @param [in] state current state
+   * @param [in] prev_state previous state
+   * @param [in] gear current gear (defined in autoware_vehicle_msgs/GearCommand)
+   * @param [in] dt delta time to update state
+   */
+  void updateStateWithGear(
+    Eigen::VectorXd & state, const Eigen::VectorXd & prev_state, const uint8_t gear,
+    const double dt);
 };
 
-#endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_ACC_HPP_
+#endif  // SIMPLE_VEHICLE_MODELS__SIM_MODEL_DELAY_STEER_ACC_GEARED_HPP_

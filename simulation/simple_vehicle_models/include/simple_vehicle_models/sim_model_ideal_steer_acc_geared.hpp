@@ -12,42 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_VEL_HPP_
-#define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_VEL_HPP_
+#ifndef SIMPLE_VEHICLE_MODELS__SIM_MODEL_IDEAL_STEER_ACC_GEARED_HPP_
+#define SIMPLE_VEHICLE_MODELS__SIM_MODEL_IDEAL_STEER_ACC_GEARED_HPP_
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/LU>
 #include <iostream>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
+#include <simple_vehicle_models/sim_model_interface.hpp>
 
 /**
- * @class SimModelIdealSteerVel
+ * @class SimModelIdealSteerAccGeared
  * @brief calculate ideal steering dynamics
  */
-class SimModelIdealSteerVel : public SimModelInterface
+class SimModelIdealSteerAccGeared : public SimModelInterface
 {
 public:
   /**
    * @brief constructor
    * @param [in] wheelbase vehicle wheelbase length [m]
    */
-  explicit SimModelIdealSteerVel(double wheelbase);
+  explicit SimModelIdealSteerAccGeared(double wheelbase);
 
   /**
    * @brief destructor
    */
-  ~SimModelIdealSteerVel() = default;
+  ~SimModelIdealSteerAccGeared() = default;
 
 private:
-  enum IDX { X = 0, Y, YAW };
+  enum IDX { X = 0, Y, YAW, VX };
   enum IDX_U {
-    VX_DES = 0,
+    AX_DES = 0,
     STEER_DES,
   };
 
   const double wheelbase_;  //!< @brief vehicle wheelbase length
-  double prev_vx_ = 0.0;
-  double current_ax_ = 0.0;
+  double current_acc_;      //!< @brief current_acc with gear consideration
 
   /**
    * @brief get vehicle position x
@@ -101,6 +100,17 @@ private:
    * @param [in] input input vector to model
    */
   Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
+
+  /**
+   * @brief update state considering current gear
+   * @param [in] state current state
+   * @param [in] prev_state previous state
+   * @param [in] gear current gear (defined in autoware_vehicle_msgs/GearCommand)
+   * @param [in] dt delta time to update state
+   */
+  void updateStateWithGear(
+    Eigen::VectorXd & state, const Eigen::VectorXd & prev_state, const uint8_t gear,
+    const double dt);
 };
 
-#endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_VEL_HPP_
+#endif  // SIMPLE_VEHICLE_MODELS__SIM_MODEL_IDEAL_STEER_ACC_GEARED_HPP_

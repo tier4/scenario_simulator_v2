@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_PERFECT_TRAJECTORY_FOLLOWER_HPP_
-#define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_PERFECT_TRAJECTORY_FOLLOWER_HPP_
+#ifndef SIMPLE_VEHICLE_MODELS__SIM_MODEL_PERFECT_TRAJECTORY_TRACKER_HPP_
+#define SIMPLE_VEHICLE_MODELS__SIM_MODEL_PERFECT_TRAJECTORY_TRACKER_HPP_
 
 #include <autoware_planning_msgs/msg/trajectory.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <rclcpp/time.hpp>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
-
-#include <eigen3/Eigen/Core>
-
 #include <deque>
+#include <eigen3/Eigen/Core>
+#include <geometry_msgs/msg/pose.hpp>
 #include <mutex>
+#include <rclcpp/time.hpp>
+#include <simple_vehicle_models/sim_model_interface.hpp>
 
 /**
- * @class SimModelPerfectTrajectoryFollower
+ * @class SimModelPerfectTrajectoryTracker
  * @brief Vehicle model that follows the planning trajectory exactly,
  *        without any controller or vehicle dynamics. Equivalent to
  *        autoware_perfect_tracker, reimplemented as a SimModelInterface
@@ -37,22 +35,21 @@
  * Input: none (trajectory is injected via setTrajectory())
  *
  * Extended API (not in SimModelInterface):
- *   setInitialReference() -- called once at construction
- *   setTrajectory()       -- called every simulation step
- *   getZ() / getPitch() / getRoll()
+ *   setInitialReference()    -- called once at construction
+ *   setTrajectory()          -- called every simulation step
+ *   setStateZInitialFrame()  -- sync initial-frame z from EgoEntity each step
  */
-class SimModelPerfectTrajectoryFollower : public SimModelInterface
+class SimModelPerfectTrajectoryTracker : public SimModelInterface
 {
 public:
-  explicit SimModelPerfectTrajectoryFollower(double delay_time_sec);
+  explicit SimModelPerfectTrajectoryTracker(double delay_time_sec);
 
   /**
    * @brief Store the initial map-frame reference for coordinate conversion.
    *        Must be called once before the first update().
    */
   void setInitialReference(
-    const geometry_msgs::msg::Pose & initial_pose,
-    const Eigen::Matrix3d & initial_rotation_matrix);
+    const geometry_msgs::msg::Pose & initial_pose, const Eigen::Matrix3d & initial_rotation_matrix);
 
   /**
    * @brief Inject a new trajectory into the delay queue.
@@ -60,13 +57,14 @@ public:
    *        Duplicate stamps are silently dropped.
    */
   void setTrajectory(
-    const rclcpp::Time & stamp,
-    const autoware_planning_msgs::msg::Trajectory & msg);
+    const rclcpp::Time & stamp, const autoware_planning_msgs::msg::Trajectory & msg);
 
-  // Extended getters (z/pitch not available in SimModelInterface)
-  double getZ() const;
-  double getPitch() const;
-  double getRoll() const { return 0.0; }
+  /**
+   * @brief Sync the initial-frame z component from EgoEntity's world_relative_position_.z()
+   *        before each update(), preserving the lanelet-corrected altitude through the R^T/R
+   *        roundtrip without an internal trajectory-Z or lanelet lookup.
+   */
+  void setStateZInitialFrame(double z);
 
   // SimModelInterface overrides
   double getX() override;
@@ -78,22 +76,16 @@ public:
   double getWz() override;
   double getSteer() override;
   void update(const double & dt) override;
-  Eigen::VectorXd calcModel(
-    const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
+  Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
 
 private:
   enum IDX { X = 0, Y, YAW, VX };
 
-  struct StampedTrajectory {
+  struct StampedTrajectory
+  {
     rclcpp::Time stamp;
     autoware_planning_msgs::msg::Trajectory msg;
   };
-
-  double interpolateZ(
-    const autoware_planning_msgs::msg::Trajectory & traj,
-    double x, double y, double fallback_z) const;
-
-  double calculatePitchFromLanelet(double x, double y, double yaw) const;
 
   const double delay_time_sec_;
 
@@ -110,8 +102,9 @@ private:
   double current_ax_{0.0};
   double current_wz_{0.0};
   double current_steer_{0.0};
-  double current_z_map_{0.0};
-  double current_pitch_{0.0};
+
+  // z-component of position in initial frame, set by EgoEntity before each update().
+  double state_z_initial_frame_{0.0};
 };
 
-#endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_PERFECT_TRAJECTORY_FOLLOWER_HPP_
+#endif  // SIMPLE_VEHICLE_MODELS__SIM_MODEL_PERFECT_TRAJECTORY_TRACKER_HPP_

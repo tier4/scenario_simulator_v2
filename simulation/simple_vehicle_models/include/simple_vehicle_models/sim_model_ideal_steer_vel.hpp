@@ -12,40 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_ACC_HPP_
-#define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_ACC_HPP_
+#ifndef SIMPLE_VEHICLE_MODELS__SIM_MODEL_IDEAL_STEER_VEL_HPP_
+#define SIMPLE_VEHICLE_MODELS__SIM_MODEL_IDEAL_STEER_VEL_HPP_
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/LU>
 #include <iostream>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
+#include <simple_vehicle_models/sim_model_interface.hpp>
 
 /**
- * @class SimModelIdealSteerAcc
+ * @class SimModelIdealSteerVel
  * @brief calculate ideal steering dynamics
  */
-class SimModelIdealSteerAcc : public SimModelInterface
+class SimModelIdealSteerVel : public SimModelInterface
 {
 public:
   /**
    * @brief constructor
    * @param [in] wheelbase vehicle wheelbase length [m]
    */
-  explicit SimModelIdealSteerAcc(double wheelbase);
+  explicit SimModelIdealSteerVel(double wheelbase);
 
   /**
    * @brief destructor
    */
-  ~SimModelIdealSteerAcc() = default;
+  ~SimModelIdealSteerVel() = default;
 
 private:
-  enum IDX { X = 0, Y, YAW, VX };
+  enum IDX { X = 0, Y, YAW };
   enum IDX_U {
-    AX_DES = 0,
+    VX_DES = 0,
     STEER_DES,
   };
 
   const double wheelbase_;  //!< @brief vehicle wheelbase length
+  double prev_vx_ = 0.0;
+  double current_ax_ = 0.0;
 
   /**
    * @brief get vehicle position x
@@ -101,4 +103,4 @@ private:
   Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
 };
 
-#endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_ACC_HPP_
+#endif  // SIMPLE_VEHICLE_MODELS__SIM_MODEL_IDEAL_STEER_VEL_HPP_

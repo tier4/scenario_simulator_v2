@@ -12,46 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef AUTOWARE__SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER_HPP_  // NOLINT
-#define AUTOWARE__SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER_HPP_  // NOLINT
+#ifndef AUTOWARE__SIMPLE_VEHICLE_MODELS__SIM_MODEL_DELAY_STEER_ACC_GEARED_WO_FALL_GUARD_HPP_  // NOLINT
+#define AUTOWARE__SIMPLE_VEHICLE_MODELS__SIM_MODEL_DELAY_STEER_ACC_GEARED_WO_FALL_GUARD_HPP_  // NOLINT
 
 #include <Eigen/Core>
 #include <Eigen/LU>
 #include <deque>
 #include <iostream>
 #include <queue>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
+#include <simple_vehicle_models/sim_model_interface.hpp>
 
 namespace autoware::simulator::simple_planning_simulator
 {
 
-/**
- * @brief 継続改良のための汎用派生モデル（初出は diffusion planner のモデル差し替え用途）。
- *
- * SimModelDelaySteerAccGearedWoFallGuard の忠実なコピーを土台に、ステア・加速度チャネルの
- * むだ時間を「指令のみ遅延（入力キュー）」から「右辺全体の遅延（full-RHS delay）」へ拡張した
- * 派生。以後の物理項の追加はこの 1 モデルに蓄積する想定で、特定機能名に依存しない汎用名とする。
- *
- * ## wo_fall_guard との差分（full-RHS delay）
- * wo_fall_guard はステア/加速度の「指令」だけを入力キューで t−d 遅延させ、状態フィードバック
- * （現ステア角・現 pedal 加速度）は現在値のまま用いる。本モデルはこれに加えて、ステア式・加速度
- * 式が参照する「状態」も t−d でサンプリングする。すなわち各チャネル c の右辺全体を t−d_c で
- * 評価する（Python 側 vehicle_model_fitting の統一枠組みと 1:1 対応）。
- *   - ステア式(STEER): steer_rate = f(STEER(t−d_steer), steer_des(t−d_steer))
- *   - 加速度式(PEDAL_ACCX): -(pedal(t−d_acc) − a_target)/τ, a_target = pedal_des(t−d_acc)
- * 位置式(X,Y)・ヨー式(YAW)・速度式(VX, ギア則) は遅延を持たない（現在状態で評価）。ヨー観測
- * 遅延 d_tt はこのフェーズの対象外（将来この派生へ追加）。
- *
- * ## 遅延状態の凍結（Python の per-step 凍結 RHS との一致）
- * 遅延状態は update() 冒頭で一度だけ取り出してメンバに凍結し、Euler 積分で定数として用いる。
- * 指令遅延も update() ごとに 1 回だけ進むため、ステア/加速度チャネルの微分は dt 区間で定数となり、
- * Python が 1 ステップで e_eff/e_a_eff を 1 回だけ計算して RK4 の全段で凍結するのと等価になる。
- *
- * ## 退化性（bit 一致ゲート）
- * 全遅延 = 0 のとき、遅延状態 = 現在状態が一致するため、本モデルは wo_fall_guard と bit 単位で
- * 一致する（配管全体の検証アンカー）。
- */
-class SimModelDelaySteerAccGearedForDiffusionPlanner : public SimModelInterface
+class SimModelDelaySteerAccGearedWoFallGuard : public SimModelInterface
 {
 public:
   /**
@@ -71,19 +45,19 @@ public:
    * @param [in] debug_steer_scaling_factor scaling factor for steering command
    * @param [in] k_us understeer coefficient [rad/(m/s²)]; 0 = ideal bicycle model
    *
-   * @note 全遅延 = 0 のとき wo_fall_guard と bit 一致。
+   * @note The yaw bias β (steer_bias) enters the yaw equation as tan(δ+β), producing a net yaw
+   *       offset instead of being cancelled by the steer controller.
    */
-  SimModelDelaySteerAccGearedForDiffusionPlanner(
+  SimModelDelaySteerAccGearedWoFallGuard(
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, double steer_dead_band, double steer_bias,
-    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-    double xy_heading_rate_coeff, bool use_rk4);
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us);
 
   /**
    * @brief default destructor
    */
-  ~SimModelDelaySteerAccGearedForDiffusionPlanner() = default;
+  ~SimModelDelaySteerAccGearedWoFallGuard() = default;
 
   /**
    * @brief replace internal acc / steer delay queues with caller-supplied histories.
@@ -92,13 +66,6 @@ public:
    */
   void setInputQueues(
     const std::deque<double> & acc_queue, const std::deque<double> & steer_queue);
-
-  /**
-   * @brief re-fill the delayed-state history buffers (STEER / PEDAL_ACCX / VX) with a constant
-   *        equal to the current state. Call after seeding the state (reset / warmup restore) so the
-   *        full-RHS delay reads the steady pre-window state, not the warm-up transient.
-   */
-  void resetStateQueues();
 
   /**
    * @brief sizes of the internal delay queues (driven by acc_delay / steer_delay / dt).
@@ -128,13 +95,6 @@ private:
 
   std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
   std::deque<double> steer_input_queue_;     //!< @brief buffer for steering command
-  // full-RHS delay: 状態フィードバックも t−d でサンプリングするための状態履歴バッファ。
-  // dt 粒度（指令キューと同サイズ round(delay/dt)）で保持する。
-  std::deque<double> steer_state_queue_;     //!< @brief buffer for STEER state (delayed feedback)
-  std::deque<double> pedal_state_queue_;     //!< @brief buffer for PEDAL_ACCX state (delayed feedback)
-  // update() 冒頭で 1 回だけ取り出し、calcModel が参照する凍結遅延状態。
-  double delayed_steer_state_ = 0.0;         //!< @brief STEER at t−steer_delay (frozen per update)
-  double delayed_pedal_state_ = 0.0;         //!< @brief PEDAL_ACCX at t−acc_delay (frozen per update)
   const double acc_delay_;                   //!< @brief time delay for accel command [s]
   const double acc_time_constant_;           //!< @brief time constant for accel dynamics
   const double steer_delay_;                 //!< @brief time delay for steering command [s]
@@ -144,8 +104,6 @@ private:
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
   const double k_us_;                        //!< @brief understeer coefficient [rad/(m/s²)]
-  const double xy_heading_rate_coeff_;       //!< @brief xy heading rate coefficient
-  const bool use_rk4_;                       //!< @brief whether to use Runge-Kutta integration
 
   /**
    * @brief steady-state yaw rate including understeer (k_us) and steer bias.
@@ -161,12 +119,6 @@ private:
    * @param [in] dt delta time
    */
   void initializeInputQueue(const double & dt);
-
-  /**
-   * @brief set queue buffer for delayed state feedback (STEER / PEDAL_ACCX / VX)
-   * @param [in] dt delta time
-   */
-  void initializeStateQueue(const double & dt);
 
   /**
    * @brief get vehicle position x
@@ -225,4 +177,4 @@ private:
 }  // namespace autoware::simulator::simple_planning_simulator
 
 // NOLINTNEXTLINE
-#endif  // AUTOWARE__SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER_HPP_
+#endif  // AUTOWARE__SIMPLE_VEHICLE_MODELS__SIM_MODEL_DELAY_STEER_ACC_GEARED_WO_FALL_GUARD_HPP_

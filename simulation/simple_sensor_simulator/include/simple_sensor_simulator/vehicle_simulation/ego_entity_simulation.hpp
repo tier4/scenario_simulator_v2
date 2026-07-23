@@ -21,7 +21,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <optional>
 #include <std_msgs/msg/empty.hpp>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
+#include <simple_vehicle_models/sim_model.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>

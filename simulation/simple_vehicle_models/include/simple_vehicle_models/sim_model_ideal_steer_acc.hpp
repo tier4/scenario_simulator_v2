@@ -12,31 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_ACC_GEARED_HPP_
-#define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_ACC_GEARED_HPP_
+#ifndef SIMPLE_VEHICLE_MODELS__SIM_MODEL_IDEAL_STEER_ACC_HPP_
+#define SIMPLE_VEHICLE_MODELS__SIM_MODEL_IDEAL_STEER_ACC_HPP_
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/LU>
 #include <iostream>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
+#include <simple_vehicle_models/sim_model_interface.hpp>
 
 /**
- * @class SimModelIdealSteerAccGeared
+ * @class SimModelIdealSteerAcc
  * @brief calculate ideal steering dynamics
  */
-class SimModelIdealSteerAccGeared : public SimModelInterface
+class SimModelIdealSteerAcc : public SimModelInterface
 {
 public:
   /**
    * @brief constructor
    * @param [in] wheelbase vehicle wheelbase length [m]
    */
-  explicit SimModelIdealSteerAccGeared(double wheelbase);
+  explicit SimModelIdealSteerAcc(double wheelbase);
 
   /**
    * @brief destructor
    */
-  ~SimModelIdealSteerAccGeared() = default;
+  ~SimModelIdealSteerAcc() = default;
 
 private:
   enum IDX { X = 0, Y, YAW, VX };
@@ -46,7 +46,6 @@ private:
   };
 
   const double wheelbase_;  //!< @brief vehicle wheelbase length
-  double current_acc_;      //!< @brief current_acc with gear consideration
 
   /**
    * @brief get vehicle position x
@@ -100,17 +99,6 @@ private:
    * @param [in] input input vector to model
    */
   Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
-
-  /**
-   * @brief update state considering current gear
-   * @param [in] state current state
-   * @param [in] prev_state previous state
-   * @param [in] gear current gear (defined in autoware_vehicle_msgs/GearCommand)
-   * @param [in] dt delta time to update state
-   */
-  void updateStateWithGear(
-    Eigen::VectorXd & state, const Eigen::VectorXd & prev_state, const uint8_t gear,
-    const double dt);
 };
 
-#endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_IDEAL_STEER_ACC_GEARED_HPP_
+#endif  // SIMPLE_VEHICLE_MODELS__SIM_MODEL_IDEAL_STEER_ACC_HPP_

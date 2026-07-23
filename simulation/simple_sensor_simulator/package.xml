@@ -50,6 +50,7 @@
   <depend>nav_msgs</depend>
   <depend>pcl_conversions</depend>
   <depend>rclcpp_components</depend>
+  <depend>simple_vehicle_models</depend>
   <depend>simulation_interface</depend>
   <depend>traffic_simulator_msgs</depend>
   <depend>visualization_msgs</depend>

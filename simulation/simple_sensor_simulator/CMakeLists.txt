@@ -58,17 +58,6 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/sensor_simulation/sensor_simulation.cpp
   src/simple_sensor_simulator.cpp
   src/vehicle_simulation/ego_entity_simulation.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_for_diffusion_planner.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_map_acc_geared.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_vel.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_vel.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_perfect_trajectory_tracker.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
   glog
@@ -79,6 +68,7 @@ target_link_libraries(simple_sensor_simulator_component
 ament_target_dependencies(simple_sensor_simulator_component
   agnocast_wrapper
   simulation_interface
+  simple_vehicle_models
 )
 
 target_include_directories(${PROJECT_NAME}_component PRIVATE
@@ -116,23 +106,7 @@ EXPORT export_simple_sensor_simulator_component
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
 
-add_library(vehicle_model_wrapper SHARED
-  src/vehicle_simulation/vehicle_model/vehicle_model_c_wrapper.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_for_diffusion_planner.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.cpp
-)
-target_include_directories(vehicle_model_wrapper PRIVATE
-  ${EIGEN3_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}/include
-)
-target_compile_features(vehicle_model_wrapper PRIVATE cxx_std_17)
-set_target_properties(vehicle_model_wrapper PROPERTIES POSITION_INDEPENDENT_CODE ON)
-ament_target_dependencies(vehicle_model_wrapper autoware_vehicle_msgs)
-install(TARGETS vehicle_model_wrapper
-  LIBRARY DESTINATION share/${PROJECT_NAME}
-)
+# vehicle_model_wrapper (C ABI) now lives in the simple_vehicle_models package (SSOT).
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

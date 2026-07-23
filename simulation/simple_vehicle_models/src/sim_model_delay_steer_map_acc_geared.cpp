@@ -14,7 +14,7 @@
 
 #include <algorithm>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_map_acc_geared.hpp>
+#include <simple_vehicle_models/sim_model_delay_steer_map_acc_geared.hpp>
 
 // copied from https://github.com/tier4/autoware.universe/blob/v0.17.0/common/interpolation/src/linear_interpolation.cpp
 namespace interpolation

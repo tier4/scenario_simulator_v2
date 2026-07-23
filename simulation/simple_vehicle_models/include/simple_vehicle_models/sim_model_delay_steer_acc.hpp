@@ -12,20 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_VEL_HPP_
-#define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_VEL_HPP_
+#ifndef SIMPLE_VEHICLE_MODELS__SIM_MODEL_DELAY_STEER_ACC_HPP_
+#define SIMPLE_VEHICLE_MODELS__SIM_MODEL_DELAY_STEER_ACC_HPP_
 
 #include <deque>
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/LU>
 #include <iostream>
 #include <queue>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
-/**
- * @class SimModelDelaySteerVel
- * @brief calculate delay steering dynamics
- */
-class SimModelDelaySteerVel : public SimModelInterface
+#include <simple_vehicle_models/sim_model_interface.hpp>
+
+class SimModelDelaySteerAcc : public SimModelInterface
 {
 public:
   /**
@@ -36,21 +33,24 @@ public:
    * @param [in] steer_rate_lim steering angular velocity limit [rad/ss]
    * @param [in] wheelbase vehicle wheelbase length [m]
    * @param [in] dt delta time information to set input buffer for delay
-   * @param [in] vx_delay time delay for velocity command [s]
-   * @param [in] vx_time_constant time constant for 1D model of velocity dynamics
+   * @param [in] acc_delay time delay for accel command [s]
+   * @param [in] acc_time_constant time constant for 1D model of accel dynamics
    * @param [in] steer_delay time delay for steering command [s]
    * @param [in] steer_time_constant time constant for 1D model of steering dynamics
    * @param [in] steer_dead_band dead band for steering angle [rad]
+   * @param [in] debug_acc_scaling_factor scaling factor for accel command
+   * @param [in] debug_steer_scaling_factor scaling factor for steering command
    */
-  SimModelDelaySteerVel(
+  SimModelDelaySteerAcc(
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
-    double dt, double vx_delay, double vx_time_constant, double steer_delay,
-    double steer_time_constant, double steer_dead_band);
+    double dt, double acc_delay, double acc_time_constant, double steer_delay,
+    double steer_time_constant, double steer_dead_band, double debug_acc_scaling_factor,
+    double debug_steer_scaling_factor);
 
   /**
-   * @brief destructor
+   * @brief default destructor
    */
-  ~SimModelDelaySteerVel() = default;
+  ~SimModelDelaySteerAcc() = default;
 
 private:
   const double MIN_TIME_CONSTANT;  //!< @brief minimum time constant
@@ -61,28 +61,29 @@ private:
     YAW,
     VX,
     STEER,
+    ACCX,
   };
   enum IDX_U {
-    VX_DES = 0,
+    ACCX_DES = 0,
     STEER_DES,
+    DRIVE_SHIFT,
   };
 
-  const double vx_lim_;          //!< @brief velocity limit
-  const double vx_rate_lim_;     //!< @brief acceleration limit
+  const double vx_lim_;          //!< @brief velocity limit [m/s]
+  const double vx_rate_lim_;     //!< @brief acceleration limit [m/ss]
   const double steer_lim_;       //!< @brief steering limit [rad]
   const double steer_rate_lim_;  //!< @brief steering angular velocity limit [rad/s]
   const double wheelbase_;       //!< @brief vehicle wheelbase length [m]
-  double current_ax_ = 0.0;
 
-  std::deque<double> vx_input_queue_;     //!< @brief buffer for velocity command
-  std::deque<double> steer_input_queue_;  //!< @brief buffer for angular velocity command
-  const double vx_delay_;                 //!< @brief time delay for velocity command [s]
-  const double vx_time_constant_;
-  //!< @brief time constant for 1D model of velocity dynamics
-  const double steer_delay_;  //!< @brief time delay for angular-velocity command [s]
-  const double
-    steer_time_constant_;  //!< @brief time constant for 1D model of angular-velocity dynamics
-  const double steer_dead_band_;  //!< @brief dead band for steering angle [rad]
+  std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
+  std::deque<double> steer_input_queue_;     //!< @brief buffer for steering command
+  const double acc_delay_;                   //!< @brief time delay for accel command [s]
+  const double acc_time_constant_;           //!< @brief time constant for accel dynamics
+  const double steer_delay_;                 //!< @brief time delay for steering command [s]
+  const double steer_time_constant_;         //!< @brief time constant for steering dynamics
+  const double steer_dead_band_;             //!< @brief dead band for steering angle [rad]
+  const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
+  const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
 
   /**
    * @brief set queue buffer for input command
@@ -106,7 +107,7 @@ private:
   double getYaw() override;
 
   /**
-   * @brief get vehicle longitudinal velocity
+   * @brief get vehicle velocity vx
    */
   double getVx() override;
 
@@ -137,11 +138,11 @@ private:
   void update(const double & dt) override;
 
   /**
-   * @brief calculate derivative of states with delay steering model
+   * @brief calculate derivative of states with time delay steering model
    * @param [in] state current model state
    * @param [in] input input vector to model
    */
   Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
 };
 
-#endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_DELAY_STEER_VEL_HPP_
+#endif  // SIMPLE_VEHICLE_MODELS__SIM_MODEL_DELAY_STEER_ACC_HPP_

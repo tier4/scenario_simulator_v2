@@ -12,8 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_INTERFACE_HPP_
-#define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_INTERFACE_HPP_
+// Standalone vehicle-model library shared by the headless (SSV2_HEADLESS_EGO) EgoEntity. Extracted
+// from simple_sensor_simulator so traffic_simulator can drive the ego in-process without the
+// ZeroMQ sensor-sim backend. simple_sensor_simulator is not built for the validator, so there is
+// no duplicate/ODR concern with its own copy.
+
+#ifndef SIMPLE_VEHICLE_MODELS__SIM_MODEL_INTERFACE_HPP_
+#define SIMPLE_VEHICLE_MODELS__SIM_MODEL_INTERFACE_HPP_
 
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <eigen3/Eigen/Core>
@@ -42,9 +47,7 @@ public:
   SimModelInterface(int dim_x, int dim_u);
 
   /**
-   * @brief virtual destructor — base for unique_ptr<SimModelInterface> ownership
-   *        (e.g. vehicle_model_c_wrapper.cpp VmModel). Non-virtual would invoke
-   *        UB on delete via base pointer; deque<double> in derivatives would leak.
+   * @brief virtual destructor — base for unique_ptr<SimModelInterface> ownership.
    */
   virtual ~SimModelInterface() = default;
 
@@ -162,4 +165,4 @@ public:
     const Eigen::VectorXd & state, const Eigen::VectorXd & input) = 0;
 };
 
-#endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_INTERFACE_HPP_
+#endif  // SIMPLE_VEHICLE_MODELS__SIM_MODEL_INTERFACE_HPP_

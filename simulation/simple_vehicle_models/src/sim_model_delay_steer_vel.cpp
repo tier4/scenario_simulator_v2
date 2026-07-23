@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <algorithm>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_vel.hpp>
+#include <simple_vehicle_models/sim_model_delay_steer_vel.hpp>
 
 SimModelDelaySteerVel::SimModelDelaySteerVel(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,

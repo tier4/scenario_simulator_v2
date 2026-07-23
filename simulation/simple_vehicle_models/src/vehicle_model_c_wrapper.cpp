@@ -37,10 +37,10 @@
 
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_for_diffusion_planner.hpp>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.hpp>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
+#include <simple_vehicle_models/sim_model_delay_steer_acc_geared_for_diffusion_planner.hpp>
+#include <simple_vehicle_models/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
+#include <simple_vehicle_models/sim_model_ideal_steer_acc.hpp>
+#include <simple_vehicle_models/sim_model_interface.hpp>
 
 namespace
 {
