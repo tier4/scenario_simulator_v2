@@ -126,6 +126,21 @@ auto API::updateTrafficLightsInSim() -> bool
 
 auto API::updateFrame() -> bool
 {
+#ifdef SSV2_HEADLESS_EGO
+  // Headless standalone Diffusion-Planner driving: the ego runs in-process (no concealer), and
+  // there is no ZeroMQ sensor-sim backend. The standalone-ego prohibition is therefore lifted,
+  // and the backend status sync (updateEntitiesStatusInSim) is skipped in standalone mode. All
+  // entity statuses — including the DP-driven ego — are produced by entity_manager update below.
+  if (ego_bag_replayer_) {
+    ego_bag_replayer_->update(getCurrentTime(), *entity_manager_ptr_);
+  }
+
+  if (not configuration_.standalone_mode) {
+    if (!updateEntitiesStatusInSim()) {
+      return false;
+    }
+  }
+#else
   if (configuration_.standalone_mode && entity_manager_ptr_->isAnyEgoSpawned()) {
     THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
   }
@@ -137,6 +152,7 @@ auto API::updateFrame() -> bool
   if (!updateEntitiesStatusInSim()) {
     return false;
   }
+#endif
 
   entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute(getCurrentTime(), clock_.getStepTime());

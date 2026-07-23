@@ -36,7 +36,10 @@ struct Configuration
 
   std::string simulator_host = "localhost";
 
-  const bool standalone_mode = false;
+  // Non-const so headless (SSV2_HEADLESS_EGO) callers can enable single-process, no-ZeroMQ
+  // operation after construction (mirrors `verbose`). The stock constructors never set it, so
+  // there was previously no way to turn standalone mode on through the public API.
+  bool standalone_mode = false;
 
   const double conventional_traffic_light_publish_rate = 30.0;
 

@@ -16,7 +16,13 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
+#ifdef SSV2_HEADLESS_EGO
+#include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <simple_vehicle_models/sim_model_perfect_trajectory_tracker.hpp>
+#else
 #include <concealer/field_operator_application.hpp>
+#endif
 #include <filesystem>
 #include <get_parameter/get_parameter.hpp>
 #include <memory>
@@ -32,6 +38,35 @@ namespace traffic_simulator
 {
 namespace entity
 {
+#ifdef SSV2_HEADLESS_EGO
+// Headless EgoEntity: driven in-process by an injected Diffusion-Planner trajectory via a
+// SimModelPerfectTrajectoryTracker (no concealer / FieldOperatorApplication, no Autoware launch,
+// no ZeroMQ). The type name `EgoEntity` is preserved so every dynamic_cast<EgoEntity*> /
+// is<EgoEntity> reference elsewhere compiles unchanged. rclcpp::Node is inherited privately (as
+// FieldOperatorApplication was) to retain node-only calls (declare_parameter via setParameter,
+// now(), get_parameter_or) without exposing a new public Node upcast.
+class EgoEntity : public VehicleEntity, private rclcpp::Node
+{
+  bool is_controlled_by_simulator_{false};
+  std::optional<double> target_speed_;
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
+  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_;
+
+  bool teleport_requested_{false};
+
+  // Diffusion-Planner-driven vehicle model and injected commands.
+  std::unique_ptr<SimModelPerfectTrajectoryTracker> vehicle_model_;
+  autoware_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command_;
+  bool initialized_{false};
+
+  // Fixed map-frame reference captured at first onUpdate; the vehicle model integrates in this
+  // initial frame (SimModelInterface is 2D, z is carried through world_relative_position_.z()).
+  geometry_msgs::msg::Pose initial_pose_{};
+  Eigen::Matrix3d initial_rotation_matrix_{Eigen::Matrix3d::Identity()};
+  Eigen::Vector3d world_relative_position_{Eigen::Vector3d::Zero()};
+
+public:
+#else
 class EgoEntity : public VehicleEntity, private concealer::FieldOperatorApplication
 {
   bool is_controlled_by_simulator_{false};
@@ -51,6 +86,7 @@ class EgoEntity : public VehicleEntity, private concealer::FieldOperatorApplicat
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr stuck_jump_marker_pub_;
 
 public:
+#endif
   explicit EgoEntity() = delete;
 
   explicit EgoEntity(
@@ -184,6 +220,15 @@ public:
   auto getMinimumRiskManeuverStateName() const -> std::string;
   auto getEmergencyStateName() const -> std::string;
   auto getTurnIndicatorsCommandName() const -> std::string;
+
+#ifdef SSV2_HEADLESS_EGO
+  // --- Headless in-process injection API (Diffusion-Planner) ---
+  // Inject the planned trajectory that the vehicle model tracks each step (see onUpdate).
+  auto setDiffusionTrajectory(
+    const rclcpp::Time & stamp, const autoware_planning_msgs::msg::Trajectory & trajectory) -> void;
+  // Inject the turn-indicator command surfaced by getTurnIndicatorsCommandName().
+  auto setTurnIndicators(const autoware_vehicle_msgs::msg::TurnIndicatorsCommand & command) -> void;
+#endif
 };
 }  // namespace entity
 }  // namespace traffic_simulator

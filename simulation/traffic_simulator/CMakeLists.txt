@@ -35,6 +35,21 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
+# Headless EgoEntity (Diffusion-Planner in-process driving; no concealer / Autoware / ZeroMQ).
+# When ON, EgoEntity is compiled from ego_entity_headless.cpp and the header branches to the
+# rclcpp::Node-based class via SSV2_HEADLESS_EGO. The definition is exported PUBLIC so that
+# downstream consumers of ego_entity.hpp (e.g. openscenario_interpreter) observe the same class
+# layout — full and headless builds are mutually exclusive across the whole workspace.
+option(SSV2_HEADLESS_EGO "Build EgoEntity in headless Diffusion-Planner mode" OFF)
+if(SSV2_HEADLESS_EGO)
+  add_compile_definitions(SSV2_HEADLESS_EGO)
+  # Headless ego is driven in-process by the standalone simple_vehicle_models library (no
+  # simple_sensor_simulator / ZeroMQ backend).
+  set(EGO_ENTITY_SRC src/entity/ego_entity_headless.cpp)
+else()
+  set(EGO_ENTITY_SRC src/entity/ego_entity.cpp)
+endif()
+
 ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
   src/behavior/follow_trajectory.cpp
@@ -48,7 +63,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/data_type/lanelet_pose.cpp
   src/data_type/routing_graph_type.cpp
   src/data_type/speed_change.cpp
-  src/entity/ego_entity.cpp
+  ${EGO_ENTITY_SRC}
   src/entity/entity_base.cpp
   src/entity/entity_manager.cpp
   src/entity/misc_object_entity.cpp
@@ -107,6 +122,16 @@ target_link_libraries(traffic_simulator
   stdc++fs
   yaml-cpp
   ${PROTOBUF_LIBRARY})
+
+if(SSV2_HEADLESS_EGO)
+  # Propagate the header-branching definition to downstream consumers of ego_entity.hpp.
+  target_compile_definitions(traffic_simulator PUBLIC SSV2_HEADLESS_EGO)
+
+  # R1c standalone driving check + Phase 0b measurement (manual executable, not a gtest).
+  ament_auto_add_executable(headless_ego_drive_check
+    src/tools/headless_ego_drive_check.cpp)
+  target_link_libraries(headless_ego_drive_check traffic_simulator)
+endif()
 
 install(
   DIRECTORY config test/catalog test/map
