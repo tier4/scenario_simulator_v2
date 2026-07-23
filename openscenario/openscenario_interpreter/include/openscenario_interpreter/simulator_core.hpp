@@ -29,6 +29,11 @@
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
 
+#ifdef SSV2_HEADLESS_EGO
+#include <autoware_planning_msgs/msg/trajectory.hpp>
+#include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
+#endif
+
 namespace openscenario_interpreter
 {
 using NativeWorldPosition = geometry_msgs::msg::Pose;
@@ -747,6 +752,23 @@ public:
     {
       return core->getEgoEntity(ego_ref).getTurnIndicatorsCommandName();
     }
+
+#ifdef SSV2_HEADLESS_EGO
+    // Headless Diffusion-Planner in-process injection: reach the ego the same way conditions do.
+    static auto setEgoDiffusionTrajectory(
+      const std::string & ego_ref, const rclcpp::Time & stamp,
+      const autoware_planning_msgs::msg::Trajectory & trajectory) -> decltype(auto)
+    {
+      return core->getEgoEntity(ego_ref).setDiffusionTrajectory(stamp, trajectory);
+    }
+
+    static auto setEgoTurnIndicators(
+      const std::string & ego_ref,
+      const autoware_vehicle_msgs::msg::TurnIndicatorsCommand & command) -> decltype(auto)
+    {
+      return core->getEgoEntity(ego_ref).setTurnIndicators(command);
+    }
+#endif
 
     static auto setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled)
       -> decltype(auto)

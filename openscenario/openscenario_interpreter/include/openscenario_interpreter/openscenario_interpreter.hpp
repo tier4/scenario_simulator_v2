@@ -113,6 +113,10 @@ public:
 
   auto currentScenarioDefinition() const -> const std::shared_ptr<ScenarioDefinition> &;
 
+  // One simulation frame (storyboard evaluate + traffic_simulator update + context publish).
+  // Public so the headless pybind path can drive it step-by-step without spinning an executor.
+  auto evaluateFrame() -> void;
+
   auto makeCurrentConfiguration() const -> traffic_simulator::Configuration;
 
   auto on_activate(const rclcpp_lifecycle::State &) -> Result override;

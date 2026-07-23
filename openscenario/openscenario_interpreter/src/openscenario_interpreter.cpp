@@ -132,7 +132,12 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
         "Timeout",
         "The simulation time has exceeded the time specified by the scenario_test_runner.");
 
-      std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
+      // In headless (SSV2_HEADLESS_EGO / pybind) mode parameters arrive synchronously via
+      // NodeOptions.parameter_overrides, so the "wait for the async parameter service" sleep is
+      // unnecessary — and at one-scenario-per-process x N cases it would dominate the eval budget.
+      if (not common::getParameter<bool>("headless", false)) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
+      }
 
       GET_PARAMETER(local_frame_rate);
       GET_PARAMETER(local_real_time_factor);
@@ -170,6 +175,76 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
     });
 }
 
+auto Interpreter::evaluateFrame() -> void
+{
+  // One simulation frame: evaluate the storyboard (or, before the scenario starts, activate the
+  // non-user-defined controllers once every Autoware ego is engaged), advance traffic_simulator,
+  // and publish the context. Extracted from the on_activate wall-timer lambda so it can also be
+  // driven step-by-step from the headless pybind path (openscenario_python) without spinning.
+  const auto evaluate_time = execution_timer.invoke("evaluate", [this]() {
+    if (std::isnan(evaluateSimulationTime())) {
+      if (std::all_of(
+            currentScenarioDefinition()->entities.begin(),
+            currentScenarioDefinition()->entities.end(), [this](const auto & each) {
+              return std::apply(
+                [this](const auto & name, const Object & object) {
+                  return not object.is<ScenarioObject>() or
+                         not object.as<ScenarioObject>().is_added or
+                         not object.as<ScenarioObject>().object_controller.isAutoware() or
+                         NonStandardOperation::isEngaged(name);
+                },
+                each);
+            })) {
+        activateNonUserDefinedControllers();
+      }
+    } else if (currentScenarioDefinition()) {
+      currentScenarioDefinition()->evaluate();
+    } else {
+      throw Error("No script evaluable.");
+    }
+  });
+
+  const auto update_time = execution_timer.invoke("update", []() { SimulatorCore::update(); });
+
+  const auto output_time =
+    execution_timer.invoke("output", [this]() { publishCurrentContext(); });
+
+  auto generate_double_user_defined_value_message = [](double value) {
+    tier4_simulation_msgs::msg::UserDefinedValue message;
+    message.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
+    message.value = std::to_string(value);
+    return message;
+  };
+  evaluate_time_publisher->publish(generate_double_user_defined_value_message(
+    std::chrono::duration<double>(evaluate_time).count()));
+  update_time_publisher->publish(generate_double_user_defined_value_message(
+    std::chrono::duration<double>(update_time).count()));
+  output_time_publisher->publish(generate_double_user_defined_value_message(
+    std::chrono::duration<double>(output_time).count()));
+
+  // In manual-step (headless) mode there is no wall-timer, so only check frame overrun when the
+  // timer exists (i.e. the scenario_test_runner-style spun path).
+  if (timer) {
+    if (auto time_until_trigger = timer->time_until_trigger(); time_until_trigger.count() < 0) {
+      /*
+        Ideally, the scenario should be terminated with an error if the total
+        time for the ScenarioDefinition evaluation and the traffic_simulator's
+        updateFrame exceeds the time allowed for a single frame. However, we
+        have found that many users are in environments where it is not possible
+        to run the simulator stably at 30 FPS (the default setting) while
+        running Autoware. In order to prioritize comfortable daily use, we
+        decided to give up full reproducibility of the scenario and only provide
+        warnings.
+      */
+      RCLCPP_WARN_STREAM(
+        get_logger(),
+        "Your machine is not powerful enough to run the scenario at the specified frame rate ("
+          << local_frame_rate << " Hz). Current frame execution exceeds "
+          << -time_until_trigger.count() / 1.e6 << " milliseconds.");
+    }
+  }
+}
+
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
   auto evaluate_storyboard = [this]() {
@@ -178,67 +253,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         publishCurrentContext();
         deactivate();
       },
-      [this]() {
-        const auto evaluate_time = execution_timer.invoke("evaluate", [this]() {
-          if (std::isnan(evaluateSimulationTime())) {
-            if (std::all_of(
-                  currentScenarioDefinition()->entities.begin(),
-                  currentScenarioDefinition()->entities.end(), [this](const auto & each) {
-                    return std::apply(
-                      [this](const auto & name, const Object & object) {
-                        return not object.is<ScenarioObject>() or
-                               not object.as<ScenarioObject>().is_added or
-                               not object.as<ScenarioObject>().object_controller.isAutoware() or
-                               NonStandardOperation::isEngaged(name);
-                      },
-                      each);
-                  })) {
-              activateNonUserDefinedControllers();
-            }
-          } else if (currentScenarioDefinition()) {
-            currentScenarioDefinition()->evaluate();
-          } else {
-            throw Error("No script evaluable.");
-          }
-        });
-
-        const auto update_time =
-          execution_timer.invoke("update", []() { SimulatorCore::update(); });
-
-        const auto output_time =
-          execution_timer.invoke("output", [this]() { publishCurrentContext(); });
-
-        auto generate_double_user_defined_value_message = [](double value) {
-          tier4_simulation_msgs::msg::UserDefinedValue message;
-          message.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
-          message.value = std::to_string(value);
-          return message;
-        };
-        evaluate_time_publisher->publish(generate_double_user_defined_value_message(
-          std::chrono::duration<double>(evaluate_time).count()));
-        update_time_publisher->publish(generate_double_user_defined_value_message(
-          std::chrono::duration<double>(update_time).count()));
-        output_time_publisher->publish(generate_double_user_defined_value_message(
-          std::chrono::duration<double>(output_time).count()));
-
-        if (auto time_until_trigger = timer->time_until_trigger(); time_until_trigger.count() < 0) {
-          /*
-            Ideally, the scenario should be terminated with an error if the total
-            time for the ScenarioDefinition evaluation and the traffic_simulator's
-            updateFrame exceeds the time allowed for a single frame. However, we
-            have found that many users are in environments where it is not possible
-            to run the simulator stably at 30 FPS (the default setting) while
-            running Autoware. In order to prioritize comfortable daily use, we
-            decided to give up full reproducibility of the scenario and only provide
-            warnings.
-          */
-          RCLCPP_WARN_STREAM(
-            get_logger(),
-            "Your machine is not powerful enough to run the scenario at the specified frame rate ("
-              << local_frame_rate << " Hz). Current frame execution exceeds "
-              << -time_until_trigger.count() / 1.e6 << " milliseconds.");
-        }
-      });
+      [this]() { evaluateFrame(); });
   };
 
   if (scenarios.empty()) {
