@@ -106,12 +106,16 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
     is_directly_lanelet2_map_file ? logic_file.filepath.parent_path() : logic_file;
 
   // XXX DIRTY HACK!!!
-  if (is_directly_lanelet2_map_file) {
-    return traffic_simulator::Configuration(
-      map_files_path, logic_file.filepath.filename().string(), osc_path);
-  } else {
-    return traffic_simulator::Configuration(map_files_path, osc_path);
-  }
+  auto configuration = is_directly_lanelet2_map_file
+                         ? traffic_simulator::Configuration(
+                             map_files_path, logic_file.filepath.filename().string(), osc_path)
+                         : traffic_simulator::Configuration(map_files_path, osc_path);
+#ifdef SSV2_HEADLESS_EGO
+  // Headless in-process operation: no ZeroMQ sensor-sim backend. The ego is driven by the
+  // headless EgoEntity; NPCs and traffic lights are computed in traffic_simulator itself.
+  configuration.standalone_mode = true;
+#endif
+  return configuration;
 }
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
@@ -244,6 +248,31 @@ auto Interpreter::evaluateFrame() -> void
     }
   }
 }
+
+#ifdef SSV2_HEADLESS_EGO
+auto Interpreter::step() -> StepOutcome
+{
+  return withExceptionHandler(
+    [this](auto &&...) -> StepOutcome {
+      publishCurrentContext();
+      return StepOutcome::terminated;
+    },
+    [this]() -> StepOutcome {
+      evaluateFrame();
+      return StepOutcome::running;
+    });
+}
+
+auto Interpreter::resultKind() const -> std::string
+{
+  return std::visit(
+    overload(
+      [](const common::junit::Pass &) -> std::string { return "Pass"; },
+      [](const common::junit::Failure &) -> std::string { return "Failure"; },
+      [](const common::junit::Error &) -> std::string { return "Error"; }),
+    result);
+}
+#endif
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {

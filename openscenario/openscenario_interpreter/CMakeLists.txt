@@ -90,6 +90,13 @@ ament_auto_add_executable(${PROJECT_NAME}_node src/${PROJECT_NAME}_node.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
+# R2 spike: manual lifecycle driving (no executor spin) for the headless pybind path.
+if(SSV2_HEADLESS_EGO)
+  ament_auto_add_executable(headless_interpreter_drive_check
+    src/headless_interpreter_drive_check.cpp)
+  target_link_libraries(headless_interpreter_drive_check ${PROJECT_NAME})
+endif()
+
 install(
   FILES ${CMAKE_CURRENT_SOURCE_DIR}/features
   DESTINATION lib/${PROJECT_NAME})

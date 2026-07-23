@@ -117,6 +117,17 @@ public:
   // Public so the headless pybind path can drive it step-by-step without spinning an executor.
   auto evaluateFrame() -> void;
 
+#ifdef SSV2_HEADLESS_EGO
+  // Headless step: evaluateFrame() wrapped in the same exception handling as the wall-timer path
+  // (writes result.junit.xml on termination via set<>()), but returns a status instead of
+  // self-deactivating so the caller (pybind / drive-check) owns the lifecycle.
+  enum class StepOutcome { running, terminated };
+  auto step() -> StepOutcome;
+
+  // Terminal result kind after a `terminated` step ("Pass" / "Failure" / "Error").
+  auto resultKind() const -> std::string;
+#endif
+
   auto makeCurrentConfiguration() const -> traffic_simulator::Configuration;
 
   auto on_activate(const rclcpp_lifecycle::State &) -> Result override;
