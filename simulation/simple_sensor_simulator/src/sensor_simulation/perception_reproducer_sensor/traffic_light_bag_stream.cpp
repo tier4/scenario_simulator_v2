@@ -38,12 +38,18 @@ auto TrafficLightBagStream::publishWithTimestampFix(
 {
   const rclcpp::Time original_stamp(msg.stamp);
   msg.stamp = ros_time;
+  // TrafficLightGroup.predictions exists only in the TIER IV autoware_perception_msgs fork.
+  // Guard by header presence so this builds against upstream autowarefoundation msgs too.
+#if __has_include(<autoware_perception_msgs/msg/predicted_traffic_light_state.hpp>)
   for (auto & group : msg.traffic_light_groups) {
     for (auto & pred : group.predictions) {
       const auto diff = rclcpp::Time(pred.predicted_stamp) - original_stamp;
       pred.predicted_stamp = ros_time + diff;
     }
   }
+#else
+  static_cast<void>(original_stamp);
+#endif
   publisher_->publish(msg);
 }
 

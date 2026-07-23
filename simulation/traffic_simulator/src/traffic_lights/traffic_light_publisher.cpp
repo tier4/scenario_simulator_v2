@@ -123,6 +123,10 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
           traffic_light_group_message.elements.push_back(light_bulb_message);
         }
 
+// The traffic-light prediction extension (PredictedTrafficLightState /
+// TrafficLightGroup.predictions) exists only in the TIER IV autoware_perception_msgs fork.
+// Guard by header presence so this builds against upstream autowarefoundation msgs too.
+#if __has_include(<autoware_perception_msgs/msg/predicted_traffic_light_state.hpp>)
         if constexpr (HasMemberPredictions<TrafficLightGroupType>::value) {
           if (predictions) {
             auto prediction_phases = predictions->find(traffic_light.id());
@@ -147,6 +151,9 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
             }
           }
         }
+#else
+        static_cast<void>(predictions);
+#endif
 
         message->traffic_light_groups.push_back(traffic_light_group_message);
       }
