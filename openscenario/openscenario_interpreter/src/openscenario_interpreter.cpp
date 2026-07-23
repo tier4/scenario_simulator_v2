@@ -139,7 +139,11 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       // In headless (SSV2_HEADLESS_EGO / pybind) mode parameters arrive synchronously via
       // NodeOptions.parameter_overrides, so the "wait for the async parameter service" sleep is
       // unnecessary — and at one-scenario-per-process x N cases it would dominate the eval budget.
-      if (not common::getParameter<bool>("headless", false)) {
+      // NOTE: read `headless` from THIS node's parameter interface (where HeadlessRunner's
+      // append_parameter_override lives), not common::getParameter()'s separate global node — the
+      // override never reaches that global node, so the plain overload always saw false and the
+      // sleep ran even in headless mode (measured: configure ~1001 ms/scenario).
+      if (not common::getParameter<bool>(get_node_parameters_interface(), "headless", false)) {
         std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
       }
 
