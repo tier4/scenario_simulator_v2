@@ -29,11 +29,6 @@
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
 
-#ifdef SSV2_HEADLESS_EGO
-#include <autoware_planning_msgs/msg/trajectory.hpp>
-#include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
-#endif
-
 namespace openscenario_interpreter
 {
 using NativeWorldPosition = geometry_msgs::msg::Pose;
@@ -367,6 +362,11 @@ public:
       }());
 
       if (controller.isAutoware()) {
+#ifndef SSV2_HEADLESS_EGO
+        // Headless Diffusion-Planner: the ego is driven in-process by the injected trajectory and
+        // consumes no simulated sensors. These attach*/cooperation calls all round-trip over
+        // ZeroMQ to simple_sensor_simulator, which does not exist in standalone/no-ZMQ mode and
+        // would block forever — so the whole Autoware sensor/cooperation setup is skipped.
         core->attachImuSensor(entity_ref, [&]() {
           simulation_api_schema::ImuSensorConfiguration configuration;
           configuration.set_entity(entity_ref);
@@ -482,6 +482,7 @@ public:
               error.what());
           }
         }
+#endif  // SSV2_HEADLESS_EGO
       }
     }
 
@@ -754,19 +755,16 @@ public:
     }
 
 #ifdef SSV2_HEADLESS_EGO
-    // Headless Diffusion-Planner in-process injection: reach the ego the same way conditions do.
-    static auto setEgoDiffusionTrajectory(
-      const std::string & ego_ref, const rclcpp::Time & stamp,
-      const autoware_planning_msgs::msg::Trajectory & trajectory) -> decltype(auto)
+    static auto getEntityNamesHeadless() -> std::vector<std::string> { return core->getEntityNames(); }
+
+    static auto getEntityRef(const std::string & name) -> traffic_simulator::entity::EntityBase &
     {
-      return core->getEgoEntity(ego_ref).setDiffusionTrajectory(stamp, trajectory);
+      return core->getEntity(name);
     }
 
-    static auto setEgoTurnIndicators(
-      const std::string & ego_ref,
-      const autoware_vehicle_msgs::msg::TurnIndicatorsCommand & command) -> decltype(auto)
+    static auto getEgoEntityRef(const std::string & ego_ref) -> traffic_simulator::entity::EgoEntity &
     {
-      return core->getEgoEntity(ego_ref).setTurnIndicators(command);
+      return core->getEgoEntity(ego_ref);
     }
 #endif
 

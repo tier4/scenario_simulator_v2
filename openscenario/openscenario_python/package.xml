@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>openscenario_python</name>
+  <version>0.0.0</version>
+  <description>
+    Headless in-process OpenSCENARIO driving for the Diffusion-Planner closed-loop validator:
+    a pybind11 facade over the SSV2_HEADLESS_EGO Interpreter seam (set trajectory / step / read
+    entity states) so the training loop can run closed-loop evaluation without ROS communication.
+  </description>
+  <maintainer email="pythagora.yoshimoto@gmail.com">Kotaro Yoshimoto</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+
+  <depend>autoware_planning_msgs</depend>
+  <depend>autoware_vehicle_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>lifecycle_msgs</depend>
+  <depend>openscenario_interpreter</depend>
+  <depend>pybind11_vendor</depend>
+  <depend>python3-dev</depend>
+  <depend>rclcpp</depend>
+  <depend>traffic_simulator</depend>
+  <depend>traffic_simulator_msgs</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -63,6 +63,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_UTILITY_SOURCES}
   src/compatibility.cpp
   src/evaluate.cpp
+  src/headless_bridge.cpp
   src/object.cpp
   src/openscenario_interpreter.cpp
   src/record.cpp
