@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <algorithm>
-#include <cmath>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
+#include <cmath>
 #include <simple_vehicle_models/sim_model_delay_steer_acc_geared_for_diffusion_planner.hpp>
 
 namespace autoware::simulator::simple_planning_simulator

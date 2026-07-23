@@ -64,7 +64,8 @@ EgoEntity::EgoEntity(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration,
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
-: VehicleEntity(name, entity_status, parameters), rclcpp::Node(makeNodeName(name), rclcpp::NodeOptions())
+: VehicleEntity(name, entity_status, parameters),
+  rclcpp::Node(makeNodeName(name), rclcpp::NodeOptions())
 {
   // Autoware launch / concealer configuration is intentionally absent in the headless build.
   static_cast<void>(configuration);
@@ -164,11 +165,11 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   // 1. Current map pose -> initial-frame relative position (z preserved through the R^T/R roundtrip;
   //    SimModelInterface is 2D so z is carried outside the model state).
   const auto & map_pose = status_->getMapPose();
-  world_relative_position_ = initial_rotation_matrix_.transpose() *
-                             Eigen::Vector3d(
-                               map_pose.position.x - initial_pose_.position.x,
-                               map_pose.position.y - initial_pose_.position.y,
-                               map_pose.position.z - initial_pose_.position.z);
+  world_relative_position_ =
+    initial_rotation_matrix_.transpose() * Eigen::Vector3d(
+                                             map_pose.position.x - initial_pose_.position.x,
+                                             map_pose.position.y - initial_pose_.position.y,
+                                             map_pose.position.z - initial_pose_.position.z);
 
   // 2. Step the vehicle model with the injected Diffusion-Planner trajectory. With no trajectory
   //    injected update() is a no-op (holds position), so this is safe before a trajectory arrives.
@@ -302,8 +303,8 @@ auto EgoEntity::requestSpeedChange(
 
 auto EgoEntity::requestClearRoute() -> void {}
 
-auto EgoEntity::requestReplanRoute(
-  const std::vector<geometry_msgs::msg::PoseStamped> &, const bool) -> void
+auto EgoEntity::requestReplanRoute(const std::vector<geometry_msgs::msg::PoseStamped> &, const bool)
+  -> void
 {
   // Headless: route replanning is delegated to the route sidecar (R1c); no Autoware planner.
 }
@@ -360,8 +361,8 @@ auto EgoEntity::setDiffusionTrajectory(
   }
 }
 
-auto EgoEntity::setTurnIndicators(
-  const autoware_vehicle_msgs::msg::TurnIndicatorsCommand & command) -> void
+auto EgoEntity::setTurnIndicators(const autoware_vehicle_msgs::msg::TurnIndicatorsCommand & command)
+  -> void
 {
   turn_indicators_command_ = command;
 }

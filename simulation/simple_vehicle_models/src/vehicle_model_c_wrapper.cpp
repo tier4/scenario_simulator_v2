@@ -29,22 +29,21 @@
 
 #include <Eigen/Core>
 #include <algorithm>
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <cmath>
 #include <cstdint>
 #include <deque>
 #include <memory>
-#include <vector>
-
-#include <autoware_vehicle_msgs/msg/gear_command.hpp>
-
 #include <simple_vehicle_models/sim_model_delay_steer_acc_geared_for_diffusion_planner.hpp>
 #include <simple_vehicle_models/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
 #include <simple_vehicle_models/sim_model_ideal_steer_acc.hpp>
 #include <simple_vehicle_models/sim_model_interface.hpp>
+#include <vector>
 
 namespace
 {
-using autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedForDiffusionPlanner;
+using autoware::simulator::simple_planning_simulator::
+  SimModelDelaySteerAccGearedForDiffusionPlanner;
 using autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard;
 using GearCommand = autoware_vehicle_msgs::msg::GearCommand;
 }  // namespace
@@ -153,9 +152,9 @@ VmModel * vm_create_delay_steer_acc_geared_wo_fall_guard(
   auto * m = new VmModel{};
   m->type = VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD;
   m->impl = std::make_unique<SimModelDelaySteerAccGearedWoFallGuard>(
-    vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
-    acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
+    vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay, acc_time_constant,
+    steer_delay, steer_time_constant, steer_dead_band, steer_bias, debug_acc_scaling_factor,
+    debug_steer_scaling_factor, k_us);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
   return m;
@@ -173,10 +172,9 @@ VmModel * vm_create_delay_steer_acc_geared_for_diffusion_planner(
   auto * m = new VmModel{};
   m->type = VmModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER;
   m->impl = std::make_unique<SimModelDelaySteerAccGearedForDiffusionPlanner>(
-    vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
-    acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
-    xy_heading_rate_coeff, use_rk4 > 0.5);
+    vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay, acc_time_constant,
+    steer_delay, steer_time_constant, steer_dead_band, steer_bias, debug_acc_scaling_factor,
+    debug_steer_scaling_factor, k_us, xy_heading_rate_coeff, use_rk4 > 0.5);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
   return m;
@@ -222,8 +220,8 @@ void vm_step_dt(VmModel * m, double dt) { m->impl->update(dt); }
 // 末尾の wz/vy 引数は既存ABIとの互換性のため受け取り、現在のモデルでは無視される。
 
 void vm_reset_full(
-  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax,
-  double, double)
+  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax, double,
+  double)
 {
   switch (m->type) {
     case VmModelType::IDEAL_STEER_ACC: {
@@ -255,8 +253,8 @@ void vm_reset_full(
 // ---- state reset (state only; queues untouched) ------------------------
 
 void vm_reset_state(
-  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax,
-  double, double)
+  VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax, double,
+  double)
 {
   switch (m->type) {
     case VmModelType::IDEAL_STEER_ACC: {
@@ -323,21 +321,9 @@ double vm_get_wz(VmModel * m) { return m->impl->getWz(); }
 // rem[k0+j]:    fractional remainder [s]; integrated if > rem_eps.
 // steer_out:    raw getSteer() value (= steer_state + steer_bias; matches vm_get_steer).
 void vm_integrate_to_horizons(
-  VmModel * m,
-  int n_intervals,
-  int k0,
-  const double * accel_des,
-  const double * steer_des,
-  const int * n_full,
-  const double * rem,
-  double rem_eps,
-  int n_horizons,
-  const int * horizons,
-  double * x_out,
-  double * y_out,
-  double * yaw_out,
-  double * vx_out,
-  double * ax_out,
+  VmModel * m, int n_intervals, int k0, const double * accel_des, const double * steer_des,
+  const int * n_full, const double * rem, double rem_eps, int n_horizons, const int * horizons,
+  double * x_out, double * y_out, double * yaw_out, double * vx_out, double * ax_out,
   double * steer_out)
 {
   // Build type-specific input vector template once.
@@ -379,11 +365,11 @@ void vm_integrate_to_horizons(
 
     // Snap at horizon checkpoints (horizons are 1-indexed interval counts).
     while (h_idx < n_horizons && horizons[h_idx] == j + 1) {
-      x_out[h_idx]     = m->impl->getX();
-      y_out[h_idx]     = m->impl->getY();
-      yaw_out[h_idx]   = m->impl->getYaw();
-      vx_out[h_idx]    = m->impl->getVx();
-      ax_out[h_idx]    = m->impl->getAx();
+      x_out[h_idx] = m->impl->getX();
+      y_out[h_idx] = m->impl->getY();
+      yaw_out[h_idx] = m->impl->getYaw();
+      vx_out[h_idx] = m->impl->getVx();
+      ax_out[h_idx] = m->impl->getAx();
       steer_out[h_idx] = m->impl->getSteer();
       ++h_idx;
     }

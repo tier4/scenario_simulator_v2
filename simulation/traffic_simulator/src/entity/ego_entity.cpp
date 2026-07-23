@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <tf2/utils.h>
+
 #include <boost/lexical_cast.hpp>
-#include <iomanip>
-#include <sstream>
 #include <concealer/field_operator_application.hpp>
 #include <concealer/launch.hpp>
 #include <functional>
+#include <iomanip>
 #include <memory>
 #include <optional>
+#include <sstream>
 #include <string>
 #include <system_error>
-#include <tf2/utils.h>
 #include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -85,8 +86,7 @@ EgoEntity::EgoEntity(
   }())
 {
   enable_stuck_jump_ = common::getParameter<bool>(node_parameters, "enable_stuck_jump", false);
-  stuck_jump_distance_ =
-    common::getParameter<double>(node_parameters, "stuck_jump_distance", 0.1);
+  stuck_jump_distance_ = common::getParameter<double>(node_parameters, "stuck_jump_distance", 0.1);
   stuck_timeout_ = common::getParameter<double>(node_parameters, "stuck_jump_timeout", 7.0);
   stuck_speed_threshold_ =
     common::getParameter<double>(node_parameters, "stuck_speed_threshold", 0.1);
@@ -207,8 +207,8 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
 
   if (
     getLegacyAutowareState().value == concealer::LegacyAutowareState::driving &&
-    status_->getTime() >= stuck_timeout_ + 3.0 &&
-    slow_duration_ >= stuck_timeout_ && !has_jumped_) {
+    status_->getTime() >= stuck_timeout_ + 3.0 && slow_duration_ >= stuck_timeout_ &&
+    !has_jumped_) {
     const auto & current_pose = status_->getMapPose();
     const double stand_still_duration = slow_duration_;
     const double yaw = tf2::getYaw(current_pose.orientation);
@@ -227,8 +227,9 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
     const auto logger = rclcpp::get_logger(status_->getName());
     RCLCPP_WARN(logger, "==============================================");
     RCLCPP_WARN(logger, "  [STUCK JUMP] Ego stopped %.1f s in DRIVING", stand_still_duration);
-    RCLCPP_WARN(logger, "  Jumping %.2f m forward from (%.2f, %.2f)",
-      stuck_jump_distance_, current_pose.position.x, current_pose.position.y);
+    RCLCPP_WARN(
+      logger, "  Jumping %.2f m forward from (%.2f, %.2f)", stuck_jump_distance_,
+      current_pose.position.x, current_pose.position.y);
     RCLCPP_WARN(logger, "==============================================");
 
     // Publish markers to /simulation/debug_marker.
@@ -262,7 +263,9 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
       disc.pose.position.z = 0.5;
       disc.scale.x = disc.scale.y = 3.0;
       disc.scale.z = 0.1;
-      disc.color.r = 0.0f; disc.color.g = 1.0f; disc.color.b = 1.0f;
+      disc.color.r = 0.0f;
+      disc.color.g = 1.0f;
+      disc.color.b = 1.0f;
       disc.color.a = 0.6f;
       marker_array.markers.push_back(disc);
     }
@@ -273,7 +276,9 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
       halo.pose.position.z = 0.3;
       halo.scale.x = halo.scale.y = 6.0;
       halo.scale.z = 0.1;
-      halo.color.r = 0.0f; halo.color.g = 0.4f; halo.color.b = 1.0f;
+      halo.color.r = 0.0f;
+      halo.color.g = 0.4f;
+      halo.color.b = 1.0f;
       halo.color.a = 0.3f;
       marker_array.markers.push_back(halo);
     }
@@ -284,7 +289,9 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
       beam.pose.position.z = 6.0;
       beam.scale.x = beam.scale.y = 0.3;
       beam.scale.z = 12.0;
-      beam.color.r = 0.0f; beam.color.g = 1.0f; beam.color.b = 1.0f;
+      beam.color.r = 0.0f;
+      beam.color.g = 1.0f;
+      beam.color.b = 1.0f;
       beam.color.a = 0.25f;
       marker_array.markers.push_back(beam);
     }
@@ -295,7 +302,9 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
       core.pose.position.z = 6.0;
       core.scale.x = core.scale.y = 0.08;
       core.scale.z = 12.0;
-      core.color.r = 1.0f; core.color.g = 1.0f; core.color.b = 1.0f;
+      core.color.r = 1.0f;
+      core.color.g = 1.0f;
+      core.color.b = 1.0f;
       core.color.a = 0.8f;
       marker_array.markers.push_back(core);
     }
@@ -308,7 +317,9 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
       arrow.scale.x = 4.0;
       arrow.scale.y = 0.2;
       arrow.scale.z = 0.35;
-      arrow.color.r = 1.0f; arrow.color.g = 0.5f; arrow.color.b = 0.0f;
+      arrow.color.r = 1.0f;
+      arrow.color.g = 0.5f;
+      arrow.color.b = 0.0f;
       arrow.color.a = 0.9f;
       marker_array.markers.push_back(arrow);
     }
@@ -318,12 +329,14 @@ auto EgoEntity::checkAndTriggerStuckJump() -> void
       text.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
       text.pose.position.z = 6.5;
       text.scale.z = 1.0;
-      text.color.r = 0.0f; text.color.g = 1.0f; text.color.b = 0.8f;
+      text.color.r = 0.0f;
+      text.color.g = 1.0f;
+      text.color.b = 0.8f;
       text.color.a = 1.0f;
       std::ostringstream oss;
       oss << "[ STUCK JUMP #" << jump_count_ << " ]\n"
-          << std::fixed << std::setprecision(1)
-          << "(" << new_pose.position.x << ", " << new_pose.position.y << ")";
+          << std::fixed << std::setprecision(1) << "(" << new_pose.position.x << ", "
+          << new_pose.position.y << ")";
       text.text = oss.str();
       marker_array.markers.push_back(text);
     }

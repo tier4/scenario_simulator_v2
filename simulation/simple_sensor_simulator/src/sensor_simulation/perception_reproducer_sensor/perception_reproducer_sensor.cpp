@@ -113,8 +113,7 @@ PerceptionReproducerSensor::PerceptionReproducerSensor(
 : logger_(node.get_logger()),
   config_(config),
   detected_objects_stream_(
-    detected_objects_topic_,
-    node.create_publisher<DetectedObjects>(detected_objects_topic_, 1)),
+    detected_objects_topic_, node.create_publisher<DetectedObjects>(detected_objects_topic_, 1)),
   tracked_objects_stream_(
     tracked_objects_topic_, node.create_publisher<TrackedObjects>(tracked_objects_topic_, 1)),
   trajectory_stream_(
@@ -129,15 +128,14 @@ PerceptionReproducerSensor::PerceptionReproducerSensor(
 #ifdef PERCEPTION_REPRODUCER_HAS_TRAFFIC_LIGHT_GROUP_ARRAY
   using TrafficLightGroupArray = autoware_perception_msgs::msg::TrafficLightGroupArray;
   traffic_light_stream_ = std::make_unique<TrafficLightBagStream>(
-    traffic_light_topic_,
-    node.create_publisher<TrafficLightGroupArray>(traffic_light_topic_, 1));
+    traffic_light_topic_, node.create_publisher<TrafficLightGroupArray>(traffic_light_topic_, 1));
 #endif
 
   loadAllBagData(bag_path, start_time_s);
 }
 
-auto PerceptionReproducerSensor::loadAllBagData(
-  const std::string & bag_path, double start_time_s) -> void
+auto PerceptionReproducerSensor::loadAllBagData(const std::string & bag_path, double start_time_s)
+  -> void
 {
   RCLCPP_INFO(logger_, "Loading bag: %s (start_time: %.3f s)", bag_path.c_str(), start_time_s);
 
@@ -155,9 +153,8 @@ auto PerceptionReproducerSensor::loadAllBagData(
     reader->get_metadata().starting_time.time_since_epoch().count(), RCL_ROS_TIME);
 
   rosbag2_storage::StorageFilter filter;
-  filter.topics = {
-    detected_objects_topic_, tracked_objects_topic_, trajectory_topic_,   odometry_topic_,
-    occupancy_grid_topic_,   traffic_light_topic_};
+  filter.topics = {detected_objects_topic_, tracked_objects_topic_, trajectory_topic_,
+                   odometry_topic_,         occupancy_grid_topic_,  traffic_light_topic_};
   reader->set_filter(filter);
 
   while (reader->has_next()) {
@@ -230,8 +227,7 @@ auto PerceptionReproducerSensor::updatePositionBased(
       playhead_ = odometry_stream_.findNearestIndex(ego_pose);
     } else if (ego_speed > stop_velocity_threshold_) {
       dwell_anchor_.reset();
-      const size_t lo =
-        *playhead_ > playhead_window_back_ ? *playhead_ - playhead_window_back_ : 0;
+      const size_t lo = *playhead_ > playhead_window_back_ ? *playhead_ - playhead_window_back_ : 0;
       playhead_ = std::max(
         *playhead_,
         odometry_stream_.findNearestIndex(ego_pose, lo, *playhead_ + playhead_window_forward_));
@@ -321,8 +317,8 @@ auto PerceptionReproducerSensor::publishVehicleMarker(
 
 auto PerceptionReproducerSensor::update(
   double current_scenario_time, const rclcpp::Time & current_ros_time,
-  const std::optional<geometry_msgs::msg::Pose> & ego_pose,
-  const std::optional<double> & ego_speed) -> void
+  const std::optional<geometry_msgs::msg::Pose> & ego_pose, const std::optional<double> & ego_speed)
+  -> void
 {
   if (std::isnan(current_scenario_time) || current_scenario_time < 0.0) {
     return;

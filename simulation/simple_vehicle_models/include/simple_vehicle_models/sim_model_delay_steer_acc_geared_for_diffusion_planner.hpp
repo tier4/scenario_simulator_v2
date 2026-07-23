@@ -90,8 +90,7 @@ public:
    *        Used by C wrapper to inject actual past command history for per-step
    *        real-vs-sim replay (see vehicle_model_c_wrapper.cpp).
    */
-  void setInputQueues(
-    const std::deque<double> & acc_queue, const std::deque<double> & steer_queue);
+  void setInputQueues(const std::deque<double> & acc_queue, const std::deque<double> & steer_queue);
 
   /**
    * @brief re-fill the delayed-state history buffers (STEER / PEDAL_ACCX / VX) with a constant
@@ -126,21 +125,21 @@ private:
   const double steer_rate_lim_;  //!< @brief steering angular velocity limit [rad/s]
   const double wheelbase_;       //!< @brief vehicle wheelbase length [m]
 
-  std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
-  std::deque<double> steer_input_queue_;     //!< @brief buffer for steering command
+  std::deque<double> acc_input_queue_;    //!< @brief buffer for accel command
+  std::deque<double> steer_input_queue_;  //!< @brief buffer for steering command
   // full-RHS delay: 状態フィードバックも t−d でサンプリングするための状態履歴バッファ。
   // dt 粒度（指令キューと同サイズ round(delay/dt)）で保持する。
-  std::deque<double> steer_state_queue_;     //!< @brief buffer for STEER state (delayed feedback)
-  std::deque<double> pedal_state_queue_;     //!< @brief buffer for PEDAL_ACCX state (delayed feedback)
+  std::deque<double> steer_state_queue_;  //!< @brief buffer for STEER state (delayed feedback)
+  std::deque<double> pedal_state_queue_;  //!< @brief buffer for PEDAL_ACCX state (delayed feedback)
   // update() 冒頭で 1 回だけ取り出し、calcModel が参照する凍結遅延状態。
-  double delayed_steer_state_ = 0.0;         //!< @brief STEER at t−steer_delay (frozen per update)
-  double delayed_pedal_state_ = 0.0;         //!< @brief PEDAL_ACCX at t−acc_delay (frozen per update)
-  const double acc_delay_;                   //!< @brief time delay for accel command [s]
-  const double acc_time_constant_;           //!< @brief time constant for accel dynamics
-  const double steer_delay_;                 //!< @brief time delay for steering command [s]
-  const double steer_time_constant_;         //!< @brief time constant for steering dynamics
-  const double steer_dead_band_;             //!< @brief dead band for steering angle [rad]
-  const double steer_bias_;                  //!< @brief steering angle bias [rad]
+  double delayed_steer_state_ = 0.0;  //!< @brief STEER at t−steer_delay (frozen per update)
+  double delayed_pedal_state_ = 0.0;  //!< @brief PEDAL_ACCX at t−acc_delay (frozen per update)
+  const double acc_delay_;            //!< @brief time delay for accel command [s]
+  const double acc_time_constant_;    //!< @brief time constant for accel dynamics
+  const double steer_delay_;          //!< @brief time delay for steering command [s]
+  const double steer_time_constant_;  //!< @brief time constant for steering dynamics
+  const double steer_dead_band_;      //!< @brief dead band for steering angle [rad]
+  const double steer_bias_;           //!< @brief steering angle bias [rad]
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
   const double k_us_;                        //!< @brief understeer coefficient [rad/(m/s²)]

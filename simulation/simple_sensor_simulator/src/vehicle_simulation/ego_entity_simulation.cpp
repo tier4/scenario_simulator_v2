@@ -91,9 +91,7 @@ void EgoEntitySimulation::initializeExternalMode()
   external_initial_pose_msg_.pose.pose = initial_pose_;
 
   carla_ready_sub_.emplace(
-    "/carla_bridge/ready",
-    rclcpp::QoS(1).transient_local().reliable(),
-    *autoware,
+    "/carla_bridge/ready", rclcpp::QoS(1).transient_local().reliable(), *autoware,
     [this](const std_msgs::msg::Empty & msg) { onCarlaReady(msg); });
 
   RCLCPP_INFO(
@@ -248,10 +246,9 @@ auto EgoEntitySimulation::makeSimulationModel(
       const auto delay_steer_acc_geared_for_diffusion_planner_version =
         common::getParameter<int>("delay_steer_acc_geared_for_diffusion_planner.version", 1);
       const auto ns = "delay_steer_acc_geared_for_diffusion_planner.v" +
-                       std::to_string(delay_steer_acc_geared_for_diffusion_planner_version) + ".";
-      return std::make_shared<
-        autoware::simulator::simple_planning_simulator::
-          SimModelDelaySteerAccGearedForDiffusionPlanner>(
+                      std::to_string(delay_steer_acc_geared_for_diffusion_planner_version) + ".";
+      return std::make_shared<autoware::simulator::simple_planning_simulator::
+                                SimModelDelaySteerAccGearedForDiffusionPlanner>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time,
         common::getParameter<double>(ns + "acc_time_delay", 0.1),
         common::getParameter<double>(ns + "acc_time_constant", 0.1),

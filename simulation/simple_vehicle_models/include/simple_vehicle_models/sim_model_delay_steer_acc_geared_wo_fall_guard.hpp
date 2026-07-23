@@ -64,8 +64,7 @@ public:
    *        Used by C wrapper to inject actual past command history for per-step
    *        real-vs-sim replay (see vehicle_model_c_wrapper.cpp).
    */
-  void setInputQueues(
-    const std::deque<double> & acc_queue, const std::deque<double> & steer_queue);
+  void setInputQueues(const std::deque<double> & acc_queue, const std::deque<double> & steer_queue);
 
   /**
    * @brief sizes of the internal delay queues (driven by acc_delay / steer_delay / dt).

@@ -18,8 +18,7 @@
 namespace traffic_simulator
 {
 SimulationClock::SimulationClock(
-  bool use_sim_time, double realtime_factor, double frame_rate,
-  double initial_simulation_ros_time)
+  bool use_sim_time, double realtime_factor, double frame_rate, double initial_simulation_ros_time)
 : rclcpp::Clock(RCL_ROS_TIME),
   use_sim_time(use_sim_time),
   realtime_factor(realtime_factor),

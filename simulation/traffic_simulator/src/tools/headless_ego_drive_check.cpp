@@ -25,6 +25,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdio>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
@@ -32,7 +33,6 @@
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <vector>
 
 namespace
@@ -121,15 +121,18 @@ int main(int argc, char ** argv)
   const double expected = target_speed * step_time * steps;
 
   std::printf("=== R1c headless ego drive check ===\n");
-  std::printf("start: (%.3f, %.3f, %.3f) yaw=%.3f\n",
-    start_pose.position.x, start_pose.position.y, start_pose.position.z, yaw);
-  std::printf("end:   (%.3f, %.3f, %.3f)\n",
-    end_pose.position.x, end_pose.position.y, end_pose.position.z);
-  std::printf("travelled=%.3f m (expected ~%.3f m over %d steps @ %.1f m/s)\n",
-    travelled, expected, steps, target_speed);
+  std::printf(
+    "start: (%.3f, %.3f, %.3f) yaw=%.3f\n", start_pose.position.x, start_pose.position.y,
+    start_pose.position.z, yaw);
+  std::printf(
+    "end:   (%.3f, %.3f, %.3f)\n", end_pose.position.x, end_pose.position.y, end_pose.position.z);
+  std::printf(
+    "travelled=%.3f m (expected ~%.3f m over %d steps @ %.1f m/s)\n", travelled, expected, steps,
+    target_speed);
   std::printf("ego vx=%.3f m/s\n", ego.getCurrentTwist().linear.x);
-  std::printf("[Phase 0b] sim.step: mean=%.3f ms  max=%.3f ms  (%d steps)\n",
-    total_step_ms / steps, max_step_ms, steps);
+  std::printf(
+    "[Phase 0b] sim.step: mean=%.3f ms  max=%.3f ms  (%d steps)\n", total_step_ms / steps,
+    max_step_ms, steps);
 
   const bool moved_forward = travelled > 0.5 * expected;
   std::printf("RESULT: %s\n", moved_forward ? "PASS (ego advanced along trajectory)" : "FAIL");

@@ -17,7 +17,6 @@
 #include <algorithm>
 #include <cmath>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
-#include <type_traits>
 #include <iomanip>
 #include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/logging.hpp>
@@ -26,6 +25,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/replay/ego_bag_replayer.hpp>
+#include <type_traits>
 
 namespace traffic_simulator
 {
@@ -93,7 +93,8 @@ EgoBagReplayer::EgoBagReplayer(
 
   while (reader.has_next()) {
     const auto bag_message = reader.read_next();
-    const auto time_ns = bagMessageTimestamp(*bag_message) - starting_time_ns - replay_start_time_ns;
+    const auto time_ns =
+      bagMessageTimestamp(*bag_message) - starting_time_ns - replay_start_time_ns;
     const rclcpp::SerializedMessage serialized_message(*bag_message->serialized_data);
     if (bag_message->topic_name == odometry_topic) {
       nav_msgs::msg::Odometry odometry;
@@ -118,9 +119,8 @@ EgoBagReplayer::EgoBagReplayer(
 
   RCLCPP_INFO_STREAM(
     logger(), "Loaded " << odometries_.size() << " odometry samples covering scenario time "
-                        << std::fixed << std::setprecision(3)
-                        << odometries_.front().time_ns * 1e-9 << " - "
-                        << odometries_.back().time_ns * 1e-9 << " [s] from "
+                        << std::fixed << std::setprecision(3) << odometries_.front().time_ns * 1e-9
+                        << " - " << odometries_.back().time_ns * 1e-9 << " [s] from "
                         << std::quoted(bag_path) << " (replay_start_time = " << replay_start_time
                         << " [s], replay_duration = " << replay_duration << " [s]).");
 }

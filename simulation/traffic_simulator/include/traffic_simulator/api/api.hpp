@@ -96,8 +96,7 @@ public:
       if (const auto replay_ego_duration = getROS2Parameter<double>("replay_ego_duration", 0.0);
           replay_ego_duration > 0.0) {
         ego_bag_replayer_ = std::make_unique<EgoBagReplayer>(
-          replay_bag_path, getROS2Parameter<double>("replay_start_time", 0.0),
-          replay_ego_duration);
+          replay_bag_path, getROS2Parameter<double>("replay_start_time", 0.0), replay_ego_duration);
       }
     }
   }
