@@ -93,9 +93,13 @@ private:
     VX,
     STEER,
     ACCX,
-    PEDAL_ACCX,
+    DRIVE_ACCX,  // [m/s²] (>= 0)
+    BRAKE_ACCX,  // [m/s²] (>= 0)
   };
   enum IDX_U { PEDAL_ACCX_DES = 0, GEAR, SLOPE_ACCX, STEER_DES };
+
+  // calcModel に伝達する内部拡張入力仕様 (5要素)
+  enum IDX_U_INNER { ACC_DES = 0, BRAKE_DES, GEAR_INNER, SLOPE_ACCX_INNER, STEER_DES_INNER };
 
   const double vx_lim_;          //!< @brief velocity limit [m/s]
   const double acc_lim_;
@@ -106,9 +110,6 @@ private:
   const double steer_rate_lim_;  //!< @brief steering angular velocity limit [rad/s]
   const double wheelbase_;       //!< @brief vehicle wheelbase length [m]
 
-  std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
-  std::deque<double> brake_input_queue_;     //!< @brief buffer for brake command
-  std::deque<double> steer_motor_input_queue_;     //!< @brief buffer for steering motor command
   const double acc_delay_;                   //!< @brief time delay for accel command [s]
   const double brake_delay_;                 //!< @brief time delay for brake command [s]
   const double acc_time_constant_;           //!< @brief time constant for accel dynamics
@@ -142,11 +143,14 @@ private:
   const double air_drag_coef_;               // 🌟 空気抵抗係数 [1/m]
 
   double brake_hysteresis_state_; // ヒステリシス（機械的なガタ）を通した後の、ブレーキペダル機構の実際の物理的な位置（残存量）
-
-  std::deque<double> vel_history_queue_;       // 車速の遅延用バッファ
   double delayed_vx_;                          // 遅延適用後の物理車速
+
   std::mt19937 vel_rng_;                       // 乱数生成器
   std::normal_distribution<double> vel_dist_;  // 正規分布
+  std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
+  std::deque<double> brake_input_queue_;     //!< @brief buffer for brake command
+  std::deque<double> steer_motor_input_queue_;     //!< @brief buffer for steering motor command
+  std::deque<double> vel_history_queue_;       // 車速の遅延用バッファ
 
   /**
    * @brief set queue buffer for input command

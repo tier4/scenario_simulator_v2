@@ -29,7 +29,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double steer_accuracy_error, double steer_resolution, double steer_hysteresis_width,
   double vel_sensor_delay, double vel_sensor_resolution, double vel_sensor_noise_stddev, int vel_sensor_noise_seed, double vel_sensor_accuracy_error, double vel_sensor_offset,
   double debug_acc_scaling_factor, double debug_steer_scaling_factor, double rolling_resistance, double air_drag_coef)
-: SimModelInterface(7 /* dim x */, 4 /* dim u */),
+: SimModelInterface(8 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
   acc_lim_(acc_lim),
@@ -101,212 +101,137 @@ double SimModelDelaySteerAccGearedWoFallGuard::getSteer()
 
 void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
-  Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
-
-  // Separation of acceleration and brake signals at the input stage
+  // 1. 入力信号の遅延バッファ処理（アクセル・ブレーキを独立保持）
   const double raw_pedal_cmd = input_(IDX_U::PEDAL_ACCX_DES);
   acc_input_queue_.push_back((raw_pedal_cmd >= 0.0) ? raw_pedal_cmd : 0.0);
-  brake_input_queue_.push_back((raw_pedal_cmd < 0.0) ? raw_pedal_cmd : 0.0);
+  brake_input_queue_.push_back((raw_pedal_cmd < 0.0) ? std::abs(raw_pedal_cmd) : 0.0);
 
-  // Dequeue values after their respective delay times have passed
   const double acc_delayed_val = acc_input_queue_.front();
   acc_input_queue_.pop_front();
   const double brake_delayed_val = brake_input_queue_.front();
   brake_input_queue_.pop_front();
 
-  // Brake Override System (BOS)
-  // Prioritize brake command if both acceleration and brake commands are active simultaneously
-  delayed_input(IDX_U::PEDAL_ACCX_DES) =
-    (brake_delayed_val < -1e-5) ? brake_delayed_val : acc_delayed_val;
-
-  // Steering motor queue processing
+  // ステアリングバッファ処理
   steer_motor_input_queue_.push_back(input_(IDX_U::STEER_DES));
-  delayed_input(IDX_U::STEER_DES) = steer_motor_input_queue_.front();
+  const double delayed_steer_des = steer_motor_input_queue_.front();
   steer_motor_input_queue_.pop_front();
 
-  delayed_input(IDX_U::GEAR) = input_(IDX_U::GEAR);
-  delayed_input(IDX_U::SLOPE_ACCX) = input_(IDX_U::SLOPE_ACCX);
-
-  // Pedal (Acceleration & Braking) command processing
-  const double baseline_acc = acc_offset_ - brake_offset_;
-  const double actual_jump_value = brake_jump_value_ * (1.0 + brake_accuracy_error_);
-  bool is_brake_pad_contacting = false;
-
-  delayed_input(IDX_U::PEDAL_ACCX_DES) = [&]() {
-    double cmd = delayed_input(IDX_U::PEDAL_ACCX_DES) * debug_acc_scaling_factor_;
-
-    if (cmd < 0.0) {  // --- Braking ---
-      double brake_cmd = std::abs(cmd);
-
-      // Apply resolution if configured
-      if (brake_resolution_ > 1e-5) {
-        brake_cmd = std::round(brake_cmd / brake_resolution_) * brake_resolution_;
-      }
-
-      // Update hysteresis state
-      if (brake_cmd < 1e-5) {
-        brake_hysteresis_state_ = 0.0;  // Reset when the pedal is fully released
-      } else {
-        brake_hysteresis_state_ = std::max(0.0, std::clamp(
-          brake_hysteresis_state_,
-          brake_cmd - (brake_hysteresis_width_ / 2.0),
-          brake_cmd + (brake_hysteresis_width_ / 2.0)
-        ));
-      }
-
-      // Calculate final braking command
-      cmd = 0.0;  // Default to zero friction (inside deadband)
-      if (brake_hysteresis_state_ > brake_dead_band_) {
-        is_brake_pad_contacting = true;
-        cmd = -(brake_hysteresis_state_ - brake_dead_band_ + brake_jump_value_) * (1.0 + brake_accuracy_error_);
-      }
-    } else {  // --- Acceleration or Coasting ---
-      // Reset brake internal state
-      brake_hysteresis_state_ = 0.0;
-
-      // Apply resolution if configured
-      if (acc_resolution_ > 1e-5) {
-        cmd = std::round(cmd / acc_resolution_) * acc_resolution_;
-      }
-
-      // Apply deadband and accuracy error
-      cmd = std::max(0.0, cmd - acc_dead_band_) * (1.0 + acc_accuracy_error_);
+  // 2. 目標モータ駆動力 (acc_target) の算出
+  const double acc_target = [&]() {
+    double cmd = acc_delayed_val * debug_acc_scaling_factor_;
+    if (acc_resolution_ > 1e-5) {
+      cmd = std::round(cmd / acc_resolution_) * acc_resolution_;
     }
-
-    // Apply baseline and absolute physical limits
-    return std::clamp(cmd + baseline_acc, -brake_lim_, acc_lim_);
+    cmd = std::max(0.0, cmd - acc_dead_band_) * (1.0 + acc_accuracy_error_);
+    return std::clamp(cmd + acc_offset_, 0.0, acc_lim_);
   }();
 
-  // Override continuous state to simulate discrete mechanical behavior
-  if (is_brake_pad_contacting) {  // Brake pad touched
-    // Apply initial braking jump directly to vehicle state (overcoming clearance)
-    const double apply_jump_target = baseline_acc - actual_jump_value;
-    if (state_(IDX::PEDAL_ACCX) <= baseline_acc && state_(IDX::PEDAL_ACCX) > apply_jump_target) {
-      state_(IDX::PEDAL_ACCX) = apply_jump_target;
+  // 3. 目標ブレーキ制動力 (brake_target) の算出
+  const double brake_target = [&]() {
+    double brake_cmd = brake_delayed_val * debug_acc_scaling_factor_;
+    if (brake_resolution_ > 1e-5) {
+      brake_cmd = std::round(brake_cmd / brake_resolution_) * brake_resolution_;
     }
-  } else {  // Brake pad released
-    // Instantly clear residual braking force to prevent unnatural drag
-    if (state_(IDX::PEDAL_ACCX) < baseline_acc && state_(IDX::PEDAL_ACCX) >= baseline_acc - actual_jump_value) {
-      state_(IDX::PEDAL_ACCX) = baseline_acc;
+
+    if (brake_cmd < 1e-5) {
+      brake_hysteresis_state_ = 0.0;
+    } else {
+      brake_hysteresis_state_ = std::max(0.0, std::clamp(
+        brake_hysteresis_state_,
+        brake_cmd - (brake_hysteresis_width_ / 2.0),
+        brake_cmd + (brake_hysteresis_width_ / 2.0)
+      ));
     }
-  }
 
-  // Steering motor command processing
-  delayed_input(IDX_U::STEER_DES) = [&]() {
-    double cmd = delayed_input(IDX_U::STEER_DES) * debug_steer_scaling_factor_;
+    double cmd = 0.0;
+    if (brake_hysteresis_state_ > brake_dead_band_) {
+      cmd = (brake_hysteresis_state_ - brake_dead_band_ + brake_jump_value_) * (1.0 + brake_accuracy_error_);
+    }
+    return std::clamp(cmd + brake_offset_, 0.0, brake_lim_);
+  }();
 
-    // Apply resolution if configured
+  // 4. 目標ステアリング角の算出
+  const double steer_target = [&]() {
+    double cmd = delayed_steer_des * debug_steer_scaling_factor_;
     if (steer_resolution_ > 1e-5) {
       cmd = std::round(cmd / steer_resolution_) * steer_resolution_;
     }
-
-    // Apply Hysteresis
     const double steer_motor_hist = std::clamp(
-      (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_), // Current steering motor angle
+      (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_),
       cmd - (steer_hysteresis_width_ / 2.0),
       cmd + (steer_hysteresis_width_ / 2.0)
     );
-
-    // Apply final limit
     return std::clamp(steer_motor_hist, -steer_lim_, steer_lim_);
   }();
 
-  // Cache state before integration, for post-processing and constraints evaluation
+  // 5. calcModel へ渡す内部入力ベクトル（5次元）を準備
+  Eigen::VectorXd inner_input(5);
+  inner_input(IDX_U_INNER::ACC_DES)          = acc_target;
+  inner_input(IDX_U_INNER::BRAKE_DES)        = brake_target;
+  inner_input(IDX_U_INNER::GEAR_INNER)       = input_(IDX_U::GEAR);
+  inner_input(IDX_U_INNER::SLOPE_ACCX_INNER) = input_(IDX_U::SLOPE_ACCX);
+  inner_input(IDX_U_INNER::STEER_DES_INNER)  = steer_target;
+
   const auto prev_state = state_;
 
-  updateRungeKutta(dt, delayed_input);
+  // 6. ルンゲ＝クッタ数値積分（連続微分方程式に基づく計算）
+  updateRungeKutta(dt, inner_input);
 
-  // Apply physical limits to raw integration results
-  state_(IDX::VX) = std::clamp(state_(IDX::VX), -vx_lim_, vx_lim_);
-  state_(IDX::PEDAL_ACCX) = std::clamp(state_(IDX::PEDAL_ACCX), -brake_lim_, acc_lim_);
+  // 7. 状態量の物理限界クランプ
+  state_(IDX::VX)         = std::clamp(state_(IDX::VX), -vx_lim_, vx_lim_);
+  state_(IDX::DRIVE_ACCX) = std::clamp(state_(IDX::DRIVE_ACCX), 0.0, acc_lim_);
+  state_(IDX::BRAKE_ACCX) = std::clamp(state_(IDX::BRAKE_ACCX), 0.0, brake_lim_);
 
-  // Enforce physical steering limits based on steering motor limits, accuracy error, and bias
   state_(IDX::STEER) = [&]() {
     const double upper = steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
     const double lower = -steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
-
-    // Failsafe clamp to prevent upper/lower limit reversal
     return std::clamp(state_(IDX::STEER), std::min(upper, lower), std::max(upper, lower));
   }();
 
-  // Snap velocity to 0.0 and freeze position when braking to a halt.
-  // Prevents floating-point drift and guarantees stable ADK state transitions.
+  // 🌟 8. 純粋な物理力の平衡判定（静止摩擦モデル）に基づく完全停止フリーズ制御
   constexpr double stop_epsilon = 1e-3;
-  if (delayed_input(IDX_U::PEDAL_ACCX_DES) < 0.0 && std::abs(state_(IDX::VX)) < stop_epsilon) {
-    state_(IDX::VX) = 0.0;
-    state_(IDX::X) = prev_state(IDX::X);
-    state_(IDX::Y) = prev_state(IDX::Y);
-    state_(IDX::YAW) = prev_state(IDX::YAW);
+  if (std::abs(state_(IDX::VX)) < stop_epsilon) {
+    using autoware_vehicle_msgs::msg::GearCommand;
+    const auto gear = static_cast<uint8_t>(inner_input(IDX_U_INNER::GEAR_INNER));
+
+    const double drive_force = [&]() {
+      if (gear == GearCommand::NONE || gear == GearCommand::PARK || gear == GearCommand::NEUTRAL) {
+        return 0.0;
+      }
+      if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
+        return -state_(IDX::DRIVE_ACCX);
+      }
+      return state_(IDX::DRIVE_ACCX);
+    }();
+
+    const double air_drag = -air_drag_coef_ * state_(IDX::VX) * std::abs(state_(IDX::VX));
+    const double external_acc = drive_force + inner_input(IDX_U_INNER::SLOPE_ACCX_INNER) + air_drag;
+    const double friction_limit = state_(IDX::BRAKE_ACCX) + rolling_resistance_;
+
+    // 外力の総和が静止摩擦限界（ブレーキ＋転がり抵抗）に収まっている場合のみ完全静止
+    if (std::abs(external_acc) <= friction_limit) {
+      state_(IDX::VX) = 0.0;
+    }
   }
 
-  // Calculate actual acceleration based on the finalized velocity delta
+  // 加速度算出とセンサ遅延処理
   state_(IDX::ACCX) = (state_(IDX::VX) - prev_state(IDX::VX)) / dt;
 
-  // Update velocity history queue and retrieve delayed velocity
   const double raw_delayed_vx = [&]() {
-    if (vel_history_queue_.empty()) {
-      return state_(IDX::VX);
-    }
-
+    if (vel_history_queue_.empty()) return state_(IDX::VX);
     vel_history_queue_.push_back(state_(IDX::VX));
     const double front_val = vel_history_queue_.front();
     vel_history_queue_.pop_front();
     return front_val;
   }();
 
-  // Apply sensor characteristics (accuracy, offset, noise, resolution)
   delayed_vx_ = [&]() {
-    if (std::abs(raw_delayed_vx) < stop_epsilon) {
-      return 0.0;
-    }
-
+    if (std::abs(raw_delayed_vx) < stop_epsilon) return 0.0;
     double vx = raw_delayed_vx * (1.0 + vel_sensor_accuracy_error_) + vel_sensor_offset_;
-    if (vel_sensor_noise_stddev_ > 1e-5) {
-      vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_;
-    }
-    if (vel_sensor_resolution_ > 1e-5) {
-      vx = std::round(vx / vel_sensor_resolution_) * vel_sensor_resolution_;
-    }
+    if (vel_sensor_noise_stddev_ > 1e-5) vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_;
+    if (vel_sensor_resolution_ > 1e-5) vx = std::round(vx / vel_sensor_resolution_) * vel_sensor_resolution_;
     return vx;
   }();
-}
-
-void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double & dt)
-{
-  // Calculate initial acceleration and brake commands
-  const auto [initial_acc_cmd, initial_brake_cmd] = [&]() -> std::pair<double, double> {
-    const double pedal_acc = state_(IDX::PEDAL_ACCX);
-    if (pedal_acc > 0.0) {
-      return {(pedal_acc / (1.0 + acc_accuracy_error_)) + acc_dead_band_, 0.0};
-    }
-    if (pedal_acc < 0.0) {
-      const double jump_cmd = std::abs(pedal_acc);
-      const double deadzoned_cmd = (jump_cmd / (1.0 + brake_accuracy_error_)) - brake_jump_value_;
-      const double brake_cmd_abs = std::max(0.0, deadzoned_cmd) + brake_dead_band_;
-      return {0.0, -brake_cmd_abs};
-    }
-    return {0.0, 0.0};
-  }();
-
-  // Initialize acceleration and brake queues
-  const size_t acc_queue_size = static_cast<size_t>(std::round(acc_delay_ / dt));
-  acc_input_queue_.assign(acc_queue_size, initial_acc_cmd);
-  const size_t brake_queue_size = static_cast<size_t>(std::round(brake_delay_ / dt));
-  brake_input_queue_.assign(brake_queue_size, initial_brake_cmd);
-
-  brake_hysteresis_state_ = std::abs(initial_brake_cmd);
-
-  // Calculate initial steering motor command and initialize steering motor queue
-  const double initial_steer_motor_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
-  const size_t steer_motor_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
-  steer_motor_input_queue_.assign(steer_motor_queue_size, initial_steer_motor_cmd);
-
-  // Calculate initial velocity and initialize velocity history queue
-  const double initial_vel = state_(IDX::VX);
-  const size_t vel_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
-  vel_history_queue_.assign(vel_queue_size, initial_vel);
-
-  delayed_vx_ = initial_vel;
 }
 
 Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
@@ -314,106 +239,101 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
 {
   using autoware_vehicle_msgs::msg::GearCommand;
 
-  // Extract states with safety clamps
-  const double vel = std::clamp(state(IDX::VX), -vx_lim_, vx_lim_);
-  const double pedal_acc = std::clamp(state(IDX::PEDAL_ACCX), -brake_lim_, acc_lim_);
-  const double yaw = state(IDX::YAW);
-  // Prevent NaN explosion in std::tan() during Runge-Kutta integration steps
+  // 1. 状態量の抽出
+  const double vel       = std::clamp(state(IDX::VX), -vx_lim_, vx_lim_);
+  const double drive_acc = std::clamp(state(IDX::DRIVE_ACCX), 0.0, acc_lim_);
+  const double brake_acc = std::clamp(state(IDX::BRAKE_ACCX), 0.0, brake_lim_);
+  const double yaw       = state(IDX::YAW);
+
   const double current_steer = [&]() {
     const double upper = steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
     const double lower = -steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
     return std::clamp(state(IDX::STEER), std::min(upper, lower), std::max(upper, lower));
   }();
 
-  const double pedal_acc_des = input(IDX_U::PEDAL_ACCX_DES);
-  const double steer_motor_des = input(IDX_U::STEER_DES);
-  const double slope_accx = input(IDX_U::SLOPE_ACCX);
-  const auto gear = input(IDX_U::GEAR);
+  // 2. 内部入力の抽出
+  const double acc_des         = input(IDX_U_INNER::ACC_DES);
+  const double brake_des       = input(IDX_U_INNER::BRAKE_DES);
+  const auto gear              = static_cast<uint8_t>(input(IDX_U_INNER::GEAR_INNER));
+  const double slope_accx      = input(IDX_U_INNER::SLOPE_ACCX_INNER);
+  const double steer_motor_des = input(IDX_U_INNER::STEER_DES_INNER);
 
-  // Dynamically select time constants and jerk limits based on pedal commands
-  constexpr double eps = 1e-5;  // Threshold for zero evaluation
-  const double current_tc = [&]() {
-    if (pedal_acc_des > (acc_offset_ + eps)) {
-      return acc_time_constant_;  // Active acceleration
-    }
-    if (pedal_acc_des < (-brake_offset_ - eps)) {
-      return brake_time_constant_;  // Active braking
-    }
-    // Coasting: release remaining forces based on the actual pedal state
-    return (pedal_acc < 0.0) ? brake_time_constant_ : acc_time_constant_;
-  }();
-  const double current_jerk_lim = [&]() {
-    if (pedal_acc_des > (acc_offset_ + eps)) {
-      return acc_rate_lim_;
-    }
-    if (pedal_acc_des < (-brake_offset_ - eps)) {
-      return brake_rate_lim_;
-    }
-    return (pedal_acc < 0.0) ? brake_rate_lim_ : acc_rate_lim_;
-  }();
-
-  // Evaluate steering motor control error with deadband
+  // 3. ステアリング偏差計算
   const double current_steer_motor = (current_steer - steer_bias_) / (1.0 + steer_accuracy_error_);
   const double steer_motor_diff = current_steer_motor - steer_motor_des;
   const double steer_motor_diff_with_dead_band = [&]() {
-    if (steer_motor_diff > steer_dead_band_) {
-      return steer_motor_diff - steer_dead_band_;
-    }
-    if (steer_motor_diff < -steer_dead_band_) {
-      return steer_motor_diff + steer_dead_band_;
-    }
+    if (steer_motor_diff > steer_dead_band_) return steer_motor_diff - steer_dead_band_;
+    if (steer_motor_diff < -steer_dead_band_) return steer_motor_diff + steer_dead_band_;
     return 0.0;
   }();
 
-  // Compute longitudinal acceleration (d_vx) using Newtonian mechanics and static friction models
+  // 🌟 4. 「力の綱引き」運動方程式による前後加速度 d_vx の計算
   const double d_vx = [&] {
     if (gear == GearCommand::NONE || gear == GearCommand::PARK) {
       return 0.0;
     }
 
-    // Aerodynamic drag: proportional to the square of velocity, opposing the motion
-    const double air_drag = -air_drag_coef_ * vel * std::abs(vel);
-
-    // Engine thrust: generated only when the accelerator is pressed, depending on the gear
     const double engine_acc = [&]() {
-      if (pedal_acc >= 0.0) {
-        if (gear == GearCommand::NEUTRAL) {
-          return 0.0;
-        }
-        if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
-          return -pedal_acc;
-        }
-        return pedal_acc;
-      }
-      return 0.0;
+      if (gear == GearCommand::NEUTRAL) return 0.0;
+      if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) return -drive_acc;
+      return drive_acc;
     }();
 
-    // Static friction model (Approximated Coulomb friction via virtual spring)
-    const double vel_epsilon = 0.02;    // Threshold for near-zero velocity
-    const double k = 1.0 / vel_epsilon; // Virtual spring constant (viscous damping coefficient)
-
-    // Total external acceleration acting on the vehicle
+    const double air_drag = -air_drag_coef_ * vel * std::abs(vel);
     const double external_acc = engine_acc + slope_accx + air_drag;
+    const double friction_limit = brake_acc + rolling_resistance_;
 
-    // Available static friction force limits (Brake force + Rolling resistance)
-    const double brake_force = (pedal_acc < 0.0) ? -pedal_acc : 0.0;
-    const double friction_limit = brake_force + rolling_resistance_;
+    // クーロン摩擦の粘性近傍モデルによる滑らかな運動計算
+    constexpr double vel_epsilon = 0.02;
+    constexpr double k = 1.0 / vel_epsilon;
 
-    // Combined motion equation:
-    // The vehicle targets zero velocity (-k * vel) near standstill, capped by the available friction limit.
     return std::clamp(-k * vel, external_acc - friction_limit, external_acc + friction_limit);
   }();
 
-  // Construct the final state derivatives
+  // 🌟 5. 8次元状態微分の構成（条件分岐を完全排除した連続モデル）
   Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
   d_state(IDX::X)          = vel * std::cos(yaw);
   d_state(IDX::Y)          = vel * std::sin(yaw);
   d_state(IDX::YAW)        = vel * std::tan(current_steer) / wheelbase_;
   d_state(IDX::VX)         = d_vx;
   d_state(IDX::STEER)      = std::clamp(-steer_motor_diff_with_dead_band / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_) * (1.0 + steer_accuracy_error_);
-  d_state(IDX::PEDAL_ACCX) = std::clamp(-(pedal_acc - pedal_acc_des) / current_tc, -current_jerk_lim, current_jerk_lim);
+  d_state(IDX::ACCX)       = 0.0;
+
+  // モータ駆動トルクおよびブレーキ圧の独立1次遅れ系
+  d_state(IDX::DRIVE_ACCX) = std::clamp(-(drive_acc - acc_des) / acc_time_constant_, -acc_rate_lim_, acc_rate_lim_);
+  d_state(IDX::BRAKE_ACCX) = std::clamp(-(brake_acc - brake_des) / brake_time_constant_, -brake_rate_lim_, brake_rate_lim_);
 
   return d_state;
+}
+
+void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double & dt)
+{
+  const double initial_drive = state_(IDX::DRIVE_ACCX);
+  const double initial_brake = state_(IDX::BRAKE_ACCX);
+
+  const double initial_acc_cmd = (initial_drive > 0.0)
+    ? (initial_drive / (1.0 + acc_accuracy_error_)) + acc_dead_band_
+    : 0.0;
+  const double initial_brake_cmd = (initial_brake > 0.0)
+    ? (initial_brake / (1.0 + brake_accuracy_error_)) + brake_dead_band_
+    : 0.0;
+
+  const size_t acc_queue_size = static_cast<size_t>(std::round(acc_delay_ / dt));
+  acc_input_queue_.assign(acc_queue_size, initial_acc_cmd);
+  const size_t brake_queue_size = static_cast<size_t>(std::round(brake_delay_ / dt));
+  brake_input_queue_.assign(brake_queue_size, initial_brake_cmd);
+
+  brake_hysteresis_state_ = initial_brake_cmd;
+
+  const double initial_steer_motor_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
+  const size_t steer_motor_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
+  steer_motor_input_queue_.assign(steer_motor_queue_size, initial_steer_motor_cmd);
+
+  const double initial_vel = state_(IDX::VX);
+  const size_t vel_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
+  vel_history_queue_.assign(vel_queue_size, initial_vel);
+
+  delayed_vx_ = initial_vel;
 }
 
 }  // namespace autoware::simulator::simple_planning_simulator
