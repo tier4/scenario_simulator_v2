@@ -38,7 +38,9 @@ public:
   MOCK_METHOD(bool, isEngaged, (), (const));
   MOCK_METHOD(bool, isEngageable, (), (const));
   MOCK_METHOD(bool, setParameterMock, (const std::string &, const bool &), (const));
-  MOCK_METHOD(void, requestAssignRoute, (const std::vector<geometry_msgs::msg::Pose> &), ());
+  MOCK_METHOD(
+    void, requestAssignRoute,
+    (const std::vector<geometry_msgs::msg::Pose> &, const traffic_simulator::RouteOption &), ());
 
   template <typename ParameterType>
   auto setParameter(const std::string & name, const ParameterType & default_value = {}) const
