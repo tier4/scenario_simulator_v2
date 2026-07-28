@@ -185,8 +185,12 @@ def launch_setup(context, *args, **kwargs):
 
         def collect_vehicle_parameters():
             vehicle_model_name = vehicle_model.perform(context)
+            default_description = Path(
+                get_package_share_directory("default_vehicle_description")
+            )
             description = Path(get_package_share_directory(vehicle_model_name + "_description"))
             return [
+                str(default_description / "config" / "simulator_model.param.yaml"),
                 str(description / "config" / "vehicle_info.param.yaml"),
                 str(description / "config" / "simulator_model.param.yaml"),
             ]
