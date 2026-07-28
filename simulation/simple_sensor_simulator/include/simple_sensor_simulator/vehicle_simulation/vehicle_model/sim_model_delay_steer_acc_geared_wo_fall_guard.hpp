@@ -68,6 +68,9 @@ public:
    * @param [in] vel_sensor_offset constant offset for velocity sensor [m/s]
    * @param [in] debug_acc_scaling_factor scaling factor for accel command
    * @param [in] debug_steer_scaling_factor scaling factor for steering command
+   * @param [in] rolling_resistance rolling resistance coefficient (friction) [m/ss]
+   * @param [in] air_drag_coef aerodynamic drag coefficient [1/m]
+   * @param [in] vel_epsilon velocity threshold for damping near zero speed to prevent chattering [m/s]
    */
   SimModelDelaySteerAccGearedWoFallGuard(
     double vx_lim, double acc_lim, double brake_lim, double acc_rate_lim, double brake_rate_lim, double steer_lim, double steer_rate_lim, double wheelbase,
@@ -76,7 +79,7 @@ public:
     double steer_delay, double steer_time_constant, double steer_dead_band, double steer_bias,
     double steer_accuracy_error, double steer_resolution, double steer_hysteresis_width,
     double vel_sensor_delay, double vel_sensor_resolution, double vel_sensor_noise_stddev, int vel_sensor_noise_seed, double vel_sensor_accuracy_error, double vel_sensor_offset,
-    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double rolling_resistance, double air_drag_coef);
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double rolling_resistance, double air_drag_coef, double vel_epsilon);
 
   /**
    * @brief default destructor
@@ -141,6 +144,7 @@ private:
 
   const double rolling_resistance_;          // 🌟 転がり抵抗係数 [m/s²]
   const double air_drag_coef_;               // 🌟 空気抵抗係数 [1/m]
+  const double vel_epsilon_;                 // 🌟 停止時のダンピング閾値 [m/s]
 
   double brake_hysteresis_state_; // ヒステリシス（機械的なガタ）を通した後の、ブレーキペダル機構の実際の物理的な位置（残存量）
   double delayed_vx_;                          // 遅延適用後の物理車速

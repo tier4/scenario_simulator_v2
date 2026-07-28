@@ -28,7 +28,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double steer_time_constant, double steer_dead_band, double steer_bias,
   double steer_accuracy_error, double steer_resolution, double steer_hysteresis_width,
   double vel_sensor_delay, double vel_sensor_resolution, double vel_sensor_noise_stddev, int vel_sensor_noise_seed, double vel_sensor_accuracy_error, double vel_sensor_offset,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double rolling_resistance, double air_drag_coef)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double rolling_resistance, double air_drag_coef, double vel_epsilon)
 : SimModelInterface(8 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -69,6 +69,7 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
   rolling_resistance_(std::max(rolling_resistance, 0.0)),
   air_drag_coef_(std::max(air_drag_coef, 0.0)),
+  vel_epsilon_(std::max(vel_epsilon, 0.001)),
   brake_hysteresis_state_(0.0),
   delayed_vx_(0.0),
   vel_rng_(vel_sensor_noise_seed),
@@ -284,8 +285,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     const double friction_limit = brake_acc + rolling_resistance_;
 
     // クーロン摩擦の粘性近傍モデルによる滑らかな運動計算
-    constexpr double vel_epsilon = 0.02;
-    constexpr double k = 1.0 / vel_epsilon;
+    const double k = 1.0 / vel_epsilon_; // ハードコードを撤廃
 
     return std::clamp(-k * vel, external_acc - friction_limit, external_acc + friction_limit);
   }();
