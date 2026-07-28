@@ -68,7 +68,7 @@ ros2 service call /rollout/switch std_srvs/srv/Trigger
 ## vehicle model に関する注意
 
 Replay 中の状態シードは vehicle model の状態量に書き込まれるため、**速度を状態量に持つモデル**
-（`DELAY_STEER_*`, `IDEAL_STEER_ACC*`, `TAIGA_DYN`, `TAIGA_X`）を使ってください。
+（`DELAY_STEER_*`, `IDEAL_STEER_ACC*`）を使ってください。
 `IDEAL_STEER_VEL` は速度が入力（状態量でない）のため、replay 中に Autoware へ供給される
 `/localization/kinematic_state` の速度が 0 になります。
 `vehicle_model_type` は `<vehicle_model>_description/config/simulator_model.param.yaml` で

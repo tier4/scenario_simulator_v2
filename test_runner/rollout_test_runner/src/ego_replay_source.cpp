@@ -54,7 +54,9 @@ EgoReplaySource::EgoReplaySource(
   rosbag2_storage::StorageOptions storage_options;
   storage_options.uri = bag_path;
   reader.open(storage_options, rosbag2_cpp::ConverterOptions());
-  reader.set_filter(rosbag2_storage::StorageFilter{{odometry_topic, acceleration_topic}});
+  rosbag2_storage::StorageFilter storage_filter;
+  storage_filter.topics = {odometry_topic, acceleration_topic};
+  reader.set_filter(storage_filter);
 
   rclcpp::Serialization<nav_msgs::msg::Odometry> odometry_serialization;
   rclcpp::Serialization<geometry_msgs::msg::AccelWithCovarianceStamped> accel_serialization;

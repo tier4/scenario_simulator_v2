@@ -147,6 +147,7 @@ auto toString(const VehicleModelType datum) -> std::string
   switch (datum) {
     BOILERPLATE(DELAY_STEER_ACC);
     BOILERPLATE(DELAY_STEER_ACC_GEARED);
+    BOILERPLATE(DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER);
     BOILERPLATE(DELAY_STEER_ACC_GEARED_WO_FALL_GUARD);
     BOILERPLATE(DELAY_STEER_MAP_ACC_GEARED);
     BOILERPLATE(DELAY_STEER_VEL);
@@ -156,8 +157,6 @@ auto toString(const VehicleModelType datum) -> std::string
     BOILERPLATE(IDEAL_STEER_ACC_GEARED);
     BOILERPLATE(IDEAL_STEER_VEL);
     BOILERPLATE(PERFECT_TRAJECTORY_TRACKER);
-    BOILERPLATE(TAIGA_DYN);
-    BOILERPLATE(TAIGA_X);
   }
 
 #undef BOILERPLATE
@@ -173,6 +172,8 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
     {"DELAY_STEER_ACC_GEARED", VehicleModelType::DELAY_STEER_ACC_GEARED},
+    {"DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER",
+     VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER},
     {"DELAY_STEER_ACC_GEARED_WO_FALL_GUARD",
      VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD},
     {"DELAY_STEER_MAP_ACC_GEARED", VehicleModelType::DELAY_STEER_MAP_ACC_GEARED},
@@ -183,8 +184,6 @@ auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
     {"IDEAL_STEER_ACC_GEARED", VehicleModelType::IDEAL_STEER_ACC_GEARED},
     {"IDEAL_STEER_VEL", VehicleModelType::IDEAL_STEER_VEL},
     {"PERFECT_TRAJECTORY_TRACKER", VehicleModelType::PERFECT_TRAJECTORY_TRACKER},
-    {"TAIGA_DYN", VehicleModelType::TAIGA_DYN},
-    {"TAIGA_X", VehicleModelType::TAIGA_X},
   };
 
   const auto iter = table.find(vehicle_model_type);
@@ -206,16 +205,6 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto acc_time_delay             = common::getParameter("acc_time_delay",             0.1);
   const auto acceleration_map_path      = common::getParameter("acceleration_map_path",      std::string(""));
   const auto k_us                       = common::getParameter("k_us",                       0.0);
-  // Verification-viewer-parity longitudinal terms (DELAY_STEER_ACC_GEARED_WO_FALL_GUARD only).
-  // All default to neutral so models that do not set them keep the original single-tau dynamics.
-  // k_us_bands / k_us_thresholds: step-band k_us. Empty → scalar k_us at all speeds.
-  const auto k_us_bands      = common::getParameter("k_us_bands",      std::vector<double>{});
-  const auto k_us_thresholds = common::getParameter("k_us_thresholds", std::vector<double>{});
-  const auto brake_time_constant        = common::getParameter("brake_time_constant",        0.0);
-  const auto lon_drag_c0                = common::getParameter("lon_drag_c0",                0.0);
-  const auto lon_drag_c1                = common::getParameter("lon_drag_c1",                0.0);
-  const auto lon_drag_c2                = common::getParameter("lon_drag_c2",                0.0);
-  const auto lon_lat_coupling           = common::getParameter("lon_lat_coupling",          0.0);
   const auto debug_acc_scaling_factor   = common::getParameter("debug_acc_scaling_factor",   1.0);
   const auto debug_steer_scaling_factor = common::getParameter("debug_steer_scaling_factor", 1.0);
   const auto steer_bias                 = common::getParameter("steer_bias",                 0.0);
@@ -249,9 +238,33 @@ auto EgoEntitySimulation::makeSimulationModel(
         autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
-        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
-        k_us_thresholds, k_us_bands,
-        brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2, lon_lat_coupling);
+        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
+
+    case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER: {
+      // 差分はステア・加速度の遅延が full-RHS（状態フィードバックも t-d）になる点。
+      // 全遅延が 0 なら wo_fall_guard と bit 一致。
+      // このモデルのみチューニングパラメータを delay_steer_acc_geared_for_diffusion_planner.version /
+      // delay_steer_acc_geared_for_diffusion_planner.v{N}.* というバージョン名前空間から読む。
+      const auto delay_steer_acc_geared_for_diffusion_planner_version =
+        common::getParameter<int>("delay_steer_acc_geared_for_diffusion_planner.version", 1);
+      const auto ns = "delay_steer_acc_geared_for_diffusion_planner.v" +
+                       std::to_string(delay_steer_acc_geared_for_diffusion_planner_version) + ".";
+      return std::make_shared<
+        autoware::simulator::simple_planning_simulator::
+          SimModelDelaySteerAccGearedForDiffusionPlanner>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time,
+        common::getParameter<double>(ns + "acc_time_delay", 0.1),
+        common::getParameter<double>(ns + "acc_time_constant", 0.1),
+        common::getParameter<double>(ns + "steer_time_delay", 0.24),
+        common::getParameter<double>(ns + "steer_time_constant", 0.27),
+        common::getParameter<double>(ns + "steer_dead_band", 0.0),
+        common::getParameter<double>(ns + "steer_bias", 0.0),
+        common::getParameter<double>(ns + "debug_acc_scaling_factor", 1.0),
+        common::getParameter<double>(ns + "debug_steer_scaling_factor", 1.0),
+        common::getParameter<double>(ns + "k_us", 0.0),
+        common::getParameter<double>(ns + "xy_heading_rate_coeff", 0.0),
+        common::getParameter<bool>(ns + "use_rk4", false));
+    }
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       if (!std::filesystem::exists(acceleration_map_path)) {
@@ -285,44 +298,6 @@ auto EgoEntitySimulation::makeSimulationModel(
     case VehicleModelType::PERFECT_TRAJECTORY_TRACKER: {
       const auto delay_time_sec = common::getParameter("perfect_tracker_delay_time_sec", 0.0);
       return std::make_shared<SimModelPerfectTrajectoryTracker>(delay_time_sec);
-    }
-
-    case VehicleModelType::TAIGA_DYN: {
-      // Dynamic-bicycle physical parameters. Defaults are nominal values for a heavy
-      // vehicle; the CG split derives from the wheelbase, and the cornering stiffnesses
-      // are initial seeds to be calibrated against steady-state cornering.
-      const auto mass = common::getParameter("mass", 6560.0);
-      const auto inertia_z = common::getParameter("inertia_z", 25868.2318);
-      const auto lf = common::getParameter("lf", wheel_base * 0.5 + 0.94323);
-      const auto lr = common::getParameter("lr", wheel_base * 0.5 - 0.94323);
-      const auto cornering_stiffness_front =
-        common::getParameter("cornering_stiffness_front", 115830.0);
-      const auto cornering_stiffness_rear =
-        common::getParameter("cornering_stiffness_rear", 535860.0);
-      const auto vx_min_dyn = common::getParameter("vx_min_dyn", 1.0);
-      return std::make_shared<
-        autoware::simulator::simple_planning_simulator::SimModelTaigaDyn>(
-        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
-        acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
-        debug_acc_scaling_factor, debug_steer_scaling_factor, mass, inertia_z, lf, lr,
-        cornering_stiffness_front, cornering_stiffness_rear, vx_min_dyn);
-    }
-
-    case VehicleModelType::TAIGA_X: {
-      // High-fidelity physics backend (flat ground). Physical defaults mirror a
-      // heavy vehicle; the internal substep follows the engine fixed timestep.
-      const auto mass = common::getParameter("mass", 6560.0);
-      const auto inertia_z = common::getParameter("inertia_z", 25868.2318);
-      const auto cg_offset_x = common::getParameter("cg_offset_x", -0.94323);
-      const auto track_width = common::getParameter("track_width", 1.754);
-      const auto wheel_radius = common::getParameter("wheel_radius", 0.3725);
-      const auto max_accel = common::getParameter("max_accel", 2.3);
-      const auto max_brake = common::getParameter("max_brake", 5.9);
-      const auto fixed_dt = common::getParameter("taiga_x_fixed_dt", 1.0 / 1200.0);
-      return std::make_shared<
-        autoware::simulator::simple_planning_simulator::SimModelTaigaX>(
-        wheel_base, track_width, mass, inertia_z, cg_offset_x, steer_lim, max_accel, max_brake,
-        wheel_radius, fixed_dt);
     }
 
     default:
@@ -359,25 +334,9 @@ void EgoEntitySimulation::requestSpeedChange(double value)
       break;
 
     case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+    case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
       v << 0, 0, 0, value, 0, 0, 0;
       break;
-
-    case VehicleModelType::TAIGA_DYN:
-      // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX, VY, WZ]
-      v << 0, 0, 0, value, 0, 0, 0, 0, 0;
-      break;
-
-    case VehicleModelType::TAIGA_X:
-      // PhysX-backed: the authoritative state lives in the engine, so teleport
-      // through the model instead of writing the state mirror.
-      if (
-        auto * tx = dynamic_cast<autoware::simulator::simple_planning_simulator::SimModelTaigaX *>(
-          vehicle_model_ptr_.get())) {
-        tx->setFullState(
-          vehicle_model_ptr_->getX(), vehicle_model_ptr_->getY(), vehicle_model_ptr_->getYaw(),
-          value, 0.0, 0.0, 0.0, 0.0);
-      }
-      return;
 
     case VehicleModelType::IDEAL_STEER_ACC:
     case VehicleModelType::IDEAL_STEER_ACC_GEARED:
@@ -451,6 +410,7 @@ auto EgoEntitySimulation::overwrite(
     switch (Eigen::VectorXd state = Eigen::VectorXd::Zero(vehicle_model_ptr_->getDimX());
             vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+      case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
         // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX]; seed the pedal acceleration
         // state with the measured acceleration so the post-replay integration continues
         // from the observed motion.
@@ -485,46 +445,6 @@ auto EgoEntitySimulation::overwrite(
         state(1) = world_relative_position_.y();
         state(2) = yaw;
         vehicle_model_ptr_->setState(state);
-        break;
-
-      case VehicleModelType::TAIGA_DYN:
-        // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX, VY, WZ]; the lateral
-        // states (VY, WZ) carry inertia, so seed them from the measured motion.
-        state(0) = world_relative_position_.x();
-        state(1) = world_relative_position_.y();
-        state(2) = yaw;
-        state(3) = status.action_status.twist.linear.x;
-        if (
-          std::abs(status.action_status.twist.linear.x) <
-          min_linear_velocity_for_steer_calculation) {
-          state(4) = 0.0;
-        } else {
-          state(4) = std::atan(
-            (status.action_status.twist.angular.z * wheel_base_) /
-            status.action_status.twist.linear.x);
-        }
-        state(5) = status.action_status.accel.linear.x;
-        state(6) = status.action_status.accel.linear.x;
-        state(7) = status.action_status.twist.linear.y;
-        state(8) = status.action_status.twist.angular.z;
-        vehicle_model_ptr_->setState(state);
-        break;
-
-      case VehicleModelType::TAIGA_X:
-        // PhysX-backed: teleport the engine chassis to the measured pose/motion.
-        if (
-          auto * tx =
-            dynamic_cast<autoware::simulator::simple_planning_simulator::SimModelTaigaX *>(
-              vehicle_model_ptr_.get())) {
-          const double vx = status.action_status.twist.linear.x;
-          const double steer = std::abs(vx) < min_linear_velocity_for_steer_calculation
-                                 ? 0.0
-                                 : std::atan(status.action_status.twist.angular.z * wheel_base_ / vx);
-          tx->setFullState(
-            world_relative_position_.x(), world_relative_position_.y(), yaw, vx,
-            status.action_status.twist.linear.y, status.action_status.twist.angular.z,
-            status.action_status.accel.linear.x, steer);
-        }
         break;
 
       case VehicleModelType::EXTERNAL:
@@ -638,8 +558,7 @@ void EgoEntitySimulation::update(
           break;
 
         case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
-        case VehicleModelType::TAIGA_DYN:
-        case VehicleModelType::TAIGA_X:
+        case VehicleModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
           input(0) = acceleration;
           input(1) = autoware->getGearCommand().command;
           input(2) = acceleration_by_slope;

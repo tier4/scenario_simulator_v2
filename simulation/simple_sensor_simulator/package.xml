@@ -44,7 +44,6 @@
   <depend>boost</depend>
   <depend>eigen</depend>
   <depend>embree_vendor</depend>
-  <depend>physx_vendor</depend>
   <depend>get_parameter</depend>
   <depend>libgoogle-glog-dev</depend>
   <depend>libpcl-all-dev</depend>

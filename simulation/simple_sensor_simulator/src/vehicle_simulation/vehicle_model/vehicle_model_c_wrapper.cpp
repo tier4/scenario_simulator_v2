@@ -1,12 +1,26 @@
+// Copyright 2026 TIER IV, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // C wrapper around scenario_simulator's SimModelInterface vehicle models.
 //
 // SimModelInterface 派生を直接使い、複数モデル種別 (ideal_steer_acc /
-// delay_steer_acc_geared_wo_fall_guard / taiga_dyn / ...) をケース別解析で切り替える。
+// delay_steer_acc_geared_wo_fall_guard / ... をケース別解析で切り替える。
 //
 // API:
 //   factory: vm_create_<type>(...)        → VmModel *
 //   common : vm_set_input / vm_step / vm_step_dt / vm_get_x/y/yaw/vx/vy/steer/ax/wz / vm_destroy
-//   reset  : vm_reset_full / vm_reset_state  (末尾に wz を取り、動的モデルの yaw rate を seed)
+//   reset  : vm_reset_full / vm_reset_state
 //   delay  : vm_set_queues / vm_get_acc_q_size / vm_get_steer_q_size
 //            (delay 系派生のみ動作。ideal 系では no-op / 0 を返す)
 //
@@ -23,25 +37,22 @@
 
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_for_diffusion_planner.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_taiga_dyn.hpp>
-#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_taiga_x.hpp>
 
 namespace
 {
+using autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedForDiffusionPlanner;
 using autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard;
-using autoware::simulator::simple_planning_simulator::SimModelTaigaDyn;
-using autoware::simulator::simple_planning_simulator::SimModelTaigaX;
 using GearCommand = autoware_vehicle_msgs::msg::GearCommand;
 }  // namespace
 
 enum class VmModelType {
   IDEAL_STEER_ACC = 0,
   DELAY_STEER_ACC_GEARED_WO_FALL_GUARD = 1,
-  TAIGA_DYN = 2,
-  TAIGA_X = 3,
+  DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER = 2,
 };
 
 struct VmModel
@@ -49,13 +60,13 @@ struct VmModel
   VmModelType type;
   std::unique_ptr<SimModelInterface> impl;
   double sub_dt;
-  // delay 系 (wo_fall_guard / taiga_dyn) 用。reset_full の warmup と vm_set_queues の
+  // delay 系用。reset_full の warmup と vm_set_queues の
   // バイアス計算で使う。
   double steer_bias = 0.0;
 };
 
 // --- internal helpers ---------------------------------------------------
-// delay queue を持つ派生 (wo_fall_guard / taiga_dyn) を横断して扱うためのヘルパ。
+// delay queue を持つ派生を横断して扱うためのヘルパ。
 // SimModelInterface には queue API が無いため、queue API を公開する派生へ
 // dynamic_cast し、見つかった派生に対し fn を適用する (見つからなければ dflt)。
 template <typename R, typename Fn>
@@ -64,8 +75,8 @@ static R for_queue_model(VmModel * m, R dflt, Fn fn)
   if (auto * w = dynamic_cast<SimModelDelaySteerAccGearedWoFallGuard *>(m->impl.get())) {
     return fn(w);
   }
-  if (auto * t = dynamic_cast<SimModelTaigaDyn *>(m->impl.get())) {
-    return fn(t);
+  if (auto * d = dynamic_cast<SimModelDelaySteerAccGearedForDiffusionPlanner *>(m->impl.get())) {
+    return fn(d);
   }
   return dflt;
 }
@@ -106,6 +117,16 @@ static void warmup_delay_queues(
   m->impl->setState(s);  // restore actual state (queues now contain warm-up history)
 }
 
+// full-RHS delay 派生 (for_diffusion_planner) のみ: state 設定後に遅延状態履歴バッファを
+// 現在 state で定数充填する。command queue の warmup とは別で、遅延状態は「窓前は定常」と
+// して seed する (warmup の過渡ではなく)。他モデルでは no-op。
+static void reset_state_queues(VmModel * m)
+{
+  if (auto * d = dynamic_cast<SimModelDelaySteerAccGearedForDiffusionPlanner *>(m->impl.get())) {
+    d->resetStateQueues();
+  }
+}
+
 // ============================================================
 // C interface
 // ============================================================
@@ -127,63 +148,37 @@ VmModel * vm_create_delay_steer_acc_geared_wo_fall_guard(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
-  const double * k_us_thresholds, const double * k_us_band_values, int n_kus_bands,
-  double brake_time_constant, double lon_drag_c0, double lon_drag_c1, double lon_drag_c2,
-  double lon_lat_coupling, int n_substep)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us)
 {
-  const int n = std::max(n_kus_bands, 0);
-  const std::vector<double> thresh_vec(
-    (k_us_thresholds && n > 1) ? k_us_thresholds : nullptr,
-    (k_us_thresholds && n > 1) ? k_us_thresholds + n - 1 : nullptr);
-  const std::vector<double> bands_vec(
-    (k_us_band_values && n > 0) ? k_us_band_values : nullptr,
-    (k_us_band_values && n > 0) ? k_us_band_values + n : nullptr);
   auto * m = new VmModel{};
   m->type = VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD;
   m->impl = std::make_unique<SimModelDelaySteerAccGearedWoFallGuard>(
     vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
     acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
-    thresh_vec, bands_vec,
-    brake_time_constant, lon_drag_c0, lon_drag_c1, lon_drag_c2, lon_lat_coupling, n_substep);
+    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
   return m;
 }
 
-VmModel * vm_create_taiga_dyn(
+// full-RHS delay 派生。差分はステア・加速度の遅延が指令のみ → 右辺全体 (状態フィードバックも t-d)
+// になった点。全遅延が 0 なら wo_fall_guard と bit 一致。
+VmModel * vm_create_delay_steer_acc_geared_for_diffusion_planner(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double sub_dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double mass,
-  double inertia_z, double lf, double lr, double cornering_stiffness_front,
-  double cornering_stiffness_rear, double vx_min_dyn)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+  double xy_heading_rate_coeff, double use_rk4)
 {
   auto * m = new VmModel{};
-  m->type = VmModelType::TAIGA_DYN;
-  m->impl = std::make_unique<SimModelTaigaDyn>(
+  m->type = VmModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER;
+  m->impl = std::make_unique<SimModelDelaySteerAccGearedForDiffusionPlanner>(
     vx_lim, steer_lim, vx_rate_lim, steer_rate_lim, wheelbase, sub_dt, acc_delay,
     acc_time_constant, steer_delay, steer_time_constant, steer_dead_band, steer_bias,
-    debug_acc_scaling_factor, debug_steer_scaling_factor, mass, inertia_z, lf, lr,
-    cornering_stiffness_front, cornering_stiffness_rear, vx_min_dyn);
+    debug_acc_scaling_factor, debug_steer_scaling_factor, k_us,
+    xy_heading_rate_coeff, use_rk4 > 0.5);
   m->sub_dt = sub_dt;
   m->steer_bias = steer_bias;
-  return m;
-}
-
-VmModel * vm_create_taiga_x(
-  double wheelbase, double track_width, double mass, double inertia_z, double cg_offset_x,
-  double max_steer, double max_accel, double max_brake, double wheel_radius, double sub_dt,
-  double fixed_dt)
-{
-  auto * m = new VmModel{};
-  m->type = VmModelType::TAIGA_X;
-  m->impl = std::make_unique<SimModelTaigaX>(
-    wheelbase, track_width, mass, inertia_z, cg_offset_x, max_steer, max_accel, max_brake,
-    wheel_radius, fixed_dt);
-  m->sub_dt = sub_dt;
-  m->steer_bias = 0.0;
   return m;
 }
 
@@ -201,8 +196,7 @@ void vm_set_input(VmModel * m, double accel_des, double steer_des)
       u << accel_des, steer_des;
       break;
     case VmModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
-    case VmModelType::TAIGA_DYN:
-    case VmModelType::TAIGA_X:
+    case VmModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER:
       // IDX_U: (PEDAL_)ACCX_DES=0, GEAR=1, SLOPE_ACCX=2, STEER_DES=3
       u.resize(4);
       u << accel_des, static_cast<double>(GearCommand::DRIVE), 0.0, steer_des;
@@ -225,12 +219,11 @@ void vm_step(VmModel * m) { m->impl->update(m->sub_dt); }
 void vm_step_dt(VmModel * m, double dt) { m->impl->update(dt); }
 
 // ---- state reset (full = state + delay-queue warmup) -------------------
-// 末尾 wz/vy は動的モデル (taiga_dyn) の yaw rate・横速度 state を実測値で seed するために
-// 使う。kinematic モデルでは無視される。vy を渡さない場合は 0 (直進近似) で初期化される。
+// 末尾の wz/vy 引数は既存ABIとの互換性のため受け取り、現在のモデルでは無視される。
 
 void vm_reset_full(
   VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax,
-  double wz, double vy)
+  double, double)
 {
   switch (m->type) {
     case VmModelType::IDEAL_STEER_ACC: {
@@ -246,19 +239,14 @@ void vm_reset_full(
       warmup_delay_queues(m, s, ax, steer_state);
       break;
     }
-    case VmModelType::TAIGA_DYN: {
+    case VmModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER: {
       const double steer_state = steer_actual - m->steer_bias;
-      // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX, VY, WZ]
-      Eigen::VectorXd s(9);
-      s << x, y, yaw, vx, steer_state, ax, ax, vy, wz;
+      Eigen::VectorXd s(7);
+      s << x, y, yaw, vx, steer_state, ax, ax;
       warmup_delay_queues(m, s, ax, steer_state);
-      break;
-    }
-    case VmModelType::TAIGA_X: {
-      // PhysX-backed: teleport the chassis (no delay queue to warm up).
-      if (auto * tx = dynamic_cast<SimModelTaigaX *>(m->impl.get())) {
-        tx->setFullState(x, y, yaw, vx, vy, wz, ax, steer_actual - m->steer_bias);
-      }
+      // command queue は warmup 履歴で充填済み。遅延状態履歴は warmup の過渡ではなく復元後の
+      // 定常 state で seed し直す (full-RHS delay 用)。
+      reset_state_queues(m);
       break;
     }
   }
@@ -268,7 +256,7 @@ void vm_reset_full(
 
 void vm_reset_state(
   VmModel * m, double x, double y, double yaw, double vx, double steer_actual, double ax,
-  double wz, double vy)
+  double, double)
 {
   switch (m->type) {
     case VmModelType::IDEAL_STEER_ACC: {
@@ -285,19 +273,14 @@ void vm_reset_state(
       m->impl->setGear(GearCommand::DRIVE);
       break;
     }
-    case VmModelType::TAIGA_DYN: {
+    case VmModelType::DELAY_STEER_ACC_GEARED_FOR_DIFFUSION_PLANNER: {
       const double steer_state = steer_actual - m->steer_bias;
-      // state: [X, Y, YAW, VX, STEER, ACCX, PEDAL_ACCX, VY, WZ]
-      Eigen::VectorXd s(9);
-      s << x, y, yaw, vx, steer_state, ax, ax, vy, wz;
+      Eigen::VectorXd s(7);
+      s << x, y, yaw, vx, steer_state, ax, ax;
       m->impl->setState(s);
       m->impl->setGear(GearCommand::DRIVE);
-      break;
-    }
-    case VmModelType::TAIGA_X: {
-      if (auto * tx = dynamic_cast<SimModelTaigaX *>(m->impl.get())) {
-        tx->setFullState(x, y, yaw, vx, vy, wz, ax, steer_actual - m->steer_bias);
-      }
+      // state のみリセット時も遅延状態履歴を現在 state で seed し直す (command queue は不変)。
+      reset_state_queues(m);
       break;
     }
   }
@@ -326,7 +309,7 @@ double vm_get_vx(VmModel * m) { return m->impl->getVx(); }
 double vm_get_vy(VmModel * m) { return m->impl->getVy(); }
 double vm_get_steer(VmModel * m) { return m->impl->getSteer(); }
 double vm_get_ax(VmModel * m) { return m->impl->getAx(); }
-// yaw rate (wz)。kinematic モデルでは steer/vx から導出、taiga_dyn では yaw rate state を返す。
+// yaw rate (wz) はkinematicモデルでsteer/vxから導出する。
 double vm_get_wz(VmModel * m) { return m->impl->getWz(); }
 
 // ---- batch integration for open-loop tuning hotpath --------------------

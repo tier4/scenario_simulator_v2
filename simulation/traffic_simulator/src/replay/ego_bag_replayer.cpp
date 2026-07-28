@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <cmath>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
+#include <type_traits>
 #include <iomanip>
 #include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/logging.hpp>
@@ -43,6 +44,28 @@ auto slerp(
 }
 
 auto logger() -> rclcpp::Logger { return rclcpp::get_logger("traffic_simulator.ego_bag_replayer"); }
+
+/// @note rosbag2_storage::SerializedBagMessage renamed `time_stamp` (Humble) to `recv_timestamp`
+/// (Jazzy and later). Detect the available member at compile time so this file builds on both.
+template <typename T, typename = void>
+struct has_recv_timestamp : std::false_type
+{
+};
+template <typename T>
+struct has_recv_timestamp<T, std::void_t<decltype(std::declval<T>().recv_timestamp)>>
+: std::true_type
+{
+};
+
+template <typename T>
+auto bagMessageTimestamp(const T & message)
+{
+  if constexpr (has_recv_timestamp<T>::value) {
+    return message.recv_timestamp;
+  } else {
+    return message.time_stamp;
+  }
+}
 }  // namespace
 
 EgoBagReplayer::EgoBagReplayer(
@@ -61,14 +84,16 @@ EgoBagReplayer::EgoBagReplayer(
     static_cast<int64_t>(reader.get_metadata().starting_time.time_since_epoch().count());
   const auto replay_start_time_ns = static_cast<int64_t>(replay_start_time * 1e9);
 
-  reader.set_filter(rosbag2_storage::StorageFilter{{odometry_topic, acceleration_topic}});
+  rosbag2_storage::StorageFilter storage_filter;
+  storage_filter.topics = {odometry_topic, acceleration_topic};
+  reader.set_filter(storage_filter);
 
   rclcpp::Serialization<nav_msgs::msg::Odometry> odometry_serialization;
   rclcpp::Serialization<geometry_msgs::msg::AccelWithCovarianceStamped> accel_serialization;
 
   while (reader.has_next()) {
     const auto bag_message = reader.read_next();
-    const auto time_ns = bag_message->time_stamp - starting_time_ns - replay_start_time_ns;
+    const auto time_ns = bagMessageTimestamp(*bag_message) - starting_time_ns - replay_start_time_ns;
     const rclcpp::SerializedMessage serialized_message(*bag_message->serialized_data);
     if (bag_message->topic_name == odometry_topic) {
       nav_msgs::msg::Odometry odometry;

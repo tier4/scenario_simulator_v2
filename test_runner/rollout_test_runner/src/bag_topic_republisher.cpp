@@ -15,11 +15,34 @@
 #include <algorithm>
 #include <iomanip>
 #include <rollout_test_runner/bag_topic_republisher.hpp>
+#include <type_traits>
 
 namespace rollout_test_runner
 {
 namespace
 {
+/// @note rosbag2_storage::SerializedBagMessage renamed `time_stamp` (Humble) to `recv_timestamp`
+/// (Jazzy and later). Detect the available member at compile time so this file builds on both.
+template <typename T, typename = void>
+struct has_recv_timestamp : std::false_type
+{
+};
+template <typename T>
+struct has_recv_timestamp<T, std::void_t<decltype(std::declval<T>().recv_timestamp)>>
+: std::true_type
+{
+};
+
+template <typename T>
+auto bagMessageTimestamp(const T & message)
+{
+  if constexpr (has_recv_timestamp<T>::value) {
+    return message.recv_timestamp;
+  } else {
+    return message.time_stamp;
+  }
+}
+
 /// Topics supplied by the simulator itself must never be replayed from the bag.
 auto isForbidden(const std::string & topic) -> bool
 {
@@ -95,7 +118,7 @@ auto BagTopicRepublisher::publishUntil(const rclcpp::Time & bag_time) -> std::si
       }
       pending_ = reader_->read_next();
     }
-    if (pending_->time_stamp > bag_time_ns) {
+    if (bagMessageTimestamp(*pending_) > bag_time_ns) {
       return count;
     }
     if (const auto iterator = publishers_.find(pending_->topic_name);

@@ -163,7 +163,6 @@ Replay 中の状態シードは vehicle model の**状態量**に書き込まれ
 | モデル | replay でシードされる量 | 適否 |
 |---|---|---|
 | `DELAY_STEER_ACC` 系 | 位置・ヨー・速度・操舵・加速度 | ◎ |
-| `TAIGA_DYN` / `TAIGA_X` | 上記 + 横速度・ヨーレート | ◎ |
 | `IDEAL_STEER_ACC` 系 | 位置・ヨー・速度 | ○ |
 | `IDEAL_STEER_VEL` | 位置・ヨーのみ（速度は入力） | ×（速度供給が 0 になる） |
 
