@@ -60,6 +60,7 @@
   <test_depend>ament_cmake_pep257</test_depend>
   <test_depend>ament_cmake_xmllint</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>default_vehicle_description</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
