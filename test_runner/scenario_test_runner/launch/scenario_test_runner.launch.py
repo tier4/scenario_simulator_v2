@@ -34,7 +34,7 @@ from launch_ros.actions import Node, LifecycleNode
 from pathlib import Path
 
 from scenario_test_runner.shutdown_once import ShutdownOnce
-from simulation_report_orchestrator import create_orchestrator_action, report_requested
+from simulation_report_orchestrator import create_simulation_report_action, simulation_report_requested
 
 
 def architecture_types():
@@ -125,12 +125,13 @@ def launch_setup(context, *args, **kwargs):
     # CARLA options
     carla_path                                  = LaunchConfiguration("carla_path",                                  default="")
     # fmt: on
-    if report_requested():
+    if simulation_report_requested():
         return [
-            create_orchestrator_action(
+            create_simulation_report_action(
                 context,
                 "planning_v2",
                 output_dir=output_directory.perform(context),
+                title=Path(scenario.perform(context)).stem,
             )
         ]
 
