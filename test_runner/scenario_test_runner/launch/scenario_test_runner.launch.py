@@ -130,9 +130,7 @@ def launch_setup(context, *args, **kwargs):
             create_orchestrator_action(
                 context,
                 "planning_v2",
-                argument_names=set(context.launch_configurations),
                 output_dir=output_directory.perform(context),
-                metadata={"caller": "scenario_test_runner"},
             )
         ]
 
