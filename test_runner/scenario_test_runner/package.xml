@@ -28,7 +28,7 @@
   <depend>rclpy</depend>
   <depend>rosbridge_server</depend>
   <exec_depend>topic_tools</exec_depend>
-  <exec_depend>simulation_report_orchestrator</exec_depend>
+  <exec_depend>simulation_report_runner</exec_depend>
   <depend>tf2_ros</depend>
   <depend>simple_sensor_simulator</depend>
   <depend>std_srvs</depend>
