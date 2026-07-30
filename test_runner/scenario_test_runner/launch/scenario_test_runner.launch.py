@@ -34,7 +34,7 @@ from launch_ros.actions import Node, LifecycleNode
 from pathlib import Path
 
 from scenario_test_runner.shutdown_once import ShutdownOnce
-from simulation_report_runner import create_simulation_report_action, simulation_report_requested
+from simulation_report.bridge import create_simulation_report_action, simulation_report_requested
 
 
 def architecture_types():
