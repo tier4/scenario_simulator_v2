@@ -32,6 +32,9 @@ auto isInIntersection(const lanelet::Id) -> bool;
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
+auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
+  -> std::tuple<double, Point, Point>;
+
 auto laneletAltitude(
   const lanelet::Id & lanelet_id, const geometry_msgs::msg::Pose & pose,
   const double matching_distance) -> std::optional<double>;

@@ -28,6 +28,7 @@
 #include <set>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
+#include <traffic_simulator/utils/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
@@ -35,9 +36,8 @@ class ConventionalTrafficLights : public TrafficLightsBase
 {
 public:
   template <typename NodeTypePointer>
-  explicit ConventionalTrafficLights(
-    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-  : TrafficLightsBase(node_ptr, hdmap_utils),
+  explicit ConventionalTrafficLights(const NodeTypePointer & node_ptr)
+  : TrafficLightsBase(node_ptr),
     backward_compatible_publisher_ptr_(
       std::make_unique<TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>>(
         node_ptr, "/simulation/traffic_lights"))
@@ -63,11 +63,6 @@ private:
 class DetectedTrafficLights
 {
 public:
-  explicit DetectedTrafficLights(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-  : hdmap_utils_(hdmap_utils)
-  {
-  }
-
   auto setState(const lanelet::Id lanelet_id, const std::string & state) -> void
   {
     clearState(lanelet_id);
@@ -76,8 +71,7 @@ public:
 
   auto addState(const lanelet::Id lanelet_id, const std::string & state) -> void
   {
-    auto [iter, inserted] =
-      detected_traffic_lights_.try_emplace(lanelet_id, lanelet_id, *hdmap_utils_);
+    auto [iter, inserted] = detected_traffic_lights_.try_emplace(lanelet_id, lanelet_id);
     iter->second.set(state);
   }
 
@@ -110,18 +104,14 @@ public:
 
 private:
   std::map<lanelet::Id, TrafficLight> detected_traffic_lights_;
-
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
 };
 
 class V2ITrafficLights : public TrafficLightsBase
 {
 public:
   template <typename NodeTypePointer>
-  explicit V2ITrafficLights(
-    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const std::string & architecture_type)
-  : TrafficLightsBase(node_ptr, hdmap_utils),
+  explicit V2ITrafficLights(const NodeTypePointer & node_ptr, const std::string & architecture_type)
+  : TrafficLightsBase(node_ptr),
     publisher_ptr_(makePublisher(
       node_ptr, architecture_type,
       "/perception/traffic_light_recognition/external/traffic_signals")),
@@ -207,12 +197,9 @@ class TrafficLightsChannel
 {
 public:
   template <typename NodeTypePointer, typename... Args>
-  explicit TrafficLightsChannel(
-    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    Args &&... args)
-  : ground_truth_(
-      std::make_shared<GroundTruthType>(node_ptr, hdmap_utils, std::forward<Args>(args)...)),
-    detected_(std::make_shared<DetectedTrafficLights>(hdmap_utils))
+  explicit TrafficLightsChannel(const NodeTypePointer & node_ptr, Args &&... args)
+  : ground_truth_(std::make_shared<GroundTruthType>(node_ptr, std::forward<Args>(args)...)),
+    detected_(std::make_shared<DetectedTrafficLights>())
   {
   }
 
@@ -239,12 +226,8 @@ class TrafficLights
 {
 public:
   template <typename NodeTypePointer>
-  explicit TrafficLights(
-    const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const std::string & architecture_type)
-  : conventional_channel_(node_ptr, hdmap_utils),
-    v2i_channel_(node_ptr, hdmap_utils, architecture_type),
-    hdmap_utils_(hdmap_utils)
+  explicit TrafficLights(const NodeTypePointer & node_ptr, const std::string & architecture_type)
+  : conventional_channel_(node_ptr), v2i_channel_(node_ptr, architecture_type)
   {
     v2i_channel_.getGroundTruth()->setDetectedTrafficLights(v2i_channel_.getDetected());
 
@@ -270,14 +253,12 @@ public:
 
   auto setV2IFeature(const lanelet::Id lanelet_id, const bool enabled) -> void
   {
-    if (hdmap_utils_->isTrafficLightRegulatoryElement(lanelet_id)) {
-      // relation ID -> convert to way IDs
-      const auto regulatory_element = hdmap_utils_->getTrafficLightRegulatoryElement(lanelet_id);
-      for (const auto & ref_member :
-           regulatory_element->getParameters<lanelet::ConstLineString3d>("refers")) {
-        setV2IFeature(ref_member.id(), enabled);
+    if (lanelet_wrapper::traffic_lights::isTrafficLightRegulatoryElement(lanelet_id)) {
+      for (const auto & traffic_light_way_id :
+           traffic_simulator::traffic_lights::wayIds(lanelet_id)) {
+        setV2IFeature(traffic_light_way_id, enabled);
       }
-    } else if (hdmap_utils_->isTrafficLight(lanelet_id)) {
+    } else if (lanelet_wrapper::traffic_lights::isTrafficLight(lanelet_id)) {
       // way ID -> use directly
       if (enabled) {
         v2i_enabled_traffic_lights_.insert(lanelet_id);
@@ -312,8 +293,6 @@ private:
   TrafficLightsChannel<V2ITrafficLights> v2i_channel_;
 
   std::set<lanelet::Id> v2i_enabled_traffic_lights_;
-
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_HPP_

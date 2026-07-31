@@ -26,17 +26,35 @@ namespace lanelet_wrapper
 {
 namespace traffic_lights
 {
-auto trafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
-  -> std::vector<std::vector<Point>>;
+auto isTrafficLight(const lanelet::Id lanelet_id) -> bool;
 
-auto trafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids;
+auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool;
 
-// used only by this namespace
+auto toTrafficLightRegulatoryElement(const lanelet::Id traffic_light_regulatory_element_id)
+  -> lanelet::TrafficLight::Ptr;
+
 auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>;
 
+auto trafficLightIds() -> lanelet::Ids;
+
+auto trafficLightBulbPosition(
+  const lanelet::Id traffic_light_id, const std::string &, const bool allow_infer_position = false)
+  -> std::optional<Point>;
+
+auto trafficLightStopLineIds(const lanelet::Id traffic_light_id) -> lanelet::Ids;
+
+auto trafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
+  -> std::vector<std::vector<Point>>;
+
+auto trafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traffic_light_way_id)
+  -> lanelet::Ids;
+
+// On path
 auto autowareTrafficLightsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>;
+
+auto trafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids;
 }  // namespace traffic_lights
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

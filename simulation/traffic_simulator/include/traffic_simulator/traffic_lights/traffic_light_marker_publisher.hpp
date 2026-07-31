@@ -17,6 +17,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {

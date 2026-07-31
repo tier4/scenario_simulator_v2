@@ -42,7 +42,7 @@ private:
   TestCaseParameters collectTestCaseParameters();
 
   static TestSuiteParameters validateParameters(
-    const TestSuiteParameters & test_parameters, std::shared_ptr<LaneletUtils> hdmap_utils);
+    const TestSuiteParameters & test_parameters, std::shared_ptr<LaneletUtils> lanelet_utils);
 
   void update();
   void start();

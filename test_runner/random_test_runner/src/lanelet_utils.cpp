@@ -26,9 +26,10 @@
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <optional>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
-#include <traffic_simulator/utils/lanelet_map.hpp>
 
 LaneletUtils::LaneletUtils(const std::filesystem::path & filename)
 {
@@ -45,7 +46,7 @@ LaneletUtils::LaneletUtils(const std::filesystem::path & filename)
   vehicle_routing_graph_ptr_ =
     lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_vehicle_ptr, costPtrs);
 
-  traffic_simulator::lanelet_map::activate(filename.string());
+  traffic_simulator::lanelet_wrapper::LaneletWrapper::activate(filename.string());
 }
 
 std::vector<int64_t> LaneletUtils::getLaneletIds() const

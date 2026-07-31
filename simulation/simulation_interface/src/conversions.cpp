@@ -659,4 +659,13 @@ auto toROS2Message(const traffic_simulator_msgs::PolylineTrajectory & proto)
   message.shape = toROS2Message(proto.shape());
   return message;
 }
+
+template <>
+auto to<osi3::Timestamp>(const builtin_interfaces::msg::Time & time) -> osi3::Timestamp
+{
+  auto timestamp = osi3::Timestamp();
+  timestamp.set_seconds(time.sec);
+  timestamp.set_nanos(time.nanosec);
+  return timestamp;
+}
 }  // namespace simulation_interface

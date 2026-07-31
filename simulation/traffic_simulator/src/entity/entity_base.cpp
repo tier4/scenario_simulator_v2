@@ -32,14 +32,11 @@ namespace traffic_simulator
 {
 namespace entity
 {
-EntityBase::EntityBase(
-  const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+EntityBase::EntityBase(const std::string & name, const CanonicalizedEntityStatus & entity_status)
 : name(name),
   verbose(true),
   status_(std::make_shared<CanonicalizedEntityStatus>(entity_status)),
-  status_before_update_(*status_),
-  hdmap_utils_ptr_(hdmap_utils_ptr)
+  status_before_update_(*status_)
 {
   job_list_.append(
     [this](double) {

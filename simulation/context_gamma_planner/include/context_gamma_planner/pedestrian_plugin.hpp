@@ -39,7 +39,7 @@ class PedestrianPlugin : public entity_behavior::BehaviorPluginBase
 public:
   void configure(const rclcpp::Logger & logger) override;
   void update(double current_time, double step_time) override;
-  auto getCurrentAction() -> const std::string & override;
+  auto getCurrentAction() const -> const std::string & override;
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                  \
   TYPE get##NAME() override                                                               \
   {                                                                                       \
@@ -63,7 +63,6 @@ public:
   DEFINE_GETTER_SETTER(DebugMarker,          std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, double)
   DEFINE_GETTER_SETTER(PolylineTrajectory,   std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
-  DEFINE_GETTER_SETTER(HdMapUtils,           std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters, traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(Obstacle,             std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,    entity_behavior::EntityStatusDict)

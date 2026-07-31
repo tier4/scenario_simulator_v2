@@ -88,7 +88,7 @@ jobs:
 
       - name: Download previous install artifact
         if: steps.previous_run.outputs.result != 'null'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           run-id: "${{ steps.previous_run.outputs.result }}"
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
@@ -96,7 +96,7 @@ jobs:
           github-token: ${{ secrets.GH_PAT }}
 
       - name: Download current install artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: install-${{ matrix.runs_on }}-RelWithDebInfo
           run-id: ${{ github.event.workflow_run.id || github.event.inputs.run_id }}
@@ -134,7 +134,7 @@ jobs:
 
       - name: Upload abidiff log
         if: steps.abidiff.outputs.exit_code != '0' && github.event_name == 'workflow_run'
-        uses: mshick/add-pr-comment@v2
+        uses: mshick/add-pr-comment@v3
         with:
           message: |
             The public API of `traffic_simulator::API` has changed. Please check logs.

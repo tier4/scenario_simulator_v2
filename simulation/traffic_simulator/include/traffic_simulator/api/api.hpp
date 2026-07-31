@@ -22,6 +22,7 @@
 #include <std_msgs/msg/float64.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
@@ -77,9 +78,7 @@ public:
       [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
       configuration.auto_sink_entity_types)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
-      node, entity_manager_ptr_->getHdmapUtils(),
-      common::getParameter<std::string>(
-        node_parameters_, "architecture_type", "awf/universe/20240605"))),
+      node, getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
     real_time_factor_subscriber_(rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {
@@ -251,8 +250,6 @@ public:
     const std::string & first_entity_name, const std::string & second_entity_name) const -> bool;
 
   // traffics, lanelet
-  auto getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
-
   auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>;
 
   auto getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>;

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5)
 project(traffic_simulator)
 
+add_compile_options(-Wno-error=class-memaccess -Wno-error=unused-local-typedefs)
+
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
 endif()
@@ -17,7 +19,7 @@ endif()
 # silence Eigen NEON memcpy warning for ARM architecture
 string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" SYS_PROC_LOWER)
 if(SYS_PROC_LOWER STREQUAL "aarch64" OR SYS_PROC_LOWER STREQUAL "arm64")
-    add_compile_options(-Wno-class-memaccess)
+  add_compile_options(-Wno-class-memaccess -Wno-error=overloaded-virtual)
 endif()
 
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
@@ -52,7 +54,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/entity/misc_object_entity.cpp
   src/entity/pedestrian_entity.cpp
   src/entity/vehicle_entity.cpp
-  src/hdmap_utils/hdmap_utils.cpp
   src/helper/helper.cpp
   src/helper/ostream_helpers.cpp
   src/job/job.cpp
@@ -80,6 +81,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/utils/lanelet_map.cpp
   src/utils/pose.cpp
   src/utils/route.cpp
+  src/utils/traffic_lights.cpp
 )
 
 ament_auto_add_library(visualization_component SHARED

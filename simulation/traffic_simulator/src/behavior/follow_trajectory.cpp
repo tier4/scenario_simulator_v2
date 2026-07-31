@@ -686,17 +686,17 @@ auto makeUpdatedStatus(
       const auto is_final = is_target_waypoint_final();
 
       /// @note this_step_distance does not affect final waypoint handling logic, so it's not displayed for final waypoints
-      std::cout << std::fixed << std::setprecision(2)
-                << "[FTA-RESULT] Entity: " << entity_status.name << ", time: " << entity_status.time
-                << "s, step distance: "
-                << (is_final ? "N/A" : std::to_string(this_step_distance) + "m")
-                << " | Waypoint: type: "
-                << (is_final ? "final"
-                             : "intermediate (" + std::to_string(waypoints_left) + " left)")
-                << ", position: [" << target_pos.x << ", " << target_pos.y << ", " << target_pos.z
-                << "] | State: distance: " << distance << "m, remaining time: "
-                << (isfinite(remaining_time) ? std::to_string(remaining_time) + "s" : "N/A")
-                << " | Result: action: " << action << ", reason: " << reason << std::endl;
+      RCLCPP_INFO_STREAM(
+        rclcpp::get_logger("traffic_simulator"),
+        std::setprecision(2)
+          << "[FTA-RESULT] Entity: " << entity_status.name << ", time: " << entity_status.time
+          << "s, step distance: " << (is_final ? "N/A" : std::to_string(this_step_distance) + "m")
+          << " | Waypoint: type: "
+          << (is_final ? "final" : "intermediate (" + std::to_string(waypoints_left) + " left)")
+          << ", position: [" << target_pos.x << ", " << target_pos.y << ", " << target_pos.z
+          << "] | State: distance: " << distance << "m, remaining time: "
+          << (isfinite(remaining_time) ? std::to_string(remaining_time) + "s" : "N/A")
+          << " | Result: action: " << action << ", reason: " << reason);
     }
   };
 
@@ -835,44 +835,35 @@ auto makeUpdatedStatus(
     auto const previous = previous_waypoint().position.position;
     auto const target = target_waypoint().position.position;
 
-    std::cout << "  --------------------   " << std::endl;
-    std::cout << "name: " << entity_status.name << std::endl;
-    std::cout << "time: " << entity_status.time << std::endl;
-    std::cout << "lanelet_pose_valid: " << (entity_status.lanelet_pose_valid ? "true" : "false")
-              << std::endl;
-    std::cout << "position: " << entity_status.pose.position.x << ", "
-              << entity_status.pose.position.y << ", " << entity_status.pose.position.z
-              << std::endl;
-    std::cout << "orientation: " << orientation.x << ", " << orientation.y << ", " << orientation.z
-              << std::endl;
-    std::cout << "speed: " << entity_status.action_status.twist.linear.x << std::endl;
-    std::cout << "acceleration: " << entity_status.action_status.accel.linear.x << std::endl;
-    std::cout << "is_entity_immobile: " << is_entity_immobile() << std::endl;
-    std::cout << "  ---  " << std::endl;
-    std::cout << "target_speed: " << (target_speed ? std::to_string(target_speed.value()) : "N/A")
-              << std::endl;
-    std::cout << "target_time: "
-              << (isfinite(target_waypoint().time) ? std::to_string(target_waypoint().time) : "N/A")
-              << std::endl;
-    std::cout << "previous_waypoint: " << previous.x << ", " << previous.y << ", " << previous.z
-              << std::endl;
-    std::cout << "target_waypoint: " << target.x << ", " << target.y << ", " << target.z
-              << std::endl;
-    std::cout << "is_target_waypoint_final: " << is_target_waypoint_final() << std::endl;
-    std::cout << "distance_to_previous: "
-              << distance_to_waypoint(polyline_trajectory.shape.vertices.begin()) << std::endl;
-    std::cout << "distance_to_target: " << distance_to_target_waypoint() << std::endl;
-    std::cout << "distance_to_timed_or_final: " << distance_to_timed_or_final_waypoint()
-              << std::endl;
-    std::cout << "time_to_target: " << remaining_time_to_target_waypoint() << std::endl;
-    std::cout << "  ---  " << std::endl;
-    std::cout << "trajectory_base_time: "
-              << (isfinite(polyline_trajectory.base_time)
-                    ? std::to_string(polyline_trajectory.base_time)
-                    : "N/A")
-              << std::endl;
-    std::cout << "trajectory_closed: " << (polyline_trajectory.closed ? "true" : "false")
-              << std::endl;
+    // clang-format off
+    RCLCPP_INFO_STREAM(
+      rclcpp::get_logger("traffic_simulator"),
+      "  --------------------   " << std::endl
+        << "name: " << entity_status.name << std::endl
+        << "time: " << entity_status.time << std::endl
+        << "lanelet_pose_valid: " << (entity_status.lanelet_pose_valid ? "true" : "false") << std::endl
+        << "position: " << entity_status.pose.position.x << ", " << entity_status.pose.position.y
+          << ", " << entity_status.pose.position.z << std::endl
+        << "orientation: " << orientation.x << ", " << orientation.y << ", " << orientation.z << std::endl
+        << "speed: " << entity_status.action_status.twist.linear.x << std::endl
+        << "acceleration: " << entity_status.action_status.accel.linear.x << std::endl
+        << "is_entity_immobile: " << is_entity_immobile() << std::endl
+        << "  ---  " << std::endl
+        << "target_speed: " << (target_speed ? std::to_string(target_speed.value()) : "N/A") << std::endl
+        << "target_time: " << (isfinite(target_waypoint().time) ? std::to_string(target_waypoint().time) : "N/A") << std::endl
+        << "previous_waypoint: " << previous.x << ", " << previous.y << ", " << previous.z << std::endl
+        << "target_waypoint: " << target.x << ", " << target.y << ", " << target.z << std::endl
+        << "is_target_waypoint_final: " << is_target_waypoint_final() << std::endl
+        << "distance_to_previous: " << distance_to_waypoint(polyline_trajectory.shape.vertices.begin()) << std::endl
+        << "distance_to_target: " << distance_to_target_waypoint() << std::endl
+        << "distance_to_timed_or_final: " << distance_to_timed_or_final_waypoint() << std::endl
+        << "time_to_target: " << remaining_time_to_target_waypoint() << std::endl
+        << "  ---  " << std::endl
+        << "trajectory_base_time: "
+          << (isfinite(polyline_trajectory.base_time) ? std::to_string(polyline_trajectory.base_time) : "N/A")
+          << std::endl
+        << "trajectory_closed: " << (polyline_trajectory.closed ? "true" : "false"));
+    // clang-format on
   }
 
   if (is_target_waypoint_final()) {

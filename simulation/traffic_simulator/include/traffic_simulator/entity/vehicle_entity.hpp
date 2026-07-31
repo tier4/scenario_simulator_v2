@@ -61,7 +61,6 @@ public:
 
   explicit VehicleEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 

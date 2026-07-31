@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__HDMAP_UTILS__TRAFFIC_RULES_HPP_
-#define TRAFFIC_SIMULATOR__HDMAP_UTILS__TRAFFIC_RULES_HPP_
+#ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER__TRAFFIC_RULES_HPP_
+#define TRAFFIC_SIMULATOR__LANELET_WRAPPER__TRAFFIC_RULES_HPP_
 
 #include <lanelet2_traffic_rules/GermanTrafficRules.h>
 
@@ -75,4 +75,4 @@ protected:
 };
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__HDMAP_UTILS__TRAFFIC_RULES_HPP_
+#endif  // TRAFFIC_SIMULATOR__LANELET_WRAPPER__TRAFFIC_RULES_HPP_

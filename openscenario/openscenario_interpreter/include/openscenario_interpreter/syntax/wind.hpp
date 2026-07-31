@@ -23,14 +23,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Wind 1.2 -----------------------------------------------------------
- *
- * <xsd:complexType name="Wind">
- *   <xsd:attribute name="direction" type="Double" use="required"/>
- *   <xsd:attribute name="speed" type="Double" use="required"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Wind (OpenSCENARIO XML 1.3.1)
+
+   Defines wind properties.
+
+   <xsd:complexType name="Wind">
+     <xsd:attribute name="direction" type="Double" use="required"/>
+     <xsd:attribute name="speed" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct Wind
 {
   const Double direction;  // The target direction of the wind (not the origin direction) in the

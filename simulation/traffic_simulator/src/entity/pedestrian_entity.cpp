@@ -26,10 +26,9 @@ namespace entity
 {
 PedestrianEntity::PedestrianEntity(
   const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
   const std::string & plugin_name)
-: EntityBase(name, entity_status, hdmap_utils_ptr),
+: EntityBase(name, entity_status),
   plugin_name(plugin_name),
   pedestrian_parameters(parameters),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
@@ -40,7 +39,6 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->setPedestrianParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
-  behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
   behavior_plugin_ptr_->setDefaultMatchingDistanceForLaneletPoseCalculation(
     getDefaultMatchingDistanceForLaneletPoseCalculation());
 }

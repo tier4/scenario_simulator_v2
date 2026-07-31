@@ -17,7 +17,8 @@
         "no-duplicate-heading": false,
         "single-title": false,
         "heading-increment": false,
-        "first-line-heading": false
+        "first-line-heading": false,
+        "MD060": false
     },
     "globs": [
         "docs/**/*.md"
