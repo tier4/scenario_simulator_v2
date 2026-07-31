@@ -139,8 +139,7 @@ class ScenarioTestRunner(LifecycleController):
                 future = self.set_parameters_preprocessor_client.call_async(request)
                 rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
                 if future.result() is None:
-                    self.print_debug('/simulation/openscenario_preprocessor/set_parameter: timeout')
-                    exit(1)
+                    raise RuntimeError('/simulation/openscenario_preprocessor/set_parameter: timeout')
 
 
     def spin(self):
@@ -164,30 +163,31 @@ class ScenarioTestRunner(LifecycleController):
         # convert t4v2/xosc to xosc
         xosc_scenarios = convert_scenario_to_xosc(scenario, self.output_directory)
 
-        # post to preprocessor
-        for xosc_scenario in xosc_scenarios:
-            if self.post_scenario_to_preprocessor(xosc_scenario):
-                preprocessed_scenarios = []
-                while self.derivative_remained_on_preprocessor():
-                    future = self.derive_preprocessor_client.call_async(Derive.Request())
-                    rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
+        try:
+            # post all scenarios to preprocessor
+            for xosc_scenario in xosc_scenarios:
+                if not self.post_scenario_to_preprocessor(xosc_scenario):
+                    raise RuntimeError("Failed to load scenario")
 
-                    if future.result() is not None:
-                        result = Scenario(future.result().path,
-                                          future.result().frame_rate)
-                        preprocessed_scenarios.append(result)
-                    else:
-                        self.print_debug(
-                            'Exception while calling service /simulation/openscenario_preprocessor/derive: '
-                            + str(future.exception()))
-                        exit(1)
+            # derive and run preprocessed scenarios
+            preprocessed_scenarios = []
+            while self.derivative_remained_on_preprocessor():
+                future = self.derive_preprocessor_client.call_async(Derive.Request())
+                rclpy.spin_until_future_complete(self, future, timeout_sec=1.0)
 
-                self.run_preprocessed_scenarios(preprocessed_scenarios)
-            else:
-                exit(1)
+                if future.result() is not None:
+                    result = Scenario(future.result().path,
+                                      future.result().frame_rate)
+                    preprocessed_scenarios.append(result)
+                else:
+                    raise RuntimeError(
+                        'Exception while calling service /simulation/openscenario_preprocessor/derive: '
+                        + str(future.exception()))
 
-        self.shutdown()
-        self.destroy_node()
+            self.run_preprocessed_scenarios(preprocessed_scenarios)
+        finally:
+            self.shutdown()
+            self.destroy_node()
 
     def run_preprocessed_scenarios(self, scenarios: List[Scenario]):
         """
@@ -254,7 +254,12 @@ class ScenarioTestRunner(LifecycleController):
         future = self.load_preprocessor_client.call_async(request)
         rclpy.spin_until_future_complete(self, future)
         if future.result() is not None:
-            return True
+            if future.result().has_succeeded:
+                return True
+            else:
+                self.get_logger().error(
+                    'Failed to load scenario: ' + future.result().message)
+                return False
         else:
             self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/load: '
                              + str(future.exception()))
@@ -267,9 +272,9 @@ class ScenarioTestRunner(LifecycleController):
         if future.result() is not None:
             return future.result().derivative_remained
         else:
-            self.print_debug('Exception while calling service /simulation/openscenario_preprocessor/check: '
-                             + str(future.exception()))
-            exit(1)
+            raise RuntimeError(
+                'Exception while calling service /simulation/openscenario_preprocessor/check: '
+                + str(future.exception()))
 
     def print_debug(self, message: str):
         self.get_logger().info(message)
@@ -307,12 +312,16 @@ def main(args=None):
     )
 
     if args.scenario != Path("/dev/null"):
-        test_runner.run_scenario(
-            Scenario(
-                substitute_ros_package(args.scenario).resolve(),
-                args.global_frame_rate,
+        try:
+            test_runner.run_scenario(
+                Scenario(
+                    substitute_ros_package(args.scenario).resolve(),
+                    args.global_frame_rate,
+                )
             )
-        )
+        except Exception as e:
+            test_runner.get_logger().error(str(e))
+            exit(1)
     else:
         print("No scenario is specified. Specify one.")
 
