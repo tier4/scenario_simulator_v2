@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 
 namespace openscenario_interpreter
@@ -71,6 +72,8 @@ auto entityStates() -> std::vector<EntityState>
 }
 
 auto simulationTime() -> double { return Bridge::evaluateSimulationTime(); }
+
+auto lanelet2MapPath() -> std::string { return traffic_simulator::lanelet_map::activatedMapPath(); }
 
 auto setEgoTrajectory(
   const std::string & ego_ref, const rclcpp::Time & stamp,

@@ -280,6 +280,9 @@ public:
   {
     return bridge::conventionalTrafficLightComposedState(lanelet_id);
   }
+
+  // The map the interpreter resolved and loaded. Valid after configure().
+  auto getLanelet2MapPath() const -> std::string { return bridge::lanelet2MapPath(); }
 };
 
 PYBIND11_MODULE(openscenario_python, m)
@@ -309,6 +312,7 @@ PYBIND11_MODULE(openscenario_python, m)
     .def("get_ego_state", &HeadlessRunner::getEgoState, py::arg("ego_ref") = "ego")
     .def("get_entity_states", &HeadlessRunner::getEntityStates)
     .def("get_traffic_light_state", &HeadlessRunner::getTrafficLightState, py::arg("lanelet_id"))
+    .def("lanelet2_map_path", &HeadlessRunner::getLanelet2MapPath)
     .def("close", &HeadlessRunner::close)
     .def("__enter__", [](HeadlessRunner & self) -> HeadlessRunner & { return self; })
     .def("__exit__", [](HeadlessRunner & self, const py::object &, const py::object &,

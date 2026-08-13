@@ -281,6 +281,9 @@ class LaneletWrapper
 public:
   static auto activate(const std::string & lanelet_map_path) -> void;
 
+  // The map path last activated. Empty until a Configuration has resolved one.
+  [[nodiscard]] static auto activatedMapPath() -> std::string;
+
   [[nodiscard]] static auto map() -> lanelet::LaneletMapPtr;
   [[nodiscard]] static auto routingGraph(const RoutingGraphType type)
     -> lanelet::routing::RoutingGraphConstPtr;

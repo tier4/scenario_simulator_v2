@@ -29,6 +29,8 @@ auto LaneletWrapper::activate(const std::string & lanelet_map_path) -> void
   }
 }
 
+auto LaneletWrapper::activatedMapPath() -> std::string { return lanelet_map_path_; }
+
 auto LaneletWrapper::map() -> lanelet::LaneletMapPtr { return getInstance().lanelet_map_ptr_; }
 
 auto LaneletWrapper::routingGraph(const RoutingGraphType type)

@@ -35,6 +35,8 @@ inline auto activate(Ts &&... xs)
   return lanelet_wrapper::LaneletWrapper::activate(std::forward<decltype(xs)>(xs)...);
 }
 
+inline auto activatedMapPath() { return lanelet_wrapper::LaneletWrapper::activatedMapPath(); }
+
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
 auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
