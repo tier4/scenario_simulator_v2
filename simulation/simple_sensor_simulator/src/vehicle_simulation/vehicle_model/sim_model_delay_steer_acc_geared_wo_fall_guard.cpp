@@ -154,6 +154,16 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   // 4. 目標ステアリング角の算出
   const double steer_target = [&]() {
     double cmd = delayed_steer_des * debug_steer_scaling_factor_;
+
+    // 連続不感帯モデル
+    if (cmd > steer_dead_band_) {
+      cmd -= steer_dead_band_;
+    } else if (cmd < -steer_dead_band_) {
+      cmd += steer_dead_band_;
+    } else {
+      cmd = 0.0;
+    }
+
     if (steer_resolution_ > 1e-5) {
       cmd = std::round(cmd / steer_resolution_) * steer_resolution_;
     }
@@ -262,11 +272,6 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   // 3. ステアリング偏差計算
   const double current_steer_motor = (current_steer - steer_bias_) / (1.0 + steer_accuracy_error_);
   const double steer_motor_diff = current_steer_motor - steer_motor_des;
-  const double steer_motor_diff_with_dead_band = [&]() {
-    if (steer_motor_diff > steer_dead_band_) return steer_motor_diff - steer_dead_band_;
-    if (steer_motor_diff < -steer_dead_band_) return steer_motor_diff + steer_dead_band_;
-    return 0.0;
-  }();
 
   // 🌟 4. 「力の綱引き」運動方程式による前後加速度 d_vx の計算
   const double d_vx = [&] {
@@ -296,7 +301,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   d_state(IDX::Y)          = vel * std::sin(yaw);
   d_state(IDX::YAW)        = vel * std::tan(current_steer) / wheelbase_;
   d_state(IDX::VX)         = d_vx;
-  d_state(IDX::STEER)      = std::clamp(-steer_motor_diff_with_dead_band / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_) * (1.0 + steer_accuracy_error_);
+  d_state(IDX::STEER)      = std::clamp(-steer_motor_diff / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_) * (1.0 + steer_accuracy_error_);
   d_state(IDX::ACCX)       = 0.0;
 
   // モータ駆動トルクおよびブレーキ圧の独立1次遅れ系
@@ -325,7 +330,12 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
 
   brake_hysteresis_state_ = initial_brake_cmd;
 
-  const double initial_steer_motor_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
+  double initial_steer_motor_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
+  if (initial_steer_motor_cmd > 0.0) {
+    initial_steer_motor_cmd += steer_dead_band_;
+  } else if (initial_steer_motor_cmd < 0.0) {
+    initial_steer_motor_cmd -= steer_dead_band_;
+  }
   const size_t steer_motor_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
   steer_motor_input_queue_.assign(steer_motor_queue_size, initial_steer_motor_cmd);
 
