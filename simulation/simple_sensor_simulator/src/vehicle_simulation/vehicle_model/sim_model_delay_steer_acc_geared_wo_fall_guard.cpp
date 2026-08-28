@@ -155,12 +155,8 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   const double steer_target = [&]() {
     double cmd = delayed_steer_des * debug_steer_scaling_factor_;
 
-    // 連続不感帯モデル
-    if (cmd > steer_dead_band_) {
-      cmd -= steer_dead_band_;
-    } else if (cmd < -steer_dead_band_) {
-      cmd += steer_dead_band_;
-    } else {
+    // 車両ECUのソフトウェア不感帯（スレッショルド型ニュートラルカット）
+    if (std::abs(cmd) < steer_dead_band_) {
       cmd = 0.0;
     }
 
@@ -331,10 +327,10 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
   brake_hysteresis_state_ = initial_brake_cmd;
 
   double initial_steer_motor_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
-  if (initial_steer_motor_cmd > 0.0) {
-    initial_steer_motor_cmd += steer_dead_band_;
-  } else if (initial_steer_motor_cmd < 0.0) {
-    initial_steer_motor_cmd -= steer_dead_band_;
+
+  // 初期化キューのスレッショルド型不感帯処理
+  if (std::abs(initial_steer_motor_cmd) < steer_dead_band_) {
+    initial_steer_motor_cmd = 0.0;
   }
   const size_t steer_motor_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
   steer_motor_input_queue_.assign(steer_motor_queue_size, initial_steer_motor_cmd);
