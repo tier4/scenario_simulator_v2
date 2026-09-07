@@ -16,6 +16,10 @@
 #define CONCEALER__AUTOWARE_USER_HPP_
 
 #include <sys/wait.h>
+#include <thread>
+#include <chrono>
+#include <cstdlib>
+#include <string>
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
@@ -164,6 +168,8 @@ struct FieldOperatorApplication : public rclcpp::Node
   auto engaged() const -> bool;
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void;
+
+  auto ResetDiagGraph() -> void;
 
   [[deprecated(
     "This function was deprecated since version 16.5.0 (released on 20250603). It will be deleted "

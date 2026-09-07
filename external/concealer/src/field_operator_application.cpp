@@ -363,10 +363,21 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             30);
           waitForAutowareStateToBe(
             LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
+          ResetDiagGraph();
           break;
       }
     });
   }
+}
+
+void FieldOperatorApplication::ResetDiagGraph()
+{
+    std::thread([logger = get_logger()]() {
+        RCLCPP_INFO(logger, "waiting 20 sec for diagnostic_graph/reset");
+        std::this_thread::sleep_for(std::chrono::seconds(20));
+        const std::string command = "ros2 service call /diagnostics_graph/reset tier4_system_msgs/srv/ResetDiagGraph '{}'";
+        std::system(command.c_str());
+    }).detach();
 }
 
 auto FieldOperatorApplication::plan(
