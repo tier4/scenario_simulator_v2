@@ -1,6 +1,6 @@
 # scenario_simulator_v2
 
-Scenario testing framework for Autoware.
+The second version of scenario testing framework for Autoware.
 
 [![BuildAndRun](https://github.com/tier4/scenario_simulator_v2/actions/workflows/BuildAndRun.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/BuildAndRun.yaml)
 [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml)
