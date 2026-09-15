@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include <agnocast_wrapper/agnocast_wrapper.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <set>
@@ -62,6 +63,51 @@ protected:
   }
 
   ~LidarSensorTest() = default;
+
+  /*
+     LidarSensor names its parameters after the *resolved* topic name of its publisher, so a fixture
+     must do the same: "lidar_output" resolves to "/lidar_output", and declaring parameters under
+     the unresolved name would leave the sensor on its default while looking configured.
+  */
+  auto declareParameter(const std::string & suffix, const rclcpp::ParameterValue & value) const
+    -> void
+  {
+    const auto name = std::string(publisher_->get_topic_name()) + suffix;
+    if (auto & parameter_node = common::getParameterNode();
+        not parameter_node.has_parameter(name)) {
+      parameter_node.declare_parameter(name, value);
+    }
+  }
+
+  /// @brief Declare a `<config_name>` of the v1 LiDAR noise model with the given keep rate.
+  auto declareNoiseModelV1Config(
+    const std::string & config_name, const std::vector<std::string> & names,
+    const double true_positive_rate) -> void
+  {
+    const auto base_path = ".noise.v1." + config_name + ".";
+    declareParameter(
+      base_path + "noise_application_entities.types",
+      rclcpp::ParameterValue(std::vector<std::string>{"*"}));
+    declareParameter(
+      base_path + "noise_application_entities.subtypes",
+      rclcpp::ParameterValue(std::vector<std::string>{"*"}));
+    declareParameter(base_path + "noise_application_entities.names", rclcpp::ParameterValue(names));
+    declareParameter(
+      base_path + "ellipse_y_radii", rclcpp::ParameterValue(std::vector<double>{1000.0}));
+    for (const auto & direction : {"radial", "tangential"}) {
+      declareParameter(
+        base_path + "distance." + direction + ".mean.values",
+        rclcpp::ParameterValue(std::vector<double>{0.0}));
+      declareParameter(
+        base_path + "distance." + direction + ".standard_deviation.values",
+        rclcpp::ParameterValue(std::vector<double>{0.0}));
+    }
+    declareParameter(
+      base_path + "true_positive.rate.ellipse_normalized_x_radius", rclcpp::ParameterValue(1.0));
+    declareParameter(
+      base_path + "true_positive.rate.values",
+      rclcpp::ParameterValue(std::vector<double>{true_positive_rate}));
+  }
 
   rclcpp::Node::SharedPtr node_;
   rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
@@ -119,5 +165,32 @@ class SegmentedLidarSensorTest : public LidarSensorTest
 {
 protected:
   SegmentedLidarSensorTest() : LidarSensorTest("lidar_output_segmented", "awf/universe/20260801") {}
+};
+
+/// @brief A LiDAR sensor publishing `PointXYZCPE`, where the noise model drops one entity entirely.
+class NoisySegmentedLidarSensorTest : public LidarSensorTest
+{
+protected:
+  NoisySegmentedLidarSensorTest()
+  : LidarSensorTest("lidar_output_segmented_noisy", "awf/universe/20260801")
+  {
+    declareParameter(".noise.model.version", rclcpp::ParameterValue(1));
+    declareParameter(".seed", rclcpp::ParameterValue(1));
+    /*
+       `findMatchingNoiseConfigForEntity` returns the first matching configuration in the order the
+       parameter names are enumerated, which is sorted. The prefixes below make that order explicit.
+    */
+    declareNoiseModelV1Config("a_lose_other1", {"other1"}, 0.0);
+    declareNoiseModelV1Config("b_keep_all", {"*"}, 1.0);
+    /*
+       Points come out in ray angle order, so the entity whose points are dropped has to precede the
+       misc object for a stale index to shift another entity's points onto it.
+    */
+    status_[1] = utils::makeEntity(
+      "other1", EntityType::VEHICLE, utils::makePose(0.0, 9.0, 0.0, 0.0, 0.0, 0.0, 1.0),
+      utils::makeDimensions(4.5, 2.0, 1.5));
+    // The base constructor built one before these parameters existed.
+    lidar_ = std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(0.0, config_, publisher_);
+  }
 };
 #endif  // SIMPLE_SENSOR_SIMULATOR__TEST__TEST_LIDAR_SENSOR_HPP_

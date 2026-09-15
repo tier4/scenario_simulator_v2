@@ -146,3 +146,35 @@ TEST(SegmentedPointCloud, classificationOf)
     PointCloudClassification::STRUCTURE)
     << "a misc object is the only way a scenario can place static world geometry";
 }
+
+/**
+ * @note Test that removing points in the noise model does not shift the point-to-entity mapping.
+ * The noise model of this fixture drops every point of `other1` and keeps the rest, so the cloud is
+ * shorter than the raycast produced. If `point_to_entity_index` were not shrunk alongside it, the
+ * surviving points would be attributed to the wrong entity.
+ */
+TEST_F(NoisySegmentedLidarSensorTest, pointRemovalKeepsTheEntityMappingInSync)
+{
+  lidar_->update(current_simulation_time_, status_, current_ros_time_);
+  executor_->spin_some();
+
+  ASSERT_TRUE(received_msg_);
+  ASSERT_EQ(received_msg_->point_step, sizeof(PointXYZCPE));
+
+  pcl::PointCloud<PointXYZCPE> cloud;
+  pcl::fromROSMsg(*received_msg_, cloud);
+  ASSERT_FALSE(cloud.empty()) << "the misc object of the fixture should have put points here";
+
+  /*
+     Checking the classification is not enough: a point handed the wrong entity is dropped rather
+     than published with another class, because every other entity of the fixture is object
+     compatible. What a stale index does show is a point of another entity carrying the misc
+     object's classification, so this checks where the points are. The misc object sits 5 m to the
+     left of the ego and is 4.5 m by 2.0 m.
+  */
+  for (const auto & point : cloud) {
+    EXPECT_EQ(point.class_id, static_cast<std::uint8_t>(PointCloudClassification::STRUCTURE));
+    EXPECT_NEAR(point.x, -5.0, 2.5) << "(" << point.x << ", " << point.y << ")";
+    EXPECT_NEAR(point.y, 0.0, 1.5) << "(" << point.x << ", " << point.y << ")";
+  }
+}
