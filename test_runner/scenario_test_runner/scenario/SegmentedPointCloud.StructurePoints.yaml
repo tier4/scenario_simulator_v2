@@ -1,0 +1,169 @@
+# Put STRUCTURE points on /perception/obstacle_segmentation/pointcloud.
+#
+# A misc object is the only entity whose points reach that topic; everything else is object
+# compatible and goes to the detected objects instead. No taller than 5 m, which is where the real
+# topic is cut off.
+#
+# Asserted by test/test_segmented_point_cloud.py. Needs architecture_type:=awf/universe/20260801,
+# which selects the PointXYZCPE layout.
+OpenSCENARIO:
+  FileHeader:
+    author: 'Kotaro Yoshimoto'
+    date: '2026-09-14T16:00:00+09:00'
+    description: 'Misc objects are reported as STRUCTURE on the segmented point cloud topic'
+    revMajor: 1
+    revMinor: 0
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: 'Autoware'
+            Properties:
+              Property:
+                - name: maxJerk
+                  value: "1.5"
+                - name: minJerk
+                  value: "-1.5"
+                # A denser sweep than the default, so that the boxes below receive enough rays.
+                - name: pointcloudChannels
+                  value: '32'
+                - name: pointcloudHorizontalResolution
+                  value: '0.5'
+      # `obstacle` is the only miscObjectCategory the interpreter accepts; every other value of the
+      # enumeration is rejected while the scenario is being read. The category does not matter here
+      # anyway, because every misc object is reported as STRUCTURE regardless of it.
+      - name: structure-1
+        MiscObject: &STRUCTURE_BOX
+          mass: 1.0
+          miscObjectCategory: obstacle
+          name: ''
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              width: 4
+              length: 12
+              height: 4
+          Properties:
+            Property: []
+      - name: structure-2
+        MiscObject: *STRUCTURE_BOX
+      - name: structure-3
+        MiscObject: *STRUCTURE_BOX
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 10
+                      offset: 0
+                      Orientation: &ORIENTATION_ZERO
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '34507'
+                        s: 50
+                        offset: 0
+                        Orientation: *ORIENTATION_ZERO
+          # Offset well clear of the lane so the boxes read as roadside structures rather than as
+          # obstacles the ego has to avoid.
+          - entityRef: structure-1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 25
+                      offset: 6
+                      Orientation: *ORIENTATION_ZERO
+          - entityRef: structure-2
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 25
+                      offset: -6
+                      Orientation: *ORIENTATION_ZERO
+          - entityRef: structure-3
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34507'
+                      s: 25
+                      offset: 6
+                      Orientation: *ORIENTATION_ZERO
+    Story:
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 10
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

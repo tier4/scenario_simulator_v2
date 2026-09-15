@@ -26,6 +26,7 @@ install(
 if(BUILD_TESTING)
   find_package(replay_testing REQUIRED)
   add_replay_test(test/test_traffic_signals.py)
+  add_replay_test(test/test_segmented_point_cloud.py)
 endif()
 
 ament_package()
