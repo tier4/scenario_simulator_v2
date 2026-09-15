@@ -42,7 +42,7 @@ class RandomTestRunnerLaunch(object):
             # autoware arguments #
             "architecture_type": {
                 "default": "awf/universe/20230906", "description": "Autoware architecture type",
-                "values": ["awf/universe/20230906", "awf/universe/20240605"]},
+                "values": ["awf/universe/20230906", "awf/universe/20240605", "awf/universe/20250130"]},
             "sensor_model": {"default": "sample_sensor_kit", "description": "Ego sensor model"},
             "vehicle_model": {"default": "sample_vehicle", "description": "Ego vehicle model"},
             "autoware_launch_file": {"default": "planning_simulator.launch.xml", "description": "Launch file name for Autoware running"},
