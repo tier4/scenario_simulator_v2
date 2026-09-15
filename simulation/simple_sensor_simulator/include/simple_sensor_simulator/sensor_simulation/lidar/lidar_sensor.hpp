@@ -26,6 +26,7 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_model_v1.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/segmented_point_cloud.hpp>
 #include <string>
 #include <vector>
 
@@ -61,11 +62,29 @@ public:
 template <typename T>
 class LidarSensor : public LidarSensorBase
 {
+  /// @brief The layout of the published point cloud. See the SimpleSensorSimulator documentation.
+  enum class PointType { PointXYZI, PointXYZCPE };
+
   const agnocast_wrapper::PublisherPtr<T> publisher_ptr_;
 
   std::queue<std::pair<sensor_msgs::msg::PointCloud2, double>> queue_pointcloud_;
 
   std::unique_ptr<LidarNoiseModelV1> noise_model_v1_ = nullptr;
+
+  PointType point_type_ = PointType::PointXYZI;
+
+  /**
+   * The same topic carries a different type depending on the Autoware under test, which is what
+   * `TrafficLightsDetector` does with `architecture_type` too.
+   */
+  static auto pointTypeOf(const std::string & architecture_type) -> PointType
+  {
+    if (architecture_type >= "awf/universe/20260801") {
+      return PointType::PointXYZCPE;
+    } else {
+      return PointType::PointXYZI;
+    }
+  }
 
   auto raycast(const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
     -> T;
@@ -95,6 +114,8 @@ public:
     } else {
       // If parameter doesn't exist, no noise model is used
     }
+
+    point_type_ = pointTypeOf(configuration.architecture_type());
   }
 
   auto update(

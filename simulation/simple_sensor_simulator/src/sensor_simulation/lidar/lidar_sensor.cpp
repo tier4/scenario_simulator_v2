@@ -50,7 +50,11 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     }
 
     sensor_msgs::msg::PointCloud2 pointcloud_msg;
-    pcl::toROSMsg(*(result.cloud), pointcloud_msg);
+    if (point_type_ == PointType::PointXYZCPE) {
+      pcl::toROSMsg(toSegmentedPointCloud(result), pointcloud_msg);
+    } else {
+      pcl::toROSMsg(*(result.cloud), pointcloud_msg);
+    }
     pointcloud_msg.header.frame_id = "base_link";
     pointcloud_msg.header.stamp = current_ros_time;
     return pointcloud_msg;

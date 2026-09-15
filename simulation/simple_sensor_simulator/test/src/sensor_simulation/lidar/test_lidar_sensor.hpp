@@ -32,18 +32,30 @@ using namespace simple_sensor_simulator;
 class LidarSensorTest : public ::testing::Test
 {
 protected:
-  static void SetUpTestSuite() { rclcpp::init(0, nullptr); }
+  /*
+     There are two fixtures below, so gtest calls these twice. The context is never shut down:
+     shutting it down while the static node of `common::getParameterNode()` still exists terminates
+     the process during static destruction.
+  */
+  static void SetUpTestSuite()
+  {
+    if (not rclcpp::ok()) {
+      rclcpp::init(0, nullptr);
+    }
+  }
 
-  static void TearDownTestSuite() { rclcpp::shutdown(); }
+  static void TearDownTestSuite() {}
 
-  LidarSensorTest()
-  : config_(utils::constructLidarConfiguration("ego", "awf/universe/20240605", 0.0, 0.5))
+  explicit LidarSensorTest(
+    const std::string & topic_name = "lidar_output",
+    const std::string & architecture_type = "awf/universe/20240605")
+  : config_(utils::constructLidarConfiguration("ego", architecture_type, 0.0, 0.5))
   {
     // Note: Executor must be created after rclcpp::init. If created before, it causes context is null error.
     executor_ = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
-    node_ = std::make_shared<rclcpp::Node>("lidar_sensor_test_node");
+    node_ = std::make_shared<rclcpp::Node>("lidar_sensor_test_node_" + topic_name);
     executor_->add_node(node_);
-    makeRosInterface();
+    makeRosInterface(topic_name);
     initializeEntityStatuses();
 
     lidar_ = std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(0.0, config_, publisher_);
@@ -79,18 +91,33 @@ private:
       "other2", EntityType::VEHICLE, utils::makePose(5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0),
       dimensions);
 
-    status_ = {ego_status, other1_status, other2_status};
+    /*
+       A misc object is the only entity whose classification is not object compatible, so it is the
+       only one whose points reach the segmented topic.
+    */
+    const auto other3_status = utils::makeEntity(
+      "other3", EntityType::MISC_OBJECT, utils::makePose(0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0),
+      dimensions);
+
+    status_ = {ego_status, other1_status, other2_status, other3_status};
   }
 
-  auto makeRosInterface() -> void
+  auto makeRosInterface(const std::string & topic_name) -> void
   {
     publisher_ =
-      agnocast_wrapper::create_publisher<sensor_msgs::msg::PointCloud2>(node_, "lidar_output", 10);
+      agnocast_wrapper::create_publisher<sensor_msgs::msg::PointCloud2>(node_, topic_name, 10);
     subscription_ = agnocast_wrapper::create_subscription<sensor_msgs::msg::PointCloud2>(
-      node_, "lidar_output", 10,
+      node_, topic_name, 10,
       [this](const agnocast_wrapper::MessagePtr<sensor_msgs::msg::PointCloud2> msg) {
         received_msg_ = msg;
       });
   }
+};
+
+/// @brief A LiDAR sensor publishing `PointXYZCPE`, whose classes come from the entities.
+class SegmentedLidarSensorTest : public LidarSensorTest
+{
+protected:
+  SegmentedLidarSensorTest() : LidarSensorTest("lidar_output_segmented", "awf/universe/20260801") {}
 };
 #endif  // SIMPLE_SENSOR_SIMULATOR__TEST__TEST_LIDAR_SENSOR_HPP_

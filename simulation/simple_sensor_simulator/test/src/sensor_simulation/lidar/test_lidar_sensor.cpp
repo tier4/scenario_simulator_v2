@@ -14,6 +14,11 @@
 
 #include "test_lidar_sensor.hpp"
 
+#include <pcl_conversions/pcl_conversions.h>
+
+#include <cstdint>
+#include <simple_sensor_simulator/sensor_simulation/lidar/object_compatibility.hpp>
+
 /**
  * @note Test function behavior when called on a scene without Ego entity added - the goal is to
  * test error throwing.
@@ -40,6 +45,8 @@ TEST_F(LidarSensorTest, update_correct)
   const auto total_num_of_points = received_msg_->width * received_msg_->height;
   EXPECT_GT(total_num_of_points, 0);
   EXPECT_EQ(received_msg_->header.frame_id, "base_link");
+  // An architecture_type older than PointXYZCPE must keep the layout existing scenarios see.
+  EXPECT_EQ(received_msg_->point_step, sizeof(pcl::PointXYZI));
 }
 
 /**
@@ -67,7 +74,8 @@ TEST_F(LidarSensorTest, update_goBackInTime)
  */
 TEST_F(LidarSensorTest, getDetectedObjects)
 {
-  const std::set<std::string> expected_objects = {status_[1].name(), status_[2].name()};
+  const std::set<std::string> expected_objects = {
+    status_[1].name(), status_[2].name(), status_[3].name()};
 
   lidar_->update(current_simulation_time_, status_, current_ros_time_);
 
@@ -81,4 +89,60 @@ TEST_F(LidarSensorTest, getDetectedObjects)
 
   ASSERT_FALSE(unique_objects.empty());
   EXPECT_EQ(unique_objects, expected_objects);
+}
+
+/**
+ * @note Test the cloud published as PointXYZCPE. Downstream rejects a cloud whose fields or
+ * point_step differ, and every point here comes from the misc object, whose classification is
+ * STRUCTURE with the maximal confidence of an exact, simulated classification.
+ */
+TEST_F(SegmentedLidarSensorTest, segmentedPointCloud)
+{
+  lidar_->update(current_simulation_time_, status_, current_ros_time_);
+  executor_->spin_some();
+
+  ASSERT_TRUE(received_msg_);
+  ASSERT_EQ(received_msg_->point_step, sizeof(PointXYZCPE));
+  ASSERT_EQ(received_msg_->point_step, 24u);
+
+  std::vector<std::string> field_names;
+  for (const auto & field : received_msg_->fields) {
+    field_names.push_back(field.name);
+  }
+  EXPECT_EQ(
+    field_names, (std::vector<std::string>{"x", "y", "z", "class_id", "probability", "entropy"}));
+
+  pcl::PointCloud<PointXYZCPE> cloud;
+  pcl::fromROSMsg(*received_msg_, cloud);
+  ASSERT_FALSE(cloud.empty()) << "the misc object of the fixture should have put points here";
+
+  for (const auto & point : cloud) {
+    EXPECT_EQ(point.class_id, static_cast<std::uint8_t>(PointCloudClassification::STRUCTURE));
+    EXPECT_FLOAT_EQ(point.probability, 1.0f);
+    EXPECT_FLOAT_EQ(point.entropy, 0.0f);
+  }
+}
+
+/**
+ * @note Test the mappings the published cloud cannot show. Only the misc object branch reaches the
+ * wire, because every other classification is object compatible and those points are dropped.
+ */
+TEST(SegmentedPointCloud, classificationOf)
+{
+  const auto pose = utils::makePose(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+  const auto dimensions = utils::makeDimensions(4.5, 2.0, 1.5);
+
+  EXPECT_EQ(
+    classificationOf(
+      utils::makeEntity("entity", EntityType::VEHICLE, EntitySubtype::TRAILER, pose, dimensions)),
+    PointCloudClassification::TRUCK)
+    << "PointCloudClassification has no TRAILER, and upstream try_into_pointcloud maps it to TRUCK";
+  EXPECT_EQ(
+    classificationOf(utils::makeEntity("entity", EntityType::VEHICLE, pose, dimensions)),
+    PointCloudClassification::CAR)
+    << "an entity without a subtype falls back to its type";
+  EXPECT_EQ(
+    classificationOf(utils::makeEntity("entity", EntityType::MISC_OBJECT, pose, dimensions)),
+    PointCloudClassification::STRUCTURE)
+    << "a misc object is the only way a scenario can place static world geometry";
 }

@@ -659,6 +659,9 @@ false, the value of `detectedObjectGroundTruthPublishingDelay` in
 
 ## /perception/obstacle_segmentation/pointcloud
 
+> The layout of this point cloud is not a parameter: it follows from the launch argument
+> `architecture_type`. See [Point Cloud Layout](SimpleSensorSimulator.md#point-cloud-layout).
+
 ### `version`
 
 An `int` type value in YYYYMMDD format, mandatory.
