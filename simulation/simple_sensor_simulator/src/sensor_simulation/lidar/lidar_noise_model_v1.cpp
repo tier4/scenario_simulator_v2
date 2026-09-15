@@ -100,16 +100,26 @@ std::optional<std::reference_wrapper<LidarNoiseModelV1::Config>> LidarNoiseModel
 }
 
 void LidarNoiseModelV1::removeMarkedPoints(
-  pcl::PointCloud<pcl::PointXYZI>::Ptr & cloud, const std::vector<bool> & points_to_remove)
+  Raycaster::RaycastResult & result, const std::vector<bool> & points_to_remove)
 {
-  size_t index = 0;
-  auto new_end = std::remove_if(cloud->points.begin(), cloud->points.end(), [&](const auto &) {
-    return points_to_remove[index++];
-  });
+  auto & cloud = result.cloud;
+  auto & point_to_entity_index = result.point_to_entity_index;
 
-  cloud->points.erase(new_end, cloud->points.end());
+  size_t index = 0;
+  auto new_points_end = std::remove_if(
+    cloud->points.begin(), cloud->points.end(),
+    [&](const auto &) { return points_to_remove[index++]; });
+
+  cloud->points.erase(new_points_end, cloud->points.end());
   cloud->width = cloud->points.size();
   cloud->height = 1;
+
+  index = 0;
+  auto new_indices_end = std::remove_if(
+    point_to_entity_index.begin(), point_to_entity_index.end(),
+    [&](const auto &) { return points_to_remove[index++]; });
+
+  point_to_entity_index.erase(new_indices_end, point_to_entity_index.end());
 }
 
 void LidarNoiseModelV1::applyNoise(
@@ -172,6 +182,6 @@ void LidarNoiseModelV1::applyNoise(
     }
   }
 
-  removeMarkedPoints(cloud, points_to_remove);
+  removeMarkedPoints(result, points_to_remove);
 }
 }  // namespace simple_sensor_simulator

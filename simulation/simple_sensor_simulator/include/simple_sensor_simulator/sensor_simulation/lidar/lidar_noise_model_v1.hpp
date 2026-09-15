@@ -71,8 +71,14 @@ private:
   std::optional<std::reference_wrapper<Config>> getConfigFor(
     const std::string & entity_name, const traffic_simulator_msgs::EntityStatus & entity_status);
 
+  /*
+     Removes the marked points from both `result.cloud` and `result.point_to_entity_index`, so that
+     the two stay the same length. Consumers that resolve the entity a point originates from (for
+     example the semantic segmentation model) run after the noise application, and would otherwise
+     read a stale index.
+  */
   static void removeMarkedPoints(
-    pcl::PointCloud<pcl::PointXYZI>::Ptr & cloud, const std::vector<bool> & points_to_remove);
+    Raycaster::RaycastResult & result, const std::vector<bool> & points_to_remove);
 };
 
 }  // namespace simple_sensor_simulator
