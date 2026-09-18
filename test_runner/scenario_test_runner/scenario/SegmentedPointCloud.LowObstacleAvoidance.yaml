@@ -1,0 +1,227 @@
+# Drive past a low obstacle that is visible only as STRUCTURE points.
+#
+# `sample.yaml` with one misc object added on the lane the three routes share. A misc object is the
+# only entity whose points reach /perception/obstacle_segmentation/pointcloud, and
+# detectedObjectMissingProbability drops the detected objects, so the point cloud is the only place
+# the obstacle appears. Needs architecture_type:=awf/universe/20260801, which selects PointXYZCPE.
+#
+# Geometry, from the map and the vehicle catalog. Lanelet 34507 is 59.2 m long and 2.89 m wide, and
+# sample_vehicle is 1.83 m wide. The obstacle is 1.0 m wide at offset 1.25, so its inner edge is
+# 0.75 m from the lane centre while the ego centred on the lane reaches 0.915 m: driving straight
+# collides. Moving 0.47 m to the right clears it by 0.3 m and still leaves the ego inside the lane,
+# whose edge is at 1.445 m.
+#
+# The sensor is denser than the default because the obstacle is small and low. The rays leave
+# base_link at ground level, so only the upward half of the vertical fan can hit anything; 10
+# degrees over 64 channels puts a row every 0.055 m at 20 m, and 0.2 degrees horizontally puts a
+# column every 0.07 m there. The default 30 degrees over 16 channels would land two rows on it.
+ScenarioModifiers:
+  ScenarioModifier:
+    - name: LANE_ID
+      list: [34513, 34510, 34564]
+OpenSCENARIO:
+  FileHeader:
+    author: 'Kotaro Yoshimoto'
+    date: '2026-09-18T10:00:00+09:00'
+    description: 'The ego drives past a low obstacle reported only on the segmented point cloud'
+    revMajor: 1
+    revMinor: 0
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: 'Autoware'
+            Properties:
+              Property:
+                - name: maxJerk
+                  value: "1.5"
+                - name: minJerk
+                  value: "-1.5"
+                - name: pointcloudChannels
+                  value: '64'
+                - name: pointcloudHorizontalResolution
+                  value: '0.2'
+                - name: pointcloudVerticalFieldOfView
+                  value: '10'
+                # Drop every detected object, so that whatever the ego does about the obstacle it
+                # did from the point cloud. Remove this property to get the on-road case instead,
+                # where the same misc object arrives on both channels.
+                - name: detectedObjectMissingProbability
+                  value: '1.0'
+      # `obstacle` is the only miscObjectCategory the interpreter accepts. It does not matter here
+      # anyway, because every misc object is reported as STRUCTURE regardless of it.
+      - name: obstacle
+        MiscObject:
+          mass: 1.0
+          miscObjectCategory: obstacle
+          name: ''
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0.4
+            Dimensions:
+              width: 1.0
+              length: 0.8
+              height: 0.8
+          Properties:
+            Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: LANE_ID
+                      s: 1
+                      offset: 0
+                      Orientation: &ORIENTATION_ZERO
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition: &GOAL
+                        roadId: ''
+                        laneId: '34507'
+                        s: 50
+                        offset: 0
+                        Orientation: *ORIENTATION_ZERO
+          # On the goal lane, which every route reaches, and well before the goal at s 50.
+          - entityRef: obstacle
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34507'
+                      s: 25
+                      offset: 1.25
+                      Orientation: *ORIENTATION_ZERO
+    Story:
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: 'reached the goal'
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition: *GOAL
+                                        tolerance: 0.5
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: RelativeHeadingCondition(ego, 34507, 50)
+                                      rule: lessThan
+                                      value: 0.1
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: ego.currentMinimumRiskManeuverState.state
+                                      rule: equalTo
+                                      value: NORMAL
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      # The ego did not move over, which is what happens when the obstacle does not
+                      # reach it at all.
+                      - name: 'hit the obstacle'
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: obstacle
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                      # The ego stopped in front of the obstacle instead of going around it, or
+                      # never got there.
+                      - name: 'ran out of time'
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 180
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
