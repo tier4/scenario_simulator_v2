@@ -227,16 +227,13 @@ auto laneChangeTrajectory(
   -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>
 {
   std::vector<double> candidates_evaluation;
-  std::vector<double> candidates_s;
+  std::vector<CanonicalizedLaneletPose> candidates_lanelet_pose;
   std::vector<Curve> candidates_curves;
 
   const auto lanelet_length = lanelet_map::laneletLength(lane_change_parameter.target.lanelet_id);
 
-  auto to_lanelet_pose =
-    helper::constructLaneletPose(lane_change_parameter.target.lanelet_id, 0.0, 0.0);
-
   for (double to_lanelet_pose_s = 0; to_lanelet_pose_s < lanelet_length; to_lanelet_pose_s += 1.0) {
-    to_lanelet_pose =
+    const auto to_lanelet_pose =
       helper::constructLaneletPose(lane_change_parameter.target.lanelet_id, to_lanelet_pose_s, 0.0);
     // skip those poses that are too close
     if (const auto to_pose = pose::toMapPose(to_lanelet_pose).pose;
@@ -252,7 +249,7 @@ auto laneChangeTrajectory(
         candidates_evaluation.push_back(
           std::fabs(target_trajectory_length - lane_change_trajectory.getLength()));
         candidates_curves.push_back(lane_change_trajectory);
-        candidates_s.push_back(to_lanelet_pose_s);
+        candidates_lanelet_pose.push_back(to_lanelet_pose);
       }
     }
   }
@@ -263,7 +260,7 @@ auto laneChangeTrajectory(
     const auto min_iterator =
       std::min_element(candidates_evaluation.begin(), candidates_evaluation.end());
     const auto min_index = std::distance(candidates_evaluation.begin(), min_iterator);
-    return std::make_pair(candidates_curves[min_index], CanonicalizedLaneletPose(to_lanelet_pose));
+    return std::make_pair(candidates_curves[min_index], candidates_lanelet_pose[min_index]);
   }
 }
 }  // namespace v2
