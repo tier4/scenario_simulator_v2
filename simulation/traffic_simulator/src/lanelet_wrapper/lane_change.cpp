@@ -21,6 +21,7 @@
 #include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -182,18 +183,22 @@ auto laneChangeTrajectory(
       ? lane_change_parameter.constraint.value
       : Parameter::default_lanechange_distance;
 
-  const auto to_lanelet_pose = helper::constructCanonicalizedLaneletPose(
-    lane_change_parameter.target.lanelet_id,
-    from_lanelet_pose.s + longitudinal_distance,  // FIXME: DIRTY HACK!!!
-    lane_change_parameter.target.offset);
-
-  const auto from_pose = pose::toMapPose(from_lanelet_pose).pose;
-  const auto to_pose = pose::toMapPose(to_lanelet_pose.getLaneletPose()).pose;
-  const auto euclidean_distance = math::geometry::hypot(from_pose.position, to_pose.position);
-  const auto lane_change_trajectory = lane_change::laneChangeTrajectory(
-    from_pose, to_lanelet_pose.getLaneletPose(), lane_change_parameter.trajectory_shape,
-    euclidean_distance * 0.5);
-  return std::make_pair(lane_change_trajectory, to_lanelet_pose);
+  if (
+    const auto to_lanelet_pose =
+      traffic_simulator::pose::toCanonicalizedLaneletPose(helper::constructLaneletPose(
+        lane_change_parameter.target.lanelet_id,
+        from_lanelet_pose.s + longitudinal_distance,  // FIXME: DIRTY HACK!!!
+        lane_change_parameter.target.offset))) {
+    const auto from_pose = pose::toMapPose(from_lanelet_pose).pose;
+    const auto to_pose = pose::toMapPose(to_lanelet_pose->getLaneletPose()).pose;
+    const auto euclidean_distance = math::geometry::hypot(from_pose.position, to_pose.position);
+    const auto lane_change_trajectory = lane_change::laneChangeTrajectory(
+      from_pose, to_lanelet_pose->getLaneletPose(), lane_change_parameter.trajectory_shape,
+      euclidean_distance * 0.5);
+    return std::make_pair(lane_change_trajectory, to_lanelet_pose.value());
+  } else {
+    return std::nullopt;
+  }
 }
 }  // namespace v2
 
