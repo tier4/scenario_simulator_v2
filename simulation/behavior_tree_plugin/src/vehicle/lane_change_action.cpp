@@ -71,10 +71,12 @@ bool LaneChangeAction::checkPreconditions()
   if (request_ != traffic_simulator::behavior::Request::LANE_CHANGE) {
     curve_ = std::nullopt;
     current_s_ = 0;
+    target_canonicalized_lanelet_pose_ = std::nullopt;
     return false;
   } else if (!lane_change_parameters_) {
     curve_ = std::nullopt;
     current_s_ = 0;
+    target_canonicalized_lanelet_pose_ = std::nullopt;
     return false;
   } else {
     return true;
@@ -191,13 +193,18 @@ BT::NodeStatus LaneChangeAction::doAction()
       const auto obstacle = calculateObstacle(waypoints);
       setOutput("waypoints", waypoints);
       setOutput("obstacle", obstacle);
+      curve_ = std::nullopt;
+      current_s_ = 0;
+      lane_change_velocity_ = 0;
       auto entity_status_updated =
         static_cast<traffic_simulator::EntityStatus>(*canonicalized_entity_status_);
       entity_status_updated.lanelet_pose = target_canonicalized_lanelet_pose_->getLaneletPose();
       entity_status_updated.lanelet_pose_valid = true;
       entity_status_updated.pose =
         traffic_simulator::pose::toMapPose(entity_status_updated.lanelet_pose);
+      entity_status_updated.action_status = canonicalized_entity_status_->getActionStatus();
       setCanonicalizedEntityStatus(entity_status_updated);
+      target_canonicalized_lanelet_pose_ = std::nullopt;
       return BT::NodeStatus::SUCCESS;
     }
   }
