@@ -249,7 +249,7 @@ auto laneChangeTrajectory(
         candidates_evaluation.push_back(
           std::fabs(target_trajectory_length - lane_change_trajectory.getLength()));
         candidates_curves.push_back(lane_change_trajectory);
-        candidates_lanelet_pose.push_back(to_lanelet_pose);
+        candidates_lanelet_pose.emplace_back(to_lanelet_pose);
       }
     }
   }
