@@ -182,13 +182,10 @@ auto laneChangeTrajectory(
       ? lane_change_parameter.constraint.value
       : Parameter::default_lanechange_distance;
 
-  const auto to_lanelet_pose = CanonicalizedLaneletPose([&]() {
-    auto lanelet_pose = LaneletPose();
-    lanelet_pose.lanelet_id = lane_change_parameter.target.lanelet_id;
-    lanelet_pose.s = from_lanelet_pose.s + longitudinal_distance;  // FIXME: DIRTY HACK!!!
-    lanelet_pose.offset = lane_change_parameter.target.offset;
-    return lanelet_pose;
-  }());
+  const auto to_lanelet_pose = helper::constructCanonicalizedLaneletPose(
+    lane_change_parameter.target.lanelet_id,
+    from_lanelet_pose.s + longitudinal_distance,  // FIXME: DIRTY HACK!!!
+    lane_change_parameter.target.offset);
 
   const auto from_pose = pose::toMapPose(from_lanelet_pose).pose;
   const auto to_pose = pose::toMapPose(to_lanelet_pose.getLaneletPose()).pose;
