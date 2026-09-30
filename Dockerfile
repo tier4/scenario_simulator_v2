@@ -88,6 +88,10 @@ RUN find /home/ubuntu/Desktop/scenario_simulator_ws/install -name cmake -type d 
     find /home/ubuntu/Desktop/scenario_simulator_ws/install -name '*.a' -type f -delete && \
     rm -rf /home/ubuntu/Desktop/scenario_simulator_ws/install/include
 
+# /home/ubuntu is mode 0750 in the Ubuntu 24.04 base image; make it traversable
+# so the entrypoint also works when the container runs with a non-ubuntu UID.
+RUN chmod 0755 /home/ubuntu
+
 COPY ./docker-entrypoint.sh /
 RUN chmod a+x /docker-entrypoint.sh
 
