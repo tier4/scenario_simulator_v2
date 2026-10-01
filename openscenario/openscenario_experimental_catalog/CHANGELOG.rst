@@ -2,6 +2,11 @@
 Changelog for package openscenario_experimental_catalog
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.1.0 (2026-10-01)
+-------------------
+* Merge remote-tracking branch 'origin/master' into fix/lane-change-action
+* Contributors: yamacir-kit
+
 25.0.22 (2026-07-17)
 --------------------
 

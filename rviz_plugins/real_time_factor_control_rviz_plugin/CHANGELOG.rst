@@ -2,6 +2,11 @@
 Changelog for package real_time_factor_control_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.1.0 (2026-10-01)
+-------------------
+* Merge remote-tracking branch 'origin/master' into fix/lane-change-action
+* Contributors: yamacir-kit
+
 25.0.22 (2026-07-17)
 --------------------
 

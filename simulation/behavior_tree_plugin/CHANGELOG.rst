@@ -2,6 +2,26 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.1.0 (2026-10-01)
+-------------------
+* Merge pull request `#1851 <https://github.com/tier4/scenario_simulator_v2/issues/1851>`_ from tier4/fix/lane-change-action
+  Fix/lane change action
+* fix: restore missing state cleanup on lane change completion in LaneChangeAction
+* revert: restore control flow and waypoints calculation in LaneChangeAction::doAction
+* Merge remote-tracking branch 'origin/master' into fix/lane-change-action
+* Cleanup
+* Fix `LaneChangeAction::doAction` to set the second part of the `laneChangeTrajectory` return value at the end
+* Split `laneChangeTrajectory` into `v1::` and `v2::` for backward compatibility
+* Cleanup `LaneChangeAction::doAction`
+* Cleanup `LaneChangeAction::doAction`
+* Cleanup `LaneChangeAction::doAction`
+* Cleanup `LaneChangeAction::doAction`
+* Cleanup `LaneChangeAction::doAction`
+* Cleanup `LaneChangeAction::doAction`
+* Update `LaneChangeAction` to handle distance constraints that exceed the length of the Lanelet
+* Update `laneChangeTrajectory` to return `CanonicalizedLaneletPose`
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
 25.0.22 (2026-07-17)
 --------------------
 

@@ -2,6 +2,14 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.1.0 (2026-10-01)
+-------------------
+* Merge pull request `#1851 <https://github.com/tier4/scenario_simulator_v2/issues/1851>`_ from tier4/fix/lane-change-action
+  Fix/lane change action
+* Merge remote-tracking branch 'origin/master' into fix/lane-change-action
+* Split `laneChangeTrajectory` into `v1::` and `v2::` for backward compatibility
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
 25.0.22 (2026-07-17)
 --------------------
 

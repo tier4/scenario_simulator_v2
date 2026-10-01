@@ -2,6 +2,20 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+25.1.0 (2026-10-01)
+-------------------
+* Merge pull request `#1851 <https://github.com/tier4/scenario_simulator_v2/issues/1851>`_ from tier4/fix/lane-change-action
+  Fix/lane change action
+* fix: use pose::toCanonicalizedLaneletPose to not throw an exception when pose canonicalization is failed
+* refactor: use helper::constructCanonicalizedLaneletPose to minimize diff
+* fix: use emplace_back to construct CanonicalizedLaneletPose
+* fix: use correct index to return lanelet pose in v2::laneChangeTrajectory function
+* Merge remote-tracking branch 'origin/master' into fix/lane-change-action
+* Cleanup free function `v2::laneChangeTrajectory`
+* Split `laneChangeTrajectory` into `v1::` and `v2::` for backward compatibility
+* Update `laneChangeTrajectory` to return `CanonicalizedLaneletPose`
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
 25.0.22 (2026-07-17)
 --------------------
 
