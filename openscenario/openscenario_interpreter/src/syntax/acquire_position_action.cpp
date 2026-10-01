@@ -77,7 +77,7 @@ auto AcquirePositionAction::start() -> void
     }
   };
 
-  traffic_simulator::v2::RouteOption route_option;
+  traffic_simulator::route_option::v2::RouteOption route_option;
   route_option.use_lane_ids_for_routing =
     get_from_parameter("RoutingAction__use_lane_ids_for_routing", false);
 
