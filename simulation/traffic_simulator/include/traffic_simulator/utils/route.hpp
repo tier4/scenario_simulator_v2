@@ -86,9 +86,21 @@ auto laneChangeAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const lane_change::Parameter & parameter) -> LaneletPose;
 
+inline namespace v1
+{
+[[deprecated("Use traffic_simulator::route::v2::laneChangeTrajectory")]]  //
 auto laneChangeTrajectory(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const lane_change::Parameter & parameter) -> std::optional<std::pair<Curve, double>>;
+}  // namespace v1
+
+namespace v2
+{
+auto laneChangeTrajectory(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const lane_change::Parameter & parameter)
+  -> std::optional<std::pair<Curve, CanonicalizedLaneletPose>>;
+}  // namespace v2
 
 auto laneChangePoints(const Curve & curve, const double current_s) -> std::vector<Point>;
 
