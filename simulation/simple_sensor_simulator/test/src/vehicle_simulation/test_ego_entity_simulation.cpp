@@ -26,8 +26,14 @@ using namespace vehicle_simulation;
 
 TEST(EgoEntitySimulation, calculateAccelerationBySlope)
 {
-  // initialize rclcpp for rosparam in EgoEntitySimulation class
-  rclcpp::init(0, nullptr);
+  // initialize rclcpp with parameters from default_vehicle_description package
+  const auto param_file =
+    ament_index_cpp::get_package_share_directory("default_vehicle_description") +
+    "/config/simulator_model.param.yaml";
+  const char * argv[] = {
+    "test_ego_entity_simulation", "--ros-args", "--params-file", param_file.c_str()};
+  int argc = 4;
+  rclcpp::init(argc, argv);
 
   const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
                             "/map/slope/lanelet2_map.osm";
