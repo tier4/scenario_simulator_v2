@@ -251,7 +251,8 @@ auto splineDistanceToBoundingBox(
       /// @todo rotation of NPC is not taken into account, same as in boundingBoxLaneLongitudinalDistance
       /// this should be considered to be changed in separate task in the future
       const auto target_bounding_box_distance =
-        bounding_box_distance.value() + from_bounding_box.dimensions.x / 2.0;
+        bounding_box_distance.value() +
+        math::geometry::getDistancesFromCenterToEdge(from_bounding_box).front;
 
       const auto target_to_spline_distance = traffic_simulator::distance::distanceToSpline(
         static_cast<geometry_msgs::msg::Pose>(target_lanelet_pose_alternative.value()),

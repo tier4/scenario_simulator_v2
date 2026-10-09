@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
+#include <geometry/bounding_box.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
@@ -78,7 +79,7 @@ std::optional<double> StopAtStopLineAction::calculateTargetSpeed(double current_
    */
   double rest_distance =
     distance_to_stopline_.value() -
-    (vehicle_parameters.bounding_box.dimensions.x * bounding_box_half_factor + stop_margin);
+    (math::geometry::getDistancesFromCenterToEdge(vehicle_parameters.bounding_box).front + stop_margin);
   if (rest_distance < calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
     return 0;
   }
