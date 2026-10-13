@@ -1,0 +1,16 @@
+/**:
+  ros__parameters:
+    vehicle_model_type: "IDEAL_STEER_VEL"
+    # NOTE: this file does not include vel_lim, vel_rate_lim, steer_lim and wheel_base, because they always override with VehicleParameters
+    acc_time_delay: 0.1
+    acc_time_constant: 0.1
+    steer_rate_lim: 5.0
+    steer_time_delay: 0.24
+    steer_time_constant: 0.27
+    steer_dead_band: 0.0
+    steer_bias: 0.0
+    vel_time_delay: 0.1      # NOTE: autoware_simple_planning_simulator default is 0.25
+    vel_time_constant: 0.1   # NOTE: autoware_simple_planning_simulator default is 0.5
+    debug_acc_scaling_factor: 1.0
+    debug_steer_scaling_factor: 1.0
+    acceleration_map_path: ""
