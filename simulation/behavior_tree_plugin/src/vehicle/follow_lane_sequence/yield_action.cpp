@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
+#include <geometry/bounding_box.hpp>
 #include <memory>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
@@ -80,7 +81,7 @@ std::optional<double> YieldAction::calculateTargetSpeed()
    * @brief hard coded parameter!! 1.0 is a stop margin
    */
   double rest_distance =
-    distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
+    distance_to_stop_target_.value() - (math::geometry::getDistancesFromCenterToEdge(vehicle_parameters.bounding_box).front + 1.0);
   if (rest_distance < calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
     return 0;
   }
