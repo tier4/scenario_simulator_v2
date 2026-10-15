@@ -27,6 +27,7 @@
 #include <simple_sensor_simulator/sensor_simulation/imu/imu_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/perception_reproducer_sensor/perception_reproducer_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/traffic_lights/traffic_lights_detector.hpp>
 #include <vector>
 
@@ -118,8 +119,27 @@ public:
       configuration, "/sensing/imu/imu_data", node));
   }
 
+  auto attachPerceptionReproducerSensor(
+    const std::string & bag_path, double start_time_s, rclcpp::Node & node) -> void
+  {
+    using Message = autoware_perception_msgs::msg::DetectedObjects;
+    perception_reproducer_sensors_.push_back(std::make_unique<PerceptionReproducerSensor>(
+      bag_path, start_time_s,
+      node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1), node));
+  }
+
+  auto resetPerceptionReproducerSensors() const -> void
+  {
+    for (const auto & sensor : perception_reproducer_sensors_) {
+      sensor->reset();
+    }
+  }
+
+  auto setSuppressDetectionSensor(bool suppress) -> void { suppress_detection_sensor_ = suppress; }
+
   auto updateSensorFrame(
-    double current_simulation_time, const rclcpp::Time & current_ros_time,
+    double current_simulation_time, double current_scenario_time,
+    const rclcpp::Time & current_ros_time,
     const std::vector<traffic_simulator_msgs::EntityStatus> &,
     const simulation_api_schema::UpdateTrafficLightsRequest &) -> void;
 
@@ -129,6 +149,8 @@ private:
   std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
   std::vector<std::unique_ptr<OccupancyGridSensorBase>> occupancy_grid_sensors_;
   std::vector<std::unique_ptr<traffic_lights::TrafficLightsDetector>> traffic_lights_detectors_;
+  std::vector<std::unique_ptr<PerceptionReproducerSensor>> perception_reproducer_sensors_;
+  bool suppress_detection_sensor_ = false;
 };
 }  // namespace simple_sensor_simulator
 
