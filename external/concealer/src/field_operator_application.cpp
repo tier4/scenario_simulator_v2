@@ -92,7 +92,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
   getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
 #endif
-  getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & message) {
+  getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1).transient_local(), *this, [this](const auto & message) {
     auto state_name_of = [](auto state) constexpr {
       switch (state) {
         case MrmState::MRM_FAILED:
