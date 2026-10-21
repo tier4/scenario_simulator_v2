@@ -13,7 +13,7 @@ OpenSCENARIO:
     ScenarioObject:
       # Enters the intersection from the west and turns right across the oncoming lane.
       - name: turning-npc
-        Vehicle: &default-vehicle
+        Vehicle: &DEFAULT_VEHICLE
           name: default-vehicle
           vehicleCategory: car
           BoundingBox:
@@ -27,7 +27,7 @@ OpenSCENARIO:
             Property: []
       # Comes the other way and goes straight through.
       - name: crossing-npc
-        Vehicle: *default-vehicle
+        Vehicle: *DEFAULT_VEHICLE
   Storyboard:
     Init:
       Actions:
@@ -50,7 +50,7 @@ OpenSCENARIO:
               - RoutingAction:
                   AcquirePositionAction:
                     Position:
-                      LanePosition: &GOAL_OF_TURNING_NPC
+                      LanePosition: &TURNING_NPC_DESTINATION
                         roadId: ''
                         laneId: '4'
                         s: 10
@@ -117,8 +117,12 @@ OpenSCENARIO:
                                         rule: lessThan
                                         value: 0.0
                                         Position:
-                                          LanePosition: *GOAL_OF_TURNING_NPC
+                                          LanePosition: *TURNING_NPC_DESTINATION
 
+                      # These two positions are where the turn runs into the oncoming lane and
+                      # where that lane runs into the turn. A distance below zero means the front
+                      # of the vehicle is past its position, so the pair says the turn went into
+                      # the overlap while the traffic it gives way to had yet to reach it.
                       - name: failure-entered-the-oncoming-lane-too-early
                         priority: parallel
                         Action:
@@ -142,7 +146,7 @@ OpenSCENARIO:
                                         freespace: true
                                         rule: lessThan
                                         value: 0.0
-                                        # Where the turn enters the polygon of oncoming lane 24.
+                                        # Where the turn enters the polygon of lane 16.
                                         Position:
                                           LanePosition:
                                             roadId: ''
@@ -164,7 +168,7 @@ OpenSCENARIO:
                                         freespace: true
                                         rule: greaterThan
                                         value: 0.0
-                                        # Where oncoming lane 24 enters the polygon of the turn.
+                                        # Where lane 16 enters the polygon of the turn.
                                         Position:
                                           LanePosition:
                                             roadId: ''
