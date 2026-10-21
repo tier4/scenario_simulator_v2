@@ -22,6 +22,10 @@
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/pose.hpp>
+#include <geometry_msgs/msg/detail/point32__builder.hpp>
+#include <geometry_msgs/msg/detail/point__struct.hpp>
+#include <geometry_msgs/msg/detail/pose__struct.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -426,6 +430,7 @@ static auto distanceToCrossingTraffic(
   const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>
 {
   constexpr auto required_gap = 5.0;
+  constexpr auto distance_accuracy = 0.05;
 
   // The other ways through the intersection from the same road. They overlap this lane, so
   // conflictingLaneIds reports them, but they are not traffic to give way to.
@@ -435,6 +440,21 @@ static auto distanceToCrossingTraffic(
       ids.push_back(previous);
       for (const auto next : lanelet_wrapper::lanelet_map::nextLaneletIds(previous)) {
         ids.push_back(next);
+      }
+    }
+    return ids;
+  };
+  
+  // The lanes that give way to this one, and so may be ignored by it.
+  const auto released_lane_ids = [](const lanelet::Id id) {
+    const auto & lanelet = lanelet_wrapper::LaneletWrapper::map()->laneletLayer.get(id);
+    auto ids = lanelet::Ids();
+    for (const auto & right_of_way : lanelet.regulatoryElementsAs<lanelet::RightOfWay>()) {
+      if (const auto & prioritized = right_of_way->rightOfWayLanelets();
+          std::find(prioritized.begin(), prioritized.end(), lanelet) != prioritized.end()) {
+        for (const auto & yield : right_of_way->yieldLanelets()) {
+          ids.push_back(yield.id());
+        }
       }
     }
     return ids;
@@ -452,28 +472,13 @@ static auto distanceToCrossingTraffic(
     return false;
   };
 
-  // The lanes that give way to this one, and so may be ignored by it.
-  const auto released_lane_ids = [](const lanelet::Id id) {
-    const auto & lanelet = lanelet_wrapper::LaneletWrapper::map()->laneletLayer.get(id);
-    auto ids = lanelet::Ids();
-    for (const auto & right_of_way : lanelet.regulatoryElementsAs<lanelet::RightOfWay>()) {
-      if (const auto & prioritized = right_of_way->rightOfWayLanelets();
-          std::find(prioritized.begin(), prioritized.end(), lanelet) != prioritized.end()) {
-        for (const auto & yield : right_of_way->yieldLanelets()) {
-          ids.push_back(yield.id());
-        }
-      }
-    }
-    return ids;
-  };
-
   // Whether a lane goes before every lane it crosses. Going straight on a green light does.
   const auto has_priority_over_conflicts = [](const lanelet::Id id) {
     const auto & lanelet = lanelet_wrapper::LaneletWrapper::map()->laneletLayer.get(id);
     const auto & traffic_lights = lanelet.regulatoryElementsAs<lanelet::TrafficLight>();
     if (lanelet.attributeOr("turn_direction", std::string()) == "straight") {
       for (const auto & traffic_light : traffic_lights) {
-        if (static_cast<bool>(traffic_light->stopLine())) {
+        if (traffic_light->stopLine()) {
           return true;
         }
       }
@@ -499,14 +504,14 @@ static auto distanceToCrossingTraffic(
     return ids;
   };
 
-  // Whether a vehicle reaches the crossed lane too soon to go before it. One already past it is
-  // behind the route and no longer in the way, and so is a standing one short of it.
+  // Whether a vehicle is still in the way, measured to where its lane leaves the crossed one:
+  // one already past that point is no longer in the way, and so is a standing one short of it.
   const auto is_approaching = [&](const lanelet::Ids & ids, const lanelet::Id crossed_id) {
     for (const auto id : ids) {
       if (
         const auto crossing_s =
           lanelet_wrapper::lanelet_map::centerPointsSpline(id)->getCollisionPointIn2D(
-            lanelet_wrapper::lanelet_map::laneletPolygon(crossed_id), false)) {
+            lanelet_wrapper::lanelet_map::laneletPolygon(crossed_id), true)) {
         for (const auto & status : other_statuses) {
           if (const auto & pose = status.getCanonicalizedLaneletPose()) {
             if (const auto distance = lanelet_wrapper::distance::longitudinalDistance(
@@ -522,6 +527,38 @@ static auto distanceToCrossingTraffic(
     return false;
   };
 
+  // The furthest the vehicle can stop with its body out of the given lane. The body is wider
+  // than the line these distances are measured along, so its front corners enter the lane first.
+  const auto distance_to_entering = [&](const lanelet::Id id) -> std::optional<double> {
+    const auto enters = [&](const double distance) {
+      const auto edges =
+        math::geometry::getDistancesFromCenterToEdge(from_status.getBoundingBox());
+      const auto pose = pose::toMapPose(lanelet_wrapper::pose::alongLaneletPose(
+        from_status.getLaneletPose(), following_lanelets, distance - edges.front));
+      for (const auto side : {edges.left, edges.right}) {
+        const auto corner = math::geometry::transformPoint(
+          pose, geometry_msgs::build<geometry_msgs::msg::Point>().x(edges.front).y(side).z(0.0));
+        if (lanelet_wrapper::lanelet_map::isInLanelet(id, corner)) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    if (const auto entering = distanceToCrosswalk(spline, id)) {
+      // The line enters the lane here, so the body is in it already; halve the gap to a
+      // distance it is out of it at.
+      auto clear = 0.0, entered = entering.value();
+      while (distance_accuracy < entered - clear) {
+        const auto midpoint = (clear + entered) / 2.0;
+        (enters(midpoint) ? entered : clear) = midpoint;
+      }
+      return clear;
+    } else {
+      return std::nullopt;
+    }
+  };
+
   // The nearest point at which the route enters a lane it still has to give way to.
   auto min_distance = std::optional<double>();
   for (const auto & lanelet_id : following_lanelets) {
@@ -531,7 +568,7 @@ static auto distanceToCrossingTraffic(
         // Lanes are left out one at a time: leaving out all of them once the first one is
         // entered would give up on the lanes still ahead, which are crossed last.
         if (not lanelet_wrapper::lanelet_map::isInLanelet(id, from_status.getMapPose().position)) {
-          if (const auto s = distanceToCrosswalk(spline, id)) {
+          if (const auto s = distance_to_entering(id)) {
             min_distance = std::min(min_distance.value_or(s.value()), s.value());
           }
         }
