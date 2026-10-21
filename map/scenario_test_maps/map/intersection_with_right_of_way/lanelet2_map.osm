@@ -1,0 +1,899 @@
+<?xml version='1.0' encoding='utf-8'?>
+<osm generator="lanelet2">
+  <node id="1" lat="35.62431298741" lon="139.74179659551" />
+  <node id="2" lat="35.6242769301" lon="139.74179716047" />
+  <node id="3" lat="35.62424087278" lon="139.74179772544" />
+  <node id="298" lat="35.62431990478" lon="139.74245902967" />
+  <node id="299" lat="35.62428384746" lon="139.74245959433" />
+  <node id="301" lat="35.62365353578" lon="139.74253571874" />
+  <node id="302" lat="35.62365399678" lon="139.74257988066" />
+  <node id="303" lat="35.62365445775" lon="139.74262404258" />
+  <node id="598" lat="35.62419439568" lon="139.74252724932" />
+  <node id="601" lat="35.62425700761" lon="139.7433434041" />
+  <node id="602" lat="35.62429306494" lon="139.74334283983" />
+  <node id="603" lat="35.62432912228" lon="139.74334227556" />
+  <node id="898" lat="35.62425009511" lon="139.74268097024" />
+  <node id="901" lat="35.62491646415" lon="139.74260428165" />
+  <node id="902" lat="35.62491600315" lon="139.74256011903" />
+  <node id="903" lat="35.62491554214" lon="139.74251595642" />
+  <node id="1198" lat="35.6243756043" lon="139.74261275077" />
+  <node id="1216" lat="35.62428453063" lon="139.7424718228" />
+  <node id="1227" lat="35.62432119291" lon="139.74247257881" />
+  <node id="1228" lat="35.62428599433" lon="139.74248217623" />
+  <node id="1251" lat="35.6243243715" lon="139.74248455673" />
+  <node id="1252" lat="35.62429129199" lon="139.74250213942" />
+  <node id="1264" lat="35.62429507797" lon="139.74251156839" />
+  <node id="1275" lat="35.62432934347" lon="139.74249558142" />
+  <node id="1278" lat="35.62430039541" lon="139.74252195206" />
+  <node id="1299" lat="35.6243359291" lon="139.74250525443" />
+  <node id="1302" lat="35.62431157892" lon="139.74253785842" />
+  <node id="1323" lat="35.62434389038" lon="139.74251322614" />
+  <node id="1326" lat="35.62432501816" lon="139.74255088509" />
+  <node id="1349" lat="35.62435373276" lon="139.74251960983" />
+  <node id="1350" lat="35.6243402274" lon="139.74256056127" />
+  <node id="1362" lat="35.62434832595" lon="139.74256402852" />
+  <node id="1375" lat="35.62436443397" lon="139.74252338932" />
+  <node id="1376" lat="35.62435806275" lon="139.74256686041" />
+  <node id="1399" lat="35.62437468231" lon="139.74252442614" />
+  <node id="1400" lat="35.62437514331" lon="139.74256858845" />
+  <node id="1599" lat="35.62432220976" lon="139.7426798411" />
+  <node id="1600" lat="35.62428615244" lon="139.74268040567" />
+  <node id="1613" lat="35.62431948672" lon="139.74247373124" />
+  <node id="1616" lat="35.62428341979" lon="139.7424718402" />
+  <node id="1627" lat="35.62431756012" lon="139.74249072812" />
+  <node id="1628" lat="35.6242821727" lon="139.74248223607" />
+  <node id="1639" lat="35.62431469253" lon="139.74250501318" />
+  <node id="1651" lat="35.62431072925" lon="139.74251889971" />
+  <node id="1652" lat="35.62427729351" lon="139.74250235863" />
+  <node id="1663" lat="35.62430570617" lon="139.74253226194" />
+  <node id="1675" lat="35.62429966878" lon="139.74254497886" />
+  <node id="1676" lat="35.62426939318" lon="139.74252098659" />
+  <node id="1687" lat="35.62429267176" lon="139.74255693531" />
+  <node id="1690" lat="35.62426349878" lon="139.74253089198" />
+  <node id="1699" lat="35.62428477848" lon="139.742568023" />
+  <node id="1702" lat="35.62425775884" lon="139.7425387012" />
+  <node id="1713" lat="35.62427453265" lon="139.74257972716" />
+  <node id="1725" lat="35.6242649526" lon="139.74258859984" />
+  <node id="1726" lat="35.62424459591" lon="139.74255214443" />
+  <node id="1737" lat="35.62425472732" lon="139.74259631701" />
+  <node id="1749" lat="35.6242439494" lon="139.74260280878" />
+  <node id="1750" lat="35.62422959363" lon="139.74256229368" />
+  <node id="1763" lat="35.62423080715" lon="139.74260875595" />
+  <node id="1774" lat="35.62421329421" lon="139.74256878212" />
+  <node id="1775" lat="35.62421917214" lon="139.74261240654" />
+  <node id="1786" lat="35.62420484091" lon="139.74257057482" />
+  <node id="1787" lat="35.6242073065" lon="139.74261468603" />
+  <node id="1799" lat="35.62419531767" lon="139.74261557376" />
+  <node id="1800" lat="35.62419485669" lon="139.74257141154" />
+  <node id="1816" lat="35.62420484091" lon="139.74257057482" />
+  <node id="1825" lat="35.62420461903" lon="139.74252589193" />
+  <node id="1828" lat="35.62421329421" lon="139.74256878212" />
+  <node id="1849" lat="35.62421444788" lon="139.7425221894" />
+  <node id="1852" lat="35.62422959363" lon="139.74256229368" />
+  <node id="1875" lat="35.62422423922" lon="139.74251568905" />
+  <node id="1876" lat="35.62424459591" lon="139.74255214443" />
+  <node id="1899" lat="35.62423213697" lon="139.74250762311" />
+  <node id="1900" lat="35.62425775884" lon="139.7425387012" />
+  <node id="1912" lat="35.62426349878" lon="139.74253089198" />
+  <node id="1923" lat="35.62423864566" lon="139.7424978723" />
+  <node id="1926" lat="35.62426939318" lon="139.74252098659" />
+  <node id="1949" lat="35.62424385777" lon="139.74248581757" />
+  <node id="1950" lat="35.62427729351" lon="139.74250235863" />
+  <node id="1974" lat="35.6242821727" lon="139.74248223607" />
+  <node id="1975" lat="35.62424694361" lon="139.74247271095" />
+  <node id="1986" lat="35.62428341979" lon="139.7424718402" />
+  <node id="1999" lat="35.62424779014" lon="139.742460159" />
+  <node id="2213" lat="35.62420639912" lon="139.74252776137" />
+  <node id="2225" lat="35.62421830847" lon="139.74252966856" />
+  <node id="2226" lat="35.62421193725" lon="139.74257313958" />
+  <node id="2237" lat="35.62423001587" lon="139.74253295364" />
+  <node id="2240" lat="35.62422167405" lon="139.74257597147" />
+  <node id="2251" lat="35.62424327797" lon="139.74253848735" />
+  <node id="2252" lat="35.6242297726" lon="139.74257943872" />
+  <node id="2263" lat="35.62425418787" lon="139.74254463951" />
+  <node id="2275" lat="35.6242645709" lon="139.74255203398" />
+  <node id="2276" lat="35.62424498184" lon="139.74258911489" />
+  <node id="2289" lat="35.62427589338" lon="139.74256214105" />
+  <node id="2300" lat="35.62425842107" lon="139.74260214156" />
+  <node id="2301" lat="35.62428481982" lon="139.74257198329" />
+  <node id="2313" lat="35.62429294197" lon="139.7425828202" />
+  <node id="2324" lat="35.62426960457" lon="139.74261804792" />
+  <node id="2325" lat="35.62430018628" lon="139.74259455364" />
+  <node id="2337" lat="35.62430648715" lon="139.74260707736" />
+  <node id="2338" lat="35.624274922" lon="139.74262843159" />
+  <node id="2350" lat="35.62427870797" lon="139.74263786057" />
+  <node id="2351" lat="35.62431257012" lon="139.74262253553" />
+  <node id="2362" lat="35.62428174501" lon="139.74264768763" />
+  <node id="2363" lat="35.62431664321" lon="139.74263637431" />
+  <node id="2375" lat="35.62431962382" lon="139.74265062462" />
+  <node id="2376" lat="35.62428430534" lon="139.74265953677" />
+  <node id="2387" lat="35.62432148496" lon="139.74266515743" />
+  <node id="2426" lat="35.62428430534" lon="139.74265953677" />
+  <node id="2427" lat="35.62424880701" lon="139.74266742111" />
+  <node id="2440" lat="35.62428174501" lon="139.74264768763" />
+  <node id="2451" lat="35.62424562843" lon="139.74265544319" />
+  <node id="2452" lat="35.62427870797" lon="139.74263786057" />
+  <node id="2464" lat="35.624274922" lon="139.74262843159" />
+  <node id="2477" lat="35.6242401664" lon="139.7426435556" />
+  <node id="2478" lat="35.62426960457" lon="139.74261804792" />
+  <node id="2501" lat="35.6242334563" lon="139.74263401179" />
+  <node id="2502" lat="35.62425842107" lon="139.74260214156" />
+  <node id="2525" lat="35.62422539276" lon="139.74262619578" />
+  <node id="2526" lat="35.62424498184" lon="139.74258911489" />
+  <node id="2550" lat="35.6242297726" lon="139.74257943872" />
+  <node id="2551" lat="35.62421546894" lon="139.74262000415" />
+  <node id="2562" lat="35.62422167405" lon="139.74257597147" />
+  <node id="2575" lat="35.62420556601" lon="139.74261661059" />
+  <node id="2576" lat="35.62421193725" lon="139.74257313958" />
+  <node id="2813" lat="35.6242505132" lon="139.74266626868" />
+  <node id="2825" lat="35.62425207039" lon="139.74265168237" />
+  <node id="2826" lat="35.62428756335" lon="139.74265948575" />
+  <node id="2837" lat="35.62425475259" lon="139.74263734339" />
+  <node id="2849" lat="35.62425853549" lon="139.74262338161" />
+  <node id="2850" lat="35.62429218128" lon="139.74263927092" />
+  <node id="2861" lat="35.62426338485" lon="139.74260992347" />
+  <node id="2864" lat="35.62429629437" lon="139.74262809694" />
+  <node id="2875" lat="35.62427033121" lon="139.74259502113" />
+  <node id="2876" lat="35.6243006068" lon="139.74261901343" />
+  <node id="2887" lat="35.62427732824" lon="139.74258306469" />
+  <node id="2899" lat="35.62428522152" lon="139.742571977" />
+  <node id="2900" lat="35.62431124274" lon="139.74260255333" />
+  <node id="2911" lat="35.62429393959" lon="139.74256185847" />
+  <node id="2914" lat="35.62431856119" lon="139.74259419322" />
+  <node id="2923" lat="35.62430340349" lon="139.74255280073" />
+  <node id="2926" lat="35.62432540408" lon="139.74258785558" />
+  <node id="2935" lat="35.62431352752" lon="139.74254488582" />
+  <node id="2949" lat="35.62432605059" lon="139.74253719119" />
+  <node id="2950" lat="35.62434040637" lon="139.74257770633" />
+  <node id="2961" lat="35.62433728353" lon="139.74253198359" />
+  <node id="2974" lat="35.62435670579" lon="139.74257121788" />
+  <node id="2975" lat="35.62435082784" lon="139.74252759339" />
+  <node id="2986" lat="35.62436515909" lon="139.74256942517" />
+  <node id="2987" lat="35.62436269348" lon="139.74252531389" />
+  <node id="3016" lat="35.62436515909" lon="139.74256942517" />
+  <node id="3025" lat="35.62436538096" lon="139.74261410815" />
+  <node id="3028" lat="35.62435670579" lon="139.74257121788" />
+  <node id="3051" lat="35.62435476213" lon="139.74261822149" />
+  <node id="3052" lat="35.62434040637" lon="139.74257770633" />
+  <node id="3076" lat="35.62432540408" lon="139.74258785558" />
+  <node id="3077" lat="35.62434505623" lon="139.74262491128" />
+  <node id="3088" lat="35.62431856119" lon="139.74259419322" />
+  <node id="3101" lat="35.62433726395" lon="139.74263312968" />
+  <node id="3102" lat="35.62431124274" lon="139.74260255333" />
+  <node id="3125" lat="35.62433088239" lon="139.74264300574" />
+  <node id="3126" lat="35.6243006068" lon="139.74261901343" />
+  <node id="3138" lat="35.62429629437" lon="139.74262809694" />
+  <node id="3149" lat="35.62432614217" lon="139.74265418252" />
+  <node id="3152" lat="35.62429218128" lon="139.74263927092" />
+  <node id="3173" lat="35.62432321464" lon="139.74266625605" />
+  <node id="3176" lat="35.62428756335" lon="139.74265948575" />
+  <node id="3413" lat="35.62436360086" lon="139.74261223871" />
+  <node id="3425" lat="35.62435169152" lon="139.7426103315" />
+  <node id="3426" lat="35.62435806275" lon="139.74256686041" />
+  <node id="3437" lat="35.62433998412" lon="139.74260704641" />
+  <node id="3440" lat="35.62434832595" lon="139.74256402852" />
+  <node id="3451" lat="35.62432672202" lon="139.74260151268" />
+  <node id="3452" lat="35.6243402274" lon="139.74256056127" />
+  <node id="3463" lat="35.62431581212" lon="139.74259536051" />
+  <node id="3475" lat="35.6243054291" lon="139.74258796603" />
+  <node id="3476" lat="35.62432501816" lon="139.74255088509" />
+  <node id="3487" lat="35.62429566697" lon="139.74257939622" />
+  <node id="3500" lat="35.62431157892" lon="139.74253785842" />
+  <node id="3501" lat="35.62428518018" lon="139.74256801671" />
+  <node id="3515" lat="35.62427578781" lon="139.74255528372" />
+  <node id="3524" lat="35.62430039541" lon="139.74252195206" />
+  <node id="3527" lat="35.6242686964" lon="139.74254341098" />
+  <node id="3538" lat="35.62429507797" lon="139.74251156839" />
+  <node id="3539" lat="35.62426255856" lon="139.74253076641" />
+  <node id="3550" lat="35.62429129199" lon="139.74250213942" />
+  <node id="3551" lat="35.62425742986" lon="139.74251746451" />
+  <node id="3563" lat="35.62425335675" lon="139.74250362575" />
+  <node id="3574" lat="35.62428599433" lon="139.74248217623" />
+  <node id="3575" lat="35.62425037612" lon="139.74248937545" />
+  <node id="3586" lat="35.62428453063" lon="139.7424718228" />
+  <node id="3587" lat="35.62424851497" lon="139.74247484266" />
+  <node id="3601" lat="35.62430751008" lon="139.74245922377">
+    <tag k="ele" v="5.775" />
+    <tag k="ele" v="5.775000" />
+  </node>
+  <node id="3602" lat="35.62429624217" lon="139.74245940023">
+    <tag k="ele" v="5.775" />
+    <tag k="ele" v="5.775000" />
+  </node>
+  <node id="3603" lat="35.6243052565" lon="139.74245925906">
+    <tag k="ele" v="6" />
+    <tag k="color" v="green" />
+    <tag k="ele" v="6.000000" />
+  </node>
+  <node id="3605" lat="35.62429849575" lon="139.74245936494">
+    <tag k="ele" v="6" />
+    <tag k="color" v="red" />
+    <tag k="ele" v="6.000000" />
+  </node>
+  <node id="3606" lat="35.62431990478" lon="139.74245902967" />
+  <node id="3607" lat="35.62428384746" lon="139.74245959433" />
+  <node id="3608" lat="35.62419469822" lon="139.74255623078">
+    <tag k="ele" v="5.775" />
+    <tag k="ele" v="5.775000" />
+  </node>
+  <node id="3609" lat="35.62419455416" lon="139.74254243009">
+    <tag k="ele" v="5.775" />
+    <tag k="ele" v="5.775000" />
+  </node>
+  <node id="3610" lat="35.62419466941" lon="139.74255347064">
+    <tag k="ele" v="6" />
+    <tag k="color" v="green" />
+    <tag k="ele" v="6.000000" />
+  </node>
+  <node id="3612" lat="35.62419458297" lon="139.74254519022">
+    <tag k="ele" v="6" />
+    <tag k="color" v="red" />
+    <tag k="ele" v="6.000000" />
+  </node>
+  <node id="3613" lat="35.62419439568" lon="139.74252724932" />
+  <node id="3614" lat="35.62419485669" lon="139.74257141154" />
+  <node id="3615" lat="35.62426248982" lon="139.74268077617">
+    <tag k="ele" v="5.775" />
+    <tag k="ele" v="5.775000" />
+  </node>
+  <node id="3616" lat="35.62427375773" lon="139.74268059974">
+    <tag k="ele" v="5.775" />
+    <tag k="ele" v="5.775000" />
+  </node>
+  <node id="3617" lat="35.6242647434" lon="139.74268074088">
+    <tag k="ele" v="6" />
+    <tag k="color" v="green" />
+    <tag k="ele" v="6.000000" />
+  </node>
+  <node id="3619" lat="35.62427150415" lon="139.74268063503">
+    <tag k="ele" v="6" />
+    <tag k="color" v="red" />
+    <tag k="ele" v="6.000000" />
+  </node>
+  <node id="3620" lat="35.62425009511" lon="139.74268097024" />
+  <node id="3621" lat="35.62428615244" lon="139.74268040567" />
+  <node id="3622" lat="35.62437530178" lon="139.74258376925">
+    <tag k="ele" v="5.775" />
+    <tag k="ele" v="5.775000" />
+  </node>
+  <node id="3623" lat="35.62437544584" lon="139.74259756997">
+    <tag k="ele" v="5.775" />
+    <tag k="ele" v="5.775000" />
+  </node>
+  <node id="3624" lat="35.62437533059" lon="139.74258652939">
+    <tag k="ele" v="6" />
+    <tag k="color" v="green" />
+    <tag k="ele" v="6.000000" />
+  </node>
+  <node id="3626" lat="35.62437541703" lon="139.74259480983">
+    <tag k="ele" v="6" />
+    <tag k="color" v="red" />
+    <tag k="ele" v="6.000000" />
+  </node>
+  <node id="3627" lat="35.6243756043" lon="139.74261275077" />
+  <node id="3628" lat="35.62437514331" lon="139.74256858845" />
+  <way id="1">
+    <nd ref="1" />
+    <nd ref="298" />
+  </way>
+  <way id="2">
+    <nd ref="2" />
+    <nd ref="299" />
+  </way>
+  <way id="3">
+    <nd ref="3" />
+    <nd ref="1999" />
+  </way>
+  <way id="4">
+    <nd ref="301" />
+    <nd ref="598" />
+  </way>
+  <way id="5">
+    <nd ref="302" />
+    <nd ref="1800" />
+  </way>
+  <way id="6">
+    <nd ref="303" />
+    <nd ref="1799" />
+  </way>
+  <way id="7">
+    <nd ref="601" />
+    <nd ref="898" />
+  </way>
+  <way id="8">
+    <nd ref="602" />
+    <nd ref="1600" />
+  </way>
+  <way id="9">
+    <nd ref="603" />
+    <nd ref="1599" />
+  </way>
+  <way id="10">
+    <nd ref="901" />
+    <nd ref="1198" />
+  </way>
+  <way id="11">
+    <nd ref="902" />
+    <nd ref="1400" />
+  </way>
+  <way id="12">
+    <nd ref="903" />
+    <nd ref="1399" />
+  </way>
+  <way id="13">
+    <nd ref="298" />
+    <nd ref="1227" />
+    <nd ref="1251" />
+    <nd ref="1275" />
+    <nd ref="1299" />
+    <nd ref="1323" />
+    <nd ref="1349" />
+    <nd ref="1375" />
+    <nd ref="1399" />
+  </way>
+  <way id="14">
+    <nd ref="299" />
+    <nd ref="1216" />
+    <nd ref="1228" />
+    <nd ref="1252" />
+    <nd ref="1264" />
+    <nd ref="1278" />
+    <nd ref="1302" />
+    <nd ref="1326" />
+    <nd ref="1350" />
+    <nd ref="1362" />
+    <nd ref="1376" />
+    <nd ref="1400" />
+  </way>
+  <way id="15">
+    <nd ref="298" />
+    <nd ref="1599" />
+  </way>
+  <way id="16">
+    <nd ref="299" />
+    <nd ref="1600" />
+  </way>
+  <way id="17">
+    <nd ref="298" />
+    <nd ref="1613" />
+    <nd ref="1627" />
+    <nd ref="1639" />
+    <nd ref="1651" />
+    <nd ref="1663" />
+    <nd ref="1675" />
+    <nd ref="1687" />
+    <nd ref="1699" />
+    <nd ref="1713" />
+    <nd ref="1725" />
+    <nd ref="1737" />
+    <nd ref="1749" />
+    <nd ref="1763" />
+    <nd ref="1775" />
+    <nd ref="1787" />
+    <nd ref="1799" />
+  </way>
+  <way id="18">
+    <nd ref="299" />
+    <nd ref="1616" />
+    <nd ref="1628" />
+    <nd ref="1652" />
+    <nd ref="1676" />
+    <nd ref="1690" />
+    <nd ref="1702" />
+    <nd ref="1726" />
+    <nd ref="1750" />
+    <nd ref="1774" />
+    <nd ref="1786" />
+    <nd ref="1800" />
+  </way>
+  <way id="19">
+    <nd ref="598" />
+    <nd ref="1825" />
+    <nd ref="1849" />
+    <nd ref="1875" />
+    <nd ref="1899" />
+    <nd ref="1923" />
+    <nd ref="1949" />
+    <nd ref="1975" />
+    <nd ref="1999" />
+  </way>
+  <way id="20">
+    <nd ref="1800" />
+    <nd ref="1816" />
+    <nd ref="1828" />
+    <nd ref="1852" />
+    <nd ref="1876" />
+    <nd ref="1900" />
+    <nd ref="1912" />
+    <nd ref="1926" />
+    <nd ref="1950" />
+    <nd ref="1974" />
+    <nd ref="1986" />
+    <nd ref="299" />
+  </way>
+  <way id="21">
+    <nd ref="598" />
+    <nd ref="1399" />
+  </way>
+  <way id="22">
+    <nd ref="1800" />
+    <nd ref="1400" />
+  </way>
+  <way id="23">
+    <nd ref="598" />
+    <nd ref="2213" />
+    <nd ref="2225" />
+    <nd ref="2237" />
+    <nd ref="2251" />
+    <nd ref="2263" />
+    <nd ref="2275" />
+    <nd ref="2289" />
+    <nd ref="2301" />
+    <nd ref="2313" />
+    <nd ref="2325" />
+    <nd ref="2337" />
+    <nd ref="2351" />
+    <nd ref="2363" />
+    <nd ref="2375" />
+    <nd ref="2387" />
+    <nd ref="1599" />
+  </way>
+  <way id="24">
+    <nd ref="1800" />
+    <nd ref="2226" />
+    <nd ref="2240" />
+    <nd ref="2252" />
+    <nd ref="2276" />
+    <nd ref="2300" />
+    <nd ref="2324" />
+    <nd ref="2338" />
+    <nd ref="2350" />
+    <nd ref="2362" />
+    <nd ref="2376" />
+    <nd ref="1600" />
+  </way>
+  <way id="25">
+    <nd ref="898" />
+    <nd ref="2427" />
+    <nd ref="2451" />
+    <nd ref="2477" />
+    <nd ref="2501" />
+    <nd ref="2525" />
+    <nd ref="2551" />
+    <nd ref="2575" />
+    <nd ref="1799" />
+  </way>
+  <way id="26">
+    <nd ref="1600" />
+    <nd ref="2426" />
+    <nd ref="2440" />
+    <nd ref="2452" />
+    <nd ref="2464" />
+    <nd ref="2478" />
+    <nd ref="2502" />
+    <nd ref="2526" />
+    <nd ref="2550" />
+    <nd ref="2562" />
+    <nd ref="2576" />
+    <nd ref="1800" />
+  </way>
+  <way id="27">
+    <nd ref="898" />
+    <nd ref="1999" />
+  </way>
+  <way id="28">
+    <nd ref="1600" />
+    <nd ref="299" />
+  </way>
+  <way id="29">
+    <nd ref="898" />
+    <nd ref="2813" />
+    <nd ref="2825" />
+    <nd ref="2837" />
+    <nd ref="2849" />
+    <nd ref="2861" />
+    <nd ref="2875" />
+    <nd ref="2887" />
+    <nd ref="2899" />
+    <nd ref="2911" />
+    <nd ref="2923" />
+    <nd ref="2935" />
+    <nd ref="2949" />
+    <nd ref="2961" />
+    <nd ref="2975" />
+    <nd ref="2987" />
+    <nd ref="1399" />
+  </way>
+  <way id="30">
+    <nd ref="1600" />
+    <nd ref="2826" />
+    <nd ref="2850" />
+    <nd ref="2864" />
+    <nd ref="2876" />
+    <nd ref="2900" />
+    <nd ref="2914" />
+    <nd ref="2926" />
+    <nd ref="2950" />
+    <nd ref="2974" />
+    <nd ref="2986" />
+    <nd ref="1400" />
+  </way>
+  <way id="31">
+    <nd ref="1198" />
+    <nd ref="3025" />
+    <nd ref="3051" />
+    <nd ref="3077" />
+    <nd ref="3101" />
+    <nd ref="3125" />
+    <nd ref="3149" />
+    <nd ref="3173" />
+    <nd ref="1599" />
+  </way>
+  <way id="32">
+    <nd ref="1400" />
+    <nd ref="3016" />
+    <nd ref="3028" />
+    <nd ref="3052" />
+    <nd ref="3076" />
+    <nd ref="3088" />
+    <nd ref="3102" />
+    <nd ref="3126" />
+    <nd ref="3138" />
+    <nd ref="3152" />
+    <nd ref="3176" />
+    <nd ref="1600" />
+  </way>
+  <way id="33">
+    <nd ref="1198" />
+    <nd ref="1799" />
+  </way>
+  <way id="34">
+    <nd ref="1400" />
+    <nd ref="1800" />
+  </way>
+  <way id="35">
+    <nd ref="1198" />
+    <nd ref="3413" />
+    <nd ref="3425" />
+    <nd ref="3437" />
+    <nd ref="3451" />
+    <nd ref="3463" />
+    <nd ref="3475" />
+    <nd ref="3487" />
+    <nd ref="3501" />
+    <nd ref="3515" />
+    <nd ref="3527" />
+    <nd ref="3539" />
+    <nd ref="3551" />
+    <nd ref="3563" />
+    <nd ref="3575" />
+    <nd ref="3587" />
+    <nd ref="1999" />
+  </way>
+  <way id="36">
+    <nd ref="1400" />
+    <nd ref="3426" />
+    <nd ref="3440" />
+    <nd ref="3452" />
+    <nd ref="3476" />
+    <nd ref="3500" />
+    <nd ref="3524" />
+    <nd ref="3538" />
+    <nd ref="3550" />
+    <nd ref="3574" />
+    <nd ref="3586" />
+    <nd ref="299" />
+  </way>
+  <way id="37">
+    <nd ref="3601" />
+    <nd ref="3602" />
+    <tag k="height" v="0.450000" />
+    <tag k="type" v="traffic_light" />
+  </way>
+  <way id="38">
+    <nd ref="3603" />
+    <nd ref="3605" />
+  <tag k="type" v="light_bulbs" />
+  </way>
+  <way id="39">
+    <nd ref="3606" />
+    <nd ref="3607" />
+    <tag k="type" v="stop_line" />
+  </way>
+  <way id="40">
+    <nd ref="3608" />
+    <nd ref="3609" />
+    <tag k="height" v="0.450000" />
+    <tag k="type" v="traffic_light" />
+  </way>
+  <way id="41">
+    <nd ref="3610" />
+    <nd ref="3612" />
+  <tag k="type" v="light_bulbs" />
+  </way>
+  <way id="42">
+    <nd ref="3613" />
+    <nd ref="3614" />
+    <tag k="type" v="stop_line" />
+  </way>
+  <way id="43">
+    <nd ref="3615" />
+    <nd ref="3616" />
+    <tag k="height" v="0.450000" />
+    <tag k="type" v="traffic_light" />
+  </way>
+  <way id="44">
+    <nd ref="3617" />
+    <nd ref="3619" />
+  <tag k="type" v="light_bulbs" />
+  </way>
+  <way id="45">
+    <nd ref="3620" />
+    <nd ref="3621" />
+    <tag k="type" v="stop_line" />
+  </way>
+  <way id="46">
+    <nd ref="3622" />
+    <nd ref="3623" />
+    <tag k="height" v="0.450000" />
+    <tag k="type" v="traffic_light" />
+  </way>
+  <way id="47">
+    <nd ref="3624" />
+    <nd ref="3626" />
+  <tag k="type" v="light_bulbs" />
+  </way>
+  <way id="48">
+    <nd ref="3627" />
+    <nd ref="3628" />
+    <tag k="type" v="stop_line" />
+  </way>
+  <relation id="1">
+    <member type="way" ref="1" role="left" />
+    <member type="way" ref="2" role="right" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="2">
+    <member type="way" ref="3" role="left" />
+    <member type="way" ref="2" role="right" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="3">
+    <member type="way" ref="4" role="left" />
+    <member type="way" ref="5" role="right" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="4">
+    <member type="way" ref="6" role="left" />
+    <member type="way" ref="5" role="right" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="5">
+    <member type="way" ref="7" role="left" />
+    <member type="way" ref="8" role="right" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="6">
+    <member type="way" ref="9" role="left" />
+    <member type="way" ref="8" role="right" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="7">
+    <member type="way" ref="10" role="left" />
+    <member type="way" ref="11" role="right" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="8">
+    <member type="way" ref="12" role="left" />
+    <member type="way" ref="11" role="right" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="9">
+    <member type="way" ref="13" role="left" />
+    <member type="way" ref="14" role="right" />
+    <member type="relation" ref="25" role="regulatory_element" />
+    <member type="relation" ref="21" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="left" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="10">
+    <member type="way" ref="15" role="left" />
+    <member type="way" ref="16" role="right" />
+    <member type="relation" ref="25" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="straight" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="11">
+    <member type="way" ref="17" role="left" />
+    <member type="way" ref="18" role="right" />
+    <member type="relation" ref="25" role="regulatory_element" />
+    <member type="relation" ref="21" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="right" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="12">
+    <member type="way" ref="19" role="left" />
+    <member type="way" ref="20" role="right" />
+    <member type="relation" ref="26" role="regulatory_element" />
+    <member type="relation" ref="22" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="left" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="13">
+    <member type="way" ref="21" role="left" />
+    <member type="way" ref="22" role="right" />
+    <member type="relation" ref="26" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="straight" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="14">
+    <member type="way" ref="23" role="left" />
+    <member type="way" ref="24" role="right" />
+    <member type="relation" ref="26" role="regulatory_element" />
+    <member type="relation" ref="22" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="right" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="15">
+    <member type="way" ref="25" role="left" />
+    <member type="way" ref="26" role="right" />
+    <member type="relation" ref="27" role="regulatory_element" />
+    <member type="relation" ref="23" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="left" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="16">
+    <member type="way" ref="27" role="left" />
+    <member type="way" ref="28" role="right" />
+    <member type="relation" ref="27" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="straight" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="17">
+    <member type="way" ref="29" role="left" />
+    <member type="way" ref="30" role="right" />
+    <member type="relation" ref="27" role="regulatory_element" />
+    <member type="relation" ref="23" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="right" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="18">
+    <member type="way" ref="31" role="left" />
+    <member type="way" ref="32" role="right" />
+    <member type="relation" ref="28" role="regulatory_element" />
+    <member type="relation" ref="24" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="left" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="19">
+    <member type="way" ref="33" role="left" />
+    <member type="way" ref="34" role="right" />
+    <member type="relation" ref="28" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="straight" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="20">
+    <member type="way" ref="35" role="left" />
+    <member type="way" ref="36" role="right" />
+    <member type="relation" ref="28" role="regulatory_element" />
+    <member type="relation" ref="24" role="regulatory_element" />
+    <tag k="one_way" v="0" />
+    <tag k="subtype" v="road" />
+    <tag k="turn_direction" v="right" />
+    <tag k="type" v="lanelet" />
+  </relation>
+  <relation id="21">
+    <member type="relation" ref="9" role="right_of_way" />
+    <member type="relation" ref="11" role="right_of_way" />
+    <member type="relation" ref="18" role="yield" />
+    <member type="relation" ref="19" role="yield" />
+    <member type="relation" ref="20" role="yield" />
+    <member type="relation" ref="12" role="yield" />
+    <member type="relation" ref="13" role="yield" />
+    <member type="relation" ref="14" role="yield" />
+    <tag k="subtype" v="right_of_way" />
+    <tag k="type" v="regulatory_element" />
+  </relation>
+  <relation id="22">
+    <member type="relation" ref="12" role="right_of_way" />
+    <member type="relation" ref="14" role="right_of_way" />
+    <member type="relation" ref="9" role="yield" />
+    <member type="relation" ref="10" role="yield" />
+    <member type="relation" ref="11" role="yield" />
+    <member type="relation" ref="15" role="yield" />
+    <member type="relation" ref="16" role="yield" />
+    <member type="relation" ref="17" role="yield" />
+    <tag k="subtype" v="right_of_way" />
+    <tag k="type" v="regulatory_element" />
+  </relation>
+  <relation id="23">
+    <member type="relation" ref="15" role="right_of_way" />
+    <member type="relation" ref="17" role="right_of_way" />
+    <member type="relation" ref="12" role="yield" />
+    <member type="relation" ref="13" role="yield" />
+    <member type="relation" ref="14" role="yield" />
+    <member type="relation" ref="18" role="yield" />
+    <member type="relation" ref="19" role="yield" />
+    <member type="relation" ref="20" role="yield" />
+    <tag k="subtype" v="right_of_way" />
+    <tag k="type" v="regulatory_element" />
+  </relation>
+  <relation id="24">
+    <member type="relation" ref="18" role="right_of_way" />
+    <member type="relation" ref="20" role="right_of_way" />
+    <member type="relation" ref="15" role="yield" />
+    <member type="relation" ref="16" role="yield" />
+    <member type="relation" ref="17" role="yield" />
+    <member type="relation" ref="9" role="yield" />
+    <member type="relation" ref="10" role="yield" />
+    <member type="relation" ref="11" role="yield" />
+    <tag k="subtype" v="right_of_way" />
+    <tag k="type" v="regulatory_element" />
+  </relation>
+  <relation id="25">
+    <member type="way" ref="38" role="light_bulbs" />
+    <member type="way" ref="39" role="ref_line" />
+    <member type="way" ref="37" role="refers" />
+    <tag k="subtype" v="traffic_light" />
+    <tag k="type" v="regulatory_element" />
+  </relation>
+  <relation id="26">
+    <member type="way" ref="41" role="light_bulbs" />
+    <member type="way" ref="42" role="ref_line" />
+    <member type="way" ref="40" role="refers" />
+    <tag k="subtype" v="traffic_light" />
+    <tag k="type" v="regulatory_element" />
+  </relation>
+  <relation id="27">
+    <member type="way" ref="44" role="light_bulbs" />
+    <member type="way" ref="45" role="ref_line" />
+    <member type="way" ref="43" role="refers" />
+    <tag k="subtype" v="traffic_light" />
+    <tag k="type" v="regulatory_element" />
+  </relation>
+  <relation id="28">
+    <member type="way" ref="47" role="light_bulbs" />
+    <member type="way" ref="48" role="ref_line" />
+    <member type="way" ref="46" role="refers" />
+    <tag k="subtype" v="traffic_light" />
+    <tag k="type" v="regulatory_element" />
+  </relation>
+</osm>
