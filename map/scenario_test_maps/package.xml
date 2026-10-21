@@ -3,8 +3,8 @@
 <package format="3">
   <name>scenario_test_maps</name>
   <version>25.0.22</version>
-  <description>Maps built for a single scenario, one directory each</description>
-  <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
+  <description>Maps built for a test scenario</description>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
