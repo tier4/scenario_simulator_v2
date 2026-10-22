@@ -163,6 +163,20 @@ private:
   void initializeInputQueue(const double & dt);
 
   /**
+   * @brief convert tire steer angle to motor-equivalent steer angle
+   * @param [in] tire_steer tire steering angle [rad]
+   * @return motor steering angle [rad]
+   */
+  [[nodiscard]] double toMotorSteer(double tire_steer) const noexcept;
+
+  /**
+   * @brief clamp tire steer angle within physical limits considering bias and accuracy error
+   * @param [in] tire_steer tire steering angle [rad]
+   * @return clamped tire steering angle [rad]
+   */
+  [[nodiscard]] double clampTireSteer(double tire_steer) const noexcept;
+
+  /**
    * @brief get vehicle position x
    */
   double getX() override;
