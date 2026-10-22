@@ -102,7 +102,7 @@ double SimModelDelaySteerAccGearedWoFallGuard::getSteer()
 
 void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
-  // 1. 入力信号の遅延バッファ処理（アクセル・ブレーキを独立保持）
+  // Separate and delay acceleration and brake pedal commands independently
   const double raw_pedal_cmd = input_(IDX_U::PEDAL_ACCX_DES);
   acc_input_queue_.push_back((raw_pedal_cmd >= 0.0) ? raw_pedal_cmd : 0.0);
   brake_input_queue_.push_back((raw_pedal_cmd < 0.0) ? std::abs(raw_pedal_cmd) : 0.0);
@@ -112,12 +112,11 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   const double brake_delayed_val = brake_input_queue_.front();
   brake_input_queue_.pop_front();
 
-  // ステアリングバッファ処理
   steer_motor_input_queue_.push_back(input_(IDX_U::STEER_DES));
   const double delayed_steer_des = steer_motor_input_queue_.front();
   steer_motor_input_queue_.pop_front();
 
-  // 2. 目標モータ駆動力 (acc_target) の算出
+  // Target motor drive acceleration
   const double acc_target = [&]() {
     double cmd = acc_delayed_val * debug_acc_scaling_factor_;
     if (acc_resolution_ > 1e-5) {
@@ -127,7 +126,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     return std::clamp(cmd + acc_offset_, 0.0, acc_lim_);
   }();
 
-  // 3. 目標ブレーキ制動力 (brake_target) の算出
+  // Target brake deceleration
   const double brake_target = [&]() {
     double brake_cmd = brake_delayed_val * debug_acc_scaling_factor_;
     if (brake_resolution_ > 1e-5) {
@@ -148,14 +147,15 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     if (brake_hysteresis_state_ > brake_dead_band_) {
       cmd = (brake_hysteresis_state_ - brake_dead_band_ + brake_jump_value_) * (1.0 + brake_accuracy_error_);
     }
+    // brake_offset_ acts as residual drag torque (e.g., pad drag or pre-charge pressure)
     return std::clamp(cmd + brake_offset_, 0.0, brake_lim_);
   }();
 
-  // 4. 目標ステアリング角の算出
+  // Target steering angle
   const double steer_target = [&]() {
     double cmd = delayed_steer_des * debug_steer_scaling_factor_;
 
-    // 車両ECUのソフトウェア不感帯（スレッショルド型ニュートラルカット）
+    // Threshold-type dead band (neutral cut)
     if (std::abs(cmd) < steer_dead_band_) {
       cmd = 0.0;
     }
@@ -163,6 +163,8 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     if (steer_resolution_ > 1e-5) {
       cmd = std::round(cmd / steer_resolution_) * steer_resolution_;
     }
+
+    // Model mechanical backlash (slack) by constraining current motor angle within cmd ± width/2
     const double steer_motor_hist = std::clamp(
       (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_),
       cmd - (steer_hysteresis_width_ / 2.0),
@@ -171,7 +173,6 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     return std::clamp(steer_motor_hist, -steer_lim_, steer_lim_);
   }();
 
-  // 5. calcModel へ渡す内部入力ベクトル（5次元）を準備
   Eigen::VectorXd inner_input(5);
   inner_input(IDX_U_INNER::ACC_DES)          = acc_target;
   inner_input(IDX_U_INNER::BRAKE_DES)        = brake_target;
@@ -181,10 +182,8 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 
   const auto prev_state = state_;
 
-  // 6. ルンゲ＝クッタ数値積分（連続微分方程式に基づく計算）
   updateRungeKutta(dt, inner_input);
 
-  // 7. 状態量の物理限界クランプ
   state_(IDX::VX)         = std::clamp(state_(IDX::VX), -vx_lim_, vx_lim_);
   state_(IDX::DRIVE_ACCX) = std::clamp(state_(IDX::DRIVE_ACCX), 0.0, acc_lim_);
   state_(IDX::BRAKE_ACCX) = std::clamp(state_(IDX::BRAKE_ACCX), 0.0, brake_lim_);
@@ -195,7 +194,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     return std::clamp(state_(IDX::STEER), std::min(upper, lower), std::max(upper, lower));
   }();
 
-  // 🌟 8. 純粋な物理力の平衡判定（静止摩擦モデル）に基づく完全停止フリーズ制御
+  // Freeze vehicle to zero velocity when net external force is within static friction limits
   constexpr double stop_epsilon = 1e-3;
   if (std::abs(state_(IDX::VX)) < stop_epsilon) {
     using autoware_vehicle_msgs::msg::GearCommand;
@@ -215,13 +214,12 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
     const double external_acc = drive_force + inner_input(IDX_U_INNER::SLOPE_ACCX_INNER) + air_drag;
     const double friction_limit = state_(IDX::BRAKE_ACCX) + rolling_resistance_;
 
-    // 外力の総和が静止摩擦限界（ブレーキ＋転がり抵抗）に収まっている場合のみ完全静止
     if (std::abs(external_acc) <= friction_limit) {
       state_(IDX::VX) = 0.0;
     }
   }
 
-  // 加速度算出とセンサ遅延処理
+  // Calculate longitudinal acceleration as backward difference to reflect post-RK4 static freeze
   state_(IDX::ACCX) = (state_(IDX::VX) - prev_state(IDX::VX)) / dt;
 
   const double raw_delayed_vx = [&]() {
@@ -233,6 +231,7 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   }();
 
   delayed_vx_ = [&]() {
+    // Suppress sensor noise and offset when the vehicle is physically stopped
     if (std::abs(raw_delayed_vx) < stop_epsilon) return 0.0;
     double vx = raw_delayed_vx * (1.0 + vel_sensor_accuracy_error_) + vel_sensor_offset_;
     if (vel_sensor_noise_stddev_ > 1e-5) vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_;
@@ -246,7 +245,6 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
 {
   using autoware_vehicle_msgs::msg::GearCommand;
 
-  // 1. 状態量の抽出
   const double vel       = std::clamp(state(IDX::VX), -vx_lim_, vx_lim_);
   const double drive_acc = std::clamp(state(IDX::DRIVE_ACCX), 0.0, acc_lim_);
   const double brake_acc = std::clamp(state(IDX::BRAKE_ACCX), 0.0, brake_lim_);
@@ -258,18 +256,17 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     return std::clamp(state(IDX::STEER), std::min(upper, lower), std::max(upper, lower));
   }();
 
-  // 2. 内部入力の抽出
   const double acc_des         = input(IDX_U_INNER::ACC_DES);
   const double brake_des       = input(IDX_U_INNER::BRAKE_DES);
   const auto gear              = static_cast<uint8_t>(input(IDX_U_INNER::GEAR_INNER));
   const double slope_accx      = input(IDX_U_INNER::SLOPE_ACCX_INNER);
   const double steer_motor_des = input(IDX_U_INNER::STEER_DES_INNER);
 
-  // 3. ステアリング偏差計算
   const double current_steer_motor = (current_steer - steer_bias_) / (1.0 + steer_accuracy_error_);
   const double steer_motor_diff = current_steer_motor - steer_motor_des;
 
-  // 🌟 4. 「力の綱引き」運動方程式による前後加速度 d_vx の計算
+  // Viscous regularization of Coulomb friction near zero velocity to prevent chattering:
+  // dv/dt = clamp(-k * vel, external_acc - friction_limit, external_acc + friction_limit)
   const double d_vx = [&] {
     if (gear == GearCommand::NONE || gear == GearCommand::PARK) {
       return 0.0;
@@ -285,13 +282,10 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     const double external_acc = engine_acc + slope_accx + air_drag;
     const double friction_limit = brake_acc + rolling_resistance_;
 
-    // クーロン摩擦の粘性近傍モデルによる滑らかな運動計算
-    const double k = 1.0 / vel_epsilon_; // ハードコードを撤廃
-
+    const double k = 1.0 / vel_epsilon_;
     return std::clamp(-k * vel, external_acc - friction_limit, external_acc + friction_limit);
   }();
 
-  // 🌟 5. 8次元状態微分の構成（条件分岐を完全排除した連続モデル）
   Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
   d_state(IDX::X)          = vel * std::cos(yaw);
   d_state(IDX::Y)          = vel * std::sin(yaw);
@@ -300,7 +294,6 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   d_state(IDX::STEER)      = std::clamp(-steer_motor_diff / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_) * (1.0 + steer_accuracy_error_);
   d_state(IDX::ACCX)       = 0.0;
 
-  // モータ駆動トルクおよびブレーキ圧の独立1次遅れ系
   d_state(IDX::DRIVE_ACCX) = std::clamp(-(drive_acc - acc_des) / acc_time_constant_, -acc_rate_lim_, acc_rate_lim_);
   d_state(IDX::BRAKE_ACCX) = std::clamp(-(brake_acc - brake_des) / brake_time_constant_, -brake_rate_lim_, brake_rate_lim_);
 
@@ -328,7 +321,6 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
 
   double initial_steer_motor_cmd = (state_(IDX::STEER) - steer_bias_) / (1.0 + steer_accuracy_error_);
 
-  // 初期化キューのスレッショルド型不感帯処理
   if (std::abs(initial_steer_motor_cmd) < steer_dead_band_) {
     initial_steer_motor_cmd = 0.0;
   }
