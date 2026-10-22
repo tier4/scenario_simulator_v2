@@ -177,6 +177,40 @@ private:
   [[nodiscard]] double clampTireSteer(double tire_steer) const noexcept;
 
   /**
+   * @brief calculate target motor drive acceleration
+   * @param [in] acc_delayed_val delayed acceleration command
+   * @return target motor acceleration [m/s²]
+   */
+  [[nodiscard]] double calculateAccTarget(double acc_delayed_val) const noexcept;
+
+  /**
+   * @brief calculate target brake deceleration and update hysteresis state
+   * @param [in] brake_delayed_val delayed brake command
+   * @return target brake deceleration [m/s²]
+   */
+  [[nodiscard]] double calculateBrakeTarget(double brake_delayed_val) noexcept;
+
+  /**
+   * @brief calculate target steering angle
+   * @param [in] delayed_steer_des delayed steering command
+   * @return target steering angle [rad]
+   */
+  [[nodiscard]] double calculateSteerTarget(double delayed_steer_des) const noexcept;
+
+  /**
+   * @brief update velocity history queue and get raw delayed velocity
+   * @return raw delayed velocity [m/s]
+   */
+  [[nodiscard]] double getRawDelayedVx();
+
+  /**
+   * @brief calculate observed delayed velocity considering noise and resolution
+   * @param [in] raw_delayed_vx raw delayed velocity
+   * @return delayed velocity with noise and resolution applied [m/s]
+   */
+  [[nodiscard]] double calculateDelayedVx(double raw_delayed_vx);
+
+  /**
    * @brief get vehicle position x
    */
   double getX() override;
