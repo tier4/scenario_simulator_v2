@@ -101,7 +101,7 @@ private:
   };
   enum IDX_U { PEDAL_ACCX_DES = 0, GEAR, SLOPE_ACCX, STEER_DES };
 
-  // calcModel に伝達する内部拡張入力仕様 (5要素)
+  // internal extended input specification passed to calcModel
   enum IDX_U_INNER { ACC_DES = 0, BRAKE_DES, GEAR_INNER, SLOPE_ACCX_INNER, STEER_DES_INNER };
 
   const double vx_lim_;          //!< @brief velocity limit [m/s]
@@ -142,19 +142,19 @@ private:
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
 
-  const double rolling_resistance_;          // 🌟 転がり抵抗係数 [m/s²]
-  const double air_drag_coef_;               // 🌟 空気抵抗係数 [1/m]
-  const double vel_epsilon_;                 // 🌟 停止時のダンピング閾値 [m/s]
+  const double rolling_resistance_;          //!< @brief rolling resistance coefficient [m/ss]
+  const double air_drag_coef_;               //!< @brief aerodynamic drag coefficient [1/m]
+  const double vel_epsilon_;                 //!< @brief velocity threshold for damping near zero speed [m/s]
 
-  double brake_hysteresis_state_; // ヒステリシス（機械的なガタ）を通した後の、ブレーキペダル機構の実際の物理的な位置（残存量）
-  double delayed_vx_;                          // 遅延適用後の物理車速
+  double brake_hysteresis_state_;            //!< @brief brake pedal state after hysteresis [m/ss]
+  double delayed_vx_;                        //!< @brief delayed vehicle velocity [m/s]
 
-  std::mt19937 vel_rng_;                       // 乱数生成器
-  std::normal_distribution<double> vel_dist_;  // 正規分布
+  std::mt19937 vel_rng_;                       //!< @brief random number generator for velocity noise
+  std::normal_distribution<double> vel_dist_;  //!< @brief normal distribution for velocity noise
   std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
   std::deque<double> brake_input_queue_;     //!< @brief buffer for brake command
-  std::deque<double> steer_motor_input_queue_;     //!< @brief buffer for steering motor command
-  std::deque<double> vel_history_queue_;       // 車速の遅延用バッファ
+  std::deque<double> steer_motor_input_queue_; //!< @brief buffer for steering motor command
+  std::deque<double> vel_history_queue_;     //!< @brief buffer for velocity sensor delay
 
   /**
    * @brief set queue buffer for input command

@@ -117,7 +117,6 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto vel_time_delay             = common::getParameter("vel_time_delay",             0.1);  /// @note 0.25 is default value on simple_planning_simulator
   const auto wheel_base                 = common::getParameter("wheel_base",                 parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
 
-  // 🌟 ここから追加：RK4・ブレーキ遅延・センサーノイズ用パラメータ
   const auto acc_lim                    = common::getParameter("acc_lim",                    parameters.performance.max_acceleration);
   const auto brake_lim                  = common::getParameter("brake_lim",                  parameters.performance.max_deceleration);
   const auto acc_rate_lim               = common::getParameter("acc_rate_lim",               5.0);
@@ -165,7 +164,7 @@ auto EgoEntitySimulation::makeSimulationModel(
       return std::make_shared<
         autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
         vel_lim, acc_lim, brake_lim, acc_rate_lim, brake_rate_lim, steer_lim, steer_rate_lim, wheel_base,
-        step_time, // 🌟 ここが dt に相当します
+        step_time,
         acc_time_delay, brake_time_delay, acc_time_constant, brake_time_constant,
         acc_accuracy_error, brake_accuracy_error, brake_hysteresis_width, acc_dead_band, brake_dead_band, brake_jump_value, acc_offset, brake_offset, acc_resolution, brake_resolution,
         steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
