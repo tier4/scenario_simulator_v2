@@ -9,7 +9,7 @@
 
   <depend>openscenario_visualization</depend>
   <depend>python3-xmlschema</depend>
-  <depend>python-yamale-pip</depend>
+  <depend>python3-yamale-pip</depend>
   <depend>rclpy</depend>
 
   <exec_depend>simple_sensor_simulator</exec_depend>
