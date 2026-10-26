@@ -23,9 +23,6 @@
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
-#include <geometry_msgs/msg/detail/point32__builder.hpp>
-#include <geometry_msgs/msg/detail/point__struct.hpp>
-#include <geometry_msgs/msg/detail/pose__struct.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
