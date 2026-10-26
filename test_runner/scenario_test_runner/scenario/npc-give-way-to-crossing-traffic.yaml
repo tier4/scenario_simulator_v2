@@ -7,7 +7,7 @@ OpenSCENARIO:
     ParameterDeclaration: []
   CatalogLocations:
   RoadNetwork:
-    LogicFile: { filepath: "$(find-pkg-share scenario_test_maps)/map/intersection_with_right_of_way/lanelet2_map.osm" }
+    LogicFile: { filepath: "$(find-pkg-share right_of_way_map)/map/lanelet2_map.osm" }
     TrafficSignals:
   Entities:
     ScenarioObject:

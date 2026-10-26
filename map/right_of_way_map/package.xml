@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>scenario_test_maps</name>
+  <name>right_of_way_map</name>
   <version>25.0.22</version>
-  <description>Maps built for a test scenario</description>
+  <description>map package for a four-way intersection whose turning lanes carry a RightOfWay</description>
   <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
   <license>Apache License 2.0</license>
 
