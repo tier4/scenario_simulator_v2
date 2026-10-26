@@ -15,7 +15,6 @@
   <depend>openscenario_preprocessor_msgs</depend>
   <depend>openscenario_utility</depend>
   <depend>openscenario_visualization</depend>
-  <depend>python-yamale-pip</depend>
   <depend>python3-pytest</depend>
   <depend>python3-xmlschema</depend>
   <depend>rclpy</depend>
