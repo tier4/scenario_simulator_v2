@@ -17,8 +17,6 @@ external/*
 !external/embree_vendor
 
 # auto-generated files
-html
-latex
 scenario_simulator.tar
 site
 *.pyc
