@@ -1,0 +1,36 @@
+name: Documentation
+on:
+  push:
+    branches: [master]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # for mkdocs-git-revision-date-localized-plugin
+          persist-credentials: false
+      - run: npx --yes markdownlint-cli2@0.20.0
+      - run: docker run --rm -v "$PWD/simulation/simulation_interface/proto:/protos" -v "$PWD/docs/proto_doc:/out" pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
+      - run: pipx install uv
+      - run: uv sync --locked
+      - run: uv run mkdocs build --strict
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+  deploy:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
