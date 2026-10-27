@@ -15,17 +15,18 @@
 #ifndef OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
+#include <algorithm>
 #include <boost/lexical_cast.hpp>
-#include <boost/range/algorithm.hpp>
-#include <filesystem>
-#include <functional>
+#include <iomanip>
+#include <iterator>
+#include <list>
+#include <map>
 #include <memory>
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/object.hpp>
-#include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
-#include <unordered_map>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -151,6 +152,8 @@ private:
 
 inline namespace syntax
 {
+struct CatalogLocations;
+
 struct Entities;
 
 struct OpenScenario;
