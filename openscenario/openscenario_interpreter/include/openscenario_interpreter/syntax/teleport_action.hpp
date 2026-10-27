@@ -16,12 +16,13 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TELEPORT_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
+class EntityOperations;
+
 inline namespace syntax
 {
 /* ---- TeleportAction ---------------------------------------------------------
@@ -33,7 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TeleportAction : private Scope, private SimulatorCore::ActionApplication
+struct TeleportAction : private Scope
 {
   const Position position;
 
@@ -49,7 +50,7 @@ struct TeleportAction : private Scope, private SimulatorCore::ActionApplication
 
   /*  */ auto start() const -> void;
 
-  static auto teleport(const EntityRef &, const Position &) -> void;
+  static auto teleport(EntityOperations &, const EntityRef &, const Position &) -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_CONDITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
@@ -37,8 +36,10 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalCondition : private SimulatorCore::NonStandardOperation
+struct TrafficSignalCondition
 {
+  ScenarioRuntime & scenario_runtime;
+
   const String name;
 
   const String state;

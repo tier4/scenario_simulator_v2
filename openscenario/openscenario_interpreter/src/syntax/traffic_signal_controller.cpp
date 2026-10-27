@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_controller.hpp>
 
@@ -22,7 +23,8 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 TrafficSignalController::TrafficSignalController(const pugi::xml_node & node, Scope & scope)
-: name(readAttribute<String>("name", node, scope)),
+: scenario_runtime(scope.runtime()),
+  name(readAttribute<String>("name", node, scope)),
   delay(readAttribute<Double>("delay", node, scope, Double::nan())),
   reference(readAttribute<String>("reference", node, scope, "")),
   phases(readElements<Phase, 0>("Phase", node, scope)),
@@ -136,7 +138,8 @@ auto TrafficSignalController::shouldChangePhaseToBegin() -> bool
 auto TrafficSignalController::updatePredictions() -> void
 {
   if (current_phase != std::end(phases)) {
-    clearV2ITrafficLightsStatePredictions();
+    auto & traffic_signals = scenario_runtime.trafficSignals();
+    traffic_signals.clearV2ITrafficLightsStatePredictions();
 
     /*
       NOTE:
@@ -153,7 +156,7 @@ auto TrafficSignalController::updatePredictions() -> void
     std::size_t extracted_phases_number = 0;
     std::unordered_map<lanelet::Id, std::vector<std::string>> current_states;
 
-    auto collect_states = [](const Phase & phase) {
+    auto collect_states = [&traffic_signals](const Phase & phase) {
       std::unordered_map<lanelet::Id, std::vector<std::string>> states;
       std::set<lanelet::Id> v2i_ids;
 
@@ -167,7 +170,7 @@ auto TrafficSignalController::updatePredictions() -> void
       for (const auto & signal : phase.traffic_signal_states) {
         if (signal.channelType() == TrafficSignalState::TrafficSignalChannelType::conventional) {
           const auto & id = signal.id();
-          if (v2i_ids.count(id) == 0 && isV2ITrafficLightEnabled(id)) {
+          if (v2i_ids.count(id) == 0 && traffic_signals.isV2ITrafficLightEnabled(id)) {
             states[id].push_back(signal.state);
           }
         }
@@ -195,7 +198,7 @@ auto TrafficSignalController::updatePredictions() -> void
         // push states to traffic_simulator
         for (const auto & [id, states] : current_states) {
           for (const auto & state : states) {
-            addV2ITrafficLightsStatePrediction(id, state, accumulated_time);
+            traffic_signals.addV2ITrafficLightsStatePrediction(id, state, accumulated_time);
           }
         }
         ++extracted_phases_number;

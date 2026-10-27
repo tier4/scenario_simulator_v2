@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
@@ -89,17 +91,19 @@ auto SpeedProfileAction::apply(const Entity & actor, const SpeedProfileEntry & s
     }
   };
 
-  actor.apply([&](const auto & object) { applyProfileAction(object, dynamic_constraints); });
+  actor.apply([&](const auto & object) {
+    runtime().entities().applyProfileAction(object, dynamic_constraints);
+  });
 
   if (entity_ref) {
     actor.apply([&](const auto & object) {
-      applySpeedAction(
+      runtime().entities().applySpeedAction(
         object, relative_target_speed(), transition(), constraint(),
         std::isnan(speed_profile_entry.time));
     });
   } else {
     actor.apply([&](const auto & object) {
-      applySpeedAction(
+      runtime().entities().applySpeedAction(
         object, absolute_target_speed(), transition(), constraint(),
         std::isnan(speed_profile_entry.time));
     });
