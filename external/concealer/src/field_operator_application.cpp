@@ -200,12 +200,30 @@ FieldOperatorApplication::~FieldOperatorApplication()
 
     const auto timeout = []() {
       auto timeout = timespec();
-      timeout.tv_sec = common::getParameter<int>("sigterm_timeout", 5);
+      /*
+         The deadline for the Autoware launch process to exit by itself. The
+         deadline must sit between the escalation `ros2 launch` applies to the
+         Autoware nodes (10 seconds) and `sigterm_timeout`, the escalation
+         ROS 2 launch applies to this process (30 seconds in the launch
+         files), or the fallback below never runs.
+      */
+      timeout.tv_sec = common::getParameter<int>("autoware_shutdown_timeout", 20);
       timeout.tv_nsec = 0;
       return timeout;
     }();
 
-    if (::kill(process_id, SIGINT); sigtimedwait(&sigset, nullptr, &timeout) < 0) {
+    if (::kill(process_id, SIGINT) < 0) {
+      RCLCPP_ERROR_STREAM(
+        get_logger(), "SIGINT to the Autoware launch process "
+                        << process_id
+                        << " failed: " << std::system_error(errno, std::system_category()).what());
+    } else {
+      RCLCPP_INFO_STREAM(
+        get_logger(), "Sent SIGINT to the Autoware launch process "
+                        << process_id << ", waiting " << timeout.tv_sec << " seconds.");
+    }
+
+    if (sigtimedwait(&sigset, nullptr, &timeout) < 0) {
       switch (errno) {
         case EINTR:
           /*
@@ -225,7 +243,11 @@ FieldOperatorApplication::~FieldOperatorApplication()
              timeout period.
           */
           RCLCPP_ERROR_STREAM(get_logger(), "Autoware launch process does not respond. Kill it.");
-          killpg(process_id, SIGKILL);
+          if (::killpg(process_id, SIGKILL) < 0) {
+            RCLCPP_ERROR_STREAM(
+              get_logger(),
+              "killpg failed: " << std::system_error(errno, std::system_category()).what());
+          }
           break;
 
         default:
@@ -236,8 +258,8 @@ FieldOperatorApplication::~FieldOperatorApplication()
           */
           RCLCPP_ERROR_STREAM(
             get_logger(),
-            "The parameter sigterm_timeout specified a value less than zero or greater than or "
-            "equal to 1000 million.");
+            "The parameter autoware_shutdown_timeout specified a value less than zero or greater "
+            "than or equal to 1000 million.");
           break;
       }
     }
@@ -249,6 +271,10 @@ FieldOperatorApplication::~FieldOperatorApplication()
       } else {
         RCLCPP_ERROR_STREAM(get_logger(), std::system_error(errno, std::system_category()).what());
       }
+    } else {
+      RCLCPP_INFO_STREAM(
+        get_logger(),
+        "The Autoware launch process " << process_id << " exited with status " << status << ".");
     }
 
     process_id = 0;

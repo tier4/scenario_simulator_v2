@@ -107,6 +107,7 @@ def launch_setup(context, *args, **kwargs):
     architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20240605")
     autoware_launch_file                = LaunchConfiguration("autoware_launch_file",                   default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
+    autoware_shutdown_timeout           = LaunchConfiguration("autoware_shutdown_timeout",              default=20)
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
     consider_pose_by_road_slope         = LaunchConfiguration("consider_pose_by_road_slope",            default=True)
     enable_perf                         = LaunchConfiguration("enable_perf",                            default=False)
@@ -125,7 +126,7 @@ def launch_setup(context, *args, **kwargs):
     rviz_config                         = LaunchConfiguration("rviz_config",                            default=default_rviz_config_file())
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
     sensor_model                        = LaunchConfiguration("sensor_model",                           default="")
-    sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
+    sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=30)
     simulate_localization               = LaunchConfiguration("simulate_localization",                  default=True)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
@@ -139,6 +140,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"architecture_type                   := {architecture_type.perform(context)}")
     print(f"autoware_launch_file                := {autoware_launch_file.perform(context)}")
     print(f"autoware_launch_package             := {autoware_launch_package.perform(context)}")
+    print(f"autoware_shutdown_timeout           := {autoware_shutdown_timeout.perform(context)}")
     print(f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}")
     print(f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}")
     print(f"enable_perf                         := {enable_perf.perform(context)}")
@@ -169,6 +171,7 @@ def launch_setup(context, *args, **kwargs):
             {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
+            {"autoware_shutdown_timeout": autoware_shutdown_timeout},
             {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"initialize_duration": initialize_duration},
@@ -235,6 +238,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("architecture_type",                   default_value=architecture_type                  ),
         DeclareLaunchArgument("autoware_launch_file",                default_value=autoware_launch_file               ),
         DeclareLaunchArgument("autoware_launch_package",             default_value=autoware_launch_package            ),
+        DeclareLaunchArgument("autoware_shutdown_timeout",           default_value=autoware_shutdown_timeout          ),
         DeclareLaunchArgument("consider_acceleration_by_road_slope", default_value=consider_acceleration_by_road_slope),
         DeclareLaunchArgument("consider_pose_by_road_slope",         default_value=consider_pose_by_road_slope        ),
         DeclareLaunchArgument("enable_perf",                         default_value=enable_perf                        ),
