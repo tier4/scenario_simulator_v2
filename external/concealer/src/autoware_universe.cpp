@@ -128,7 +128,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
       setSteeringReport([this]() {
         SteeringReport message;
         message.stamp = get_clock()->now();
-        message.steering_tire_angle = getCommand().lateral.steering_tire_angle;
+        message.steering_tire_angle = current_steering_tire_angle.load();
         return message;
       }());
 
