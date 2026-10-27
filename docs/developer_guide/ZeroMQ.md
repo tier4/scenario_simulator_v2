@@ -9,7 +9,7 @@ We use ZeroMQ Inter-Process communication to communicate with your simulator and
 
 ## What is ZeroMQ
 
-[ZeroMQ](https://zeromq.org/) is an open-source messaging library. It supports TCP/UDP/Inter-Process messaging communication.  
+[ZeroMQ](https://zeromq.org/) is an open-source messaging library. It supports TCP/UDP/Inter-Process messaging communication.
 We use [ZeroMQ](https://zeromq.org/) in order to communicate with the simulator and interpreter.
 We use Request/Reply sockets in order to run the simulators synchronously.
 
@@ -63,24 +63,26 @@ The `traffic_simulator::API` sends a request to the simulator. The request is se
 
 ### Protobuf definition
 
-The schema of protobuf is [here](https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/simulation_interface/proto/simulation_api_schema.proto).  
-Protobuf documentation is [here](../proto_doc/protobuf.md). All data are serialized as string and sent via TCP by using ZeroMQ.
+The schema of protobuf is [here](https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/simulation_interface/proto/simulation_api_schema.proto).
+All data are serialized as string and sent via TCP by using ZeroMQ.
 
 ## Required APIs for co-simulation
 
 The traffic simulator and the simple sensor simulator communicate with APIs. If you want to integrate the simulators with your simulator, only you have to do is preparing the following APIs:
 
-| API                                 | Request                                                                                                                                                   | Response                                                                                                                                                    |
-|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| initialize                          | [InitializeRequest](../proto_doc/protobuf.md#initializerequest)                                             | [InitializeResponse](../proto_doc/protobuf.md#initializeresponse)                                             |
-| update_frame                        | [UpdateFrameRequest](../proto_doc/protobuf.md#updateframerequest)                                           | [UpdateFrameResponse](../proto_doc/protobuf.md#updateframeresponse)                                           |
-| spawn_vehicle_entity                | [SpawnVehicleEntityRequest](../proto_doc/protobuf.md#spawnvehicleentityrequest)                             | [SpawnVehicleEntityResponse](../proto_doc/protobuf.md#spawnvehicleentityresponse)                             |
-| spawn_pedestrian_entity             | [SpawnPedestrianEntityRequest](../proto_doc/protobuf.md#spawnpedestrianentityrequest)                       | [SpawnPedestrianEntityResponse](../proto_doc/protobuf.md#spawnpedestrianentityresponse)                       |
-| spawn_misc_object_entity            | [SpawnMiscObjectEntityRequest](../proto_doc/protobuf.md#spawnmiscobjectentityrequest)                       | [SpawnMiscObjectEntityResponse](../proto_doc/protobuf.md#spawnmiscobjectentityresponse)                       |
-| despawn_entity                      | [DespawnEntityRequest](../proto_doc/protobuf.md#despawnentityrequest)                                       | [DespawnEntityResponse](../proto_doc/protobuf.md#despawnentityresponse)                                       |
-| update_entity_status                | [UpdateEntityStatusRequest](../proto_doc/protobuf.md#updateentitystatusrequest)                             | [UpdateEntityStatusResponse](../proto_doc/protobuf.md#updateentitystatusresponse)                             |
-| attach_lidar_sensor                 | [AttachLidarSensorRequest](../proto_doc/protobuf.md#attachlidarsensorrequest)                               | [AttachLidarSensorResponse](../proto_doc/protobuf.md#attachlidarsensorresponse)                               |
-| attach_detection_sensor             | [AttachDetectionSensorRequest](../proto_doc/protobuf.md#attachdetectionsensorrequest)                       | [AttachDetectionSensorResponse](../proto_doc/protobuf.md#attachdetectionsensorresponse)                       |
-| attach_occupancy_grid_sensor        | [AttachOccupancyGridSensorRequest](../proto_doc/protobuf.md#attachoccupancygridsensorrequest)               | [AttachOccupancyGridSensorResponse](../proto_doc/protobuf.md#attachoccupancygridsensorresponse)               |
-| attach_pseudo_traffic_light_detector | [AttachPseudoTrafficLightDetectorRequest](../proto_doc/protobuf.md#attachpseudotrafficlightdetectorrequest) | [AttachPseudoTrafficLightDetectorResponse](../proto_doc/protobuf.md#attachpseudotrafficlightdetectorresponse) |
-| update_traffic_lights               | [UpdateTrafficLightsRequest](../proto_doc/protobuf.md#updatetrafficlightsrequest)                           | [UpdateTrafficLightsResponse](../proto_doc/protobuf.md#updatetrafficlightsresponse)                           |
+| API                                  | Request                                                                | Response                                                                |
+|--------------------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| initialize                           | [InitializeRequest][simulation_api_schema.proto]                       | [InitializeResponse][simulation_api_schema.proto]                       |
+| update_frame                         | [UpdateFrameRequest][simulation_api_schema.proto]                      | [UpdateFrameResponse][simulation_api_schema.proto]                      |
+| spawn_vehicle_entity                 | [SpawnVehicleEntityRequest][simulation_api_schema.proto]               | [SpawnVehicleEntityResponse][simulation_api_schema.proto]               |
+| spawn_pedestrian_entity              | [SpawnPedestrianEntityRequest][simulation_api_schema.proto]            | [SpawnPedestrianEntityResponse][simulation_api_schema.proto]            |
+| spawn_misc_object_entity             | [SpawnMiscObjectEntityRequest][simulation_api_schema.proto]            | [SpawnMiscObjectEntityResponse][simulation_api_schema.proto]            |
+| despawn_entity                       | [DespawnEntityRequest][simulation_api_schema.proto]                    | [DespawnEntityResponse][simulation_api_schema.proto]                    |
+| update_entity_status                 | [UpdateEntityStatusRequest][simulation_api_schema.proto]               | [UpdateEntityStatusResponse][simulation_api_schema.proto]               |
+| attach_lidar_sensor                  | [AttachLidarSensorRequest][simulation_api_schema.proto]                | [AttachLidarSensorResponse][simulation_api_schema.proto]                |
+| attach_detection_sensor              | [AttachDetectionSensorRequest][simulation_api_schema.proto]            | [AttachDetectionSensorResponse][simulation_api_schema.proto]            |
+| attach_occupancy_grid_sensor         | [AttachOccupancyGridSensorRequest][simulation_api_schema.proto]        | [AttachOccupancyGridSensorResponse][simulation_api_schema.proto]        |
+| attach_pseudo_traffic_light_detector | [AttachPseudoTrafficLightDetectorRequest][simulation_api_schema.proto] | [AttachPseudoTrafficLightDetectorResponse][simulation_api_schema.proto] |
+| update_traffic_lights                | [UpdateTrafficLightsRequest][simulation_api_schema.proto]              | [UpdateTrafficLightsResponse][simulation_api_schema.proto]              |
+
+[simulation_api_schema.proto]: https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/simulation_interface/proto/simulation_api_schema.proto

@@ -14,7 +14,6 @@ jobs:
           fetch-depth: 0 # for mkdocs-git-revision-date-localized-plugin
           persist-credentials: false
       - run: npx --yes markdownlint-cli2@0.20.0
-      - run: docker run --rm -v "$PWD/simulation/simulation_interface/proto:/protos" -v "$PWD/docs/proto_doc:/out" pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
       - run: pipx install uv
       - run: uv sync --locked
       - run: uv run mkdocs build --strict
