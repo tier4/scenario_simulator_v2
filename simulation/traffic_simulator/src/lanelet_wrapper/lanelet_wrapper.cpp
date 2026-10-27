@@ -20,6 +20,26 @@ namespace traffic_simulator
 {
 namespace lanelet_wrapper
 {
+CenterPointsCache::CenterPointsCache(const lanelet::LaneletMapPtr & lanelet_map)
+{
+  data_.reserve(lanelet_map->laneletLayer.size());
+  splines_.reserve(lanelet_map->laneletLayer.size());
+  for (const auto & lanelet : lanelet_map->laneletLayer) {
+    const auto lanelet_id = lanelet.id();
+    const auto & points =
+      data_.emplace(lanelet_id, centerPoints(lanelet_id, lanelet_map)).first->second;
+    splines_.emplace(lanelet_id, std::make_shared<Spline>(points));
+  }
+}
+
+LaneletLengthCache::LaneletLengthCache(const lanelet::LaneletMapPtr & lanelet_map)
+{
+  data_.reserve(lanelet_map->laneletLayer.size());
+  for (const auto & lanelet : lanelet_map->laneletLayer) {
+    data_.emplace(lanelet.id(), lanelet::utils::getLaneletLength2d(lanelet));
+  }
+}
+
 auto TopologyCache::getNextLaneletIds(
   const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &
 {
@@ -170,12 +190,12 @@ auto LaneletWrapper::routeCache(const RoutingGraphType type) -> RouteCache &
   }
 }
 
-auto LaneletWrapper::centerPointsCache() -> CenterPointsCache &
+auto LaneletWrapper::centerPointsCache() -> const CenterPointsCache &
 {
   return getInstance().center_points_cache_;
 }
 
-auto LaneletWrapper::laneletLengthCache() -> LaneletLengthCache &
+auto LaneletWrapper::laneletLengthCache() -> const LaneletLengthCache &
 {
   return getInstance().lanelet_length_cache_;
 }
@@ -191,6 +211,8 @@ LaneletWrapper::LaneletWrapper(const std::filesystem::path & lanelet_map_path)
   vehicle_with_road_shoulder_(
     lanelet_map_ptr_, Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle),
   pedestrian_(lanelet_map_ptr_, lanelet::Locations::Germany, lanelet::Participants::Pedestrian),
+  center_points_cache_(lanelet_map_ptr_),
+  lanelet_length_cache_(lanelet_map_ptr_),
   topology_cache_(
     lanelet_map_ptr_, {vehicle_.graph, pedestrian_.graph, vehicle_with_road_shoulder_.graph})
 {

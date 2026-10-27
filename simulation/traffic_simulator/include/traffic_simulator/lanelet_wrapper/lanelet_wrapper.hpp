@@ -149,48 +149,22 @@ private:
 class CenterPointsCache
 {
 public:
-  auto getCenterPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map)
-    -> decltype(auto)
+  explicit CenterPointsCache(const lanelet::LaneletMapPtr & lanelet_map);
+
+  auto getCenterPoints(const lanelet::Id lanelet_id) const -> decltype(auto)
   {
-    if (!exists(lanelet_id)) {
-      appendData(lanelet_id, centerPoints(lanelet_id, lanelet_map));
-    }
-    return readData(lanelet_id);
+    return data_.at(lanelet_id);
   }
 
-  auto getCenterPointsSpline(
-    const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map) -> decltype(auto)
+  auto getCenterPointsSpline(const lanelet::Id lanelet_id) const -> decltype(auto)
   {
-    if (!exists(lanelet_id)) {
-      appendData(lanelet_id, centerPoints(lanelet_id, lanelet_map));
-    }
     return readDataSpline(lanelet_id);
   }
 
 private:
-  auto exists(const lanelet::Id lanelet_id) -> bool
+  auto readDataSpline(const lanelet::Id lanelet_id) const -> std::shared_ptr<Spline>
   {
-    std::lock_guard lock(mutex_);
-    return data_.find(lanelet_id) != data_.end();
-  }
-
-  auto readData(const lanelet::Id lanelet_id) -> const std::vector<Point> &
-  {
-    std::lock_guard lock(mutex_);
-    return data_.at(lanelet_id);
-  }
-
-  auto readDataSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
-  {
-    std::lock_guard lock(mutex_);
     return splines_.at(lanelet_id);
-  }
-
-  auto appendData(const lanelet::Id lanelet_id, const std::vector<Point> & route) -> void
-  {
-    std::lock_guard lock(mutex_);
-    data_[lanelet_id] = route;
-    splines_[lanelet_id] = std::make_shared<Spline>(route);
   }
 
   auto centerPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map) const
@@ -217,50 +191,17 @@ private:
 
   std::unordered_map<lanelet::Id, std::vector<Point>> data_;
   std::unordered_map<lanelet::Id, std::shared_ptr<Spline>> splines_;
-  std::mutex mutex_;
 };
 
 class LaneletLengthCache
 {
 public:
-  auto getLength(lanelet::Id lanelet_id) -> double
-  {
-    if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route cache.");
-    }
-    return readData(lanelet_id);
-  }
+  explicit LaneletLengthCache(const lanelet::LaneletMapPtr & lanelet_map);
 
-  auto getLength(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map) -> double
-  {
-    if (!exists(lanelet_id)) {
-      appendData(
-        lanelet_id, lanelet::utils::getLaneletLength2d(lanelet_map->laneletLayer.get(lanelet_id)));
-    }
-    return readData(lanelet_id);
-  }
+  auto getLength(const lanelet::Id lanelet_id) const -> double { return data_.at(lanelet_id); }
 
 private:
-  auto exists(const lanelet::Id lanelet_id) -> bool
-  {
-    std::lock_guard lock(mutex_);
-    return data_.find(lanelet_id) != data_.end();
-  }
-
-  auto readData(const lanelet::Id lanelet_id) -> double
-  {
-    std::lock_guard lock(mutex_);
-    return data_.at(lanelet_id);
-  }
-
-  auto appendData(const lanelet::Id lanelet_id, double length) -> void
-  {
-    std::lock_guard lock(mutex_);
-    data_[lanelet_id] = length;
-  }
-
   std::unordered_map<lanelet::Id, double> data_;
-  std::mutex mutex_;
 };
 
 class TopologyCache
@@ -318,8 +259,8 @@ public:
     -> lanelet::traffic_rules::TrafficRulesPtr;
 
   [[nodiscard]] static auto routeCache(const RoutingGraphType type) -> RouteCache &;
-  [[nodiscard]] static auto centerPointsCache() -> CenterPointsCache &;
-  [[nodiscard]] static auto laneletLengthCache() -> LaneletLengthCache &;
+  [[nodiscard]] static auto centerPointsCache() -> const CenterPointsCache &;
+  [[nodiscard]] static auto laneletLengthCache() -> const LaneletLengthCache &;
   [[nodiscard]] static auto topologyCache() -> const TopologyCache &;
 
 private:
@@ -336,8 +277,8 @@ private:
   const TrafficRulesWithRoutingGraph vehicle_with_road_shoulder_;
   const TrafficRulesWithRoutingGraph pedestrian_;
 
-  mutable CenterPointsCache center_points_cache_;
-  mutable LaneletLengthCache lanelet_length_cache_;
+  const CenterPointsCache center_points_cache_;
+  const LaneletLengthCache lanelet_length_cache_;
   const TopologyCache topology_cache_;
 };
 }  // namespace lanelet_wrapper
