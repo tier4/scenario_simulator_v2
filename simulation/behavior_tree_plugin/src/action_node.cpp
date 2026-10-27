@@ -392,6 +392,25 @@ auto detectEntityCollisions(
     if (entity_name == name) {
       continue;
     }
+    if (data.trajectory_bounds) {
+      const auto & box = status.getBoundingBox();
+      // Contain all rotated top-face corners, including the bounding-box center offset.
+      const double radius = std::hypot(
+                              std::hypot(
+                                std::abs(box.center.x) + 0.5 * std::abs(box.dimensions.x),
+                                std::abs(box.center.y) + 0.5 * std::abs(box.dimensions.y)),
+                              std::abs(box.center.z + 0.5 * box.dimensions.z)) +
+                            1e-8;
+      const auto & p = status.getMapPose().position;
+      const auto & bounds = *data.trajectory_bounds;
+      if (
+        p.x + radius < bg::get<bg::min_corner, 0>(bounds) ||
+        p.x - radius > bg::get<bg::max_corner, 0>(bounds) ||
+        p.y + radius < bg::get<bg::min_corner, 1>(bounds) ||
+        p.y - radius > bg::get<bg::max_corner, 1>(bounds)) {
+        continue;
+      }
+    }
     // Generate a 2D polygon from the entity pose and bounding box.
     auto polygon = math::geometry::toPolygon2D(status.getMapPose(), status.getBoundingBox());
     if (polygon.outer().size() < 3) {
