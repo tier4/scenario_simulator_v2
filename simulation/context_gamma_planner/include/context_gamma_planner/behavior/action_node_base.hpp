@@ -43,7 +43,7 @@ public:
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
       BT::InputPort<double>("current_time"),
       BT::InputPort<double>("step_time"),
-      BT::InputPort<entity_behavior::EntityStatusDict>("other_entity_status"),
+      BT::InputPort<traffic_simulator::OtherEntityStatuses>("other_entity_status"),
       BT::InputPort<std::vector<geometry_msgs::msg::Pose>>("goal_poses"),
       BT::InputPort<std::vector<lanelet::Id>>("route_lanelets"),
       BT::InputPort<std::optional<double>>("target_speed"),
@@ -51,7 +51,7 @@ public:
       BT::OutputPort<geometry_msgs::msg::Point>("next_goal"),
       BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("updated_status"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
-      BT::InputPort<entity_behavior::EntityStatusDict>("other_entity_status"),
+      BT::InputPort<traffic_simulator::OtherEntityStatuses>("other_entity_status"),
       BT::InputPort<std::vector<lanelet::Id>>("route_lanelets"),
       BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
@@ -69,7 +69,7 @@ protected:
   double step_time;
   std::optional<double> target_speed;
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> updated_status;
-  entity_behavior::EntityStatusDict other_entity_status;
+  traffic_simulator::OtherEntityStatuses other_entity_status;
   std::vector<lanelet::Id> route_lanelets;
 };
 }  // namespace context_gamma_planner

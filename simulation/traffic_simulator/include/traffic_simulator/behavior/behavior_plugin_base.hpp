@@ -22,6 +22,7 @@
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/other_entity_statuses.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
@@ -67,7 +68,7 @@ public:
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             "lane_change_parameters",                         traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        "lateral_collision_threshold",                    std::optional<double>)
   DEFINE_GETTER_SETTER(Obstacle,                                         "obstacle",                                       std::optional<traffic_simulator_msgs::msg::Obstacle>)
-  DEFINE_GETTER_SETTER(OtherEntityStatus,                                "other_entity_status",                            EntityStatusDict)
+  DEFINE_GETTER_SETTER(OtherEntityStatus,                                "other_entity_status",                            traffic_simulator::OtherEntityStatuses)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             "pedestrian_parameters",                          traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(PolylineTrajectory,                               "polyline_trajectory",                            std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
   DEFINE_GETTER_SETTER(ReferenceTrajectory,                              "reference_trajectory",                           std::shared_ptr<math::geometry::CatmullRomSpline>)
