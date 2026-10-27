@@ -44,7 +44,7 @@ auto isInIntersection(const lanelet::Id lanelet_id) -> bool
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
-  return LaneletWrapper::laneletLengthCache().getLength(lanelet_id, LaneletWrapper::map());
+  return LaneletWrapper::laneletLengthCache().getLength(lanelet_id);
 }
 
 auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
@@ -186,13 +186,12 @@ auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
 
 auto centerPoints(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
-  return LaneletWrapper::centerPointsCache().getCenterPoints(lanelet_id, LaneletWrapper::map());
+  return LaneletWrapper::centerPointsCache().getCenterPoints(lanelet_id);
 }
 
 auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
 {
-  return LaneletWrapper::centerPointsCache().getCenterPointsSpline(
-    lanelet_id, LaneletWrapper::map());
+  return LaneletWrapper::centerPointsCache().getCenterPointsSpline(lanelet_id);
 }
 
 // Next lanelet
