@@ -30,12 +30,12 @@ static_assert(std::is_move_constructible_v<RelativeTargetSpeed>);
 static_assert(std::is_copy_assignable_v<RelativeTargetSpeed>);
 static_assert(std::is_move_assignable_v<RelativeTargetSpeed>);
 
-double RelativeTargetSpeed::getAbsoluteValue(
-  const CanonicalizedEntityStatus & status,
-  const std::unordered_map<std::string, CanonicalizedEntityStatus> & other_status) const
+template <typename Statuses>
+double RelativeTargetSpeed::getAbsoluteValueImpl(
+  const CanonicalizedEntityStatus & status, const Statuses & other_status) const
 {
   if (const auto iter = other_status.find(reference_entity_name); iter == other_status.end()) {
-    if (static_cast<EntityStatus>(status).name == reference_entity_name) {
+    if (status.getName() == reference_entity_name) {
       switch (type) {
         default:
         case Type::DELTA:
@@ -59,6 +59,19 @@ double RelativeTargetSpeed::getAbsoluteValue(
         return iter->second.getTwist().linear.x * value;
     }
   }
+}
+
+double RelativeTargetSpeed::getAbsoluteValue(
+  const CanonicalizedEntityStatus & status,
+  const std::unordered_map<std::string, CanonicalizedEntityStatus> & other_status) const
+{
+  return getAbsoluteValueImpl(status, other_status);
+}
+
+double RelativeTargetSpeed::getAbsoluteValue(
+  const CanonicalizedEntityStatus & status, const OtherEntityStatuses & other_status) const
+{
+  return getAbsoluteValueImpl(status, other_status);
 }
 }  // namespace speed_change
 }  // namespace traffic_simulator

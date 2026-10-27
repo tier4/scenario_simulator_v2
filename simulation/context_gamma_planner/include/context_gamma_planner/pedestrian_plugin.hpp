@@ -65,7 +65,7 @@ public:
   DEFINE_GETTER_SETTER(PolylineTrajectory,   std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
   DEFINE_GETTER_SETTER(LaneChangeParameters, traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(Obstacle,             std::optional<traffic_simulator_msgs::msg::Obstacle>)
-  DEFINE_GETTER_SETTER(OtherEntityStatus,    entity_behavior::EntityStatusDict)
+  DEFINE_GETTER_SETTER(OtherEntityStatus,    traffic_simulator::OtherEntityStatuses)
   DEFINE_GETTER_SETTER(PedestrianParameters, traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(Request,              traffic_simulator::behavior::Request)
   DEFINE_GETTER_SETTER(RouteLanelets,        std::vector<lanelet::Id>)

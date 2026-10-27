@@ -566,11 +566,15 @@ void EntityBase::setDynamicConstraints(
   setBehaviorParameter(behavior_parameter);
 }
 
+void EntityBase::setOtherStatus(const OtherEntityStatuses & status)
+{
+  other_status_ = status.excluding(name);
+}
+
 void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, CanonicalizedEntityStatus> & status)
 {
-  other_status_ = status;
-  other_status_.erase(name);
+  setOtherStatus(OtherEntityStatuses(status));
 }
 
 auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void

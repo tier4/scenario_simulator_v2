@@ -41,7 +41,8 @@ auto ActionNodeBase::getBlackBoardValues() -> void
     target_speed = std::nullopt;
   }
 
-  if (!getInput<entity_behavior::EntityStatusDict>("other_entity_status", other_entity_status)) {
+  if (!getInput<traffic_simulator::OtherEntityStatuses>(
+        "other_entity_status", other_entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status in ActionNode");
   }
   if (!getInput<std::vector<lanelet::Id>>("route_lanelets", route_lanelets)) {
