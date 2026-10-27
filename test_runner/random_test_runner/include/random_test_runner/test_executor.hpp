@@ -61,12 +61,13 @@ public:
   TestExecutor(
     std::shared_ptr<traffic_simulator_api_type> api, TestDescription description,
     JunitXmlReporterTestCase test_case_reporter, double test_timeout,
-    ArchitectureType architecture_type, rclcpp::Logger logger)
+    ArchitectureType architecture_type, rclcpp::Logger logger, const bool spawn_ego_as_npc = false)
   : api_(std::move(api)),
     test_description_(std::move(description)),
     error_reporter_(std::move(test_case_reporter)),
     test_timeout_(test_timeout),
     architecture_type_(architecture_type),
+    spawn_ego_as_npc_(spawn_ego_as_npc),
     logger_(logger)
   {
   }
@@ -89,62 +90,77 @@ public:
           " offset: " + std::to_string(test_description_.ego_start_position.offset));
       } else {
         api_->updateFrame();
-        api_->spawn(
-          ego_name_, ego_start_canonicalized_lanelet_pose.value(), getVehicleParameters(),
-          traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
+        const traffic_simulator::RouteOption option;
 
-        auto & ego_entity = api_->getEgoEntity(ego_name_);
+        if (spawn_ego_as_npc_) {
+          api_->spawn(
+            ego_name_, ego_start_canonicalized_lanelet_pose.value(), getVehicleParameters());
 
-        ego_entity.setStatus(
-          ego_start_canonicalized_lanelet_pose.value(),
-          traffic_simulator::helper::constructActionStatus());
+          auto & ego_entity = api_->getEntity(ego_name_);
 
-        if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
-          api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-            traffic_simulator::helper::LidarType::VLP16, ego_name_,
-            stringFromArchitectureType(architecture_type_)));
+          ego_entity.setStatus(
+            ego_start_canonicalized_lanelet_pose.value(),
+            traffic_simulator::helper::constructActionStatus());
 
-          double constexpr detection_update_duration = 0.1;
-          api_->attachDetectionSensor(
-            traffic_simulator::helper::constructDetectionSensorConfiguration(
-              ego_name_, stringFromArchitectureType(architecture_type_),
-              detection_update_duration));
+          ego_entity.requestAssignRoute({test_description_.ego_goal_pose}, option);
+        } else {
+          api_->spawn(
+            ego_name_, ego_start_canonicalized_lanelet_pose.value(), getVehicleParameters(),
+            traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
 
-          api_->attachOccupancyGridSensor([&]() {
-            simulation_api_schema::OccupancyGridSensorConfiguration configuration;
-            configuration.set_architecture_type(stringFromArchitectureType(architecture_type_));
-            configuration.set_entity(ego_name_);
-            configuration.set_filter_by_range(true);
-            configuration.set_height(200);
-            configuration.set_range(300);
-            configuration.set_resolution(0.5);
-            configuration.set_update_duration(0.1);
-            configuration.set_width(200);
-            return configuration;
-          }());
+          auto & ego_entity = api_->getEgoEntity(ego_name_);
 
-          api_->attachImuSensor(ego_name_, [&]() {
-            simulation_api_schema::ImuSensorConfiguration configuration;
-            configuration.set_entity(ego_name_);
-            configuration.set_frame_id("base_link");
-            configuration.set_add_gravity(true);
-            configuration.set_use_seed(true);
-            configuration.set_seed(0);
-            configuration.set_noise_standard_deviation_orientation(0.01);
-            configuration.set_noise_standard_deviation_twist(0.01);
-            configuration.set_noise_standard_deviation_acceleration(0.01);
-            return configuration;
-          }());
+          ego_entity.setStatus(
+            ego_start_canonicalized_lanelet_pose.value(),
+            traffic_simulator::helper::constructActionStatus());
 
-          ego_entity.template setParameter<bool>("allow_goal_modification", true);
+          if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
+            api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+              traffic_simulator::helper::LidarType::VLP16, ego_name_,
+              stringFromArchitectureType(architecture_type_)));
+
+            double constexpr detection_update_duration = 0.1;
+            api_->attachDetectionSensor(
+              traffic_simulator::helper::constructDetectionSensorConfiguration(
+                ego_name_, stringFromArchitectureType(architecture_type_),
+                detection_update_duration));
+
+            api_->attachOccupancyGridSensor([&]() {
+              simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+              configuration.set_architecture_type(stringFromArchitectureType(architecture_type_));
+              configuration.set_entity(ego_name_);
+              configuration.set_filter_by_range(true);
+              configuration.set_height(200);
+              configuration.set_range(300);
+              configuration.set_resolution(0.5);
+              configuration.set_update_duration(0.1);
+              configuration.set_width(200);
+              return configuration;
+            }());
+
+            api_->attachImuSensor(ego_name_, [&]() {
+              simulation_api_schema::ImuSensorConfiguration configuration;
+              configuration.set_entity(ego_name_);
+              configuration.set_frame_id("base_link");
+              configuration.set_add_gravity(true);
+              configuration.set_use_seed(true);
+              configuration.set_seed(0);
+              configuration.set_noise_standard_deviation_orientation(0.01);
+              configuration.set_noise_standard_deviation_twist(0.01);
+              configuration.set_noise_standard_deviation_acceleration(0.01);
+              return configuration;
+            }());
+
+            ego_entity.template setParameter<bool>("allow_goal_modification", true);
+          }
+          // XXX dirty hack: wait for autoware system to launch
+          // ugly but helps for now
+          std::this_thread::sleep_for(std::chrono::milliseconds{5000});
+
+          ego_entity.requestAssignRoute({test_description_.ego_goal_pose}, option);
+
+          ego_entity.engage();
         }
-
-        // XXX dirty hack: wait for autoware system to launch
-        // ugly but helps for now
-        std::this_thread::sleep_for(std::chrono::milliseconds{5000});
-
-        ego_entity.requestAssignRoute(std::vector({test_description_.ego_goal_pose}));
-        ego_entity.engage();
 
         goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
 
@@ -179,7 +195,7 @@ public:
   {
     executeWithErrorHandling([this]() {
       if (!api_->isNpcLogicStarted()) {
-        if (api_->isEntityExist(ego_name_)) {
+        if (api_->isEntityExist(ego_name_) && not spawn_ego_as_npc_) {
           auto & ego_entity = api_->getEgoEntity(ego_name_);
           if (ego_entity.isEngaged()) {
             api_->startNpcLogic();
@@ -290,7 +306,8 @@ private:
   double test_timeout_;
   ArchitectureType architecture_type_;
 
-  bool scenario_completed_ = false;
+  bool scenario_completed_{false};
+  bool spawn_ego_as_npc_{false};
 
   rclcpp::Logger logger_;
 };

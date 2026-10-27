@@ -103,8 +103,8 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
         get_logger(), validated_params, test_case_parameters_vector[test_id], lanelet_utils)
         .generate(),
       error_reporter_.spawnTestCase(validated_params.name, std::to_string(test_id)),
-      test_control_parameters.test_timeout, test_control_parameters.architecture_type,
-      get_logger());
+      test_control_parameters.test_timeout, test_control_parameters.architecture_type, get_logger(),
+      test_control_parameters.spawn_ego_as_npc);
     yaml_test_params_saver.addTestCase(test_case_parameters_vector[test_id], validated_params.name);
   }
 
@@ -152,6 +152,7 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
   tp.architecture_type =
     architectureTypeFromString(this->declare_parameter<std::string>("architecture_type", ""));
   tp.simulator_host = this->declare_parameter<std::string>("simulator_host", "localhost");
+  tp.spawn_ego_as_npc = this->declare_parameter<bool>("spawn_ego_as_npc", false);
 
   if (!tp.input_dir.empty() && !std::filesystem::is_directory(tp.input_dir)) {
     throw std::runtime_error(
