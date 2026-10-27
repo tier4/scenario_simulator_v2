@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <geometry/bounding_box.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
@@ -141,7 +142,7 @@ BT::NodeStatus FollowLaneAction::doAction()
       if (
         distance_to_stopline.value() <=
         calculateStopDistance(behavior_parameter_.dynamic_constraints) +
-          vehicle_parameters.bounding_box.dimensions.x * bounding_box_half_factor +
+          math::geometry::getDistancesFromCenterToEdge(vehicle_parameters.bounding_box).front +
           stop_line_margin) {
         return BT::NodeStatus::FAILURE;
       }

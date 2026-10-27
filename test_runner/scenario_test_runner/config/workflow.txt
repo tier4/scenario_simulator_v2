@@ -30,3 +30,5 @@ $(find-pkg-share scenario_test_runner)/scenario/collision_condition_by_type.yaml
 $(find-pkg-share scenario_test_runner)/scenario/Event.Priority.override.yaml
 $(find-pkg-share scenario_test_runner)/scenario/Event.Priority.parallel.yaml
 $(find-pkg-share scenario_test_runner)/scenario/Event.Priority.skip.yaml
+$(find-pkg-share scenario_test_runner)/scenario/npc-give-way-to-crossing-traffic.yaml
+$(find-pkg-share scenario_test_runner)/scenario/npc-stop-at-stop-line.yaml

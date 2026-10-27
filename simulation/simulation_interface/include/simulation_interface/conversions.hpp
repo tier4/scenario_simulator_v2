@@ -15,6 +15,7 @@
 #ifndef SIMULATION_INTERFACE__CONVERSIONS_HPP_
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
+#include <osi_common.pb.h>
 #include <simulation_interface/builtin_interfaces.pb.h>
 #include <simulation_interface/geometry_msgs.pb.h>
 #include <simulation_interface/rosgraph_msgs.pb.h>
@@ -280,6 +281,12 @@ auto toProtobufMessage(const traffic_simulator_msgs::msg::PolylineTrajectory &)
 
 auto toROS2Message(const traffic_simulator_msgs::PolylineTrajectory &)
   -> traffic_simulator_msgs::msg::PolylineTrajectory;
+
+template <typename T, typename... Ts>
+auto to(Ts &&...) -> T = delete;
+
+template <>
+auto to<osi3::Timestamp>(const builtin_interfaces::msg::Time &) -> osi3::Timestamp;
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_
