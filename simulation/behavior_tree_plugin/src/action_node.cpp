@@ -275,11 +275,14 @@ namespace
 {
 namespace bg = boost::geometry;
 using BoostPolygon = math::geometry::boost_polygon;
+using AxisAlignedBox = bg::model::box<math::geometry::boost_point>;
 
 struct QuadrilateralData
 {
   std::vector<BoostPolygon> polygons;
+  std::vector<AxisAlignedBox> segment_bounds;
   std::vector<double> longitudinal_starts;
+  std::optional<AxisAlignedBox> trajectory_bounds;
 };
 
 auto buildQuadrilateralData(
@@ -319,6 +322,7 @@ auto buildQuadrilateralData(
   }
 
   data.polygons.reserve(num_segments);
+  data.segment_bounds.reserve(num_segments);
   data.longitudinal_starts.reserve(num_segments);
   for (std::size_t i = 0; i < num_segments; ++i) {
     data.longitudinal_starts.emplace_back(step_size * static_cast<double>(i));
@@ -333,6 +337,15 @@ auto buildQuadrilateralData(
     outer.emplace_back(right_bounds[i + 1].x, right_bounds[i + 1].y);
     outer.push_back(outer.front());
     bg::correct(polygon);
+
+    AxisAlignedBox bounds;
+    bg::envelope(polygon, bounds);
+    if (data.trajectory_bounds) {
+      bg::expand(data.trajectory_bounds.value(), bounds);
+    } else {
+      data.trajectory_bounds = bounds;
+    }
+    data.segment_bounds.emplace_back(bounds);
     data.polygons.emplace_back(std::move(polygon));
   }
   return data;
@@ -342,8 +355,19 @@ auto intersectsTrajectory(
   const QuadrilateralData & trajectory_polygons, const BoostPolygon & target_polygon)
   -> std::optional<double>
 {
+  AxisAlignedBox target_bounds;
+  bg::envelope(target_polygon, target_bounds);
+  if (
+    trajectory_polygons.trajectory_bounds &&
+    bg::disjoint(trajectory_polygons.trajectory_bounds.value(), target_bounds)) {
+    return std::nullopt;
+  }
+
   const auto num = trajectory_polygons.polygons.size();
   for (std::size_t i = 0; i < num; ++i) {
+    if (bg::disjoint(trajectory_polygons.segment_bounds.at(i), target_bounds)) {
+      continue;
+    }
     if (bg::intersects(trajectory_polygons.polygons.at(i), target_polygon)) {
       return trajectory_polygons.longitudinal_starts.at(i);
     }
