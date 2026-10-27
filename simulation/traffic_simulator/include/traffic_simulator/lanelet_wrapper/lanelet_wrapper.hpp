@@ -22,6 +22,7 @@
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
+#include <array>
 #include <autoware_lanelet2_extension/utility/utilities.hpp>
 #include <filesystem>
 #include <geometry/spline/catmull_rom_spline.hpp>
@@ -38,6 +39,7 @@
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
+#include <unordered_map>
 
 namespace std
 {
@@ -261,6 +263,34 @@ private:
   std::mutex mutex_;
 };
 
+class TopologyCache
+{
+public:
+  TopologyCache(
+    const lanelet::LaneletMapPtr & lanelet_map,
+    const std::array<lanelet::routing::RoutingGraphConstPtr, 3> & routing_graphs);
+
+  [[nodiscard]] auto getNextLaneletIds(
+    const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &;
+  [[nodiscard]] auto getPreviousLaneletIds(
+    const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &;
+  [[nodiscard]] auto getRightOfWayLaneletIds(const lanelet::Id lanelet_id) const
+    -> const lanelet::Ids &;
+  [[nodiscard]] auto getConflictingCrosswalkIds(const lanelet::Id lanelet_id) const
+    -> const lanelet::Ids &;
+  [[nodiscard]] auto getConflictingLaneIds(
+    const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &;
+
+private:
+  using LaneletIdsCache = std::unordered_map<lanelet::Id, lanelet::Ids>;
+
+  std::array<LaneletIdsCache, 3> next_lanelet_ids_cache_;
+  std::array<LaneletIdsCache, 3> previous_lanelet_ids_cache_;
+  LaneletIdsCache right_of_way_lanelet_ids_cache_;
+  LaneletIdsCache conflicting_crosswalk_ids_cache_;
+  std::array<LaneletIdsCache, 3> conflicting_lanelet_ids_cache_;
+};
+
 struct TrafficRulesWithRoutingGraph
 {
   lanelet::traffic_rules::TrafficRulesPtr rules;
@@ -290,6 +320,7 @@ public:
   [[nodiscard]] static auto routeCache(const RoutingGraphType type) -> RouteCache &;
   [[nodiscard]] static auto centerPointsCache() -> CenterPointsCache &;
   [[nodiscard]] static auto laneletLengthCache() -> LaneletLengthCache &;
+  [[nodiscard]] static auto topologyCache() -> const TopologyCache &;
 
 private:
   explicit LaneletWrapper(const std::filesystem::path & lanelet_map_path);
@@ -307,6 +338,7 @@ private:
 
   mutable CenterPointsCache center_points_cache_;
   mutable LaneletLengthCache lanelet_length_cache_;
+  const TopologyCache topology_cache_;
 };
 }  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
