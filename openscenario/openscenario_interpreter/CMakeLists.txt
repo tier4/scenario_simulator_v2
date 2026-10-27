@@ -83,6 +83,39 @@ target_precompile_headers(${PROJECT_NAME}
     "<openscenario_interpreter/object.hpp>"
     "<openscenario_interpreter/scope.hpp>")
 
+set(${PROJECT_NAME}_LIGHTWEIGHT_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/boolean.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/command.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/condition_edge.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/coordinate_system.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/double.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/following_mode.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/fractional_cloud_cover.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/integer.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/misc_object_category.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/parameter_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/pedestrian_category.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/precipitation_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/priority.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/reference_context.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/relative_distance_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/route_strategy.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/routing_algorithm.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/rule.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/storyboard_element_state.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/storyboard_element_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/stochastic_distribution_type.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/trajectory_following_mode.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/triggering_entities_rule.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/unsigned_integer.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/unsigned_short.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/vehicle_category.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/syntax/wetness.cpp)
+
+set_source_files_properties(
+  ${${PROJECT_NAME}_LIGHTWEIGHT_SOURCES}
+  PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
 # ------------------------------------------------------------------------------
