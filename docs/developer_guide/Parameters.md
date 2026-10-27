@@ -22,7 +22,7 @@ behave as if similar default values had been specified.
 There are currently two ways to configure some topics: an old way and a new way
 described on this page. The new way is backward compatible and is the
 recommended way. If you want to know how to use the old way, [see this
-page](https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/ConfiguringPerceptionTopics/).
+page](ConfiguringPerceptionTopics.md).
 
 ## /perception/object_recognition/detection/objects
 

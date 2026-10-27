@@ -25,7 +25,7 @@ With this simulation, we can get lidar point-cloud data based on simple ray-cast
 
 ### Configuration
 
-See [the Lidar Configuration documentation](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#lidarconfiguration)
+See [the Lidar Configuration documentation](../proto_doc/protobuf.md#lidarconfiguration)
 
 ### Acknowledgments
 
@@ -61,7 +61,7 @@ This enables us to reduce computational resources when we want to test Autoware'
 
 ### Configuration
 
-See [the OccupancyGridSensorConfiguration documentation](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#occupancygridsensorconfiguration)
+See [the OccupancyGridSensorConfiguration documentation](../proto_doc/protobuf.md#occupancygridsensorconfiguration)
 
 ## Object Detection Results Simulation
 
@@ -77,4 +77,4 @@ This also enables you to reduce computational resources when you want to test Au
 
 ### Configuration
 
-See [the DetectionSensorConfiguration documentation](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#detectionsensorconfiguration)
+See [the DetectionSensorConfiguration documentation](../proto_doc/protobuf.md#detectionsensorconfiguration)
