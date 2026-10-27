@@ -31,6 +31,8 @@
 
 namespace openscenario_interpreter
 {
+class ScenarioRuntime;
+
 class EnvironmentFrame
 {
   friend struct Scope;
@@ -191,6 +193,8 @@ class Scope
 
   const std::shared_ptr<ScenarioDefinition> scenario_definition;
 
+  const std::shared_ptr<ScenarioRuntime> scenario_runtime;
+
 public:
   const std::string name;
 
@@ -204,7 +208,7 @@ public:
 
   Scope(Scope &&) = default;
 
-  explicit Scope(const OpenScenario * const);
+  explicit Scope(const OpenScenario * const, std::shared_ptr<ScenarioRuntime>);
 
   explicit Scope(const std::string &, const Scope &);
 
@@ -229,6 +233,8 @@ public:
   auto local() const noexcept -> const Scope &;
 
   auto local() noexcept -> Scope &;
+
+  auto runtime() const noexcept -> ScenarioRuntime &;
 
   auto insert(const Name &, const Object &) -> void;
 };

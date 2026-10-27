@@ -51,7 +51,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   publish_empty_context(false),
   record(false),
   record_option(""),
-  record_storage_id("")
+  record_storage_id(""),
+  scenario_runtime(std::make_shared<ScenarioRuntime>())
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
@@ -125,7 +126,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(record_option);
       GET_PARAMETER(record_storage_id);
 
-      script = std::make_shared<OpenScenario>(osc_path);
+      script = std::make_shared<OpenScenario>(osc_path, scenario_runtime);
 
       common::status_monitor.updateThreshold(
         std::chrono::seconds(common::getParameter<std::int64_t>("status_monitor_threshold", 10)));

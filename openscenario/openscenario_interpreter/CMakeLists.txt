@@ -62,11 +62,14 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   ${${PROJECT_NAME}_SYNTAX_SOURCES}
   ${${PROJECT_NAME}_UTILITY_SOURCES}
   src/compatibility.cpp
+  src/entity_operations.cpp
   src/evaluate.cpp
   src/object.cpp
   src/openscenario_interpreter.cpp
   src/record.cpp
-  src/scope.cpp)
+  src/scenario_runtime.cpp
+  src/scope.cpp
+  src/traffic_signal_operations.cpp)
 
 target_link_libraries(${PROJECT_NAME} Boost::json glog pugixml)
 

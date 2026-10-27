@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
@@ -121,7 +123,7 @@ auto SpeedAction::start() -> void
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       each.first.apply([&](const auto & object) {
-        applySpeedAction(
+        runtime().entities().applySpeedAction(
           object, speed_action_target.as<AbsoluteTargetSpeed>().value,
           static_cast<traffic_simulator::speed_change::Transition>(
             speed_action_dynamics.dynamics_shape),
@@ -129,7 +131,7 @@ auto SpeedAction::start() -> void
       });
     } else {
       each.first.apply([&](const auto & object) {
-        applySpeedAction(
+        runtime().entities().applySpeedAction(
           object,
           static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
             speed_action_target.as<RelativeTargetSpeed>()),

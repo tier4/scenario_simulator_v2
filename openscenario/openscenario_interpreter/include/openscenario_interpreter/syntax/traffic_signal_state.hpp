@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_HPP_
 
+#include <lanelet2_core/Forward.h>
+
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
@@ -34,8 +35,10 @@ inline namespace syntax
      <xsd:attribute name="trafficSignalId" type="String" use="required"/>
    </xsd:complexType>
 */
-struct TrafficSignalState : private SimulatorCore::NonStandardOperation
+struct TrafficSignalState
 {
+  ScenarioRuntime & scenario_runtime;
+
   /*
      NOTE:
        ID of the referenced signal in a road network. The signal ID must be

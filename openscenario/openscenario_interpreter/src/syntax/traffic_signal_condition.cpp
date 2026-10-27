@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_condition.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 
@@ -21,7 +22,8 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 TrafficSignalCondition::TrafficSignalCondition(const pugi::xml_node & node, Scope & scope)
-: name(readAttribute<String>("name", node, scope)),
+: scenario_runtime(scope.runtime()),
+  name(readAttribute<String>("name", node, scope)),
   state(readAttribute<String>("state", node, scope))
 {
 }
@@ -39,11 +41,12 @@ auto TrafficSignalCondition::description() const -> String
 auto TrafficSignalCondition::evaluate() -> Object
 {
   const auto lanelet_id = boost::lexical_cast<std::int64_t>(name);
-  current_state = getConventionalTrafficLightsComposedState(lanelet_id);
+  const auto & traffic_signals = scenario_runtime.trafficSignals();
+  current_state = traffic_signals.getConventionalTrafficLightsComposedState(lanelet_id);
   if (current_state.empty()) {
     current_state = "none";
   }
-  return asBoolean(compareConventionalTrafficLightsState(lanelet_id, state));
+  return asBoolean(traffic_signals.compareConventionalTrafficLightsState(lanelet_id, state));
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

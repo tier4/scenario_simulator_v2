@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/acquire_position_action.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
@@ -32,25 +33,29 @@ AcquirePositionAction::AcquirePositionAction(const pugi::xml_node & node, Scope 
 auto AcquirePositionAction::start() -> void
 {
   const auto acquire_position = overload(
-    [](
+    [&](
       const WorldPosition & position, auto && actor,
       const traffic_simulator::RouteOption & options) {
-      return applyAcquirePositionAction(actor, static_cast<NativeWorldPosition>(position), options);
+      return runtime().entities().applyAcquirePositionAction(
+        actor, static_cast<geometry_msgs::msg::Pose>(position), options);
     },
-    [](
+    [&](
       const RelativeWorldPosition & position, auto && actor,
       const traffic_simulator::RouteOption & options) {
-      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position), options);
+      return runtime().entities().applyAcquirePositionAction(
+        actor, static_cast<traffic_simulator::CanonicalizedLaneletPose>(position), options);
     },
-    [](
+    [&](
       const RelativeObjectPosition & position, auto && actor,
       const traffic_simulator::RouteOption & options) {
-      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position), options);
+      return runtime().entities().applyAcquirePositionAction(
+        actor, static_cast<traffic_simulator::CanonicalizedLaneletPose>(position), options);
     },
-    [](
+    [&](
       const LanePosition & position, auto && actor,
       const traffic_simulator::RouteOption & options) {
-      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position), options);
+      return runtime().entities().applyAcquirePositionAction(
+        actor, static_cast<traffic_simulator::CanonicalizedLaneletPose>(position), options);
     });
 
   auto get_from_controller_property =

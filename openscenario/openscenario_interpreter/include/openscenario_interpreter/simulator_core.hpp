@@ -31,6 +31,9 @@
 
 namespace openscenario_interpreter
 {
+class EntityOperations;
+class TrafficSignalOperations;
+
 using NativeWorldPosition = geometry_msgs::msg::Pose;
 
 using NativeRelativeWorldPosition = NativeWorldPosition;
@@ -41,6 +44,9 @@ using NativeRelativeLanePosition = traffic_simulator::LaneletPose;
 
 class SimulatorCore
 {
+  friend class EntityOperations;
+  friend class TrafficSignalOperations;
+
   static inline std::unique_ptr<traffic_simulator::API> core = nullptr;
 
 public:
@@ -293,43 +299,6 @@ public:
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
   {
   protected:
-    template <typename... Ts>
-    static auto applyAcquirePositionAction(const std::string & entity_ref, Ts &&... xs)
-    {
-      return core->getEntity(entity_ref).requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto applyAddEntityAction(Ts &&... xs) -> decltype(auto)
-    {
-      return core->spawn(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename EntityRef, typename DynamicConstraints>
-    static auto applyProfileAction(
-      const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints) -> void
-    {
-      auto & entity = core->getEntity(entity_ref);
-      entity.setBehaviorParameter([&]() {
-        auto behavior_parameter = entity.getBehaviorParameter();
-
-        // clang-format off
-        const auto setIfNotInf = [](auto & target, const auto & value) {
-          if (not std::isinf(value)) {
-            target = value;
-          }
-        };
-        setIfNotInf(behavior_parameter.dynamic_constraints.max_speed, dynamic_constraints.max_speed);
-        setIfNotInf(behavior_parameter.dynamic_constraints.max_acceleration, dynamic_constraints.max_acceleration);
-        setIfNotInf(behavior_parameter.dynamic_constraints.max_acceleration_rate, dynamic_constraints.max_acceleration_rate);
-        setIfNotInf(behavior_parameter.dynamic_constraints.max_deceleration, dynamic_constraints.max_deceleration);
-        setIfNotInf(behavior_parameter.dynamic_constraints.max_deceleration_rate, dynamic_constraints.max_deceleration_rate);
-        // clang-format on
-
-        return behavior_parameter;
-      }());
-    }
-
     template <typename Controller>
     static auto applyAssignControllerAction(
       const std::string & entity_ref, Controller && controller) -> void
@@ -478,68 +447,6 @@ public:
           }
         }
       }
-    }
-
-    template <typename... Ts>
-    static auto applyAssignRouteAction(const std::string & entity_ref, Ts &&... xs)
-    {
-      return core->getEntity(entity_ref).requestAssignRoute(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto applyDeleteEntityAction(Ts &&... xs)
-    {
-      return core->despawn(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto applyFollowTrajectoryAction(
-      const std::string & entity_ref,
-      const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter)
-    {
-      /// @note add current entity pose as the first waypoint in the trajectory
-      traffic_simulator_msgs::msg::Vertex initial_vertex;
-      initial_vertex.time = std::numeric_limits<double>::quiet_NaN();
-      initial_vertex.position = core->getEntity(entity_ref).getMapPose();
-      parameter->shape.vertices.insert(parameter->shape.vertices.begin(), initial_vertex);
-      return core->getEntity(entity_ref).requestFollowTrajectory(parameter);
-    }
-
-    template <typename... Ts>
-    static auto applyLaneChangeAction(const std::string & entity_ref, Ts &&... xs)
-    {
-      return core->getEntity(entity_ref).requestLaneChange(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto applySpeedAction(const std::string & entity_ref, Ts &&... xs)
-    {
-      return core->getEntity(entity_ref).requestSpeedChange(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <
-      typename PoseType, typename... Ts,
-      typename = std::enable_if_t<
-        std::is_same_v<std::decay_t<PoseType>, geometry_msgs::msg::Pose> ||
-        std::is_same_v<std::decay_t<PoseType>, traffic_simulator::LaneletPose> ||
-        std::is_same_v<std::decay_t<PoseType>, traffic_simulator::CanonicalizedLaneletPose>>>
-    static auto applyTeleportAction(const std::string & name, const PoseType & pose, Ts &&... xs)
-    {
-      return core->getEntity(name).setStatus(pose, std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto applyTeleportAction(
-      const std::string & name, const std::string & reference_entity_name, Ts &&... xs)
-    {
-      return core->getEntity(name).setStatus(
-        core->getEntity(reference_entity_name).getMapPose(), std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto applyWalkStraightAction(const std::string & entity_ref, Ts &&... xs)
-    {
-      return core->getEntity(entity_ref).requestWalkStraight(std::forward<decltype(xs)>(xs)...);
     }
   };
 
@@ -746,131 +653,6 @@ public:
     static auto getTurnIndicatorsCommandName(const std::string & ego_ref) -> decltype(auto)
     {
       return core->getEgoEntity(ego_ref).getTurnIndicatorsCommandName();
-    }
-
-    static auto setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled)
-      -> decltype(auto)
-    {
-      return core->setTrafficSignalV2IFeature(lanelet_id, enabled);
-    }
-
-    // TrafficLights - Conventional and V2I
-    template <typename... Ts>
-    static auto setConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights()->setTrafficLightsState(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto clearConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights()->clearTrafficLightsState(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto addConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights()->addTrafficLightsState(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto clearConventionalDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalDetectedTrafficLights()->clearState(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto addConventionalDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalDetectedTrafficLights()->addState(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights()->setTrafficLightsConfidence(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto getConventionalTrafficLightsComposedState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights()->getTrafficLightsComposedState(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto compareConventionalTrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights()->compareTrafficLightsState(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto resetConventionalTrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto setV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2ITrafficLights()->setTrafficLightsState(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto clearV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2ITrafficLights()->clearTrafficLightsState(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto addV2ITrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2ITrafficLights()->addTrafficLightsState(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto clearV2IDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2IDetectedTrafficLights()->clearState(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto addV2IDetectedTrafficLightsState(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2IDetectedTrafficLights()->addState(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2ITrafficLights()->resetUpdate(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto addV2ITrafficLightsStatePrediction(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2ITrafficLights()->addTrafficLightsStatePrediction(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto clearV2ITrafficLightsStatePredictions(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2ITrafficLights()->clearTrafficLightsStatePredictions(
-        std::forward<decltype(xs)>(xs)...);
-    }
-
-    static auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) -> bool
-    {
-      return core->isV2ITrafficLightEnabled(lanelet_id);
     }
   };
 };
