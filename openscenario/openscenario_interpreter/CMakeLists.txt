@@ -80,10 +80,8 @@ target_precompile_headers(${PROJECT_NAME}
     "<openscenario_interpreter/expression.hpp>"
     "<openscenario_interpreter/pointer.hpp>"
     "<openscenario_interpreter/record.hpp>"
-    "<openscenario_interpreter/simulator_core.hpp>"
     "<pugixml.hpp>"
     "<rclcpp/rclcpp.hpp>"
-    "<traffic_simulator/api/api.hpp>"
     "<openscenario_interpreter/object.hpp>"
     "<openscenario_interpreter/scope.hpp>")
 
