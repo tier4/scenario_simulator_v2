@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <boost/json.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
@@ -26,6 +27,7 @@
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <sstream>
 #include <status_monitor/status_monitor.hpp>
+#include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \

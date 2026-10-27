@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
+#include <traffic_simulator/api/api.hpp>
 
 namespace openscenario_interpreter
 {

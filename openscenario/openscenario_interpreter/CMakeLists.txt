@@ -69,7 +69,8 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/record.cpp
   src/scenario_runtime.cpp
   src/scope.cpp
-  src/traffic_signal_operations.cpp)
+  src/traffic_signal_operations.cpp
+  src/simulator_core.cpp)
 
 target_link_libraries(${PROJECT_NAME} Boost::json glog pugixml)
 
