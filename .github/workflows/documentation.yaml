@@ -4,7 +4,7 @@ on:
     branches: [master]
   pull_request:
 jobs:
-  build:
+  documentation-build:
     runs-on: ubuntu-slim
     permissions:
       contents: read
@@ -20,9 +20,9 @@ jobs:
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site
-  deploy:
+  documentation-deploy:
     if: github.event_name == 'push'
-    needs: build
+    needs: documentation-build
     runs-on: ubuntu-slim
     permissions:
       pages: write
