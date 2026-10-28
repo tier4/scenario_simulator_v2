@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
@@ -82,9 +83,11 @@ void Preprocessor::preprocessScenario(ScenarioSet & scenario)
 {
   using openscenario_interpreter::OpenScenario;
   using openscenario_interpreter::ParameterValueDistribution;
+  using openscenario_interpreter::ScenarioRuntime;
 
   if (validateXOSC(scenario.path)) {
-    if (auto script = std::make_shared<OpenScenario>(scenario.path);
+    if (auto script = std::make_shared<OpenScenario>(
+          scenario.path, std::make_shared<ScenarioRuntime>());
         script->category.is<ParameterValueDistribution>()) {
       auto base_scenario_path =
         script->category.as<ParameterValueDistribution>().scenario_file.filepath;

@@ -20,6 +20,7 @@
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
@@ -81,6 +82,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
   String record_storage_id;
 
   std::shared_ptr<OpenScenario> script;
+
+  const std::shared_ptr<ScenarioRuntime> scenario_runtime;
 
   std::list<std::shared_ptr<ScenarioDefinition>> scenarios;
 

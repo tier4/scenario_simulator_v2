@@ -20,6 +20,7 @@
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <std_msgs/msg/float64.hpp>
+#include <traffic_simulator/api/entity_behavior.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -31,28 +32,6 @@
 
 namespace traffic_simulator
 {
-struct VehicleBehavior : public entity::VehicleEntity::BuiltinBehavior
-{
-  static auto autoware() noexcept -> const std::string &
-  {
-    static const std::string name = "Autoware";
-    return name;
-  }
-};
-
-struct PedestrianBehavior : public entity::PedestrianEntity::BuiltinBehavior
-{
-};
-
-struct MicsObjectBehavior
-{
-  static auto noBehavior() noexcept -> const std::string &
-  {
-    static const std::string name = "";
-    return name;
-  }
-};
-
 class API
 {
 public:
