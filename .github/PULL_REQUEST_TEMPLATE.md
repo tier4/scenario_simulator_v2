@@ -18,6 +18,9 @@
 > Delete this sentence and describe this pull request.  
 > For example, it is desirable to describe the specifications of added functions, and detailed explanations of bugs that have been fixed.  
 
+> [!IMPORTANT]
+> The vehicle models in `simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/vehicle_model` and `simulation/simple_sensor_simulator/src/vehicle_simulation/vehicle_model` are copied from [simple_planning_simulator](https://github.com/autowarefoundation/autoware_simple_planning_simulator). If this pull request changes them, consider making the changes to the original code first.
+
 ## References
 
 > [Optional] If the referenced material does not exist, you can skip this section.  
