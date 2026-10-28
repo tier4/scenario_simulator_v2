@@ -44,7 +44,7 @@ auto isInIntersection(const lanelet::Id lanelet_id) -> bool
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
-  return LaneletWrapper::laneletLengthCache().getLength(lanelet_id, LaneletWrapper::map());
+  return LaneletWrapper::laneletLengthCache().getLength(lanelet_id);
 }
 
 auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
@@ -186,26 +186,18 @@ auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
 
 auto centerPoints(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
-  return LaneletWrapper::centerPointsCache().getCenterPoints(lanelet_id, LaneletWrapper::map());
+  return LaneletWrapper::centerPointsCache().getCenterPoints(lanelet_id);
 }
 
 auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
 {
-  return LaneletWrapper::centerPointsCache().getCenterPointsSpline(
-    lanelet_id, LaneletWrapper::map());
+  return LaneletWrapper::centerPointsCache().getCenterPointsSpline(lanelet_id);
 }
 
 // Next lanelet
 auto nextLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
-  lanelet::Ids next_lanelet_ids;
-  const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
-  const auto & following_lanelets = LaneletWrapper::routingGraph(type)->following(lanelet);
-  next_lanelet_ids.reserve(following_lanelets.size());
-  for (const auto & following_lanelet : following_lanelets) {
-    next_lanelet_ids.push_back(following_lanelet.id());
-  }
-  return next_lanelet_ids;
+  return LaneletWrapper::topologyCache().getNextLaneletIds(lanelet_id, type);
 }
 
 auto nextLaneletIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType type) -> lanelet::Ids
@@ -223,11 +215,13 @@ auto nextLaneletIds(
   -> lanelet::Ids
 {
   lanelet::Ids next_lanelet_ids;
-  const auto & reference_lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
-  for (const auto & following_lanelet :
-       LaneletWrapper::routingGraph(type)->following(reference_lanelet)) {
-    if (following_lanelet.attributeOr("turn_direction", "else") == turn_direction) {
-      next_lanelet_ids.push_back(following_lanelet.id());
+  const auto lanelet_map = LaneletWrapper::map();
+  for (const auto following_lanelet_id :
+       LaneletWrapper::topologyCache().getNextLaneletIds(lanelet_id, type)) {
+    if (
+      lanelet_map->laneletLayer.get(following_lanelet_id).attributeOr("turn_direction", "else") ==
+      turn_direction) {
+      next_lanelet_ids.push_back(following_lanelet_id);
     }
   }
   return next_lanelet_ids;
@@ -248,14 +242,7 @@ auto nextLaneletIds(
 // Previous lanelet
 auto previousLaneletIds(const lanelet::Id lanelet_id, const RoutingGraphType type) -> lanelet::Ids
 {
-  lanelet::Ids previous_lanelet_ids;
-  const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
-  const auto & previous_lanelets = LaneletWrapper::routingGraph(type)->previous(lanelet);
-  previous_lanelet_ids.reserve(previous_lanelets.size());
-  for (const auto & previous_lanelet : previous_lanelets) {
-    previous_lanelet_ids.push_back(previous_lanelet.id());
-  }
-  return previous_lanelet_ids;
+  return LaneletWrapper::topologyCache().getPreviousLaneletIds(lanelet_id, type);
 }
 
 auto previousLaneletIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType type)
@@ -274,11 +261,13 @@ auto previousLaneletIds(
   -> lanelet::Ids
 {
   lanelet::Ids previous_lanelet_ids;
-  const auto reference_lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
-  for (const auto & previous_lanelet :
-       LaneletWrapper::routingGraph(type)->previous(reference_lanelet)) {
-    if (previous_lanelet.attributeOr("turn_direction", "else") == turn_direction) {
-      previous_lanelet_ids.push_back(previous_lanelet.id());
+  const auto lanelet_map = LaneletWrapper::map();
+  for (const auto previous_lanelet_id :
+       LaneletWrapper::topologyCache().getPreviousLaneletIds(lanelet_id, type)) {
+    if (
+      lanelet_map->laneletLayer.get(previous_lanelet_id).attributeOr("turn_direction", "else") ==
+      turn_direction) {
+      previous_lanelet_ids.push_back(previous_lanelet_id);
     }
   }
   return previous_lanelet_ids;
@@ -338,17 +327,7 @@ auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Po
 // Relations
 auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
-  lanelet::Ids right_of_way_lanelets_ids;
-  const auto & right_of_ways =
-    LaneletWrapper::map()->laneletLayer.get(lanelet_id).regulatoryElementsAs<lanelet::RightOfWay>();
-  for (const auto & right_of_way : right_of_ways) {
-    for (const auto & right_of_way_lanelet : right_of_way->rightOfWayLanelets()) {
-      if (right_of_way_lanelet.id() != lanelet_id) {
-        right_of_way_lanelets_ids.push_back(right_of_way_lanelet.id());
-      }
-    }
-  }
-  return right_of_way_lanelets_ids;
+  return LaneletWrapper::topologyCache().getRightOfWayLaneletIds(lanelet_id);
 }
 
 auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
@@ -363,19 +342,10 @@ auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
 
 auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
 {
-  constexpr size_t routing_graph_id{1};
-  constexpr double height_clearance{4};
-  /// @note it is not clear if the distinction for crosswalks only is implemented here
   lanelet::Ids conflicting_crosswalk_ids;
-  lanelet::routing::RoutingGraphContainer graphs_container(
-    {LaneletWrapper::routingGraph(RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER),
-     LaneletWrapper::routingGraph(RoutingGraphType::PEDESTRIAN)});
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto & conflicting_crosswalks = graphs_container.conflictingInGraph(
-      LaneletWrapper::map()->laneletLayer.get(lanelet_id), routing_graph_id, height_clearance);
-    for (const auto & conflicting_crosswalk : conflicting_crosswalks) {
-      conflicting_crosswalk_ids.push_back(conflicting_crosswalk.id());
-    }
+    const auto & cached = LaneletWrapper::topologyCache().getConflictingCrosswalkIds(lanelet_id);
+    conflicting_crosswalk_ids.insert(conflicting_crosswalk_ids.end(), cached.begin(), cached.end());
   }
   return conflicting_crosswalk_ids;
 }
@@ -385,11 +355,8 @@ auto conflictingLaneIds(const lanelet::Ids & lanelet_ids, const RoutingGraphType
 {
   lanelet::Ids conflicting_lanes_ids;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto & conflicting_lanelets = lanelet::utils::getConflictingLanelets(
-      LaneletWrapper::routingGraph(type), LaneletWrapper::map()->laneletLayer.get(lanelet_id));
-    for (const auto & conflicting_lanelet : conflicting_lanelets) {
-      conflicting_lanes_ids.push_back(conflicting_lanelet.id());
-    }
+    const auto & cached = LaneletWrapper::topologyCache().getConflictingLaneIds(lanelet_id, type);
+    conflicting_lanes_ids.insert(conflicting_lanes_ids.end(), cached.begin(), cached.end());
   }
   return conflicting_lanes_ids;
 }
