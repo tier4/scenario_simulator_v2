@@ -40,3 +40,13 @@
 > [Optional] If there are no known limitations that you can think of, you can skip this section. If there are any limitations on the features or fixes added by this pull request, delete this sentence and clearly describe them.
 > For example, the lane matching algorithm currently (1/25/2024) employed is unable to match Entity that is heavily tilted with respect to the lane, and it is difficult to throw an exception.  
 > If the developer is aware of the existence of such problems or limitations, describe them in detail. The problems or limitation should be listed as an Issue on GitHub and a link to it should be provided in this section.  
+
+# Checklist for reviewers
+
+All references to "You" in the following text refer to the code reviewer.
+
+- [ ] Is this pull request written in a way that is easy to read from a third-party perspective?
+- [ ] Is there sufficient information (background, purpose, specification, algorithm description, list of disruptive changes, and migration guide) in the description of this pull request?
+- [ ] If this pull request contains a destructive change, does this pull request contain the migration guide?
+- [ ] All unit tests/integration tests are included in this pull request? If you think adding test cases is unnecessary, please describe why and cross out this line.
+- [ ] The documentation for this pull request is enough? If you think adding documents for this pull request is unnecessary, please describe why and cross out this line.
