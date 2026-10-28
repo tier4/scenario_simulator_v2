@@ -29,6 +29,9 @@
 > Include a description of the changes and a migration guide and send the pull request with a bump major label. (Example : https://github.com/tier4/scenario_simulator_v2/pull/1139)  
 > Otherwise, skip the "Destructive Changes" section and make sure this pull request is labeled `bump minor` or `bump patch`.  
 
+> [!CAUTION]
+> Changes to the message definitions in `openscenario/openscenario_interpreter_msgs/msg` and `simulation/traffic_simulator_msgs/msg` may seriously break the integration with external services such as Web.Auto. If this pull request contains such changes, describe them in this section.
+
 # Known Limitations
 
 > [Optional] If there are no known limitations that you can think of, you can skip this section. If there are any limitations on the features or fixes added by this pull request, delete this sentence and clearly describe them.
