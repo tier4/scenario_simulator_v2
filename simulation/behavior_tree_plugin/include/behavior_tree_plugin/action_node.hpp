@@ -75,7 +75,7 @@ public:
       BT::InputPort<double>("current_time"),
       BT::InputPort<double>("matching_distance_for_lanelet_pose_calculation"),
       BT::InputPort<double>("step_time"),
-      BT::InputPort<EntityStatusDict>("other_entity_status"),
+      BT::InputPort<traffic_simulator::OtherEntityStatuses>("other_entity_status"),
       BT::InputPort<lanelet::Ids>("route_lanelets"),
       BT::InputPort<std::optional<double>>("target_speed"),
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
@@ -115,7 +115,7 @@ protected:
   double step_time_;
   double default_matching_distance_for_lanelet_pose_calculation_;
   std::optional<double> target_speed_;
-  EntityStatusDict other_entity_status_;
+  traffic_simulator::OtherEntityStatuses other_entity_status_;
   lanelet::Ids route_lanelets_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
   std::optional<double> lateral_collision_threshold_;
