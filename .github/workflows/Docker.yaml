@@ -70,6 +70,8 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Get version
         id: version
@@ -213,6 +215,8 @@ jobs:
         run: sudo apt update && sudo apt install -y python3-catkin-pkg git curl
 
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Get version
         id: version
