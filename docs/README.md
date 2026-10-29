@@ -1,9 +1,5 @@
 # Scenario simulator v2
 
-[![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml)
-[![BuildAndRun](https://github.com/tier4/scenario_simulator_v2/actions/workflows/BuildAndRun.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/BuildAndRun.yaml)
-[![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)
-
 Scenario simulator v2 is a scenario testing framework for Autoware.
 
 ![Scenario Testing Framework](image/what_is_scenario_testing_framework.png "what is scenario testing framework")
