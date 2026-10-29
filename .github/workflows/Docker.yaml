@@ -90,17 +90,18 @@ jobs:
           build-args: |
             ROS_DISTRO=${{ matrix.rosdistro }}
           target: runtime
-      - run: |
-          mkdir -p /tmp/digests/desktop
-          touch "/tmp/digests/desktop/${DESKTOP_DIGEST#sha256:}"
-          mkdir -p /tmp/digests/development
-          touch "/tmp/digests/development/${DEVELOPMENT_DIGEST#sha256:}"
-          mkdir -p /tmp/digests/runtime
-          touch "/tmp/digests/runtime/${RUNTIME_DIGEST#sha256:}"
+      - run: mkdir -p /tmp/digests/desktop
+      - run: mkdir -p /tmp/digests/development
+      - run: mkdir -p /tmp/digests/runtime
+      - run: touch "/tmp/digests/desktop/${DIGEST#sha256:}"
         env:
-          DESKTOP_DIGEST: ${{ steps.build_desktop.outputs.digest }}
-          DEVELOPMENT_DIGEST: ${{ steps.build_development.outputs.digest }}
-          RUNTIME_DIGEST: ${{ steps.build_runtime.outputs.digest }}
+          DIGEST: ${{ steps.build_desktop.outputs.digest }}
+      - run: touch "/tmp/digests/development/${DIGEST#sha256:}"
+        env:
+          DIGEST: ${{ steps.build_development.outputs.digest }}
+      - run: touch "/tmp/digests/runtime/${DIGEST#sha256:}"
+        env:
+          DIGEST: ${{ steps.build_runtime.outputs.digest }}
       - uses: actions/upload-artifact@v7
         with:
           name: digests-${{ matrix.rosdistro }}-${{ matrix.platform }}
@@ -147,14 +148,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - working-directory: /tmp/digests/${{ matrix.variant }}
-        run: |
-          docker buildx imagetools create -t "$IMAGE" $(printf "$IMAGE@sha256:%s " *)
+      - run: docker buildx imagetools create -t "$IMAGE" $(printf "$IMAGE@sha256:%s " *)
+        working-directory: /tmp/digests/${{ matrix.variant }}
         env:
           IMAGE: ${{ steps.image_tag.outputs.image_tag }}
-      - if: github.ref == 'refs/heads/master' && matrix.variant == 'desktop'
-        run: |
-          docker buildx imagetools create -t "$IMAGE_BASE:$ROSDISTRO-latest" "$IMAGE"
+      - run: docker buildx imagetools create -t "$IMAGE_BASE:$ROSDISTRO-latest" "$IMAGE"
+        if: github.ref == 'refs/heads/master' && matrix.variant == 'desktop'
         env:
           ROSDISTRO: ${{ matrix.rosdistro }}
           IMAGE: ${{ steps.image_tag.outputs.image_tag }}
