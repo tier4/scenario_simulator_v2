@@ -36,10 +36,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - { runs-on: ubuntu-22.04,     rosdistro: humble, platform: amd64, image_tag: humble }
-          - { runs-on: ubuntu-22.04-arm, rosdistro: humble, platform: arm64, image_tag: humble }
-          - { runs-on: ubuntu-24.04,     rosdistro: jazzy,  platform: amd64, image_tag: jazzy  }
-          - { runs-on: ubuntu-24.04-arm, rosdistro: jazzy,  platform: arm64, image_tag: jazzy  }
+          - { runs-on: ubuntu-22.04,     rosdistro: humble, platform: amd64 }
+          - { runs-on: ubuntu-22.04-arm, rosdistro: humble, platform: arm64 }
+          - { runs-on: ubuntu-24.04,     rosdistro: jazzy,  platform: amd64 }
+          - { runs-on: ubuntu-24.04-arm, rosdistro: jazzy,  platform: arm64 }
 
     steps:
       - name: Free Disk Space (Ubuntu)
@@ -130,7 +130,7 @@ jobs:
       - name: Upload digest (desktop)
         uses: actions/upload-artifact@v7
         with:
-          name: digests-desktop-${{ matrix.image_tag }}-${{ matrix.platform }}
+          name: digests-desktop-${{ matrix.rosdistro }}-${{ matrix.platform }}
           path: /tmp/desktop/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -138,7 +138,7 @@ jobs:
       - name: Upload digest (development)
         uses: actions/upload-artifact@v7
         with:
-          name: digests-development-${{ matrix.image_tag }}-${{ matrix.platform }}
+          name: digests-development-${{ matrix.rosdistro }}-${{ matrix.platform }}
           path: /tmp/development/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -146,7 +146,7 @@ jobs:
       - name: Upload digest (runtime)
         uses: actions/upload-artifact@v7
         with:
-          name: digests-runtime-${{ matrix.image_tag }}-${{ matrix.platform }}
+          name: digests-runtime-${{ matrix.rosdistro }}-${{ matrix.platform }}
           path: /tmp/runtime/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -162,18 +162,18 @@ jobs:
     strategy:
       matrix:
         include:
-          - { image_tag: humble, variant: desktop,     image_suffix: ""       }
-          - { image_tag: humble, variant: development, image_suffix: -devel   }
-          - { image_tag: humble, variant: runtime,     image_suffix: -runtime }
-          - { image_tag: jazzy,  variant: desktop,     image_suffix: ""       }
-          - { image_tag: jazzy,  variant: development, image_suffix: -devel   }
-          - { image_tag: jazzy,  variant: runtime,     image_suffix: -runtime }
+          - { rosdistro: humble, variant: desktop,     image_suffix: ""       }
+          - { rosdistro: humble, variant: development, image_suffix: -devel   }
+          - { rosdistro: humble, variant: runtime,     image_suffix: -runtime }
+          - { rosdistro: jazzy,  variant: desktop,     image_suffix: ""       }
+          - { rosdistro: jazzy,  variant: development, image_suffix: -devel   }
+          - { rosdistro: jazzy,  variant: runtime,     image_suffix: -runtime }
     steps:
       - name: Download digests
         uses: actions/download-artifact@v7
         with:
           path: /tmp/digests
-          pattern: digests-${{ matrix.variant }}-${{ matrix.image_tag }}-*
+          pattern: digests-${{ matrix.variant }}-${{ matrix.rosdistro }}-*
           merge-multiple: true
 
       - uses: actions/checkout@v6
@@ -188,9 +188,9 @@ jobs:
 
       - name: Create image tag
         id: image_tag
-        run: echo "image_tag=$IMAGE_BASE:$IMAGE_TAG-$VERSION$IMAGE_SUFFIX" >> "$GITHUB_OUTPUT"
+        run: echo "image_tag=$IMAGE_BASE:$ROSDISTRO-$VERSION$IMAGE_SUFFIX" >> "$GITHUB_OUTPUT"
         env:
-          IMAGE_TAG: ${{ matrix.image_tag }}
+          ROSDISTRO: ${{ matrix.rosdistro }}
           VERSION: ${{ github.event.inputs.version || steps.version.outputs.version }}
           IMAGE_SUFFIX: ${{ matrix.image_suffix }}
 
@@ -211,7 +211,7 @@ jobs:
       - name: Add latest tag
         if: github.ref == 'refs/heads/master' && matrix.variant == 'desktop'
         run: |
-          docker buildx imagetools create -t "$IMAGE_BASE:$IMAGE_TAG-latest" "$IMAGE"
+          docker buildx imagetools create -t "$IMAGE_BASE:$ROSDISTRO-latest" "$IMAGE"
         env:
-          IMAGE_TAG: ${{ matrix.image_tag }}
+          ROSDISTRO: ${{ matrix.rosdistro }}
           IMAGE: ${{ steps.image_tag.outputs.image_tag }}
