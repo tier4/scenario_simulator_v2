@@ -248,7 +248,7 @@ jobs:
           IMAGE: ${{ steps.image_tag.outputs.image_tag }}
 
       - name: Add latest tag
-        if: github.ref == 'refs/heads/master' && matrix.image_suffix == 'desktop'
+        if: github.ref == 'refs/heads/master' && matrix.variant == 'desktop'
         run: |
           docker buildx imagetools create -t "$IMAGE_BASE:$IMAGE_TAG-latest" "$IMAGE"
         env:
