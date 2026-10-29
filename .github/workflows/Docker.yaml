@@ -36,22 +36,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - runs-on: ubuntu-22.04
-            rosdistro: humble
-            platform: amd64
-            image_tag: humble
-          - runs-on: ubuntu-22.04-arm
-            rosdistro: humble
-            platform: arm64
-            image_tag: humble
-          - runs-on: ubuntu-24.04
-            rosdistro: jazzy
-            platform: amd64
-            image_tag: jazzy
-          - runs-on: ubuntu-24.04-arm
-            rosdistro: jazzy
-            platform: arm64
-            image_tag: jazzy
+          - { runs-on: ubuntu-22.04,     rosdistro: humble, platform: amd64, image_tag: humble }
+          - { runs-on: ubuntu-22.04-arm, rosdistro: humble, platform: arm64, image_tag: humble }
+          - { runs-on: ubuntu-24.04,     rosdistro: jazzy,  platform: amd64, image_tag: jazzy  }
+          - { runs-on: ubuntu-24.04-arm, rosdistro: jazzy,  platform: arm64, image_tag: jazzy  }
 
     steps:
       - name: Free Disk Space (Ubuntu)
@@ -174,22 +162,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - image_tag: humble
-            variant: desktop
-          - image_tag: humble
-            variant: development
-            image_suffix: -devel
-          - image_tag: humble
-            variant: runtime
-            image_suffix: -runtime
-          - image_tag: jazzy
-            variant: desktop
-          - image_tag: jazzy
-            variant: development
-            image_suffix: -devel
-          - image_tag: jazzy
-            variant: runtime
-            image_suffix: -runtime
+          - { image_tag: humble, variant: desktop,     image_suffix: ""       }
+          - { image_tag: humble, variant: development, image_suffix: -devel   }
+          - { image_tag: humble, variant: runtime,     image_suffix: -runtime }
+          - { image_tag: jazzy,  variant: desktop,     image_suffix: ""       }
+          - { image_tag: jazzy,  variant: development, image_suffix: -devel   }
+          - { image_tag: jazzy,  variant: runtime,     image_suffix: -runtime }
     steps:
       - name: Download digests
         uses: actions/download-artifact@v7
