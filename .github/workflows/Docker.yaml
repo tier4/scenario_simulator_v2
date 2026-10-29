@@ -141,16 +141,17 @@ jobs:
       - name: Export digest
         run: |
           mkdir -p /tmp/desktop/digests
-          digest="${{ steps.build_desktop.outputs.digest }}"
-          touch "/tmp/desktop/digests/${digest#sha256:}"
+          touch "/tmp/desktop/digests/${DESKTOP_DIGEST#sha256:}"
 
           mkdir -p /tmp/development/digests
-          digest="${{ steps.build_development.outputs.digest }}"
-          touch "/tmp/development/digests/${digest#sha256:}"
+          touch "/tmp/development/digests/${DEVELOPMENT_DIGEST#sha256:}"
 
           mkdir -p /tmp/runtime/digests
-          digest="${{ steps.build_runtime.outputs.digest }}"
-          touch "/tmp/runtime/digests/${digest#sha256:}"
+          touch "/tmp/runtime/digests/${RUNTIME_DIGEST#sha256:}"
+        env:
+          DESKTOP_DIGEST: ${{ steps.build_desktop.outputs.digest }}
+          DEVELOPMENT_DIGEST: ${{ steps.build_development.outputs.digest }}
+          RUNTIME_DIGEST: ${{ steps.build_runtime.outputs.digest }}
 
       - name: Upload digest (desktop)
         uses: actions/upload-artifact@v7
@@ -242,9 +243,14 @@ jobs:
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create -t ${{ steps.image_tag.outputs.image_tag }} $(printf '${{ steps.image_tag.outputs.image_tag }}@sha256:%s ' *)
+          docker buildx imagetools create -t "$IMAGE" $(printf "$IMAGE@sha256:%s " *)
+        env:
+          IMAGE: ${{ steps.image_tag.outputs.image_tag }}
 
       - name: Add latest tag
         if: github.ref == 'refs/heads/master' && matrix.image_suffix == 'desktop'
         run: |
-          docker buildx imagetools create -t ${{ env.IMAGE_BASE }}:${{ matrix.image_tag }}-latest ${{ steps.image_tag.outputs.image_tag }}
+          docker buildx imagetools create -t "$IMAGE_BASE:$IMAGE_TAG-latest" "$IMAGE"
+        env:
+          IMAGE_TAG: ${{ matrix.image_tag }}
+          IMAGE: ${{ steps.image_tag.outputs.image_tag }}
