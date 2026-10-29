@@ -1,0 +1,149 @@
+name: Docker
+on:
+  pull_request:
+    paths:
+      - "**"
+      - "!docs/**"
+      - "!README.md"
+      - "!CONTRIBUTING.md"
+      - "!.github/**"
+      - ".github/workflows/docker.yaml"
+      - "!mkdocs.yml"
+      - "!pyproject.toml"
+      - "!sonar-project.properties"
+      - "!uv.lock"
+  push:
+    branches: [master]
+    paths: ["**/package.xml"]
+env:
+  IMAGE_BASE: ghcr.io/tier4/scenario_simulator_v2
+jobs:
+  docker-build:
+    runs-on: ${{ matrix.runs-on }}
+    permissions:
+      contents: read
+      packages: write
+    timeout-minutes: 720
+    strategy:
+      matrix:
+        include:
+          - { runs-on: ubuntu-22.04,     rosdistro: humble, platform: amd64 }
+          - { runs-on: ubuntu-22.04-arm, rosdistro: humble, platform: arm64 }
+          - { runs-on: ubuntu-24.04,     rosdistro: jazzy,  platform: amd64 }
+          - { runs-on: ubuntu-24.04-arm, rosdistro: jazzy,  platform: arm64 }
+    steps:
+      - uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+      - uses: docker/setup-buildx-action@v4
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_BASE }}
+      - id: build_development
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' }},name-canonical=true,push=${{ github.event_name == 'push' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: development
+          build-args: ROS_DISTRO=${{ matrix.rosdistro }}
+      - run: mkdir -p /tmp/digests/development
+      - run: touch "/tmp/digests/development/${DIGEST#sha256:}"
+        env:
+          DIGEST: ${{ steps.build_development.outputs.digest }}
+      - id: build_desktop
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' }},name-canonical=true,push=${{ github.event_name == 'push' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: ROS_DISTRO=${{ matrix.rosdistro }}
+          target: desktop
+      - run: mkdir -p /tmp/digests/desktop
+      - run: touch "/tmp/digests/desktop/${DIGEST#sha256:}"
+        env:
+          DIGEST: ${{ steps.build_desktop.outputs.digest }}
+      - id: build_runtime
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' }},name-canonical=true,push=${{ github.event_name == 'push' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: ROS_DISTRO=${{ matrix.rosdistro }}
+          target: runtime
+      - run: mkdir -p /tmp/digests/runtime
+      - run: touch "/tmp/digests/runtime/${DIGEST#sha256:}"
+        env:
+          DIGEST: ${{ steps.build_runtime.outputs.digest }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: digests-${{ matrix.rosdistro }}-${{ matrix.platform }}
+          path: /tmp/digests
+          if-no-files-found: error
+          retention-days: 1
+  docker-merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [docker-build]
+    if: github.event_name == 'push'
+    strategy:
+      matrix:
+        include:
+          - { rosdistro: humble, variant: desktop,     image_suffix: ""       }
+          - { rosdistro: humble, variant: development, image_suffix: -devel   }
+          - { rosdistro: humble, variant: runtime,     image_suffix: -runtime }
+          - { rosdistro: jazzy,  variant: desktop,     image_suffix: ""       }
+          - { rosdistro: jazzy,  variant: development, image_suffix: -devel   }
+          - { rosdistro: jazzy,  variant: runtime,     image_suffix: -runtime }
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          path: /tmp/digests
+          pattern: digests-${{ matrix.rosdistro }}-*
+          merge-multiple: true
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - id: version
+        run: echo "version=$(sed -n 's|^ *<version>\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)</version> *$|\1|p' scenario_simulator_v2/package.xml)" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v4
+      - id: image_tag
+        run: echo "image_tag=$IMAGE_BASE:$ROSDISTRO-$VERSION$IMAGE_SUFFIX" >> "$GITHUB_OUTPUT"
+        env:
+          ROSDISTRO: ${{ matrix.rosdistro }}
+          VERSION: ${{ steps.version.outputs.version }}
+          IMAGE_SUFFIX: ${{ matrix.image_suffix }}
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - run: docker buildx imagetools create -t "$IMAGE" $(printf "$IMAGE@sha256:%s " *)
+        working-directory: /tmp/digests/${{ matrix.variant }}
+        env:
+          IMAGE: ${{ steps.image_tag.outputs.image_tag }}
+      - run: docker buildx imagetools create -t "$IMAGE_BASE:$ROSDISTRO-latest" "$IMAGE"
+        if: github.ref == 'refs/heads/master' && matrix.variant == 'desktop'
+        env:
+          ROSDISTRO: ${{ matrix.rosdistro }}
+          IMAGE: ${{ steps.image_tag.outputs.image_tag }}
