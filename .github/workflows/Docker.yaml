@@ -17,11 +17,6 @@ on:
       - master
     paths:
       - "**/package.xml"
-  workflow_dispatch:
-    inputs:
-      version:
-        description: version of the scenario_simulator_v2
-        required: true
 
 env:
   IMAGE_BASE: ghcr.io/tier4/scenario_simulator_v2
@@ -72,10 +67,10 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          push: ${{ github.event_name == 'push' }}
           platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' }},name-canonical=true,push=${{ github.event_name == 'push' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           target: development
@@ -87,10 +82,10 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          push: ${{ github.event_name == 'push' }}
           platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' }},name-canonical=true,push=${{ github.event_name == 'push' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -102,10 +97,10 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          push: ${{ github.event_name == 'push' }}
           platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' }},name-canonical=true,push=${{ github.event_name == 'push' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -158,7 +153,7 @@ jobs:
       packages: write
     needs:
       - build
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push'
     strategy:
       matrix:
         include:
@@ -191,7 +186,7 @@ jobs:
         run: echo "image_tag=$IMAGE_BASE:$ROSDISTRO-$VERSION$IMAGE_SUFFIX" >> "$GITHUB_OUTPUT"
         env:
           ROSDISTRO: ${{ matrix.rosdistro }}
-          VERSION: ${{ github.event.inputs.version || steps.version.outputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
           IMAGE_SUFFIX: ${{ matrix.image_suffix }}
 
       - name: Login to Docker Hub
