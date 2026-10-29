@@ -39,22 +39,18 @@ jobs:
           - runs-on: ubuntu-22.04
             rosdistro: humble
             platform: amd64
-            dockerfile: Dockerfile
             image_tag: humble
           - runs-on: ubuntu-22.04-arm
             rosdistro: humble
             platform: arm64
-            dockerfile: Dockerfile
             image_tag: humble
           - runs-on: ubuntu-24.04
             rosdistro: jazzy
             platform: amd64
-            dockerfile: Dockerfile
             image_tag: jazzy
           - runs-on: ubuntu-24.04-arm
             rosdistro: jazzy
             platform: arm64
-            dockerfile: Dockerfile
             image_tag: jazzy
 
     steps:
@@ -91,7 +87,6 @@ jobs:
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          file: ${{ matrix.dockerfile }}
           outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -107,7 +102,6 @@ jobs:
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          file: ${{ matrix.dockerfile }}
           outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -123,7 +117,6 @@ jobs:
           push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          file: ${{ matrix.dockerfile }}
           outputs: type=image,name=${{ env.IMAGE_BASE }},push-by-digest=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }},name-canonical=true,push=${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
