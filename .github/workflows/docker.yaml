@@ -7,7 +7,7 @@ on:
       - "!README.md"
       - "!CONTRIBUTING.md"
       - "!.github/**"
-      - ".github/workflows/Docker.yaml"
+      - ".github/workflows/docker.yaml"
       - "!mkdocs.yml"
       - "!pyproject.toml"
       - "!sonar-project.properties"
@@ -18,8 +18,7 @@ on:
 env:
   IMAGE_BASE: ghcr.io/tier4/scenario_simulator_v2
 jobs:
-  build:
-    name: Build Docker Image
+  docker-build:
     runs-on: ${{ matrix.runs-on }}
     permissions:
       contents: read
@@ -100,12 +99,12 @@ jobs:
           path: /tmp/digests
           if-no-files-found: error
           retention-days: 1
-  merge:
+  docker-merge:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-    needs: [build]
+    needs: [docker-build]
     if: github.event_name == 'push'
     strategy:
       matrix:
