@@ -17,7 +17,6 @@ on:
       - master
     paths:
       - "**/package.xml"
-
 env:
   IMAGE_BASE: ghcr.io/tier4/scenario_simulator_v2
 jobs:
@@ -35,35 +34,24 @@ jobs:
           - { runs-on: ubuntu-22.04-arm, rosdistro: humble, platform: arm64 }
           - { runs-on: ubuntu-24.04,     rosdistro: jazzy,  platform: amd64 }
           - { runs-on: ubuntu-24.04-arm, rosdistro: jazzy,  platform: arm64 }
-
     steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
+      - uses: jlumbroso/free-disk-space@main
         with:
           tool-cache: false
-
-      - name: Install docker for ubuntu runner
-        uses: docker/setup-buildx-action@v4
-
+      - uses: docker/setup-buildx-action@v4
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
+      - uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Docker meta
-        id: meta
+      - id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE_BASE }}
-
-      - name: Build development stage
-        id: build_development
+      - id: build_development
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -76,9 +64,7 @@ jobs:
           target: development
           build-args: |
             ROS_DISTRO=${{ matrix.rosdistro }}
-
-      - name: Build desktop stage
-        id: build_desktop
+      - id: build_desktop
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -91,9 +77,7 @@ jobs:
           build-args: |
             ROS_DISTRO=${{ matrix.rosdistro }}
           target: desktop
-
-      - name: Build runtime stage
-        id: build_runtime
+      - id: build_runtime
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -106,9 +90,7 @@ jobs:
           build-args: |
             ROS_DISTRO=${{ matrix.rosdistro }}
           target: runtime
-
-      - name: Export digest
-        run: |
+      - run: |
           mkdir -p /tmp/digests/desktop
           touch "/tmp/digests/desktop/${DESKTOP_DIGEST#sha256:}"
           mkdir -p /tmp/digests/development
@@ -119,15 +101,12 @@ jobs:
           DESKTOP_DIGEST: ${{ steps.build_desktop.outputs.digest }}
           DEVELOPMENT_DIGEST: ${{ steps.build_development.outputs.digest }}
           RUNTIME_DIGEST: ${{ steps.build_runtime.outputs.digest }}
-
-      - name: Upload digests
-        uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7
         with:
           name: digests-${{ matrix.rosdistro }}-${{ matrix.platform }}
           path: /tmp/digests
           if-no-files-found: error
           retention-days: 1
-
   merge:
     runs-on: ubuntu-latest
     permissions:
@@ -146,47 +125,34 @@ jobs:
           - { rosdistro: jazzy,  variant: development, image_suffix: -devel   }
           - { rosdistro: jazzy,  variant: runtime,     image_suffix: -runtime }
     steps:
-      - name: Download digests
-        uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v7
         with:
           path: /tmp/digests
           pattern: digests-${{ matrix.rosdistro }}-*
           merge-multiple: true
-
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-
-      - name: Get version
-        id: version
+      - id: version
         run: echo "version=$(sed -n 's|^ *<version>\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)</version> *$|\1|p' scenario_simulator_v2/package.xml)" >> "$GITHUB_OUTPUT"
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Create image tag
-        id: image_tag
+      - uses: docker/setup-buildx-action@v4
+      - id: image_tag
         run: echo "image_tag=$IMAGE_BASE:$ROSDISTRO-$VERSION$IMAGE_SUFFIX" >> "$GITHUB_OUTPUT"
         env:
           ROSDISTRO: ${{ matrix.rosdistro }}
           VERSION: ${{ steps.version.outputs.version }}
           IMAGE_SUFFIX: ${{ matrix.image_suffix }}
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create manifest list and push
-        working-directory: /tmp/digests/${{ matrix.variant }}
+      - working-directory: /tmp/digests/${{ matrix.variant }}
         run: |
           docker buildx imagetools create -t "$IMAGE" $(printf "$IMAGE@sha256:%s " *)
         env:
           IMAGE: ${{ steps.image_tag.outputs.image_tag }}
-
-      - name: Add latest tag
-        if: github.ref == 'refs/heads/master' && matrix.variant == 'desktop'
+      - if: github.ref == 'refs/heads/master' && matrix.variant == 'desktop'
         run: |
           docker buildx imagetools create -t "$IMAGE_BASE:$ROSDISTRO-latest" "$IMAGE"
         env:
