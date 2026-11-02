@@ -24,6 +24,7 @@
 
 namespace traffic_simulator
 {
+class OtherEntityStatuses;
 inline namespace distance
 {
 // Lateral
@@ -140,6 +141,11 @@ auto distanceToNearestConflictingPose(
   const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
   const CanonicalizedEntityStatus & from_status,
   const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>;
+
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedEntityStatus & from_status, const OtherEntityStatuses & other_statuses)
+  -> std::optional<double>;
 
 // spline
 auto distanceToSpline(

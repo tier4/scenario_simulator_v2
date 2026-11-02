@@ -106,8 +106,7 @@ BT::NodeStatus FollowFrontEntityAction::doAction()
     traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
   const auto distance_to_conflicting_entity =
     traffic_simulator::distance::distanceToNearestConflictingPose(
-      route_lanelets_, *trajectory, *canonicalized_entity_status_,
-      getOtherEntitiesCanonicalizedEntityStatuses());
+      route_lanelets_, *trajectory, *canonicalized_entity_status_, other_entity_status_);
   std::optional<std::string> front_entity_name;
   distance_to_front_entity_ = std::nullopt;
   if (use_trajectory_based_front_entity_detection_) {

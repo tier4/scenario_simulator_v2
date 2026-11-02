@@ -150,8 +150,7 @@ BT::NodeStatus FollowLaneAction::doAction()
     if (
       const auto distance_to_conflicting_entity =
         traffic_simulator::distance::distanceToNearestConflictingPose(
-          route_lanelets_, *trajectory, *canonicalized_entity_status_,
-          getOtherEntitiesCanonicalizedEntityStatuses())) {
+          route_lanelets_, *trajectory, *canonicalized_entity_status_, other_entity_status_)) {
       if (
         distance_to_conflicting_entity.value() <
         (vehicle_parameters.bounding_box.dimensions.x + conflicting_entity_margin +

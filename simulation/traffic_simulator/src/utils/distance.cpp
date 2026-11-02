@@ -15,6 +15,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
+#include <traffic_simulator/data_type/other_entity_statuses.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_wrapper/distance.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
@@ -421,10 +422,23 @@ auto distanceToYieldStop(
   return std::nullopt;
 }
 
+static auto statusReference(const CanonicalizedEntityStatus & status)
+  -> const CanonicalizedEntityStatus &
+{
+  return status;
+}
+
+static auto statusReference(const OtherEntityStatuses::value_type & entry)
+  -> const CanonicalizedEntityStatus &
+{
+  return entry.second;
+}
+
+template <typename StatusRange>
 static auto distanceToCrossingTraffic(
   const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
-  const CanonicalizedEntityStatus & from_status,
-  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>
+  const CanonicalizedEntityStatus & from_status, const StatusRange & other_statuses)
+  -> std::optional<double>
 {
   constexpr auto required_gap = 5.0;
   constexpr auto distance_accuracy = 0.05;
@@ -531,7 +545,8 @@ static auto distanceToCrossingTraffic(
         const auto crossing_s =
           lanelet_wrapper::lanelet_map::centerPointsSpline(id)->getCollisionPointIn2D(
             lanelet_wrapper::lanelet_map::laneletPolygon(crossed_id), true)) {
-        for (const auto & status : other_statuses) {
+        for (const auto & entry : other_statuses) {
+          const auto & status = statusReference(entry);
           if (const auto & pose = status.getCanonicalizedLaneletPose()) {
             if (const auto distance = lanelet_wrapper::distance::longitudinalDistance(
                   static_cast<LaneletPose>(pose.value()),
@@ -566,29 +581,15 @@ static auto distanceToCrossingTraffic(
   return min_distance;
 }
 
-auto distanceToNearestConflictingPose(
+template <typename StatusRange>
+static auto distanceToNearestConflictingPoseImpl(
   const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
-  const CanonicalizedEntityStatus & from_status,
-  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>
+  const CanonicalizedEntityStatus & from_status, const StatusRange & other_statuses)
+  -> std::optional<double>
 {
   if (not from_status.isInLanelet()) {
     return std::nullopt;
   }
-
-  auto conflicting_entities_on_lanelets =
-    [&other_statuses](
-      const lanelet::Ids & conflicting_ids) -> std::vector<CanonicalizedEntityStatus> {
-    std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
-    for (const auto & status : other_statuses) {
-      if (
-        status.isInLanelet() &&
-        std::find(conflicting_ids.cbegin(), conflicting_ids.cend(), status.getLaneletId()) !=
-          conflicting_ids.cend()) {
-        conflicting_entity_status.push_back(status);
-      }
-    }
-    return conflicting_entity_status;
-  };
 
   std::optional<double> min_distance = std::nullopt;
   auto try_min_distance = [&min_distance](const double & distance) {
@@ -597,10 +598,16 @@ auto distanceToNearestConflictingPose(
     }
   };
 
-  const auto & conflicting_entities_on_crosswalk = conflicting_entities_on_lanelets(
-    lanelet_wrapper::lanelet_map::conflictingCrosswalkIds(following_lanelets));
-
-  for (const auto & status : conflicting_entities_on_crosswalk) {
+  const auto crosswalk_ids =
+    lanelet_wrapper::lanelet_map::conflictingCrosswalkIds(following_lanelets);
+  for (const auto & entry : other_statuses) {
+    const auto & status = statusReference(entry);
+    if (
+      not status.isInLanelet() or
+      std::find(crosswalk_ids.cbegin(), crosswalk_ids.cend(), status.getLaneletId()) ==
+        crosswalk_ids.cend()) {
+      continue;
+    }
     if (const auto & pose = status.getCanonicalizedLaneletPose()) {
       if (const auto s = distanceToCrosswalk(spline, pose->getLaneletId())) {
         try_min_distance(s.value());
@@ -608,10 +615,14 @@ auto distanceToNearestConflictingPose(
     }
   }
 
-  const auto & conflicting_entities_on_lane = conflicting_entities_on_lanelets(
-    lanelet_wrapper::lanelet_map::conflictingLaneIds(following_lanelets));
-
-  for (const auto & status : conflicting_entities_on_lane) {
+  const auto lane_ids = lanelet_wrapper::lanelet_map::conflictingLaneIds(following_lanelets);
+  for (const auto & entry : other_statuses) {
+    const auto & status = statusReference(entry);
+    if (
+      not status.isInLanelet() or
+      std::find(lane_ids.cbegin(), lane_ids.cend(), status.getLaneletId()) == lane_ids.cend()) {
+      continue;
+    }
     if (const auto & pose = status.getCanonicalizedLaneletPose()) {
       if (
         const auto s = splineDistanceToBoundingBox(
@@ -629,6 +640,24 @@ auto distanceToNearestConflictingPose(
   }
 
   return min_distance;
+}
+
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedEntityStatus & from_status,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>
+{
+  return distanceToNearestConflictingPoseImpl(
+    following_lanelets, spline, from_status, other_statuses);
+}
+
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedEntityStatus & from_status, const OtherEntityStatuses & other_statuses)
+  -> std::optional<double>
+{
+  return distanceToNearestConflictingPoseImpl(
+    following_lanelets, spline, from_status, other_statuses);
 }
 
 auto distanceToSpline(
