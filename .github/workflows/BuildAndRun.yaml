@@ -101,7 +101,7 @@ jobs:
         if: matrix.sonar
       - run: . install/setup.sh && colcon test-result --verbose
         continue-on-error: ${{ matrix.rosdistro == 'jazzy' }} # Jazzy is not supported yet
-      - run: . install/setup.sh && ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
+      - run: . install/setup.sh && ./src/scenario_simulator_v2/script/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         if: matrix.test
         continue-on-error: ${{ matrix.rosdistro == 'jazzy' }} # Jazzy is not supported yet
       - uses: SonarSource/sonarqube-scan-action@v8.2.1
