@@ -41,11 +41,11 @@ jobs:
       matrix:
         # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
         include:
-          - { rosdistro: humble, runs-on: ubuntu-22.04,     cmake_build_type: RelWithDebInfo, test: true,  sonar: true  }
-          - { rosdistro: humble, runs-on: ubuntu-22.04,     cmake_build_type: Release,        test: true,  sonar: true  }
-          - { rosdistro: humble, runs-on: ubuntu-22.04-arm, cmake_build_type: RelWithDebInfo, test: false, sonar: false } # ARM testing is currently broken
-          - { rosdistro: humble, runs-on: ubuntu-22.04-arm, cmake_build_type: Release,        test: false, sonar: false } # ARM testing is currently broken
-          - { rosdistro: jazzy,  runs-on: ubuntu-24.04,     cmake_build_type: Release,        test: true,  sonar: false }
+          - { rosdistro: humble, runs-on: ubuntu-22.04,     cmake_build_type: RelWithDebInfo, test: test,    sonar: sonar    }
+          - { rosdistro: humble, runs-on: ubuntu-22.04,     cmake_build_type: Release,        test: test,    sonar: sonar    }
+          - { rosdistro: humble, runs-on: ubuntu-22.04-arm, cmake_build_type: RelWithDebInfo, test: no-test, sonar: no-sonar } # ARM testing is currently broken
+          - { rosdistro: humble, runs-on: ubuntu-22.04-arm, cmake_build_type: Release,        test: no-test, sonar: no-sonar } # ARM testing is currently broken
+          - { rosdistro: jazzy,  runs-on: ubuntu-24.04,     cmake_build_type: Release,        test: test,    sonar: no-sonar }
     steps:
       - run: git config --global --add safe.directory '*'
       - run: mkdir -p src/scenario_simulator_v2
@@ -70,7 +70,7 @@ jobs:
       - run: rm -rf /root/.ros/rosdep
       - id: build_wrapper
         uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v8.2.1
-        if: matrix.sonar && github.event.pull_request.head.repo.fork == false
+        if: matrix.sonar != 'no-sonar' && github.event.pull_request.head.repo.fork == false
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       - run: |
@@ -94,18 +94,18 @@ jobs:
           BUILD_WRAPPER: ${{ steps.build_wrapper.outputs.build-wrapper-binary }}
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
       - run: . install/setup.sh && colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES
-        if: matrix.test
+        if: matrix.test != 'no-test'
         env:
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
       - run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
-        if: matrix.sonar
+        if: matrix.sonar != 'no-sonar'
       - run: . install/setup.sh && colcon test-result --verbose
         continue-on-error: ${{ matrix.rosdistro == 'jazzy' }} # Jazzy is not supported yet
       - run: . install/setup.sh && ./src/scenario_simulator_v2/script/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
-        if: matrix.test
+        if: matrix.test != 'no-test'
         continue-on-error: ${{ matrix.rosdistro == 'jazzy' }} # Jazzy is not supported yet
       - uses: SonarSource/sonarqube-scan-action@v8.2.1
-        if: matrix.sonar && github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]'
+        if: matrix.sonar != 'no-sonar' && github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]'
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
