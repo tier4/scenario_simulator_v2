@@ -63,7 +63,7 @@ jobs:
       - name: Resolve rosdep
         run: |
           apt-get update
-          apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
+          apt-get install -y python3-pip unzip gcovr libunwind-dev
           rosdep update
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
           apt-get clean
@@ -105,7 +105,6 @@ jobs:
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
           colcon test --event-handlers console_cohesion+ --packages-select ${{ steps.list_packages.outputs.package_list }}
-          colcon lcov-result --packages-select ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: generate gcov report for sonarcloud
@@ -156,14 +155,6 @@ jobs:
               repo: context.repo.repo,
               body: commentBody
             })
-
-      - name: Upload Lcov result
-        uses: actions/upload-artifact@v7
-        if: matrix.runs_on != 'ubuntu-22.04-arm'
-        with:
-          name: lcov-${{ matrix.cmake_build_type }}
-          path: lcov
-          retention-days: 1
 
       - name: Upload Gcov result
         uses: actions/upload-artifact@v7
