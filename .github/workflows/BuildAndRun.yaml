@@ -73,15 +73,15 @@ jobs:
         env:
           BUILD_WRAPPER: ${{ steps.build_wrapper.outputs.build-wrapper-binary }}
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
-      - run: . "/opt/ros/$ROS_DISTRO/setup.sh" && . install/local_setup.sh && colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES
+      - run: . install/setup.sh && colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES
         if: matrix.runs_on != 'ubuntu-22.04-arm' # ARM testing is currently broken
         env:
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
       - run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
         if: matrix.runs_on != 'ubuntu-22.04-arm'
-      - run: . "/opt/ros/$ROS_DISTRO/setup.sh" && . install/local_setup.sh && colcon test-result --verbose
+      - run: . install/setup.sh && colcon test-result --verbose
         if: always()
-      - run: . install/setup.sh && . install/local_setup.sh && ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
+      - run: . install/setup.sh && ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         if: matrix.runs_on != 'ubuntu-22.04-arm'
       - id: sonarcloud
         uses: SonarSource/sonarqube-scan-action@v8.2.1
