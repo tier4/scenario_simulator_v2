@@ -38,14 +38,12 @@ jobs:
           vcs import src < src/scenario_simulator_v2/test_dependency_humble.repos
           rm -rf src/agnocast # currently, agnocast occurs build errors with ROS 2 Jazzy
 
-      - name: Resolve rosdep and install colcon mixin
+      - name: Resolve rosdep
         run: |
           apt-get update
           apt-get install -y python3-pip python3-colcon-lcov-result lcov unzip gcovr libunwind-dev
           rosdep update
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
-          colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
-          colcon mixin update default
         shell: bash
 
       - name: Build
