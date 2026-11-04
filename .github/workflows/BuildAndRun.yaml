@@ -24,23 +24,28 @@ concurrency:
 jobs:
   job1:
     name: BuildAndRun
-    runs-on: ${{ matrix.runs_on }}
+    runs-on: ${{ matrix.runs-on }}
     permissions:
       contents: read
     container:
-      image: ros:humble-ros-base-jammy
+      image: ros:${{ matrix.rosdistro }}-ros-base
       options: --user root
     timeout-minutes: 180
     env:
       CMAKE_BUILD_TYPE: ${{ matrix.cmake_build_type }}
       DEBIAN_FRONTEND: noninteractive
+      PIP_BREAK_SYSTEM_PACKAGES: 1
       ROS_DISTRO: ${{ matrix.rosdistro }}
     strategy:
       fail-fast: false
       matrix:
-        rosdistro: [humble]
-        runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
-        cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
+        # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
+        include:
+          - { rosdistro: humble, runs-on: ubuntu-22.04,     cmake_build_type: RelWithDebInfo, test: true,  sonar: true  }
+          - { rosdistro: humble, runs-on: ubuntu-22.04,     cmake_build_type: Release,        test: true,  sonar: true  }
+          - { rosdistro: humble, runs-on: ubuntu-22.04-arm, cmake_build_type: RelWithDebInfo, test: false, sonar: false } # ARM testing is currently broken
+          - { rosdistro: humble, runs-on: ubuntu-22.04-arm, cmake_build_type: Release,        test: false, sonar: false } # ARM testing is currently broken
+          - { rosdistro: jazzy,  runs-on: ubuntu-24.04,     cmake_build_type: Release,        test: true,  sonar: false }
     steps:
       - run: git config --global --add safe.directory '*'
       - run: mkdir -p src/scenario_simulator_v2
@@ -51,8 +56,10 @@ jobs:
           persist-credentials: false
       - id: list_packages
         run: echo package_list=$(colcon list --names-only | tr '\n' ' ') >> "$GITHUB_OUTPUT"
-      - run: vcs import src < src/scenario_simulator_v2/dependency_$ROS_DISTRO.repos
-      - run: vcs import src < src/scenario_simulator_v2/test_dependency_$ROS_DISTRO.repos
+      - run: vcs import src < src/scenario_simulator_v2/dependency_humble.repos
+      - run: vcs import src < src/scenario_simulator_v2/test_dependency_humble.repos
+      - run: rm -rf src/agnocast
+        if: matrix.rosdistro == 'jazzy' # currently, agnocast occurs build errors with ROS 2 Jazzy
       - run: apt-get update
       - run: apt-get install -y python3-pip unzip gcovr libunwind-dev
       - run: rosdep update
@@ -63,35 +70,42 @@ jobs:
       - run: rm -rf /root/.ros/rosdep
       - id: build_wrapper
         uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v8.2.1
-        if: github.event.pull_request.head.repo.fork == false
+        if: matrix.sonar && github.event.pull_request.head.repo.fork == false
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       - run: |
           . "/opt/ros/$ROS_DISTRO/setup.sh"
-          CXX_FLAGS="$CXX_FLAGS -Wno-error=class-memaccess" # Error from Eigen with GCC on aarch64, remove when Eigen in Ubuntu is updated (https://gitlab.com/libeigen/eigen/-/issues/2326)
+          CXX_FLAGS="$CXX_FLAGS -fprofile-arcs"
+          CXX_FLAGS="$CXX_FLAGS -ftest-coverage"
+          CXX_FLAGS="$CXX_FLAGS -Wno-error=class-memaccess"  # Error from Eigen with GCC on aarch64, remove when Eigen in Ubuntu is updated (https://gitlab.com/libeigen/eigen/-/issues/2326)
+          CXX_FLAGS="$CXX_FLAGS -Wno-error=pessimizing-move" # Added with the Jazzy build test in #1704
+          CXX_FLAGS="$CXX_FLAGS -Wno-error=redundant-move"   # Added with the Jazzy build test in #1704
+          CXX_FLAGS="$CXX_FLAGS -Wno-unused-local-typedefs"  # Added with the Jazzy build test in #1704
           ${BUILD_WRAPPER:+"$BUILD_WRAPPER" --out-dir src/scenario_simulator_v2/bw-output} colcon build \
+            --event-handlers console_cohesion+ \
             --symlink-install \
             --cmake-args \
               -D BUILD_CPP_MOCK_SCENARIOS=ON \
               -D BUILD_TESTING=true \
               -D CMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
-              -D CMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage $CXX_FLAGS" \
-              -D CMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
+              -D CMAKE_CXX_FLAGS="$CXX_FLAGS" \
             --packages-up-to $PACKAGES
         env:
           BUILD_WRAPPER: ${{ steps.build_wrapper.outputs.build-wrapper-binary }}
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
       - run: . install/setup.sh && colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES
-        if: matrix.runs_on != 'ubuntu-22.04-arm' # ARM testing is currently broken
+        if: matrix.test
         env:
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
       - run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
-        if: matrix.runs_on != 'ubuntu-22.04-arm'
+        if: matrix.sonar
       - run: . install/setup.sh && colcon test-result --verbose
+        continue-on-error: ${{ matrix.rosdistro == 'jazzy' }} # Jazzy is not supported yet
       - run: . install/setup.sh && ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
-        if: matrix.runs_on != 'ubuntu-22.04-arm'
+        if: matrix.test
+        continue-on-error: ${{ matrix.rosdistro == 'jazzy' }} # Jazzy is not supported yet
       - uses: SonarSource/sonarqube-scan-action@v8.2.1
-        if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]' # In ARM build, SonarQube result should be same as x86 build because no test runs
+        if: matrix.sonar && github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]'
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
