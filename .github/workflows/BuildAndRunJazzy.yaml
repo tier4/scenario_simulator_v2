@@ -49,11 +49,10 @@ jobs:
           apt-get install -y python3-pip unzip gcovr libunwind-dev
           rosdep update
           rosdep install -iy --from-paths src --rosdistro "$ROS_DISTRO"
-        shell: bash
 
       - name: Build
         run: |
-          source "/opt/ros/$ROS_DISTRO/setup.bash"
+          . "/opt/ros/$ROS_DISTRO/setup.sh"
           colcon build --symlink-install \
           --event-handlers console_cohesion+ \
           --cmake-args \
@@ -62,28 +61,24 @@ jobs:
             -DBUILD_TESTING=true \
             -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess -Wno-unused-local-typedefs -Wno-error=redundant-move -Wno-error=pessimizing-move' \
             -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
-        shell: bash
 
       - name: Colcon test
         continue-on-error: true # currently, clang-format test on Jazzy is different one on Humble
         run: |
-          source install/setup.bash
+          . install/setup.sh
           colcon test --event-handlers console_cohesion+
-        shell: bash
 
       - name: Show test result
         if: always()
         continue-on-error: true
         run: |
-          source "/opt/ros/$ROS_DISTRO/setup.bash"
-          source install/local_setup.bash
+          . "/opt/ros/$ROS_DISTRO/setup.sh"
+          . install/local_setup.sh
           colcon test-result --verbose
-        shell: bash
 
       - name: Scenario test
         continue-on-error: true
         run: |
-          source install/setup.bash
-          source install/local_setup.bash
+          . install/setup.sh
+          . install/local_setup.sh
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
-        shell: bash

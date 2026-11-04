@@ -75,7 +75,6 @@ jobs:
           rm -rf /var/lib/apt/lists/*
           rm -rf /tmp/*
           rm -rf /root/.ros/rosdep
-        shell: bash
 
       - name: Install Build Wrapper
         if: github.event.pull_request.head.repo.fork == false
@@ -89,8 +88,8 @@ jobs:
         # This should be removed when Eigen is updated in Ubuntu package repository
         # See also: https://gitlab.com/libeigen/eigen/-/issues/2326
         run: |
-          source "/opt/ros/$ROS_DISTRO/setup.bash"
-          if [[ -n "$BUILD_WRAPPER" ]]; then
+          . "/opt/ros/$ROS_DISTRO/setup.sh"
+          if [ -n "$BUILD_WRAPPER" ]; then
             COMMAND_PREFIX="$BUILD_WRAPPER --out-dir src/scenario_simulator_v2/bw-output"
           fi
           $COMMAND_PREFIX colcon build --symlink-install \
@@ -101,7 +100,6 @@ jobs:
             -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess' \
             -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
             --packages-up-to $PACKAGES
-        shell: bash
         env:
           BUILD_WRAPPER: ${{ steps.build_wrapper.outputs.build-wrapper-binary }}
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
@@ -110,10 +108,9 @@ jobs:
         # ARM testing is currently broken
         if: matrix.runs_on != 'ubuntu-22.04-arm'
         run: |
-          source "/opt/ros/$ROS_DISTRO/setup.bash"
-          source install/local_setup.bash
+          . "/opt/ros/$ROS_DISTRO/setup.sh"
+          . install/local_setup.sh
           colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES
-        shell: bash
         env:
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
 
@@ -124,18 +121,16 @@ jobs:
       - name: Show test result
         if: always()
         run: |
-          source "/opt/ros/$ROS_DISTRO/setup.bash"
-          source install/local_setup.bash
+          . "/opt/ros/$ROS_DISTRO/setup.sh"
+          . install/local_setup.sh
           colcon test-result --verbose
-        shell: bash
 
       - name: Scenario test
         if: matrix.runs_on != 'ubuntu-22.04-arm'
         run: |
-          source install/setup.bash
-          source install/local_setup.bash
+          . install/setup.sh
+          . install/local_setup.sh
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
-        shell: bash
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v8.2.1
