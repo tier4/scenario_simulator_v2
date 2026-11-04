@@ -1,4 +1,4 @@
-name: Build and run
+name: Main
 on:
   workflow_dispatch:
   schedule:
@@ -10,7 +10,7 @@ on:
       - "!README.md"
       - "!CONTRIBUTING.md"
       - "!.github/**"
-      - ".github/workflows/BuildAndRun.yaml"
+      - ".github/workflows/main.yaml"
       - "!mkdocs.yml"
       - "!pyproject.toml"
       - "!sonar-project.properties"
@@ -22,8 +22,7 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  job1:
-    name: BuildAndRun
+  main:
     runs-on: ${{ matrix.runs-on }}
     permissions:
       contents: read
