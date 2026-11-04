@@ -156,14 +156,6 @@ jobs:
               body: commentBody
             })
 
-      - name: Upload Gcov result
-        uses: actions/upload-artifact@v7
-        if: matrix.runs_on != 'ubuntu-22.04-arm'
-        with:
-          name: coverage${{ matrix.cmake_build_type }}.xml
-          path: coverage.xml
-          retention-days: 1
-
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v8.2.1
         id: sonarcloud
