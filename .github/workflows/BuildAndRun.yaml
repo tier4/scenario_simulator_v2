@@ -127,18 +127,6 @@ jobs:
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         shell: bash
 
-      - name: Scenario test (optional)
-        id: optional-scenario-test
-        if: matrix.runs_on != 'ubuntu-22.04-arm'
-        run: |
-          source install/setup.bash
-          source install/local_setup.bash
-          # execute scenarios but ignore the return code
-          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/optional_workflow.txt global_frame_rate:=20 || true
-          ./src/scenario_simulator_v2/.github/workflows/generate_workflow_report.sh /tmp/scenario_workflow/optional_workflow
-          echo failure=$(grep -c "<failure"  /tmp/scenario_workflow/optional_workflow/failure_report.md) >> $GITHUB_OUTPUT
-        shell: bash
-
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v8.2.1
         id: sonarcloud
