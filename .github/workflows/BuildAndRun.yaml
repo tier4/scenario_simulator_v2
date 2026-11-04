@@ -139,23 +139,6 @@ jobs:
           echo failure=$(grep -c "<failure"  /tmp/scenario_workflow/optional_workflow/failure_report.md) >> $GITHUB_OUTPUT
         shell: bash
 
-      - uses: actions/github-script@v8
-        if: steps.optional-scenario-test.outputs.failure > 0 && matrix.runs_on != 'ubuntu-22.04-arm' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            let commentBody = fs.readFileSync('/tmp/scenario_workflow/optional_workflow/failure_report.md', 'utf8');
-            if (commentBody) {
-              commentBody = '## Failure optional scenarios\n> [!NOTE]\n> This is an experimental check and does not block merging the pull-request. \n> But, please be aware that this may indicate a regression.\n' + commentBody;
-            }
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: commentBody
-            })
-
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v8.2.1
         id: sonarcloud
@@ -170,10 +153,3 @@ jobs:
           args: >
             --define sonar.cfamily.compile-commands=src/scenario_simulator_v2/bw-output/compile_commands.json
           projectBaseDir: src/scenario_simulator_v2/
-
-      - name: Report error if SonarQube scan failed
-        if: steps.sonarcloud.outcome == 'failure' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
-        uses: mshick/add-pr-comment@v3
-        with:
-          message: "This PR has failed the SonarQube scan. Please check the details in the SonarQube dashboard."
-          message-id: "sonarcloud-scan-failure"
