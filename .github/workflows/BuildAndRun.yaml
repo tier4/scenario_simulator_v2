@@ -50,11 +50,6 @@ jobs:
           fetch-depth: 0
           path: src/scenario_simulator_v2
 
-      - uses: actions/checkout@v6
-        with:
-          repository: RobotecAI/scenario_simulator_v2_scenarios
-          path: src/scenario_simulator_v2_scenarios
-
       - name: Search packages in this repository
         id: list_packages
         run: |
@@ -198,12 +193,6 @@ jobs:
           args: >
             --define sonar.cfamily.compile-commands=src/scenario_simulator_v2/bw-output/compile_commands.json
           projectBaseDir: src/scenario_simulator_v2/
-      #      - name: Basic test
-      #        run: |
-      #          source install/setup.bash
-      #          source install/local_setup.bash
-      #          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
-      #        shell: bash
 
       - name: Report error if SonarQube scan failed
         if: steps.sonarcloud.outcome == 'failure' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
