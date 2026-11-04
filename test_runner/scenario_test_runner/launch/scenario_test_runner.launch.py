@@ -174,7 +174,6 @@ def launch_setup(context, *args, **kwargs):
             {"record_storage_id": record_storage_id},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
-            {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
             {"status_monitor_threshold": status_monitor_threshold},

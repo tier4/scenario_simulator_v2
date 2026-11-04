@@ -181,7 +181,6 @@ def launch_setup(context, *args, **kwargs):
             {"record": record},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
-            {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"vehicle_model": vehicle_model},
             {"global_real_time_factor": global_real_time_factor},
