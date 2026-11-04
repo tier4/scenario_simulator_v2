@@ -80,6 +80,7 @@ auto toModuleType(const std::string & module_name)
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid),
+  autoware_shutdown_timeout(common::getParameter<int>("autoware_shutdown_timeout", 20)),
   time_limit(std::chrono::steady_clock::now() + std::chrono::seconds(common::getParameter<int>("initialize_duration"))),
   getAutowareState("/autoware/state", rclcpp::QoS(1), *this),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
@@ -198,7 +199,7 @@ FieldOperatorApplication::~FieldOperatorApplication()
       }
     }();
 
-    const auto timeout = []() {
+    const auto timeout = [this]() {
       auto timeout = timespec();
       /*
          The deadline for the Autoware launch process to exit by itself. The
@@ -206,8 +207,11 @@ FieldOperatorApplication::~FieldOperatorApplication()
          Autoware nodes (10 seconds) and `sigterm_timeout`, the escalation
          ROS 2 launch applies to this process (30 seconds in the launch
          files), or the fallback below never runs.
+
+         Read in the constructor: `common::getParameter` can throw, and a
+         destructor is implicitly noexcept.
       */
-      timeout.tv_sec = common::getParameter<int>("autoware_shutdown_timeout", 20);
+      timeout.tv_sec = autoware_shutdown_timeout.count();
       timeout.tv_nsec = 0;
       return timeout;
     }();
