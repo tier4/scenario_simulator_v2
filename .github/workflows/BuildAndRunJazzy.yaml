@@ -1,5 +1,4 @@
 name: Build and run with Jazzy
-
 on:
   workflow_dispatch:
   schedule:
@@ -28,30 +27,22 @@ jobs:
         runs_on: [ubuntu-24.04]
         cmake_build_type: [Release]
     steps:
-      - name: Setup workspace
-        run: mkdir -p src/scenario_simulator_v2
-
+      - run: mkdir -p src/scenario_simulator_v2
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           path: src/scenario_simulator_v2
           persist-credentials: false
-
-      - name: Install dependencies
-        run: |
+      - run: |
           vcs import src < src/scenario_simulator_v2/dependency_humble.repos
           vcs import src < src/scenario_simulator_v2/test_dependency_humble.repos
           rm -rf src/agnocast # currently, agnocast occurs build errors with ROS 2 Jazzy
-
-      - name: Resolve rosdep
-        run: |
+      - run: |
           apt-get update
           apt-get install -y python3-pip unzip gcovr libunwind-dev
           rosdep update
           rosdep install -iy --from-paths src --rosdistro "$ROS_DISTRO"
-
-      - name: Build
-        run: |
+      - run: |
           . "/opt/ros/$ROS_DISTRO/setup.sh"
           colcon build --symlink-install \
           --event-handlers console_cohesion+ \
@@ -61,24 +52,18 @@ jobs:
             -DBUILD_TESTING=true \
             -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess -Wno-unused-local-typedefs -Wno-error=redundant-move -Wno-error=pessimizing-move' \
             -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
-
-      - name: Colcon test
-        continue-on-error: true # currently, clang-format test on Jazzy is different one on Humble
-        run: |
+      - run: |
           . install/setup.sh
           colcon test --event-handlers console_cohesion+
-
-      - name: Show test result
-        if: always()
-        continue-on-error: true
-        run: |
+        continue-on-error: true # currently, clang-format test on Jazzy is different one on Humble
+      - run: |
           . "/opt/ros/$ROS_DISTRO/setup.sh"
           . install/local_setup.sh
           colcon test-result --verbose
-
-      - name: Scenario test
+        if: always()
         continue-on-error: true
-        run: |
+      - run: |
           . install/setup.sh
           . install/local_setup.sh
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
+        continue-on-error: true

@@ -1,5 +1,4 @@
 name: Build and run
-
 on:
   workflow_dispatch:
   schedule:
@@ -43,30 +42,20 @@ jobs:
         runs_on: [ubuntu-22.04, ubuntu-22.04-arm]
         cmake_build_type: [RelWithDebInfo, Release] # Debug build type is currently unavailable. @TODO Fix problem and add Debug build.
     steps:
-      - name: Suppress warnings
-        run: git config --global --add safe.directory '*'
-
-      - name: Setup workspace
-        run: mkdir -p src/scenario_simulator_v2
-
+      - run: git config --global --add safe.directory '*'
+      - run: mkdir -p src/scenario_simulator_v2
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           path: src/scenario_simulator_v2
           persist-credentials: false
-
-      - name: Search packages in this repository
-        id: list_packages
+      - id: list_packages
         run: |
           echo package_list=$(colcon list --names-only | tr '\n' ' ') >> $GITHUB_OUTPUT
-
-      - name: Install dependencies
-        run: |
+      - run: |
           vcs import src < src/scenario_simulator_v2/dependency_$ROS_DISTRO.repos
           vcs import src < src/scenario_simulator_v2/test_dependency_$ROS_DISTRO.repos
-
-      - name: Resolve rosdep
-        run: |
+      - run: |
           apt-get update
           apt-get install -y python3-pip unzip gcovr libunwind-dev
           rosdep update
@@ -75,19 +64,15 @@ jobs:
           rm -rf /var/lib/apt/lists/*
           rm -rf /tmp/*
           rm -rf /root/.ros/rosdep
-
-      - name: Install Build Wrapper
-        if: github.event.pull_request.head.repo.fork == false
+      - id: build_wrapper
         uses: SonarSource/sonarqube-scan-action/install-build-wrapper@v8.2.1
-        id: build_wrapper
+        if: github.event.pull_request.head.repo.fork == false
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-
-      - name: Build with SonarCloud Build Wrapper
-        # Note: `-Wno-error=class-memaccess` is temporary workaround for aarch64 GCC error
-        # This should be removed when Eigen is updated in Ubuntu package repository
-        # See also: https://gitlab.com/libeigen/eigen/-/issues/2326
-        run: |
+      # Note: `-Wno-error=class-memaccess` is temporary workaround for aarch64 GCC error
+      # This should be removed when Eigen is updated in Ubuntu package repository
+      # See also: https://gitlab.com/libeigen/eigen/-/issues/2326
+      - run: |
           . "/opt/ros/$ROS_DISTRO/setup.sh"
           if [ -n "$BUILD_WRAPPER" ]; then
             COMMAND_PREFIX="$BUILD_WRAPPER --out-dir src/scenario_simulator_v2/bw-output"
@@ -103,38 +88,28 @@ jobs:
         env:
           BUILD_WRAPPER: ${{ steps.build_wrapper.outputs.build-wrapper-binary }}
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
-
-      - name: Colcon test
-        # ARM testing is currently broken
-        if: matrix.runs_on != 'ubuntu-22.04-arm'
-        run: |
+      - run: |
           . "/opt/ros/$ROS_DISTRO/setup.sh"
           . install/local_setup.sh
           colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES
+        # ARM testing is currently broken
+        if: matrix.runs_on != 'ubuntu-22.04-arm'
         env:
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
-
-      - name: generate gcov report for sonarcloud
+      - run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
         if: matrix.runs_on != 'ubuntu-22.04-arm'
-        run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
-
-      - name: Show test result
-        if: always()
-        run: |
+      - run: |
           . "/opt/ros/$ROS_DISTRO/setup.sh"
           . install/local_setup.sh
           colcon test-result --verbose
-
-      - name: Scenario test
-        if: matrix.runs_on != 'ubuntu-22.04-arm'
-        run: |
+        if: always()
+      - run: |
           . install/setup.sh
           . install/local_setup.sh
           ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
-
-      - name: SonarQube Scan
+        if: matrix.runs_on != 'ubuntu-22.04-arm'
+      - id: sonarcloud
         uses: SonarSource/sonarqube-scan-action@v8.2.1
-        id: sonarcloud
         # In ARM build, SonarQube result should be same as x86 build because no test runs
         if: matrix.runs_on != 'ubuntu-22.04-arm' && github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]'
         continue-on-error: true
