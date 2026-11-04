@@ -66,10 +66,18 @@ jobs:
         if: github.event.pull_request.head.repo.fork == false
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      # Note: `-Wno-error=class-memaccess` is temporary workaround for aarch64 GCC error
-      # This should be removed when Eigen is updated in Ubuntu package repository
-      # See also: https://gitlab.com/libeigen/eigen/-/issues/2326
-      - run: . "/opt/ros/$ROS_DISTRO/setup.sh" && ${BUILD_WRAPPER:+"$BUILD_WRAPPER" --out-dir src/scenario_simulator_v2/bw-output} colcon build --symlink-install --cmake-args -D CMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -D BUILD_CPP_MOCK_SCENARIOS=ON -D BUILD_TESTING=true -D CMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess' -D CMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' --packages-up-to $PACKAGES
+      - run: |
+          . "/opt/ros/$ROS_DISTRO/setup.sh"
+          CXX_FLAGS="$CXX_FLAGS -Wno-error=class-memaccess" # Error from Eigen with GCC on aarch64, remove when Eigen in Ubuntu is updated (https://gitlab.com/libeigen/eigen/-/issues/2326)
+          ${BUILD_WRAPPER:+"$BUILD_WRAPPER" --out-dir src/scenario_simulator_v2/bw-output} colcon build \
+            --symlink-install \
+            --cmake-args \
+              -D BUILD_CPP_MOCK_SCENARIOS=ON \
+              -D BUILD_TESTING=true \
+              -D CMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
+              -D CMAKE_CXX_FLAGS="-fprofile-arcs -ftest-coverage $CXX_FLAGS" \
+              -D CMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage' \
+            --packages-up-to $PACKAGES
         env:
           BUILD_WRAPPER: ${{ steps.build_wrapper.outputs.build-wrapper-binary }}
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
