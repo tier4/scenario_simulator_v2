@@ -33,6 +33,7 @@ jobs:
         with:
           fetch-depth: 0
           path: src/scenario_simulator_v2
+          persist-credentials: false
 
       - name: Install dependencies
         run: |
