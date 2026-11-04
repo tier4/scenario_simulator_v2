@@ -33,37 +33,18 @@ jobs:
           fetch-depth: 0
           path: src/scenario_simulator_v2
           persist-credentials: false
-      - run: |
-          vcs import src < src/scenario_simulator_v2/dependency_humble.repos
-          vcs import src < src/scenario_simulator_v2/test_dependency_humble.repos
-          rm -rf src/agnocast # currently, agnocast occurs build errors with ROS 2 Jazzy
-      - run: |
-          apt-get update
-          apt-get install -y python3-pip unzip gcovr libunwind-dev
-          rosdep update
-          rosdep install -iy --from-paths src --rosdistro "$ROS_DISTRO"
-      - run: |
-          . "/opt/ros/$ROS_DISTRO/setup.sh"
-          colcon build --symlink-install \
-          --event-handlers console_cohesion+ \
-          --cmake-args \
-            -DCMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" \
-            -DBUILD_CPP_MOCK_SCENARIOS=ON \
-            -DBUILD_TESTING=true \
-            -DCMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess -Wno-unused-local-typedefs -Wno-error=redundant-move -Wno-error=pessimizing-move' \
-            -DCMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
-      - run: |
-          . install/setup.sh
-          colcon test --event-handlers console_cohesion+
+      - run: vcs import src < src/scenario_simulator_v2/dependency_humble.repos
+      - run: vcs import src < src/scenario_simulator_v2/test_dependency_humble.repos
+      - run: rm -rf src/agnocast # currently, agnocast occurs build errors with ROS 2 Jazzy
+      - run: apt-get update
+      - run: apt-get install -y python3-pip unzip gcovr libunwind-dev
+      - run: rosdep update
+      - run: rosdep install -iy --from-paths src --rosdistro "$ROS_DISTRO"
+      - run: . "/opt/ros/$ROS_DISTRO/setup.sh" && colcon build --symlink-install --event-handlers console_cohesion+ --cmake-args -D CMAKE_BUILD_TYPE="$CMAKE_BUILD_TYPE" -D BUILD_CPP_MOCK_SCENARIOS=ON -D BUILD_TESTING=true -D CMAKE_CXX_FLAGS='-fprofile-arcs -ftest-coverage -Wno-error=class-memaccess -Wno-unused-local-typedefs -Wno-error=redundant-move -Wno-error=pessimizing-move' -D CMAKE_C_FLAGS='-fprofile-arcs -ftest-coverage'
+      - run: . install/setup.sh && colcon test --event-handlers console_cohesion+
         continue-on-error: true # currently, clang-format test on Jazzy is different one on Humble
-      - run: |
-          . "/opt/ros/$ROS_DISTRO/setup.sh"
-          . install/local_setup.sh
-          colcon test-result --verbose
+      - run: . "/opt/ros/$ROS_DISTRO/setup.sh" && . install/local_setup.sh && colcon test-result --verbose
         if: always()
         continue-on-error: true
-      - run: |
-          . install/setup.sh
-          . install/local_setup.sh
-          ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
+      - run: . install/setup.sh && . install/local_setup.sh && ./src/scenario_simulator_v2/.github/workflows/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         continue-on-error: true
