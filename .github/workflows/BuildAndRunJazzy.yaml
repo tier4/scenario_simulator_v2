@@ -11,6 +11,8 @@ jobs:
   job1:
     name: BuildAndRun
     runs-on: ${{ matrix.runs_on }}
+    permissions:
+      contents: read
     container:
       image: ros:${{ matrix.rosdistro }}
     timeout-minutes: 180
