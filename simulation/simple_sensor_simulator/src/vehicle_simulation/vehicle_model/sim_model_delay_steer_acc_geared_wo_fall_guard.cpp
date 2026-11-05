@@ -45,6 +45,28 @@ constexpr double STOP_VELOCITY_EPSILON = 1e-3;
   }
   return drive_acc;
 }
+
+[[nodiscard]] constexpr bool isParkOrNone(uint8_t gear) noexcept
+{
+  using autoware_vehicle_msgs::msg::GearCommand;
+  return gear == GearCommand::NONE || gear == GearCommand::PARK;
+}
+
+struct LongitudinalForces
+{
+  double external_acc;    //!< a_external = a_engine + a_slope + a_air_drag
+  double friction_limit;  //!< a_friction = a_brake + R_roll
+};
+
+// Shared by calcModel (dv/dt) and update (static freeze). Arithmetic order must not be changed.
+[[nodiscard]] LongitudinalForces computeLongitudinalForces(
+  uint8_t gear, double drive_acc, double brake_acc, double slope_acc, double vel,
+  double air_drag_coef, double rolling_resistance) noexcept
+{
+  const double engine_acc = calculateDriveAcc(gear, drive_acc);
+  const double air_drag = -air_drag_coef * vel * std::abs(vel);
+  return {engine_acc + slope_acc + air_drag, brake_acc + rolling_resistance};
+}
 }  // namespace
 
 SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
@@ -253,12 +275,12 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   // Freeze vehicle to zero velocity when net external force is within static friction limits
   if (std::abs(state_(IDX::VX)) < STOP_VELOCITY_EPSILON) {
     const auto gear = static_cast<uint8_t>(inner_input(IDX_U_INNER::GEAR_INNER));
-    const double drive_force = calculateDriveAcc(gear, state_(IDX::DRIVE_ACCX));
-    const double air_drag = -air_drag_coef_ * state_(IDX::VX) * std::abs(state_(IDX::VX));
-    const double external_acc = drive_force + inner_input(IDX_U_INNER::SLOPE_ACCX_INNER) + air_drag;
-    const double friction_limit = state_(IDX::BRAKE_ACCX) + rolling_resistance_;
+    const auto forces = computeLongitudinalForces(
+      gear, state_(IDX::DRIVE_ACCX), state_(IDX::BRAKE_ACCX),
+      inner_input(IDX_U_INNER::SLOPE_ACCX_INNER), state_(IDX::VX), air_drag_coef_,
+      rolling_resistance_);
 
-    if (std::abs(external_acc) <= friction_limit) {
+    if (std::abs(forces.external_acc) <= forces.friction_limit) {
       state_(IDX::VX) = 0.0;
     }
   }
@@ -273,8 +295,6 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const Eigen::VectorXd & state, const Eigen::VectorXd & input)
 {
-  using autoware_vehicle_msgs::msg::GearCommand;
-
   const double vel           = std::clamp(state(IDX::VX), -vx_lim_, vx_lim_);
   const double drive_acc     = std::clamp(state(IDX::DRIVE_ACCX), 0.0, acc_lim_);
   const double brake_acc     = std::clamp(state(IDX::BRAKE_ACCX), 0.0, brake_lim_);
@@ -293,17 +313,17 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   // Viscous regularization of Coulomb friction near zero velocity to prevent chattering:
   // dv/dt = clamp(-k * vel, external_acc - friction_limit, external_acc + friction_limit)
   const double d_vx = [&] {
-    if (gear == GearCommand::NONE || gear == GearCommand::PARK) {
+    if (isParkOrNone(gear)) {
       return 0.0;
     }
 
-    const double engine_acc = calculateDriveAcc(gear, drive_acc);
-    const double air_drag = -air_drag_coef_ * vel * std::abs(vel);
-    const double external_acc = engine_acc + slope_accx + air_drag;
-    const double friction_limit = brake_acc + rolling_resistance_;
+    const auto forces = computeLongitudinalForces(
+      gear, drive_acc, brake_acc, slope_accx, vel, air_drag_coef_, rolling_resistance_);
 
     const double k = 1.0 / vel_epsilon_;
-    return std::clamp(-k * vel, external_acc - friction_limit, external_acc + friction_limit);
+    return std::clamp(
+      -k * vel, forces.external_acc - forces.friction_limit,
+      forces.external_acc + forces.friction_limit);
   }();
 
   Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
