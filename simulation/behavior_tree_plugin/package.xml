@@ -4,7 +4,9 @@
   <name>behavior_tree_plugin</name>
   <version>25.0.22</version>
   <description>Behavior tree plugin for traffic_simulator</description>
-  <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
