@@ -26,6 +26,7 @@
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/other_entity_statuses.hpp>
 #include <traffic_simulator/data_type/route_option.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -277,6 +278,8 @@ public:
 
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
 
+  /*   */ void setOtherStatus(const OtherEntityStatuses & status);
+
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, CanonicalizedEntityStatus> & status);
 
@@ -367,7 +370,7 @@ protected:
   double prev_job_duration_ = 0.0;
   double step_time_ = 0.0;
 
-  std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
+  OtherEntityStatuses other_status_;
 
   std::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
