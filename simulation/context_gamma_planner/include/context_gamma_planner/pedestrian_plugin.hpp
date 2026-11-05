@@ -33,7 +33,6 @@
 
 namespace context_gamma_planner
 {
-using EuclideanDistancesMap = std::unordered_map<std::pair<std::string, std::string>, double>;
 class PedestrianPlugin : public entity_behavior::BehaviorPluginBase
 {
 public:
@@ -76,7 +75,6 @@ public:
   DEFINE_GETTER_SETTER(VehicleParameters,    traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,            traffic_simulator_msgs::msg::WaypointsArray)
   DEFINE_GETTER_SETTER(GoalPoses,            std::vector<geometry_msgs::msg::Pose>)
-  DEFINE_GETTER_SETTER(EuclideanDistancesMap,std::shared_ptr<EuclideanDistancesMap>)
   DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        std::optional<double>)
   // clang-format on
 

@@ -56,6 +56,14 @@ public:
     return view;
   }
 
+  auto selfStatus() const -> const CanonicalizedEntityStatus &
+  {
+    if (not self_) {
+      throw std::out_of_range("OtherEntityStatuses::selfStatus: self is unavailable");
+    }
+    return self_->second;
+  }
+
   auto begin() const -> const_iterator { return {ExcludeSelf{self_}, map().begin(), map().end()}; }
 
   auto end() const -> const_iterator { return {ExcludeSelf{self_}, map().end(), map().end()}; }

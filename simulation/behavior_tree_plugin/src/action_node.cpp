@@ -100,10 +100,6 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets_)) {
     THROW_SIMULATION_ERROR("failed to get input route_lanelets_ in ActionNode");
   }
-  if (!getInput<std::shared_ptr<EuclideanDistancesMap>>(
-        "euclidean_distances_map", euclidean_distances_map_)) {
-    euclidean_distances_map_ = std::make_shared<EuclideanDistancesMap>();
-  }
   if (!getInput<traffic_simulator_msgs::msg::BehaviorParameter>(
         "behavior_parameter", behavior_parameter_)) {
     behavior_parameter_ = traffic_simulator_msgs::msg::BehaviorParameter();
@@ -195,7 +191,7 @@ auto ActionNode::getDistanceToFrontEntity(
 auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
   -> std::optional<std::string>
 {
-  if (not canonicalized_entity_status_->isInLanelet()) {
+  if (not canonicalized_entity_status_->isInLanelet() || other_entity_status_.empty()) {
     return std::nullopt;
   }
   /**
@@ -204,61 +200,53 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
    */
   constexpr double front_entity_angle_threshold{boost::math::constants::half_pi<double>()};
 
-  if (euclidean_distances_map_ != nullptr) {
-    std::map<double, std::string> local_euclidean_distances_map;
-    const double stop_distance = calculateStopDistance(behavior_parameter_.dynamic_constraints);
-    const double horizon = spline.getLength() > stop_distance ? spline.getLength() : stop_distance;
-    for (const auto & [name_pair, euclidean_distance] : *euclidean_distances_map_) {
-      /**
-       * @note Euclidean distance is here used as a "rough" distance to filter only NPCs which possibly are in range of current horizon. Because euclidean distance is the shortest possible distance comparing it with horizon will never omit NPCs for which actual lane distance is in range of horizon.
-       */
-      if (euclidean_distance < horizon) {
-        if (name_pair.first == canonicalized_entity_status_->getName()) {
-          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.second);
-        } else if (name_pair.second == canonicalized_entity_status_->getName()) {
-          local_euclidean_distances_map.emplace(euclidean_distance, name_pair.first);
-        }
-      }
+  std::map<double, std::string> candidates_by_distance;
+  const double stop_distance = calculateStopDistance(behavior_parameter_.dynamic_constraints);
+  const double horizon = spline.getLength() > stop_distance ? spline.getLength() : stop_distance;
+  const auto & self_pose = other_entity_status_.selfStatus().getMapPose();
+  for (const auto & [name, status] : other_entity_status_) {
+    const auto distance = math::geometry::getDistance(self_pose, status.getMapPose());
+    if (distance < horizon) {
+      candidates_by_distance.emplace(distance, name);
     }
+  }
 
-    const auto self_pos = canonicalized_entity_status_->getMapPose().position;
-    const auto self_yaw = math::geometry::convertQuaternionToEulerAngle(
-                            canonicalized_entity_status_->getMapPose().orientation)
-                            .z;
-    // Iterate by increasing euclidean distance and compute the
-    // actual spline-based distance using traffic_simulator::distance::splineDistanceToBoundingBox.
-    // Select the entity that yields the minimal valid distance.
-    std::optional<std::string> best_name;
-    double best_distance = std::numeric_limits<double>::infinity();
-    for (const auto & [euclidean_distance, name] : local_euclidean_distances_map) {
-      const auto & other_status = other_entity_status_.at(name);
-      if (
-        const auto & other_canonicalized_lanelet_pose =
-          other_status.getCanonicalizedLaneletPose()) {
-        const auto other_pos = other_status.getMapPose().position;
-        const auto dx = other_pos.x - self_pos.x;
-        const auto dy = other_pos.y - self_pos.y;
-        const auto vec_yaw = std::atan2(dy, dx);
-        const auto yaw_diff =
-          std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
-        if (std::fabs(yaw_diff) <= front_entity_angle_threshold) {
-          if (const auto distance_opt = traffic_simulator::distance::splineDistanceToBoundingBox(
-                spline, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
-                canonicalized_entity_status_->getBoundingBox(),
-                other_canonicalized_lanelet_pose.value(), other_status.getBoundingBox());
-              distance_opt.has_value()) {
-            const auto dist = distance_opt.value();
-            if (dist < best_distance) {
-              best_distance = dist;
-              best_name = name;
-            }
+  const auto self_pos = canonicalized_entity_status_->getMapPose().position;
+  const auto self_yaw = math::geometry::convertQuaternionToEulerAngle(
+                          canonicalized_entity_status_->getMapPose().orientation)
+                          .z;
+  // Iterate by increasing euclidean distance and compute the
+  // actual spline-based distance using traffic_simulator::distance::splineDistanceToBoundingBox.
+  // Select the entity that yields the minimal valid distance.
+  std::optional<std::string> best_name;
+  double best_distance = std::numeric_limits<double>::infinity();
+  for (const auto & [euclidean_distance, name] : candidates_by_distance) {
+    const auto & other_status = other_entity_status_.at(name);
+    if (
+      const auto & other_canonicalized_lanelet_pose =
+        other_status.getCanonicalizedLaneletPose()) {
+      const auto other_pos = other_status.getMapPose().position;
+      const auto dx = other_pos.x - self_pos.x;
+      const auto dy = other_pos.y - self_pos.y;
+      const auto vec_yaw = std::atan2(dy, dx);
+      const auto yaw_diff =
+        std::atan2(std::sin(vec_yaw - self_yaw), std::cos(vec_yaw - self_yaw));
+      if (std::fabs(yaw_diff) <= front_entity_angle_threshold) {
+        if (const auto distance_opt = traffic_simulator::distance::splineDistanceToBoundingBox(
+              spline, canonicalized_entity_status_->getCanonicalizedLaneletPose().value(),
+              canonicalized_entity_status_->getBoundingBox(),
+              other_canonicalized_lanelet_pose.value(), other_status.getBoundingBox());
+            distance_opt.has_value()) {
+          const auto dist = distance_opt.value();
+          if (dist < best_distance) {
+            best_distance = dist;
+            best_name = name;
           }
         }
       }
     }
-    return best_name;
   }
-  return std::nullopt;
+  return best_name;
 }
 
 auto ActionNode::getEntityStatus(const std::string & target_name) const

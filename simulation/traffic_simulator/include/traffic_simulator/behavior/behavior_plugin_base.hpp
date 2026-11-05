@@ -38,8 +38,6 @@ namespace entity_behavior
 using EntityStatusDict =
   std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>;
 
-using EuclideanDistancesMap = std::unordered_map<std::pair<std::string, std::string>, double>;
-
 class BehaviorPluginBase
 {
 public:
@@ -63,7 +61,6 @@ public:
   DEFINE_GETTER_SETTER(CurrentTime,                                      "current_time",                                   double)
   DEFINE_GETTER_SETTER(DebugMarker,                                      "debug_marker",                                   std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, "matching_distance_for_lanelet_pose_calculation", double)
-  DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            "euclidean_distances_map",                        std::shared_ptr<EuclideanDistancesMap>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        "goal_poses",                                     std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             "lane_change_parameters",                         traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        "lateral_collision_threshold",                    std::optional<double>)

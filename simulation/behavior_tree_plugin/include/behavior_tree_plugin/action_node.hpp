@@ -81,7 +81,6 @@ public:
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("canonicalized_entity_status"),
       BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightsBase>>("traffic_lights"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
-      BT::InputPort<std::shared_ptr<EuclideanDistancesMap>>("euclidean_distances_map"),
       BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
       BT::InputPort<std::optional<double>>("lateral_collision_threshold"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
@@ -119,7 +118,6 @@ protected:
   lanelet::Ids route_lanelets_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
   std::optional<double> lateral_collision_threshold_;
-  std::shared_ptr<EuclideanDistancesMap> euclidean_distances_map_;
 };
 }  // namespace entity_behavior
 
