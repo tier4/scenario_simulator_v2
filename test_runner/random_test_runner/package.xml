@@ -4,7 +4,9 @@
   <name>random_test_runner</name>
   <version>25.0.22</version>
   <description>Random behavior test runner</description>
-  <maintainer email="piotr-zyskowski@robotec.ai">piotr-zyskowski-rai</maintainer>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
