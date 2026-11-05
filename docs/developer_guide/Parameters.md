@@ -22,7 +22,7 @@ behave as if similar default values had been specified.
 There are currently two ways to configure some topics: an old way and a new way
 described on this page. The new way is backward compatible and is the
 recommended way. If you want to know how to use the old way, [see this
-page](https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/ConfiguringPerceptionTopics/).
+page](ConfiguringPerceptionTopics.md).
 
 ## /perception/object_recognition/detection/objects
 
@@ -495,13 +495,13 @@ This parameter is used only if the value of `noise.model.version` is `4`.
 ### `noise.v4.<config_name>.position.<x/y>.standard_deviation.ellipse_normalized_x_radius`
 
 A positive `double` type value, default `1.0`.
-See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancestandarddeviationellipse_normalized_x_radius) for detailed explanation.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2distancestandard_deviationellipse_normalized_x_radius) for detailed explanation.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.position.<x/y>.standard_deviation.values`
 
 Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
-See [`values` documentation of noise v2](#noisev2distancestandarddeviationvalues) for detailed explanation.
+See [`values` documentation of noise v2](#noisev2distancestandard_deviationvalues) for detailed explanation.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.position.<x/y>.autocorrelation_coefficient.amplitude`
@@ -542,13 +542,13 @@ The unit is radians. This parameter is used only if the value of `noise.model.ve
 ### `noise.v4.<config_name>.yaw.standard_deviation.ellipse_normalized_x_radius`
 
 A positive `double` type value, default `1.0`.
-See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2yawstandarddeviationellipse_normalized_x_radius) for detailed explanation.
+See [`ellipse_normalized_x_radius` documentation of noise v2](#noisev2yawstandard_deviationellipse_normalized_x_radius) for detailed explanation.
 This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.yaw.standard_deviation.values`
 
 Array of positive double type values, default `[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]`.
-See [`values` documentation of noise v2](#noisev2yawstandarddeviationvalues) for detailed explanation.
+See [`values` documentation of noise v2](#noisev2yawstandard_deviationvalues) for detailed explanation.
 The unit is radians. This parameter is used only if the value of `noise.model.version` is `4`.
 
 ### `noise.v4.<config_name>.yaw.autocorrelation_coefficient.amplitude`

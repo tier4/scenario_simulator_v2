@@ -14,7 +14,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
 #include <regex>
 
@@ -38,7 +38,8 @@ TrafficSignalState::TrafficSignalChannelType::TrafficSignalChannelType(const std
 }
 
 TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scope)
-: traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
+: scenario_runtime(scope.runtime()),
+  traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
   state(readAttribute<String>("state", node, scope)),
   target(traffic_signal_id)
 {
@@ -52,19 +53,20 @@ TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scop
 
 auto TrafficSignalState::clear() const -> void
 {
+  auto & traffic_signals = scenario_runtime.trafficSignals();
   switch (channelType()) {
     case TrafficSignalChannelType::conventional:
       if (isDetected()) {
-        clearConventionalDetectedTrafficLightsState(id());
+        traffic_signals.clearConventionalDetectedTrafficLightsState(id());
       } else {
-        clearConventionalTrafficLightsState(id());
+        traffic_signals.clearConventionalTrafficLightsState(id());
       }
       break;
     case TrafficSignalChannelType::v2i:
       if (isDetected()) {
-        clearV2IDetectedTrafficLightsState(id());
+        traffic_signals.clearV2IDetectedTrafficLightsState(id());
       } else {
-        clearV2ITrafficLightsState(id());
+        traffic_signals.clearV2ITrafficLightsState(id());
       }
       break;
     default:
@@ -74,19 +76,20 @@ auto TrafficSignalState::clear() const -> void
 
 auto TrafficSignalState::evaluate() const -> Object
 {
+  auto & traffic_signals = scenario_runtime.trafficSignals();
   switch (channelType()) {
     case TrafficSignalChannelType::conventional:
       if (isDetected()) {
-        addConventionalDetectedTrafficLightsState(id(), state);
+        traffic_signals.addConventionalDetectedTrafficLightsState(id(), state);
       } else {
-        addConventionalTrafficLightsState(id(), state);
+        traffic_signals.addConventionalTrafficLightsState(id(), state);
       }
       break;
     case TrafficSignalChannelType::v2i:
       if (isDetected()) {
-        addV2IDetectedTrafficLightsState(id(), state);
+        traffic_signals.addV2IDetectedTrafficLightsState(id(), state);
       } else {
-        addV2ITrafficLightsState(id(), state);
+        traffic_signals.addV2ITrafficLightsState(id(), state);
       }
       break;
     default:

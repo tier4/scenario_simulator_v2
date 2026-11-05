@@ -113,7 +113,7 @@ message InitializeRequest {
  * Result of initializing simulation.
  **/
 message InitializeResponse {
-  Result result = 1; // Result of [InitializeRequest](#InitializeRequest)
+  Result result = 1; // Result of [InitializeRequest](#simulation_api_schema-InitializeRequest)
 }
 
 /**
@@ -129,7 +129,7 @@ message UpdateFrameRequest {
  * Response of updating simulation frame.
  **/
 message UpdateFrameResponse {
-  Result result = 1; // Result of [UpdateFrameRequest](#UpdateFrameRequest)
+  Result result = 1; // Result of [UpdateFrameRequest](#simulation_api_schema-UpdateFrameRequest)
 }
 
 /**
@@ -147,7 +147,7 @@ message SpawnVehicleEntityRequest {
  * Response of spawning vehicle entity.
  **/
 message SpawnVehicleEntityResponse {
-  Result result = 1; // Result of [SpawnVehicleEntityResponse](#SpawnVehicleEntityResponse)
+  Result result = 1; // Result of [SpawnVehicleEntityRequest](#simulation_api_schema-SpawnVehicleEntityRequest)
 }
 
 /**
@@ -163,7 +163,7 @@ message SpawnPedestrianEntityRequest {
  * Response of spawning vehicle entity.
  **/
 message SpawnPedestrianEntityResponse {
-  Result result = 1; // Result of [SpawnPedestrianEntityResponse](#SpawnPedestrianEntityResponse)
+  Result result = 1; // Result of [SpawnPedestrianEntityRequest](#simulation_api_schema-SpawnPedestrianEntityRequest)
 }
 
 /**
@@ -179,7 +179,7 @@ message SpawnMiscObjectEntityRequest {
  * Response of spawning misc object entity
  **/
 message SpawnMiscObjectEntityResponse {
-  Result result = 1; // Result of [SpawnPedestrianEntityResponse](#SpawnPedestrianEntityResponse)
+  Result result = 1; // Result of [SpawnMiscObjectEntityRequest](#simulation_api_schema-SpawnMiscObjectEntityRequest)
 }
 
 /**
@@ -193,7 +193,7 @@ message DespawnEntityRequest {
  * Response of despawning entity.
  **/
 message DespawnEntityResponse {
-  Result result = 1; // Result of [DespawnEntityRequest](#DespawnEntityRequest)
+  Result result = 1; // Result of [DespawnEntityRequest](#simulation_api_schema-DespawnEntityRequest)
 }
 
 /**
@@ -209,7 +209,7 @@ message UpdateEntityStatusRequest {
  * Response of updating entity status.
  **/
 message UpdateEntityStatusResponse {
-  Result result = 1;                       // Result of [UpdateEntityStatusRequest](#UpdateEntityStatusRequest)
+  Result result = 1;                       // Result of [UpdateEntityStatusRequest](#simulation_api_schema-UpdateEntityStatusRequest)
   repeated UpdatedEntityStatus status = 2; // List of updated entity status in sensor/dynamics simulator
 }
 
@@ -224,7 +224,7 @@ message UpdateEntityStatusResponse {
  * Requests attaching a imu sensor to the target entity.
  **/
  message AttachImuSensorResponse {
-  Result result = 1; // Result of [AttachImuSensorRequest](#AttachImuSensorRequest)
+  Result result = 1; // Result of [AttachImuSensorRequest](#simulation_api_schema-AttachImuSensorRequest)
 }
 
 /**
@@ -238,7 +238,7 @@ message AttachPseudoTrafficLightDetectorRequest {
  * Response of attaching a traffic light detector emulator.
  **/
 message AttachPseudoTrafficLightDetectorResponse {
-  Result result = 1; // Result of [AttachPseudoTrafficLightDetectorRequest](#AttachPseudoTrafficLightDetectorRequest)
+  Result result = 1; // Result of [AttachPseudoTrafficLightDetectorRequest](#simulation_api_schema-AttachPseudoTrafficLightDetectorRequest)
 }
 
 /**
@@ -252,7 +252,7 @@ message AttachLidarSensorRequest {
  * Response of attaching a lidar sensor to the target entity.
  **/
 message AttachLidarSensorResponse {
-  Result result = 1; // Result of [AttachLidarSensorRequest](#AttachLidarSensorRequest)
+  Result result = 1; // Result of [AttachLidarSensorRequest](#simulation_api_schema-AttachLidarSensorRequest)
 }
 
 /**
@@ -266,7 +266,7 @@ message AttachDetectionSensorRequest {
  * Response of attaching detection sensor to the target entity.
  **/
 message AttachDetectionSensorResponse {
-  Result result = 1; // Result of [AttachDetectionSensorRequest](#AttachDetectionSensorRequest)
+  Result result = 1; // Result of [AttachDetectionSensorRequest](#simulation_api_schema-AttachDetectionSensorRequest)
 }
 
 /**
@@ -280,7 +280,7 @@ message AttachDetectionSensorResponse {
  * Response of attaching occupancy grid sensor to the target entity.
  **/
 message AttachOccupancyGridSensorResponse {
-  Result result = 1; // Result of [AttachOccupancyGridSensorRequest](#AttachOccupancyGridRequest)
+  Result result = 1; // Result of [AttachOccupancyGridSensorRequest](#simulation_api_schema-AttachOccupancyGridSensorRequest)
 }
 
 message TrafficLight {
@@ -336,7 +336,7 @@ message UpdateTrafficLightsRequest {
  * Response of updating traffic lights in simulation.
  **/
 message UpdateTrafficLightsResponse {
-  Result result = 1; // Result of [DespawnEntityRequest](#DespawnEntityRequest)
+  Result result = 1; // Result of [UpdateTrafficLightsRequest](#simulation_api_schema-UpdateTrafficLightsRequest)
 }
 
 /**
@@ -350,7 +350,7 @@ message UpdateStepTimeRequest {
  * Response of updating simulation step time.
  **/
 message UpdateStepTimeResponse {
-  Result result = 1; // Result of [UpdateStepTimeRequest](#UpdateStepTimeRequest)
+  Result result = 1; // Result of [UpdateStepTimeRequest](#simulation_api_schema-UpdateStepTimeRequest)
 }
 
 /**

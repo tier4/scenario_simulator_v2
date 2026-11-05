@@ -1,0 +1,20 @@
+name: Release
+on:
+  push:
+    branches: [master]
+jobs:
+  release:
+    runs-on: ubuntu-slim
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq '.[0].body // ""' > notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: gh release create "$(sed -n 's|^ *<version>\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)</version> *$|\1|p' scenario_simulator_v2/package.xml)" --target "$GITHUB_SHA" --notes-file notes.md --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

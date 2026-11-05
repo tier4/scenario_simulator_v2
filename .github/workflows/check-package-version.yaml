@@ -1,0 +1,18 @@
+name: Check package version
+on:
+  pull_request:
+    branches: [master]
+jobs:
+  check-package-version:
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+    env:
+      VERSION: 's|^ *<version>\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)</version> *$|\1|p'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: test "$(find . -name package.xml -exec sed -n "$VERSION" {} + | sort -u | wc -l)" -eq 1
+      - run: git fetch --depth 1 origin "$GITHUB_BASE_REF"
+      - run: awk -v base="$(git show "origin/$GITHUB_BASE_REF:scenario_simulator_v2/package.xml" | sed -n "$VERSION")" -v head="$(sed -n "$VERSION" scenario_simulator_v2/package.xml)" 'BEGIN { split(base, b, "."); split(head, h, "."); for (i = 1; i <= 3; i++) { if (h[i] + 0 > b[i] + 0) exit 0; if (h[i] + 0 < b[i] + 0) exit 1 } exit 1 }'

@@ -19,8 +19,6 @@ dependencies = [
     "mkdocs-awesome-pages-plugin>=2.9.2,<3",
     "plantuml>=0.3.0,<0.4",
     "mkdocs-redirects>=1.2.1,<2",
-    "requests>=2.32.4,<3",
-    "catkin-pkg>=1.1.0,<2",
 ]
 
 [build-system]

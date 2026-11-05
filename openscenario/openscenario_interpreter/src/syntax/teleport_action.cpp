@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/object_type.hpp>
@@ -55,33 +56,32 @@ auto TeleportAction::start() const -> void
     if (not global().entities->isAdded(actor)) {
       actor.apply(AddEntityAction(local(), position));  // NOTE: TIER IV extension
     } else {
-      actor.apply([&](const auto & object) { teleport(object, position); });
+      actor.apply([&](const auto & object) { teleport(runtime().entities(), object, position); });
     }
   }
 }
 
-auto TeleportAction::teleport(const EntityRef & entity_ref, const Position & position) -> void
+auto TeleportAction::teleport(
+  EntityOperations & entities, const EntityRef & entity_ref, const Position & position) -> void
 {
   auto teleport = overload(
     [&](const WorldPosition & position) {
-      return applyTeleportAction(entity_ref, static_cast<NativeWorldPosition>(position));
+      return entities.applyTeleportAction(
+        entity_ref, static_cast<geometry_msgs::msg::Pose>(position));
     },
     [&](const RelativeWorldPosition & position) {
-      return applyTeleportAction(
-        entity_ref,
-        position.entity_ref,  // name
-        position,             // geometry_msgs::msg::Point
-        position.orientation);
+      return entities.applyTeleportAction(
+        entity_ref, position.entity_ref, static_cast<geometry_msgs::msg::Point>(position),
+        static_cast<geometry_msgs::msg::Vector3>(position.orientation));
     },
     [&](const RelativeObjectPosition & position) {
-      return applyTeleportAction(
-        entity_ref,
-        position.entity_ref,  // name
-        position,             // geometry_msgs::msg::Point
-        position.orientation);
+      return entities.applyTeleportAction(
+        entity_ref, position.entity_ref, static_cast<geometry_msgs::msg::Point>(position),
+        static_cast<geometry_msgs::msg::Vector3>(position.orientation));
     },
     [&](const LanePosition & position) {
-      return applyTeleportAction(entity_ref, static_cast<NativeLanePosition>(position));
+      return entities.applyTeleportAction(
+        entity_ref, static_cast<traffic_simulator::CanonicalizedLaneletPose>(position));
     });
 
   return apply<void>(teleport, position);

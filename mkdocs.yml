@@ -19,6 +19,9 @@ extra:
       link: https://github.com/tier4/scenario_simulator_v2/issues
     - icon: fontawesome/solid/code-pull-request
       link: https://github.com/tier4/scenario_simulator_v2/pulls
+validation:
+  links:
+    anchors: warn
 plugins:
   - awesome-pages
   - search

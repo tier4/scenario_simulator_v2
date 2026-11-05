@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/assign_route_action.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
@@ -94,8 +95,10 @@ auto AssignRouteAction::start() -> void
           return get_from_parameter("RoutingAction__allow_goal_modification", false);
         }
       }();
-      applyAssignRouteAction(
-        object, static_cast<std::vector<NativeLanePosition>>(route.as<const Route>()),
+      runtime().entities().applyAssignRouteAction(
+        object,
+        static_cast<std::vector<traffic_simulator::CanonicalizedLaneletPose>>(
+          route.as<const Route>()),
         route_option);
     });
   }
