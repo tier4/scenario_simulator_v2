@@ -20,6 +20,115 @@ namespace traffic_simulator
 {
 namespace lanelet_wrapper
 {
+CenterPointsCache::CenterPointsCache(const lanelet::LaneletMapPtr & lanelet_map)
+{
+  data_.reserve(lanelet_map->laneletLayer.size());
+  splines_.reserve(lanelet_map->laneletLayer.size());
+  for (const auto & lanelet : lanelet_map->laneletLayer) {
+    const auto lanelet_id = lanelet.id();
+    const auto & points =
+      data_.emplace(lanelet_id, centerPoints(lanelet_id, lanelet_map)).first->second;
+    splines_.emplace(lanelet_id, std::make_shared<Spline>(points));
+  }
+}
+
+LaneletLengthCache::LaneletLengthCache(const lanelet::LaneletMapPtr & lanelet_map)
+{
+  data_.reserve(lanelet_map->laneletLayer.size());
+  for (const auto & lanelet : lanelet_map->laneletLayer) {
+    data_.emplace(lanelet.id(), lanelet::utils::getLaneletLength2d(lanelet));
+  }
+}
+
+auto TopologyCache::getNextLaneletIds(
+  const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &
+{
+  return next_lanelet_ids_cache_.at(static_cast<std::size_t>(type)).at(lanelet_id);
+}
+
+auto TopologyCache::getPreviousLaneletIds(
+  const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &
+{
+  return previous_lanelet_ids_cache_.at(static_cast<std::size_t>(type)).at(lanelet_id);
+}
+
+auto TopologyCache::getRightOfWayLaneletIds(const lanelet::Id lanelet_id) const
+  -> const lanelet::Ids &
+{
+  return right_of_way_lanelet_ids_cache_.at(lanelet_id);
+}
+
+auto TopologyCache::getConflictingCrosswalkIds(const lanelet::Id lanelet_id) const
+  -> const lanelet::Ids &
+{
+  return conflicting_crosswalk_ids_cache_.at(lanelet_id);
+}
+
+auto TopologyCache::getConflictingLaneIds(
+  const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &
+{
+  return conflicting_lanelet_ids_cache_.at(static_cast<std::size_t>(type)).at(lanelet_id);
+}
+
+TopologyCache::TopologyCache(
+  const lanelet::LaneletMapPtr & lanelet_map,
+  const std::array<lanelet::routing::RoutingGraphConstPtr, 3> & routing_graphs)
+{
+  lanelet::routing::RoutingGraphContainer graphs_container(
+    {routing_graphs[static_cast<std::size_t>(RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER)],
+     routing_graphs[static_cast<std::size_t>(RoutingGraphType::PEDESTRIAN)]});
+  constexpr std::size_t routing_graph_id{1};
+  constexpr double height_clearance{4};
+
+  for (const auto & lanelet : lanelet_map->laneletLayer) {
+    const auto lanelet_id = lanelet.id();
+
+    for (std::size_t i = 0; i < routing_graphs.size(); ++i) {
+      const auto & graph = routing_graphs[i];
+
+      auto & next_lanelet_ids = next_lanelet_ids_cache_[i][lanelet_id];
+      const auto & following_lanelets = graph->following(lanelet);
+      next_lanelet_ids.reserve(following_lanelets.size());
+      for (const auto & following_lanelet : following_lanelets) {
+        next_lanelet_ids.push_back(following_lanelet.id());
+      }
+
+      auto & previous_lanelet_ids = previous_lanelet_ids_cache_[i][lanelet_id];
+      const auto & previous_lanelets = graph->previous(lanelet);
+      previous_lanelet_ids.reserve(previous_lanelets.size());
+      for (const auto & previous_lanelet : previous_lanelets) {
+        previous_lanelet_ids.push_back(previous_lanelet.id());
+      }
+
+      auto & conflicting_lanes_ids = conflicting_lanelet_ids_cache_[i][lanelet_id];
+      const auto & conflicting_lanelets = lanelet::utils::getConflictingLanelets(graph, lanelet);
+      conflicting_lanes_ids.reserve(conflicting_lanelets.size());
+      for (const auto & conflicting_lanelet : conflicting_lanelets) {
+        conflicting_lanes_ids.push_back(conflicting_lanelet.id());
+      }
+    }
+
+    auto & right_of_way_lanelets_ids = right_of_way_lanelet_ids_cache_[lanelet_id];
+    const auto & right_of_ways = lanelet.regulatoryElementsAs<lanelet::RightOfWay>();
+    for (const auto & right_of_way : right_of_ways) {
+      for (const auto & right_of_way_lanelet : right_of_way->rightOfWayLanelets()) {
+        if (right_of_way_lanelet.id() != lanelet_id) {
+          right_of_way_lanelets_ids.push_back(right_of_way_lanelet.id());
+        }
+      }
+    }
+
+    auto & conflicting_crosswalk_ids = conflicting_crosswalk_ids_cache_[lanelet_id];
+    /// @note it is not clear if the distinction for crosswalks only is implemented here
+    const auto & conflicting_crosswalks =
+      graphs_container.conflictingInGraph(lanelet, routing_graph_id, height_clearance);
+    conflicting_crosswalk_ids.reserve(conflicting_crosswalks.size());
+    for (const auto & conflicting_crosswalk : conflicting_crosswalks) {
+      conflicting_crosswalk_ids.push_back(conflicting_crosswalk.id());
+    }
+  }
+}
+
 auto LaneletWrapper::activate(const std::string & lanelet_map_path) -> void
 {
   lanelet_map_path_ = lanelet_map_path;
@@ -81,14 +190,19 @@ auto LaneletWrapper::routeCache(const RoutingGraphType type) -> RouteCache &
   }
 }
 
-auto LaneletWrapper::centerPointsCache() -> CenterPointsCache &
+auto LaneletWrapper::centerPointsCache() -> const CenterPointsCache &
 {
   return getInstance().center_points_cache_;
 }
 
-auto LaneletWrapper::laneletLengthCache() -> LaneletLengthCache &
+auto LaneletWrapper::laneletLengthCache() -> const LaneletLengthCache &
 {
   return getInstance().lanelet_length_cache_;
+}
+
+auto LaneletWrapper::topologyCache() -> const TopologyCache &
+{
+  return getInstance().topology_cache_;
 }
 
 LaneletWrapper::LaneletWrapper(const std::filesystem::path & lanelet_map_path)
@@ -96,7 +210,11 @@ LaneletWrapper::LaneletWrapper(const std::filesystem::path & lanelet_map_path)
   vehicle_(lanelet_map_ptr_, lanelet::Locations::Germany, lanelet::Participants::Vehicle),
   vehicle_with_road_shoulder_(
     lanelet_map_ptr_, Locations::RoadShoulderPassableGermany, lanelet::Participants::Vehicle),
-  pedestrian_(lanelet_map_ptr_, lanelet::Locations::Germany, lanelet::Participants::Pedestrian)
+  pedestrian_(lanelet_map_ptr_, lanelet::Locations::Germany, lanelet::Participants::Pedestrian),
+  center_points_cache_(lanelet_map_ptr_),
+  lanelet_length_cache_(lanelet_map_ptr_),
+  topology_cache_(
+    lanelet_map_ptr_, {vehicle_.graph, pedestrian_.graph, vehicle_with_road_shoulder_.graph})
 {
 }
 
