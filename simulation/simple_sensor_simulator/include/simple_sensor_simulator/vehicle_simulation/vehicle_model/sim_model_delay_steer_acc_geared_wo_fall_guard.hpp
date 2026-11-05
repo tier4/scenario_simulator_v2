@@ -36,7 +36,7 @@ public:
    * @param [in] acc_rate_lim acceleration jerk limit [m/s^3]
    * @param [in] brake_rate_lim deceleration jerk limit [m/s^3]
    * @param [in] steer_lim steering limit [rad]
-   * @param [in] steer_rate_lim steering angular velocity limit [rad/ss]
+   * @param [in] steer_rate_lim steering angular velocity limit [rad/s]
    * @param [in] wheelbase vehicle wheelbase length [m]
    * @param [in] dt delta time information to set input buffer for delay
    * @param [in] acc_delay time delay for accel command [s]
@@ -48,7 +48,7 @@ public:
    * @param [in] brake_hysteresis_width hysteresis width for brake command [m/ss]
    * @param [in] acc_dead_band dead band for acc [m/ss]
    * @param [in] brake_dead_band dead band for brake [m/ss]
-   * @param [in] brake_jump_value minimum output value when brake is activated [m/ss]
+   * @param [in] brake_jump_value additional deceleration added once the brake command exceeds the dead band (initial brake jump) [m/ss]
    * @param [in] acc_offset constant offset for acc [m/ss]
    * @param [in] brake_offset constant offset for brake [m/ss]
    * @param [in] acc_resolution resolution (step size) for acc command [m/ss]
