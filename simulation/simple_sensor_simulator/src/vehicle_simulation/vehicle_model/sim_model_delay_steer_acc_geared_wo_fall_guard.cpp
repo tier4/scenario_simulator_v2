@@ -52,6 +52,16 @@ constexpr double STOP_VELOCITY_EPSILON = 1e-3;
   return gear == GearCommand::NONE || gear == GearCommand::PARK;
 }
 
+// Push the newest value into a fixed-length delay queue and return the oldest one.
+// With a zero-length queue the pushed value is returned immediately (no delay).
+[[nodiscard]] double popDelayed(std::deque<double> & queue, double new_value)
+{
+  queue.push_back(new_value);
+  const double delayed_value = queue.front();
+  queue.pop_front();
+  return delayed_value;
+}
+
 struct LongitudinalForces
 {
   double external_acc;    //!< a_external = a_engine + a_slope + a_air_drag
@@ -215,10 +225,7 @@ double SimModelDelaySteerAccGearedWoFallGuard::calculateSteerTarget(double delay
 double SimModelDelaySteerAccGearedWoFallGuard::getRawDelayedVx()
 {
   if (vel_history_queue_.empty()) return state_(IDX::VX);
-  vel_history_queue_.push_back(state_(IDX::VX));
-  const double front_val = vel_history_queue_.front();
-  vel_history_queue_.pop_front();
-  return front_val;
+  return popDelayed(vel_history_queue_, state_(IDX::VX));
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::calculateDelayedVx(double raw_delayed_vx)
@@ -235,17 +242,13 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
   // Separate and delay acceleration and brake pedal commands independently
   const double raw_pedal_cmd = input_(IDX_U::PEDAL_ACCX_DES);
-  acc_input_queue_.push_back((raw_pedal_cmd >= 0.0) ? raw_pedal_cmd : 0.0);
-  brake_input_queue_.push_back((raw_pedal_cmd < 0.0) ? std::abs(raw_pedal_cmd) : 0.0);
+  const double acc_delayed_val =
+    popDelayed(acc_input_queue_, (raw_pedal_cmd >= 0.0) ? raw_pedal_cmd : 0.0);
+  const double brake_delayed_val =
+    popDelayed(brake_input_queue_, (raw_pedal_cmd < 0.0) ? std::abs(raw_pedal_cmd) : 0.0);
 
-  const double acc_delayed_val = acc_input_queue_.front();
-  acc_input_queue_.pop_front();
-  const double brake_delayed_val = brake_input_queue_.front();
-  brake_input_queue_.pop_front();
-
-  steer_motor_input_queue_.push_back(input_(IDX_U::STEER_DES));
-  const double delayed_steer_des = steer_motor_input_queue_.front();
-  steer_motor_input_queue_.pop_front();
+  const double delayed_steer_des =
+    popDelayed(steer_motor_input_queue_, input_(IDX_U::STEER_DES));
 
   // Target motor drive acceleration
   const double acc_target = calculateAccTarget(acc_delayed_val);
