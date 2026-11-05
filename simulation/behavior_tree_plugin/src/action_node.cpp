@@ -275,11 +275,14 @@ namespace
 {
 namespace bg = boost::geometry;
 using BoostPolygon = math::geometry::boost_polygon;
+using AxisAlignedBox = bg::model::box<math::geometry::boost_point>;
 
 struct QuadrilateralData
 {
   std::vector<BoostPolygon> polygons;
+  std::vector<AxisAlignedBox> segment_bounds;
   std::vector<double> longitudinal_starts;
+  std::optional<AxisAlignedBox> trajectory_bounds;
 };
 
 auto buildQuadrilateralData(
@@ -319,6 +322,7 @@ auto buildQuadrilateralData(
   }
 
   data.polygons.reserve(num_segments);
+  data.segment_bounds.reserve(num_segments);
   data.longitudinal_starts.reserve(num_segments);
   for (std::size_t i = 0; i < num_segments; ++i) {
     data.longitudinal_starts.emplace_back(step_size * static_cast<double>(i));
@@ -333,6 +337,15 @@ auto buildQuadrilateralData(
     outer.emplace_back(right_bounds[i + 1].x, right_bounds[i + 1].y);
     outer.push_back(outer.front());
     bg::correct(polygon);
+
+    AxisAlignedBox bounds;
+    bg::envelope(polygon, bounds);
+    if (data.trajectory_bounds) {
+      bg::expand(data.trajectory_bounds.value(), bounds);
+    } else {
+      data.trajectory_bounds = bounds;
+    }
+    data.segment_bounds.emplace_back(bounds);
     data.polygons.emplace_back(std::move(polygon));
   }
   return data;
@@ -342,8 +355,19 @@ auto intersectsTrajectory(
   const QuadrilateralData & trajectory_polygons, const BoostPolygon & target_polygon)
   -> std::optional<double>
 {
+  AxisAlignedBox target_bounds;
+  bg::envelope(target_polygon, target_bounds);
+  if (
+    trajectory_polygons.trajectory_bounds &&
+    bg::disjoint(trajectory_polygons.trajectory_bounds.value(), target_bounds)) {
+    return std::nullopt;
+  }
+
   const auto num = trajectory_polygons.polygons.size();
   for (std::size_t i = 0; i < num; ++i) {
+    if (bg::disjoint(trajectory_polygons.segment_bounds.at(i), target_bounds)) {
+      continue;
+    }
     if (bg::intersects(trajectory_polygons.polygons.at(i), target_polygon)) {
       return trajectory_polygons.longitudinal_starts.at(i);
     }
@@ -367,6 +391,25 @@ auto detectEntityCollisions(
   for (const auto & [name, status] : other_entity_status) {
     if (entity_name == name) {
       continue;
+    }
+    if (data.trajectory_bounds) {
+      const auto & box = status.getBoundingBox();
+      // Contain all rotated top-face corners, including the bounding-box center offset.
+      const double radius = std::hypot(
+                              std::hypot(
+                                std::abs(box.center.x) + 0.5 * std::abs(box.dimensions.x),
+                                std::abs(box.center.y) + 0.5 * std::abs(box.dimensions.y)),
+                              std::abs(box.center.z + 0.5 * box.dimensions.z)) +
+                            1e-8;
+      const auto & p = status.getMapPose().position;
+      const auto & bounds = *data.trajectory_bounds;
+      if (
+        p.x + radius < bg::get<bg::min_corner, 0>(bounds) ||
+        p.x - radius > bg::get<bg::max_corner, 0>(bounds) ||
+        p.y + radius < bg::get<bg::min_corner, 1>(bounds) ||
+        p.y - radius > bg::get<bg::max_corner, 1>(bounds)) {
+        continue;
+      }
     }
     // Generate a 2D polygon from the entity pose and bounding box.
     auto polygon = math::geometry::toPolygon2D(status.getMapPose(), status.getBoundingBox());
