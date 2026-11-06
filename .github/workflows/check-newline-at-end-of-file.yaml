@@ -1,0 +1,17 @@
+name: Check newline at end of file
+on:
+  pull_request:
+jobs:
+  check-newline-at-end-of-file:
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: |
+          ! git grep -I -l -e '' -- '*.[ch]pp' '*.py' '*.xml' '*.yaml' | while IFS= read -r file
+          do
+            [ -n "$(tail -c 1 "$file")" ] || [ -z "$(tail -c 2 "$file")" ] && echo "$file"
+          done | grep .

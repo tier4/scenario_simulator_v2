@@ -3,9 +3,6 @@
 This section describes how to configure the topics that `scenario_simulator_v2`
 publishes to Autoware.
 
-<!-- cspell: ignore mathtt -->
-<!-- cspell: ignore occlusionless -->
-
 ## Overview
 
 The topics that `scenario_simulator_v2` publishes to Autoware are configurable
