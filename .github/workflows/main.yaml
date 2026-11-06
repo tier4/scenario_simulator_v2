@@ -95,13 +95,14 @@ jobs:
         if: matrix.test != 'no-test'
         env:
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
-      - run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
-        if: matrix.sonar != 'no-sonar'
       - run: . install/setup.sh && colcon test-result --verbose
+        if: always() # colcon test only reports the number of failed tests per package, so show the details even if a previous step failed
         continue-on-error: ${{ matrix.rosdistro == 'jazzy' }} # Jazzy is not supported yet
       - run: . install/setup.sh && ./src/scenario_simulator_v2/script/workflow.sh ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt global_frame_rate:=20
         if: matrix.test != 'no-test'
         continue-on-error: ${{ matrix.rosdistro == 'jazzy' }} # Jazzy is not supported yet
+      - run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
+        if: matrix.sonar != 'no-sonar'
       - uses: SonarSource/sonarqube-scan-action@v8.2.1
         if: matrix.sonar != 'no-sonar' && github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]'
         continue-on-error: true
