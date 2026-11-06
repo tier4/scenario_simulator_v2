@@ -19,7 +19,6 @@
 #include <openscenario_interpreter/syntax/controller.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
-#include <openscenario_interpreter/syntax/teleport_action.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <traffic_simulator/api/entity_behavior.hpp>
 
@@ -92,7 +91,6 @@ try {
         throw common::Error(__FILE__);
       }
 
-      TeleportAction::teleport(runtime().entities(), entity_ref, position);
       AssignControllerAction(entity.as<ScenarioObject>().object_controller)(entity_ref);
       runtime().entities().activatePerformanceAssertion(
         entity_ref, vehicle.performance,
@@ -138,7 +136,6 @@ try {
         throw common::Error(__FILE__);
       }
 
-      TeleportAction::teleport(runtime().entities(), entity_ref, position);
       AssignControllerAction(entity.as<ScenarioObject>().object_controller)(entity_ref);
     },
     [&](const MiscObject & misc_object) {
@@ -166,8 +163,6 @@ try {
       } else {
         throw common::Error(__FILE__);
       }
-
-      TeleportAction::teleport(runtime().entities(), entity_ref, position);
     });
 
   if (not std::exchange(entity.as<ScenarioObject>().is_added, true)) {
