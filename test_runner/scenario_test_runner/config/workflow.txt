@@ -32,3 +32,11 @@ $(find-pkg-share scenario_test_runner)/scenario/Event.Priority.parallel.yaml
 $(find-pkg-share scenario_test_runner)/scenario/Event.Priority.skip.yaml
 $(find-pkg-share scenario_test_runner)/scenario/npc-give-way-to-crossing-traffic.yaml
 $(find-pkg-share scenario_test_runner)/scenario/npc-stop-at-stop-line.yaml
+$(find-pkg-share scenario_test_runner)/scenario/AddEntityAction.WorldPosition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/AddEntityAction.RelativeWorldPosition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/AddEntityAction.RelativeObjectPosition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/AddEntityAction.LanePosition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/TeleportAction.WorldPosition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/TeleportAction.RelativeWorldPosition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/TeleportAction.RelativeObjectPosition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/TeleportAction.LanePosition.yaml
