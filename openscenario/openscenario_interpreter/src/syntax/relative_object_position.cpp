@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/operator.hpp>
 #include <geometry/transform.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
@@ -69,7 +71,12 @@ RelativeObjectPosition::operator NativeWorldPosition() const
   geometry_msgs::msg::Pose target_pose_in_world{};
   target_pose_in_world.position =
     math::geometry::transformPoint(reference_pose_in_world, target_point_in_entity_ref);
-  target_pose_in_world.orientation = world_origin_pose.orientation;
+
+  using math::geometry::operator*;
+
+  target_pose_in_world.orientation =
+    reference_pose_in_world.orientation * math::geometry::convertEulerAngleToQuaternion(
+                                            static_cast<geometry_msgs::msg::Vector3>(orientation));
 
   return target_pose_in_world;
 }
