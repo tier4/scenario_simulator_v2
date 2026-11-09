@@ -53,7 +53,7 @@ expect_success AddEntityAction.RelativeWorldPosition.yaml
 expect_success AddEntityAction.RelativeObjectPosition.yaml
 expect_success AddEntityAction.LanePosition.yaml
 expect_success TeleportAction.WorldPosition.yaml
-expect_failure TeleportAction.RelativeWorldPosition.yaml
+expect_success TeleportAction.RelativeWorldPosition.yaml
 expect_success TeleportAction.RelativeObjectPosition.yaml
 expect_success TeleportAction.LanePosition.yaml
 
