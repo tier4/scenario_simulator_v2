@@ -49,7 +49,7 @@ expect_failure()
 }
 
 expect_success AddEntityAction.WorldPosition.yaml
-expect_failure AddEntityAction.RelativeWorldPosition.yaml
+expect_success AddEntityAction.RelativeWorldPosition.yaml
 expect_success AddEntityAction.RelativeObjectPosition.yaml
 expect_success AddEntityAction.LanePosition.yaml
 expect_success TeleportAction.WorldPosition.yaml

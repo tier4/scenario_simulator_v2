@@ -52,12 +52,6 @@ RelativeObjectPosition::operator NativeLanePosition() const
 RelativeObjectPosition::operator NativeWorldPosition() const
 {
   geometry_msgs::msg::Pose world_origin_pose{};
-  world_origin_pose.position.x = 0;
-  world_origin_pose.position.y = 0;
-  world_origin_pose.position.z = 0;
-  world_origin_pose.orientation.x = 0;
-  world_origin_pose.orientation.y = 0;
-  world_origin_pose.orientation.z = 0;
   world_origin_pose.orientation.w = 1;
 
   const auto reference_pose_in_world =
@@ -68,18 +62,16 @@ RelativeObjectPosition::operator NativeWorldPosition() const
   target_point_in_entity_ref.y = dy;
   target_point_in_entity_ref.z = dz;
 
-  geometry_msgs::msg::Pose target_pose_in_world{};
-  target_pose_in_world.position =
-    math::geometry::transformPoint(reference_pose_in_world, target_point_in_entity_ref);
-
   using math::geometry::operator*;
 
+  auto target_pose_in_world = geometry_msgs::msg::Pose();
+  target_pose_in_world.position =
+    math::geometry::transformPoint(reference_pose_in_world, target_point_in_entity_ref);
   target_pose_in_world.orientation =
     reference_pose_in_world.orientation * math::geometry::convertEulerAngleToQuaternion(
                                             static_cast<geometry_msgs::msg::Vector3>(orientation));
 
   return target_pose_in_world;
 }
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
