@@ -13,13 +13,15 @@ jobs:
         with:
           fetch-depth: 0 # for mkdocs-git-revision-date-localized-plugin
           persist-credentials: false
-      - run: npx --yes markdownlint-cli2@0.20.0
+      - run: npx --yes markdownlint-cli2@0.20.0 --config mkdocs/.markdownlint-cli2.jsonc
       - run: pipx install uv
       - run: uv sync --locked
+        working-directory: mkdocs
       - run: uv run mkdocs build --strict
+        working-directory: mkdocs
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: site
+          path: mkdocs/site
   documentation-deploy:
     if: github.event_name == 'push'
     needs: documentation-build

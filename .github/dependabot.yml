@@ -5,6 +5,6 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "uv"
-    directory: "/"
+    directory: "/mkdocs"
     schedule:
       interval: "weekly"

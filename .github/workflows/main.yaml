@@ -10,9 +10,7 @@ on:
       - "!CONTRIBUTING.md"
       - "!.github/**"
       - ".github/workflows/main.yaml"
-      - "!mkdocs.yml"
-      - "!pyproject.toml"
-      - "!uv.lock"
+      - "!mkdocs/**"
   push:
     branches:
       - master
