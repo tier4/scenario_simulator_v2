@@ -19,8 +19,6 @@ Most parameters should have their uses understood just by looking at the sample
 parameter file or by reading the comments in the file. Below we discuss some
 parameters that require additional detailed explanation.
 
-<!-- cspell: ignore YYYYMMDD -->
-
 | Name                   | Value                                   | Default              | Description                                                                                                                                                          |
 |------------------------|-----------------------------------------|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `<topic-name>.version` | An `int` type value in YYYYMMDD format  | None (**mandatory**) | Suffix of `scenario_test_runner` launch argument `architecture_type`, used to maintain backward compatibility of the simulator when changing the Autoware interface. |
