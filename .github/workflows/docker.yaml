@@ -10,7 +10,6 @@ on:
       - ".github/workflows/docker.yaml"
       - "!mkdocs.yml"
       - "!pyproject.toml"
-      - "!sonar-project.properties"
       - "!uv.lock"
   push:
     branches: [master]
