@@ -32,24 +32,22 @@ jobs:
           - { runs-on: ubuntu-24.04,     rosdistro: jazzy,  platform: amd64 }
           - { runs-on: ubuntu-24.04-arm, rosdistro: jazzy,  platform: arm64 }
     steps:
-      - uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-      - uses: docker/setup-buildx-action@v4
-      - uses: actions/checkout@v6
+      - uses: jlumbroso/free-disk-space@ceedf095f4ec1a097402bc6bd80831f2e1a6fde6 # v2.0.0
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
-      - uses: docker/login-action@v4
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
         with:
           images: ${{ env.IMAGE_BASE }}
       - id: build_development
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           platforms: linux/${{ matrix.platform }}
@@ -64,7 +62,7 @@ jobs:
         env:
           DIGEST: ${{ steps.build_development.outputs.digest }}
       - id: build_desktop
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           platforms: linux/${{ matrix.platform }}
@@ -79,7 +77,7 @@ jobs:
         env:
           DIGEST: ${{ steps.build_desktop.outputs.digest }}
       - id: build_runtime
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           platforms: linux/${{ matrix.platform }}
@@ -93,7 +91,7 @@ jobs:
       - run: touch "/tmp/digests/runtime/${DIGEST#sha256:}"
         env:
           DIGEST: ${{ steps.build_runtime.outputs.digest }}
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: digests-${{ matrix.rosdistro }}-${{ matrix.platform }}
           path: /tmp/digests
@@ -116,24 +114,24 @@ jobs:
           - { rosdistro: jazzy,  variant: development, image_suffix: -devel   }
           - { rosdistro: jazzy,  variant: runtime,     image_suffix: -runtime }
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
           path: /tmp/digests
           pattern: digests-${{ matrix.rosdistro }}-*
           merge-multiple: true
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
       - id: version
         run: echo "version=$(sed -n 's|^ *<version>\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)</version> *$|\1|p' scenario_simulator_v2/package.xml)" >> "$GITHUB_OUTPUT"
-      - uses: docker/setup-buildx-action@v4
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - id: image_tag
         run: echo "image_tag=$IMAGE_BASE:$ROSDISTRO-$VERSION$IMAGE_SUFFIX" >> "$GITHUB_OUTPUT"
         env:
           ROSDISTRO: ${{ matrix.rosdistro }}
           VERSION: ${{ steps.version.outputs.version }}
           IMAGE_SUFFIX: ${{ matrix.image_suffix }}
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

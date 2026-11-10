@@ -10,7 +10,7 @@ jobs:
     env:
       VERSION: 's|^ *<version>\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)</version> *$|\1|p'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           persist-credentials: false
       - run: test "$(find . -name package.xml -exec sed -n "$VERSION" {} + | sort -u | wc -l)" -eq 1
