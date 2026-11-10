@@ -16,8 +16,11 @@
 #include <concealer/field_operator_application.hpp>
 #include <concealer/is_package_exists.hpp>
 #include <concealer/member_detector.hpp>
+#include <array>
+#include <cstdio>
 #include <cstdlib>
 #include <exception>
+#include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <system_error>
 
@@ -363,21 +366,63 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             30);
           waitForAutowareStateToBe(
             LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
-          ResetDiagGraph();
+          ResetMrm();
           break;
       }
     });
   }
 }
 
-void FieldOperatorApplication::ResetDiagGraph()
+void FieldOperatorApplication::ResetMrm()
 {
-    std::thread([logger = get_logger()]() {
-        RCLCPP_INFO(logger, "waiting 20 sec for diagnostic_graph/reset");
-        std::this_thread::sleep_for(std::chrono::seconds(20));
-        const std::string command = "ros2 service call /diagnostics_graph/reset tier4_system_msgs/srv/ResetDiagGraph '{}'";
-        std::system(command.c_str());
-    }).detach();
+  std::thread([logger = get_logger()]() {
+    constexpr int timeout_seconds = 30;
+
+    RCLCPP_INFO(logger, "waiting 20 sec for /system/mrm/reset");
+    std::this_thread::sleep_for(std::chrono::seconds(20));
+
+    // `ros2 service call` waits for the service forever, so bound it with `timeout`.
+    const std::string command =
+      "timeout " + std::to_string(timeout_seconds) +
+      " ros2 service call /system/mrm/reset tier4_external_api_msgs/srv/ResetMrm '{}' 2>&1";
+
+    std::string output;
+    FILE * pipe = ::popen(command.c_str(), "r");
+    if (pipe == nullptr) {
+      RCLCPP_ERROR_STREAM(logger, "/system/mrm/reset: failed to run command: " << command);
+      return;
+    }
+    std::array<char, 256> buffer{};
+    while (std::fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+      output += buffer.data();
+    }
+    const int status = ::pclose(pipe);
+
+    if (status == -1 or not WIFEXITED(status)) {
+      RCLCPP_ERROR_STREAM(logger, "/system/mrm/reset: command terminated abnormally\n" << output);
+      return;
+    }
+    if (const int exit_code = WEXITSTATUS(status); exit_code == 124) {
+      RCLCPP_ERROR_STREAM(
+        logger, "/system/mrm/reset: no response within " << timeout_seconds
+                                                          << " sec (service not available?)\n"
+                                                          << output);
+      return;
+    } else if (exit_code != 0) {
+      RCLCPP_ERROR_STREAM(
+        logger, "/system/mrm/reset: command failed with exit code " << exit_code << "\n" << output);
+      return;
+    }
+
+    // Response is printed as `...ResponseStatus(code=<N>, message='...')`.
+    // See tier4_external_api_msgs/msg/ResponseStatus.msg (SUCCESS=1).
+    if (std::smatch match;
+        std::regex_search(output, match, std::regex(R"(code=(\d+))")) and match[1] == "1") {
+      RCLCPP_INFO(logger, "/system/mrm/reset: succeeded");
+    } else {
+      RCLCPP_ERROR_STREAM(logger, "/system/mrm/reset: service returned non-success status\n" << output);
+    }
+  }).detach();
 }
 
 auto FieldOperatorApplication::plan(
