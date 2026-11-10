@@ -14,7 +14,6 @@
 
   <depend>traffic_simulator</depend>
   <depend>simple_sensor_simulator</depend>
-  <depend>simple_junit</depend>
   <depend>yaml-cpp</depend>
   <depend>fmt</depend>
   <depend>traffic_simulator_msgs</depend>

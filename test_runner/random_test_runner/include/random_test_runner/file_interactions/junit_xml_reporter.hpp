@@ -24,7 +24,7 @@
 #include <rclcpp/rclcpp.hpp>
 
 #include "random_test_runner/data_types.hpp"
-#include "simple_junit/junit5.hpp"
+#include "traffic_simulator/utils/junit5.hpp"
 
 class JunitXmlReporterTestCase
 {

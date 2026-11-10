@@ -31,8 +31,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <simple_junit/junit5.hpp>
 #include <tier4_simulation_msgs/msg/user_defined_value.hpp>
+#include <traffic_simulator/utils/junit5.hpp>
 #include <utility>
 
 #define INTERPRETER_INFO_STREAM(...) \

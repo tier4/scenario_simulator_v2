@@ -16,7 +16,6 @@
 
   <depend>generate_parameter_library</depend>
   <depend>kashiwanoha_map</depend>
-  <depend>simple_junit</depend>
   <depend>simple_sensor_simulator</depend>
   <depend>traffic_simulator</depend>
 

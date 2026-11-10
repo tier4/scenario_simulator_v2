@@ -20,9 +20,6 @@ install(
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-
-  ament_auto_add_gtest(test_simple_junit test/src/test.cpp)
-  target_link_libraries(test_simple_junit pugixml)
 endif()
 
 ament_auto_package()
