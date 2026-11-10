@@ -10,15 +10,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake_auto REQUIRED)
-find_package(Boost COMPONENTS date_time filesystem)
 
 ament_auto_find_build_dependencies()
-
-ament_auto_add_library(${PROJECT_NAME} SHARED src/test_suites.cpp)
-
-target_link_libraries(${PROJECT_NAME}
-  Boost::date_time
-  pugixml)
 
 install(
   DIRECTORY test/expected
@@ -28,8 +21,8 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  ament_add_gtest(test_simple_junit test/src/test.cpp)
-  target_link_libraries(test_simple_junit ${PROJECT_NAME})
+  ament_auto_add_gtest(test_simple_junit test/src/test.cpp)
+  target_link_libraries(test_simple_junit pugixml)
 endif()
 
 ament_auto_package()
