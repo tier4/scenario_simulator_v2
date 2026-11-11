@@ -363,22 +363,40 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             30);
           waitForAutowareStateToBe(
             LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
-          ResetDiagGraph();
+          EgoStartService();
           break;
       }
     });
   }
 }
 
-void FieldOperatorApplication::ResetDiagGraph()
+void FieldOperatorApplication::EgoStartService()
 {
     std::thread([logger = get_logger()]() {
         RCLCPP_INFO(logger, "waiting 20 sec for diagnostic_graph/reset");
         std::this_thread::sleep_for(std::chrono::seconds(20));
-        const std::string command = "ros2 service call /diagnostics_graph/reset tier4_system_msgs/srv/ResetDiagGraph '{}'";
-        std::system(command.c_str());
-    }).detach();
+
+        // Diag Reset Service
+        const std::string diag_reset_cmd =
+          "timeout -k 2 3 ros2 service call /diagnostics_graph/reset "
+          "tier4_system_msgs/srv/ResetDiagGraph '{}'";
+        const int diag_ret = std::system(diag_reset_cmd.c_str());
+        if (diag_ret != 0) {
+          RCLCPP_WARN(logger, "diagnostics_graph/reset call failed or timed out (status %d)", diag_ret);
+        }
+
+        // Ml Planner Force Start Service
+        const std::string ml_planner_start_cmd =
+          "timeout -k 2 3 ros2 service call "
+          "/planning/trajectory_generator/neural_network_based_planner/ml_planner_node/service/start "
+          "std_srvs/srv/SetBool \"{data: true}\"";
+        const int ml_ret = std::system(ml_planner_start_cmd.c_str());
+        if (ml_ret != 0) {
+          RCLCPP_WARN(logger, "ml_planner start service call failed or timed out (status %d)", ml_ret);
+        }
+      }).detach();
 }
+
 
 auto FieldOperatorApplication::plan(
   const std::vector<geometry_msgs::msg::PoseStamped> & route, const bool allow_goal_modification)

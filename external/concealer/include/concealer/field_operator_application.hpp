@@ -169,7 +169,7 @@ struct FieldOperatorApplication : public rclcpp::Node
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void;
 
-  auto ResetDiagGraph() -> void;
+  auto EgoStartService() -> void;
 
   [[deprecated(
     "This function was deprecated since version 16.5.0 (released on 20250603). It will be deleted "
