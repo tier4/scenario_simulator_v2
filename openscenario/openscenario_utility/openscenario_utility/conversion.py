@@ -117,11 +117,11 @@ def load_yaml(path: Path):
         exit()
 
 
-def expand_dotted_keys(items):
+def expand_dotted_keys(node):
     #
     # A.B.c: { ... }
     #
-    # => A: { B.c: { ... } }
+    # => A: { B: { c: { ... } } }
     #
     # Keys sharing the same head are merged:
     #
@@ -130,23 +130,30 @@ def expand_dotted_keys(items):
     #
     # => A: { B: { c: x }, D: { e: y } }
     #
-    result = {}
+    def merge(target, source):
+        for tag, value in source.items():
+            if tag not in target:
+                target[tag] = value
+            elif isinstance(target[tag], dict) and isinstance(value, dict):
+                merge(target[tag], value)
+            else:
+                print(f"\x1b[31mDuplicated key: {tag}\x1b[0m", file=stderr)
+                exit(1)
 
-    for tag, value in items:
-        tag, dot, rest = tag.partition(".")
+    if isinstance(node, dict):
+        result = {}
 
-        if dot:
-            value = {rest: value}
+        for tag, value in node.items():
+            tag, dot, rest = tag.partition(".")
+            merge(result, {tag: expand_dotted_keys({rest: value} if dot else value)})
 
-        if tag not in result:
-            result[tag] = value
-        elif isinstance(result[tag], dict) and isinstance(value, dict):
-            result[tag] = expand_dotted_keys([*result[tag].items(), *value.items()])
-        else:
-            print(f"\x1b[31mDuplicated key: {tag}\x1b[0m", file=stderr)
-            exit(1)
+        return result
 
-    return result
+    elif isinstance(node, list):
+        return [expand_dotted_keys(each) for each in node]
+
+    else:
+        return node
 
 
 def from_yaml(keyword, node):
@@ -157,7 +164,7 @@ def from_yaml(keyword, node):
         #
         result = {}
 
-        for tag, value in expand_dotted_keys(node.items()).items():
+        for tag, value in node.items():
 
             if isinstance(value, list) and len(value) == 0:
                 #
@@ -216,7 +223,7 @@ def convert(input: Path, output: Path, verbose: bool = True):
 
     yaml = load_yaml(input)
     yaml = normalize_yaml_bools(yaml)
-    yaml = expand_dotted_keys(yaml.items())
+    yaml = expand_dotted_keys(yaml)
 
     macroexpand = MacroExpander(yaml.pop("ScenarioModifiers", None), schema)
 
