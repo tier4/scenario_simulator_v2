@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_JUNIT__JUNIT5_HPP_
-#define SIMPLE_JUNIT__JUNIT5_HPP_
+#ifndef TRAFFIC_SIMULATOR__UTILS__JUNIT5_HPP_
+#define TRAFFIC_SIMULATOR__UTILS__JUNIT5_HPP_
 
 #include <optional>
 #include <pugixml.hpp>
@@ -392,4 +392,4 @@ using JUnit5 = SimpleTestSuites;
 }  // namespace junit
 }  // namespace common
 
-#endif  // SIMPLE_JUNIT__JUNIT5_HPP_
+#endif  // TRAFFIC_SIMULATOR__UTILS__JUNIT5_HPP_

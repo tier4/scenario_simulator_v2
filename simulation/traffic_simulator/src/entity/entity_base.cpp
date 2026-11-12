@@ -594,6 +594,15 @@ auto EntityBase::setStatus(
 {
   auto status = static_cast<EntityStatus>(getCanonicalizedStatus());
   status.pose = map_pose;
+  /*
+     The LaneletPose copied from the current status corresponds to the old map
+     pose. If it is left valid, it takes precedence over the new map pose: the
+     orientation and the z of the new map pose are overwritten with those based
+     on the old LaneletPose, and then the behavior plugin moves the entity back
+     to the old LaneletPose. Invalidate it so that the LaneletPose is
+     recalculated from the new map pose.
+  */
+  status.lanelet_pose_valid = false;
   status.action_status = action_status;
   setStatus(status);
 }
