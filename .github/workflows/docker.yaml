@@ -8,10 +8,7 @@ on:
       - "!CONTRIBUTING.md"
       - "!.github/**"
       - ".github/workflows/docker.yaml"
-      - "!mkdocs.yml"
-      - "!pyproject.toml"
-      - "!sonar-project.properties"
-      - "!uv.lock"
+      - "!mkdocs/**"
   push:
     branches: [master]
     paths: ["**/package.xml"]

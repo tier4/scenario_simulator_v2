@@ -102,10 +102,10 @@ The documentation is built by [mkdocs](https://www.mkdocs.org/).
 
 You may rename existing files or add new files to the `docs/` directory.
 
-* If you add new files, you should add the file name to the `nav` section in the `mkdocs.yml` file.
+* If you add new files, you should add the file name to the `nav` section in the `mkdocs/mkdocs.yml` file.
 
 * If you rename existing files, you should set up a redirect from the old file to the new file.
-Redirects are defined in the `mkdocs.yml` file using `mkdocs-redirects` plugin, so you will edit `plugins.redirects.redirect_maps` in the `mkdocs.yml` file.
+Redirects are defined in the `mkdocs/mkdocs.yml` file using `mkdocs-redirects` plugin, so you will edit `plugins.redirects.redirect_maps` in the `mkdocs/mkdocs.yml` file.
 
 ## License
 
