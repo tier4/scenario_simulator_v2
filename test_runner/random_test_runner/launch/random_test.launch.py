@@ -78,6 +78,7 @@ class RandomTestRunnerLaunch(object):
                  "description": "Directory to which result.yaml and result.junit.xml files will be placed"},
 
             "initialize_duration": {"default": 35, "description": "How long test runner will wait for Autoware to initialize"},
+            "initialize_localization": {"default": 10, "description": "Positive response timeout for localization initialization, in seconds"},
 
             # test suite arguments #
             "test_name": {"default": "random_test",
