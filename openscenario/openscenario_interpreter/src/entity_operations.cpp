@@ -182,15 +182,6 @@ auto EntityOperations::applyTeleportAction(
   api().getEntity(name).setStatus(position);
 }
 
-auto EntityOperations::applyTeleportAction(
-  const std::string & name, const std::string & reference_name,
-  const geometry_msgs::msg::Point & position, const geometry_msgs::msg::Vector3 & orientation)
-  -> void
-{
-  api().getEntity(name).setStatus(
-    api().getEntity(reference_name).getMapPose(), position, orientation);
-}
-
 auto EntityOperations::applyWalkStraightAction(const std::string & name) -> void
 {
   api().getEntity(name).requestWalkStraight();
