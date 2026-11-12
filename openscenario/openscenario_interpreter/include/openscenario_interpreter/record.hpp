@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__RECORD_HPP_
 #define OPENSCENARIO_INTERPRETER__RECORD_HPP_
 
+#include <sys/prctl.h>
 #include <unistd.h>
 
 #ifndef OPENSCENARIO_INTERPRETER_VERBOSE_RECORD
@@ -25,6 +26,7 @@
 
 #include <boost/algorithm/string.hpp>  // boost::algorithm::replace_all_copy
 #include <concealer/execute.hpp>
+#include <csignal>
 #include <cstdlib>
 #include <iostream>
 #include <rclcpp/logging.hpp>
@@ -45,6 +47,8 @@ inline auto start(const std::vector<std::string> & args) -> pid_t
 
   command.insert(command.end(), args.begin(), args.end());
 
+  const auto parent_process_id = getpid();
+
   switch (process_id = fork()) {
     case -1:
       throw std::system_error(errno, std::system_category());
@@ -56,12 +60,20 @@ inline auto start(const std::vector<std::string> & args) -> pid_t
         ::close(fd);
       }
 #endif
-      if (concealer::execute(command) < 0) {
+      /*
+         NOTE: `record::stop` sends this recorder SIGINT. Ask the kernel to
+         send the same signal if this process dies before `record::stop` runs,
+         or the bag is left unfinalized.
+      */
+      if (prctl(PR_SET_PDEATHSIG, SIGINT) < 0 or getppid() != parent_process_id) {
+        RCLCPP_ERROR_STREAM(
+          rclcpp::get_logger("record"),
+          "prctl: " << std::system_error(errno, std::system_category()).what());
+      } else if (concealer::execute(command) < 0) {
         RCLCPP_ERROR_STREAM(
           rclcpp::get_logger("record"), std::system_error(errno, std::system_category()).what());
-        std::exit(EXIT_FAILURE);
       }
-      return 0;
+      std::_Exit(EXIT_FAILURE);
 
     default:
       return process_id;

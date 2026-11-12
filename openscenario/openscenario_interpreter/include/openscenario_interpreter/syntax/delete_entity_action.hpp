@@ -15,8 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DELETE_ENTITY_ACTION_HPP_
 
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <pugixml.hpp>
 
 namespace openscenario_interpreter
 {
@@ -27,12 +28,9 @@ inline namespace syntax
  *  <xsd:complexType name="DeleteEntityAction"/>
  *
  * -------------------------------------------------------------------------- */
-struct DeleteEntityAction : private SimulatorCore::ActionApplication
+struct DeleteEntityAction : private Scope
 {
-  template <typename... Ts>
-  explicit DeleteEntityAction(Ts &&...)
-  {
-  }
+  explicit DeleteEntityAction(const pugi::xml_node &, Scope & scope) : Scope(scope) {}
 
   auto operator()(const EntityRef &) const -> void;
 };

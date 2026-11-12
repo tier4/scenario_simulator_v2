@@ -14,12 +14,11 @@
 
 #include <gtest/gtest.h>
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <simple_junit/junit5.hpp>
 #include <string>
+#include <traffic_simulator/utils/junit5.hpp>
 
 std::string readFromFile(const std::string & path)
 {
@@ -73,9 +72,7 @@ TEST(SIMPLE_JUNIT, PASS)
   junit.testsuite("example_suites");
   junit.testsuite("example_suite").testcase("example_case").pass.push_back(common::junit::Pass());
   junit.write_to("result_pass.junit.xml", "  ");
-  EXPECT_TEXT_FILE_EQ(
-    "result_pass.junit.xml",
-    ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/pass.junit.xml");
+  EXPECT_TEXT_FILE_EQ("result_pass.junit.xml", TEST_JUNIT5_DIRECTORY "/pass.junit.xml");
   cleanup("result_pass.junit.xml");
 }
 
@@ -86,9 +83,7 @@ TEST(SIMPLE_JUNIT, FAILURE)
   common::junit::Failure failure_case("example_failure", "failure_test_case");
   junit.testsuite("example_suite").testcase("example_case").failure.push_back(failure_case);
   junit.write_to("result_failure.junit.xml", "  ");
-  EXPECT_TEXT_FILE_EQ(
-    "result_failure.junit.xml",
-    ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/failure.junit.xml");
+  EXPECT_TEXT_FILE_EQ("result_failure.junit.xml", TEST_JUNIT5_DIRECTORY "/failure.junit.xml");
   cleanup("result_failure.junit.xml");
 }
 
@@ -99,9 +94,7 @@ TEST(SIMPLE_JUNIT, ERROR)
   common::junit::Error error_case("example_error", "error_test_case");
   junit.testsuite("example_suite").testcase("example_case").error.push_back(error_case);
   junit.write_to("result_error.junit.xml", "  ");
-  EXPECT_TEXT_FILE_EQ(
-    "result_error.junit.xml",
-    ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/error.junit.xml");
+  EXPECT_TEXT_FILE_EQ("result_error.junit.xml", TEST_JUNIT5_DIRECTORY "/error.junit.xml");
   cleanup("result_error.junit.xml");
 }
 
@@ -114,9 +107,7 @@ TEST(SIMPLE_JUNIT, COMPLEX)
   common::junit::Failure failure_case("example_failure", "failure_test_case");
   junit.testsuite("example_suite").testcase("example_case").failure.push_back(failure_case);
   junit.write_to("result_complex.junit.xml", "  ");
-  EXPECT_TEXT_FILE_EQ(
-    "result_complex.junit.xml",
-    ament_index_cpp::get_package_share_directory("simple_junit") + "/expected/complex.junit.xml");
+  EXPECT_TEXT_FILE_EQ("result_complex.junit.xml", TEST_JUNIT5_DIRECTORY "/complex.junit.xml");
   cleanup("result_complex.junit.xml");
 }
 
@@ -131,9 +122,7 @@ TEST(SIMPLE_JUNIT, ATTRIBUTES)
   junit.testsuite("example_suite").testcase("example_case").classname = "example_class";
   junit.testsuite("example_suite").testcase("example_case").status = "failure";
   junit.write_to("result_attribute.junit.xml", "  ");
-  EXPECT_TEXT_FILE_EQ(
-    "result_attribute.junit.xml", ament_index_cpp::get_package_share_directory("simple_junit") +
-                                    "/expected/attributes.junit.xml");
+  EXPECT_TEXT_FILE_EQ("result_attribute.junit.xml", TEST_JUNIT5_DIRECTORY "/attributes.junit.xml");
   cleanup("result_attribute.junit.xml");
 }
 
@@ -144,9 +133,7 @@ TEST(SIMPLE_JUNIT, TESTSUITES_NAME)
   junit.name = "example_name";
   junit.write_to("result_testsuites_name.junit.xml", "  ");
   EXPECT_TEXT_FILE_EQ(
-    "result_testsuites_name.junit.xml",
-    ament_index_cpp::get_package_share_directory("simple_junit") +
-      "/expected/testsuites_name.junit.xml");
+    "result_testsuites_name.junit.xml", TEST_JUNIT5_DIRECTORY "/testsuites_name.junit.xml");
   cleanup("result_testsuites_name.junit.xml");
 }
 

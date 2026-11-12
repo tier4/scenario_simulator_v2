@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/follow_trajectory_action.hpp>
 #include <openscenario_interpreter/syntax/polyline.hpp>
 #include <openscenario_interpreter/syntax/timing.hpp>
@@ -114,7 +116,9 @@ auto FollowTrajectoryAction::start() -> void
     parameter->closed = trajectory_ref.trajectory.as<Trajectory>().closed;
     parameter->shape = repack_trajectory();
 
-    actor.apply([&](const auto & object) { applyFollowTrajectoryAction(object, parameter); });
+    actor.apply([&](const auto & object) {
+      runtime().entities().applyFollowTrajectoryAction(object, parameter);
+    });
   }
 }
 }  // namespace syntax
