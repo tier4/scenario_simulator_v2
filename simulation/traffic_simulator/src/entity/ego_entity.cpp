@@ -21,12 +21,14 @@
 #include <string>
 #include <system_error>
 #include <thread>
+#include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -258,13 +260,12 @@ void EgoEntity::requestAssignRoute(
     assert(not route.empty());
 
     auto goal = static_cast<geometry_msgs::msg::Pose>(route.back());
+    using autoware_adapi_v1_msgs::msg::RoutePrimitive;
     using autoware_adapi_v1_msgs::msg::RouteSegment;
     auto make_segment = [](const int64_t id) {
       RouteSegment segment;
       segment.preferred.id = id;
       segment.preferred.type = "lane";
-      // NOTE: If traffic_simulator supports to the overlap of lanelet pose,
-      //       the second and subsequent lanelet pose are packed into segment.alternatives.
       return segment;
     };
 
@@ -295,6 +296,66 @@ void EgoEntity::requestAssignRoute(
           return a.preferred.id == b.preferred.id;
         }),
       route_segments.end());
+
+    // Pack source-lane neighbors into alternatives only after a lane-change transition.
+    // Policy:
+    //   - before LC: preferred only (single lane)
+    //   - after LC: keep the previous lane as alternatives until the boundary is no longer
+    //     changeable (e.g. solid), so LC / cancel still have enough route length.
+    // Each lanelet ID may appear only once across all segments (isRouteLooped rejects duplicates).
+    std::unordered_set<int64_t> used_lanelet_ids;
+    used_lanelet_ids.reserve(route_segments.size());
+    for (const auto & segment : route_segments) {
+      used_lanelet_ids.insert(segment.preferred.id);
+    }
+
+    const auto routing_graph_type = routing_configuration.routing_graph_type;
+    const auto is_lateral_neighbor =
+      [this, routing_graph_type](
+        const int64_t from_id, const int64_t to_id,
+        traffic_simulator::lane_change::Direction direction) {
+        const auto neighbor_id =
+          hdmap_utils_ptr_->getLaneChangeableLaneletId(from_id, direction, routing_graph_type);
+        return neighbor_id && *neighbor_id == to_id;
+      };
+
+    auto append_alternative_if_unused =
+      [&used_lanelet_ids](RouteSegment & segment, const int64_t id) {
+        if (!used_lanelet_ids.insert(id).second) {
+          return false;
+        }
+        RoutePrimitive alternative;
+        alternative.id = id;
+        alternative.type = "lane";
+        segment.alternatives.push_back(alternative);
+        return true;
+      };
+
+    for (std::size_t i = 0; i + 1 < route_segments.size(); ++i) {
+      const auto from_id = route_segments[i].preferred.id;
+      const auto to_id = route_segments[i + 1].preferred.id;
+
+      std::optional<traffic_simulator::lane_change::Direction> source_side;
+      if (is_lateral_neighbor(from_id, to_id, traffic_simulator::lane_change::Direction::LEFT)) {
+        // Preferred jumped to the left lane; keep the previous (right) lane as alternatives.
+        source_side = traffic_simulator::lane_change::Direction::RIGHT;
+      } else if (is_lateral_neighbor(
+                   from_id, to_id, traffic_simulator::lane_change::Direction::RIGHT)) {
+        source_side = traffic_simulator::lane_change::Direction::LEFT;
+      }
+      if (!source_side) {
+        continue;
+      }
+
+      for (std::size_t j = i + 1; j < route_segments.size(); ++j) {
+        const auto neighbor_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+          route_segments[j].preferred.id, *source_side, routing_graph_type);
+        if (!neighbor_id) {
+          break;  // no more changeable neighbor on the source side
+        }
+        append_alternative_if_unused(route_segments[j], *neighbor_id);
+      }
+    }
 
     requestClearRoute();
 
