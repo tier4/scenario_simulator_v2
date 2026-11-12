@@ -13,32 +13,126 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <cmath>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared_wo_fall_guard.hpp>
 
 namespace autoware::simulator::simple_planning_simulator
 {
 
+namespace
+{
+constexpr double PARAM_EPSILON = 1e-5;
+constexpr double PEDAL_EPSILON = 1e-5;
+constexpr double STOP_VELOCITY_EPSILON = 1e-3;
+
+[[nodiscard]] constexpr double applyResolution(double value, double resolution) noexcept
+{
+  if (resolution > PARAM_EPSILON) {
+    return std::round(value / resolution) * resolution;
+  }
+  return value;
+}
+
+[[nodiscard]] double calculateDriveAcc(uint8_t gear, double drive_acc) noexcept
+{
+  using autoware_vehicle_msgs::msg::GearCommand;
+  if (gear == GearCommand::NONE || gear == GearCommand::PARK || gear == GearCommand::NEUTRAL) {
+    return 0.0;
+  }
+  if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
+    return -drive_acc;
+  }
+  return drive_acc;
+}
+
+[[nodiscard]] constexpr bool isParkOrNone(uint8_t gear) noexcept
+{
+  using autoware_vehicle_msgs::msg::GearCommand;
+  return gear == GearCommand::NONE || gear == GearCommand::PARK;
+}
+
+// Push the newest value into a fixed-length delay queue and return the oldest one.
+// With a zero-length queue the pushed value is returned immediately (no delay).
+[[nodiscard]] double popDelayed(std::deque<double> & queue, double new_value)
+{
+  queue.push_back(new_value);
+  const double delayed_value = queue.front();
+  queue.pop_front();
+  return delayed_value;
+}
+
+struct LongitudinalForces
+{
+  double external_acc;    //!< a_external = a_engine + a_slope + a_air_drag
+  double friction_limit;  //!< a_friction = a_brake + R_roll
+};
+
+// Shared by calcModel (dv/dt) and update (static freeze). Arithmetic order must not be changed.
+[[nodiscard]] LongitudinalForces computeLongitudinalForces(
+  uint8_t gear, double drive_acc, double brake_acc, double slope_acc, double vel,
+  double air_drag_coef, double rolling_resistance) noexcept
+{
+  const double engine_acc = calculateDriveAcc(gear, drive_acc);
+  const double air_drag = -air_drag_coef * vel * std::abs(vel);
+  return {engine_acc + slope_acc + air_drag, brake_acc + rolling_resistance};
+}
+}  // namespace
+
 SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
-  double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
-  double dt, double acc_delay, double acc_time_constant, double steer_delay,
+  double vx_lim, double acc_lim, double brake_lim, double acc_rate_lim, double brake_rate_lim, double steer_lim, double steer_rate_lim, double wheelbase,
+  double dt, double acc_delay, double brake_delay, double acc_time_constant, double brake_time_constant,
+  double acc_accuracy_error, double brake_accuracy_error, double brake_hysteresis_width, double acc_dead_band, double brake_dead_band, double brake_jump_value, double acc_offset, double brake_offset, double acc_resolution, double brake_resolution,
+  double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor)
-: SimModelInterface(7 /* dim x */, 4 /* dim u */),
+  double steer_accuracy_error, double steer_resolution, double steer_hysteresis_width,
+  double vel_sensor_delay, double vel_sensor_resolution, double vel_sensor_noise_stddev, int vel_sensor_noise_seed, double vel_sensor_accuracy_error, double vel_sensor_offset,
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double rolling_resistance, double air_drag_coef, double vel_epsilon)
+: SimModelInterface(8 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
-  vx_rate_lim_(vx_rate_lim),
+  acc_lim_(acc_lim),
+  brake_lim_(brake_lim),
+  acc_rate_lim_(acc_rate_lim),
+  brake_rate_lim_(brake_rate_lim),
   steer_lim_(steer_lim),
   steer_rate_lim_(steer_rate_lim),
   wheelbase_(wheelbase),
   acc_delay_(acc_delay),
+  brake_delay_(brake_delay),
   acc_time_constant_(std::max(acc_time_constant, MIN_TIME_CONSTANT)),
+  brake_time_constant_(std::max(brake_time_constant, MIN_TIME_CONSTANT)),
+  acc_accuracy_error_(acc_accuracy_error),
+  brake_accuracy_error_(brake_accuracy_error),
+  brake_hysteresis_width_(brake_hysteresis_width),
+  acc_dead_band_(acc_dead_band),
+  brake_dead_band_(brake_dead_band),
+  brake_jump_value_(brake_jump_value),
+  acc_offset_(acc_offset),
+  brake_offset_(brake_offset),
+  acc_resolution_(acc_resolution),
+  brake_resolution_(brake_resolution),
   steer_delay_(steer_delay),
   steer_time_constant_(std::max(steer_time_constant, MIN_TIME_CONSTANT)),
   steer_dead_band_(steer_dead_band),
   steer_bias_(steer_bias),
+  steer_accuracy_error_(steer_accuracy_error),
+  steer_resolution_(steer_resolution),
+  steer_hysteresis_width_(steer_hysteresis_width),
+  vel_sensor_delay_(vel_sensor_delay),
+  vel_sensor_resolution_(vel_sensor_resolution),
+  vel_sensor_noise_stddev_(std::max(vel_sensor_noise_stddev, 0.0)),
+  vel_sensor_accuracy_error_(vel_sensor_accuracy_error),
+  vel_sensor_offset_(vel_sensor_offset),
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
-  debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0))
+  debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
+  rolling_resistance_(std::max(rolling_resistance, 0.0)),
+  air_drag_coef_(std::max(air_drag_coef, 0.0)),
+  vel_epsilon_(std::max(vel_epsilon, 0.001)),
+  brake_hysteresis_state_(0.0),
+  delayed_vx_(0.0),
+  vel_rng_(vel_sensor_noise_seed),
+  vel_dist_(0.0, 1.0)
 {
   initializeInputQueue(dt);
 }
@@ -49,7 +143,7 @@ double SimModelDelaySteerAccGearedWoFallGuard::getY() { return state_(IDX::Y); }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getYaw() { return state_(IDX::YAW); }
 
-double SimModelDelaySteerAccGearedWoFallGuard::getVx() { return state_(IDX::VX); }
+double SimModelDelaySteerAccGearedWoFallGuard::getVx() { return delayed_vx_; }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getVy() { return 0.0; }
 
@@ -62,115 +156,225 @@ double SimModelDelaySteerAccGearedWoFallGuard::getWz()
 
 double SimModelDelaySteerAccGearedWoFallGuard::getSteer()
 {
-  // return measured values with bias added to actual values
-  return state_(IDX::STEER) + steer_bias_;
+  return toMotorSteer(state_(IDX::STEER));
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::toMotorSteer(double tire_steer) const noexcept
+{
+  return (tire_steer - steer_bias_) / (1.0 + steer_accuracy_error_);
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::clampTireSteer(double tire_steer) const noexcept
+{
+  const double upper = steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
+  const double lower = -steer_lim_ * (1.0 + steer_accuracy_error_) + steer_bias_;
+  return std::clamp(tire_steer, std::min(upper, lower), std::max(upper, lower));
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::calculateAccTarget(double acc_delayed_val) const noexcept
+{
+  double cmd = acc_delayed_val * debug_acc_scaling_factor_;
+  cmd = applyResolution(cmd, acc_resolution_);
+  cmd = std::max(0.0, cmd - acc_dead_band_) * (1.0 + acc_accuracy_error_);
+  return std::clamp(cmd + acc_offset_, 0.0, acc_lim_);
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::calculateBrakeTarget(double brake_delayed_val) noexcept
+{
+  double brake_cmd = brake_delayed_val * debug_acc_scaling_factor_;
+  brake_cmd = applyResolution(brake_cmd, brake_resolution_);
+
+  if (brake_cmd < PEDAL_EPSILON) {
+    brake_hysteresis_state_ = 0.0;
+  } else {
+    brake_hysteresis_state_ = std::max(0.0, std::clamp(
+      brake_hysteresis_state_,
+      brake_cmd - (brake_hysteresis_width_ / 2.0),
+      brake_cmd + (brake_hysteresis_width_ / 2.0)
+    ));
+  }
+
+  double cmd = 0.0;
+  if (brake_hysteresis_state_ > brake_dead_band_) {
+    cmd = (brake_hysteresis_state_ - brake_dead_band_ + brake_jump_value_) * (1.0 + brake_accuracy_error_);
+  }
+  // brake_offset_ acts as residual drag torque (e.g., pad drag or pre-charge pressure)
+  return std::clamp(cmd + brake_offset_, 0.0, brake_lim_);
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::calculateSteerTarget(double delayed_steer_des) const noexcept
+{
+  double cmd = delayed_steer_des * debug_steer_scaling_factor_;
+
+  // Threshold-type dead band (neutral cut)
+  if (std::abs(cmd) < steer_dead_band_) {
+    cmd = 0.0;
+  }
+
+  cmd = applyResolution(cmd, steer_resolution_);
+
+  // Model mechanical backlash (slack) by constraining current motor angle within cmd ± width/2
+  const double steer_motor_hist = std::clamp(
+    toMotorSteer(state_(IDX::STEER)),
+    cmd - (steer_hysteresis_width_ / 2.0),
+    cmd + (steer_hysteresis_width_ / 2.0)
+  );
+  return std::clamp(steer_motor_hist, -steer_lim_, steer_lim_);
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::getRawDelayedVx()
+{
+  if (vel_history_queue_.empty()) return state_(IDX::VX);
+  return popDelayed(vel_history_queue_, state_(IDX::VX));
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::calculateDelayedVx(double raw_delayed_vx)
+{
+  // Suppress sensor noise and offset when the vehicle is physically stopped
+  if (std::abs(raw_delayed_vx) < STOP_VELOCITY_EPSILON) return 0.0;
+  double vx = raw_delayed_vx * (1.0 + vel_sensor_accuracy_error_) + vel_sensor_offset_;
+  if (vel_sensor_noise_stddev_ > PARAM_EPSILON) vx += vel_dist_(vel_rng_) * vel_sensor_noise_stddev_;
+  vx = applyResolution(vx, vel_sensor_resolution_);
+  return vx;
 }
 
 void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
-  Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
+  // Separate and delay acceleration and brake pedal commands independently
+  const double raw_pedal_cmd = input_(IDX_U::PEDAL_ACCX_DES);
+  const double acc_delayed_val =
+    popDelayed(acc_input_queue_, (raw_pedal_cmd >= 0.0) ? raw_pedal_cmd : 0.0);
+  const double brake_delayed_val =
+    popDelayed(brake_input_queue_, (raw_pedal_cmd < 0.0) ? std::abs(raw_pedal_cmd) : 0.0);
 
-  acc_input_queue_.push_back(input_(IDX_U::PEDAL_ACCX_DES));
-  delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_input_queue_.front();
-  acc_input_queue_.pop_front();
-  steer_input_queue_.push_back(input_(IDX_U::STEER_DES));
-  delayed_input(IDX_U::STEER_DES) = steer_input_queue_.front();
-  steer_input_queue_.pop_front();
-  delayed_input(IDX_U::GEAR) = input_(IDX_U::GEAR);
-  delayed_input(IDX_U::SLOPE_ACCX) = input_(IDX_U::SLOPE_ACCX);
+  const double delayed_steer_des =
+    popDelayed(steer_motor_input_queue_, input_(IDX_U::STEER_DES));
+
+  // Target motor drive acceleration
+  const double acc_target = calculateAccTarget(acc_delayed_val);
+
+  // Target brake deceleration
+  const double brake_target = calculateBrakeTarget(brake_delayed_val);
+
+  // Target steering angle
+  const double steer_target = calculateSteerTarget(delayed_steer_des);
+
+  Eigen::VectorXd inner_input(5);
+  inner_input(IDX_U_INNER::ACC_DES)          = acc_target;
+  inner_input(IDX_U_INNER::BRAKE_DES)        = brake_target;
+  inner_input(IDX_U_INNER::GEAR_INNER)       = input_(IDX_U::GEAR);
+  inner_input(IDX_U_INNER::SLOPE_ACCX_INNER) = input_(IDX_U::SLOPE_ACCX);
+  inner_input(IDX_U_INNER::STEER_DES_INNER)  = steer_target;
 
   const auto prev_state = state_;
-  updateEuler(dt, delayed_input);
-  // we cannot use updateRungeKutta() because the differentiability or the continuity condition is
-  // not satisfied, but we can use Runge-Kutta method with code reconstruction.
 
-  // take velocity limit explicitly
-  state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
+  updateRungeKutta(dt, inner_input);
 
-  if (
-    prev_state(IDX::VX) * state_(IDX::VX) <= 0.0 &&
-    -state_(IDX::PEDAL_ACCX) >= std::abs(delayed_input(IDX_U::SLOPE_ACCX))) {
-    // stop condition is satisfied
-    state_(IDX::VX) = 0.0;
+  state_(IDX::VX)         = std::clamp(state_(IDX::VX), -vx_lim_, vx_lim_);
+  state_(IDX::DRIVE_ACCX) = std::clamp(state_(IDX::DRIVE_ACCX), 0.0, acc_lim_);
+  state_(IDX::BRAKE_ACCX) = std::clamp(state_(IDX::BRAKE_ACCX), 0.0, brake_lim_);
+  state_(IDX::STEER)      = clampTireSteer(state_(IDX::STEER));
+
+  // Freeze vehicle to zero velocity when net external force is within static friction limits
+  if (std::abs(state_(IDX::VX)) < STOP_VELOCITY_EPSILON) {
+    const auto gear = static_cast<uint8_t>(inner_input(IDX_U_INNER::GEAR_INNER));
+    const auto forces = computeLongitudinalForces(
+      gear, state_(IDX::DRIVE_ACCX), state_(IDX::BRAKE_ACCX),
+      inner_input(IDX_U_INNER::SLOPE_ACCX_INNER), state_(IDX::VX), air_drag_coef_,
+      rolling_resistance_);
+
+    if (std::abs(forces.external_acc) <= forces.friction_limit) {
+      state_(IDX::VX) = 0.0;
+    }
   }
 
+  // Calculate longitudinal acceleration as backward difference to reflect post-RK4 static freeze
   state_(IDX::ACCX) = (state_(IDX::VX) - prev_state(IDX::VX)) / dt;
-}
 
-void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double & dt)
-{
-  size_t acc_input_queue_size = static_cast<size_t>(round(acc_delay_ / dt));
-  acc_input_queue_.resize(acc_input_queue_size);
-  std::fill(acc_input_queue_.begin(), acc_input_queue_.end(), 0.0);
-
-  size_t steer_input_queue_size = static_cast<size_t>(round(steer_delay_ / dt));
-  steer_input_queue_.resize(steer_input_queue_size);
-  std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), 0.0);
+  const double raw_delayed_vx = getRawDelayedVx();
+  delayed_vx_ = calculateDelayedVx(raw_delayed_vx);
 }
 
 Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const Eigen::VectorXd & state, const Eigen::VectorXd & input)
 {
-  auto sat = [](double val, double u, double l) { return std::max(std::min(val, u), l); };
+  const double vel           = std::clamp(state(IDX::VX), -vx_lim_, vx_lim_);
+  const double drive_acc     = std::clamp(state(IDX::DRIVE_ACCX), 0.0, acc_lim_);
+  const double brake_acc     = std::clamp(state(IDX::BRAKE_ACCX), 0.0, brake_lim_);
+  const double yaw           = state(IDX::YAW);
+  const double current_steer = clampTireSteer(state(IDX::STEER));
 
-  const double vel = sat(state(IDX::VX), vx_lim_, -vx_lim_);
-  const double pedal_acc = sat(state(IDX::PEDAL_ACCX), vx_rate_lim_, -vx_rate_lim_);
-  const double yaw = state(IDX::YAW);
-  const double steer = state(IDX::STEER);
-  const double pedal_acc_des =
-    sat(input(IDX_U::PEDAL_ACCX_DES), vx_rate_lim_, -vx_rate_lim_) * debug_acc_scaling_factor_;
-  const double steer_des =
-    sat(input(IDX_U::STEER_DES), steer_lim_, -steer_lim_) * debug_steer_scaling_factor_;
-  // NOTE: `steer_des` is calculated by control from measured values. getSteer() also gets the
-  // measured value. The steer_rate used in the motion calculation is obtained from these
-  // differences.
-  const double steer_diff = getSteer() - steer_des;
-  const double steer_diff_with_dead_band = std::invoke([&]() {
-    if (steer_diff > steer_dead_band_) {
-      return steer_diff - steer_dead_band_;
-    } else if (steer_diff < -steer_dead_band_) {
-      return steer_diff + steer_dead_band_;
-    } else {
+  const double acc_des         = input(IDX_U_INNER::ACC_DES);
+  const double brake_des       = input(IDX_U_INNER::BRAKE_DES);
+  const auto gear              = static_cast<uint8_t>(input(IDX_U_INNER::GEAR_INNER));
+  const double slope_accx      = input(IDX_U_INNER::SLOPE_ACCX_INNER);
+  const double steer_motor_des = input(IDX_U_INNER::STEER_DES_INNER);
+
+  const double current_steer_motor = toMotorSteer(current_steer);
+  const double steer_motor_diff = current_steer_motor - steer_motor_des;
+
+  // Viscous regularization of Coulomb friction near zero velocity to prevent chattering:
+  // dv/dt = clamp(-k * vel, external_acc - friction_limit, external_acc + friction_limit)
+  const double d_vx = [&] {
+    if (isParkOrNone(gear)) {
       return 0.0;
     }
-  });
-  const double steer_rate =
-    sat(-steer_diff_with_dead_band / steer_time_constant_, steer_rate_lim_, -steer_rate_lim_);
+
+    const auto forces = computeLongitudinalForces(
+      gear, drive_acc, brake_acc, slope_accx, vel, air_drag_coef_, rolling_resistance_);
+
+    const double k = 1.0 / vel_epsilon_;
+    return std::clamp(
+      -k * vel, forces.external_acc - forces.friction_limit,
+      forces.external_acc + forces.friction_limit);
+  }();
 
   Eigen::VectorXd d_state = Eigen::VectorXd::Zero(dim_x_);
+  d_state(IDX::X)          = vel * std::cos(yaw);
+  d_state(IDX::Y)          = vel * std::sin(yaw);
+  d_state(IDX::YAW)        = vel * std::tan(current_steer) / wheelbase_;
+  d_state(IDX::VX)         = d_vx;
+  d_state(IDX::STEER)      = std::clamp(-steer_motor_diff / steer_time_constant_, -steer_rate_lim_, steer_rate_lim_) * (1.0 + steer_accuracy_error_);
+  d_state(IDX::ACCX)       = 0.0;
 
-  d_state(IDX::X) = vel * cos(yaw);
-  d_state(IDX::Y) = vel * sin(yaw);
-  d_state(IDX::YAW) = vel * std::tan(steer) / wheelbase_;
-  d_state(IDX::VX) = [&] {
-    if (pedal_acc >= 0.0) {
-      using autoware_vehicle_msgs::msg::GearCommand;
-      const auto gear = input(IDX_U::GEAR);
-      if (gear == GearCommand::NONE || gear == GearCommand::PARK) {
-        return 0.0;
-      } else if (gear == GearCommand::NEUTRAL) {
-        return input(IDX_U::SLOPE_ACCX);
-      } else if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
-        return -pedal_acc + input(IDX_U::SLOPE_ACCX);
-      } else {
-        return pedal_acc + input(IDX_U::SLOPE_ACCX);
-      }
-    } else {
-      if (vel > 0.0) {
-        return pedal_acc + input(IDX_U::SLOPE_ACCX);
-      } else if (vel < 0.0) {
-        return -pedal_acc + input(IDX_U::SLOPE_ACCX);
-      } else if (-pedal_acc >= std::abs(input(IDX_U::SLOPE_ACCX))) {
-        return 0.0;
-      } else {
-        return input(IDX_U::SLOPE_ACCX);
-      }
-    }
-  }();
-  d_state(IDX::STEER) = steer_rate;
-  d_state(IDX::PEDAL_ACCX) = -(pedal_acc - pedal_acc_des) / acc_time_constant_;
+  d_state(IDX::DRIVE_ACCX) = std::clamp(-(drive_acc - acc_des) / acc_time_constant_, -acc_rate_lim_, acc_rate_lim_);
+  d_state(IDX::BRAKE_ACCX) = std::clamp(-(brake_acc - brake_des) / brake_time_constant_, -brake_rate_lim_, brake_rate_lim_);
 
   return d_state;
+}
+
+void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double & dt)
+{
+  const double initial_drive = state_(IDX::DRIVE_ACCX);
+  const double initial_brake = state_(IDX::BRAKE_ACCX);
+
+  const double initial_acc_cmd = (initial_drive > 0.0)
+    ? (initial_drive / (1.0 + acc_accuracy_error_)) + acc_dead_band_
+    : 0.0;
+  const double initial_brake_cmd = (initial_brake > 0.0)
+    ? (initial_brake / (1.0 + brake_accuracy_error_)) + brake_dead_band_
+    : 0.0;
+
+  const size_t acc_queue_size = static_cast<size_t>(std::round(acc_delay_ / dt));
+  acc_input_queue_.assign(acc_queue_size, initial_acc_cmd);
+  const size_t brake_queue_size = static_cast<size_t>(std::round(brake_delay_ / dt));
+  brake_input_queue_.assign(brake_queue_size, initial_brake_cmd);
+
+  brake_hysteresis_state_ = initial_brake_cmd;
+
+  double initial_steer_motor_cmd = toMotorSteer(state_(IDX::STEER));
+
+  if (std::abs(initial_steer_motor_cmd) < steer_dead_band_) {
+    initial_steer_motor_cmd = 0.0;
+  }
+  const size_t steer_motor_queue_size = static_cast<size_t>(std::round(steer_delay_ / dt));
+  steer_motor_input_queue_.assign(steer_motor_queue_size, initial_steer_motor_cmd);
+
+  const double initial_vel = state_(IDX::VX);
+  const size_t vel_queue_size = static_cast<size_t>(std::round(vel_sensor_delay_ / dt));
+  vel_history_queue_.assign(vel_queue_size, initial_vel);
+
+  delayed_vx_ = initial_vel;
 }
 
 }  // namespace autoware::simulator::simple_planning_simulator
