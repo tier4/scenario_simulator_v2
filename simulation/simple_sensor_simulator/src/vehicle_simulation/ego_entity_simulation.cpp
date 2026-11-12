@@ -229,7 +229,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
       break;
 
     case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
-      v << 0, 0, 0, value, 0, 0, 0;
+      v << 0, 0, 0, value, 0, 0, 0, 0;
       break;
 
     case VehicleModelType::IDEAL_STEER_ACC:
@@ -287,7 +287,10 @@ auto EgoEntitySimulation::overwrite(
       return convertQuaternionToEulerAngle(relative_orientation).z;
     }();
 
-    switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
+    Eigen::VectorXd current_state;
+    vehicle_model_ptr_->getState(current_state);  // Get current model state (to preserve elements 6 and 7)
+
+    switch (auto state = current_state; vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
