@@ -22,7 +22,7 @@ from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
 
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, OpaqueFunction, SetEnvironmentVariable
 
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import FrontendLaunchDescriptionSource
@@ -608,4 +608,11 @@ def launch_setup(context, *args, **kwargs):
 
 
 def generate_launch_description():
-    return LaunchDescription([OpaqueFunction(function=launch_setup)])
+    return LaunchDescription(
+        [
+            # Run the simulator (and Autoware, which inherits this environment via execvp) in ROS domain 1.
+            # The redundant Autoware setup bridges Sub ECU (domain 2) and Main MRM (domain 3) to domain 1.
+            SetEnvironmentVariable("ROS_DOMAIN_ID", "1"),
+            OpaqueFunction(function=launch_setup),
+        ]
+    )
