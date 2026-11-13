@@ -269,23 +269,23 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 
 void EntityBase::requestSpeedChangeWithTimeConstraint(
   const double target_speed, const speed_change::Transition transition,
-  const double acceleration_time)
+  const double acceleration_time, const bool continuous)
 {
-  if (isTargetSpeedReached(target_speed)) {
+  if (isTargetSpeedReached(target_speed) and not continuous) {
     return;
   }
   if (
     std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon() &&
     transition != speed_change::Transition::STEP) {
     requestSpeedChangeWithTimeConstraint(
-      target_speed, speed_change::Transition::STEP, acceleration_time);
+      target_speed, speed_change::Transition::STEP, acceleration_time, continuous);
     return;
   }
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithConstantAcceleration(
         target_speed, transition, (target_speed - getCurrentTwist().linear.x) / acceleration_time,
-        false);
+        continuous);
       break;
     }
     case speed_change::Transition::AUTO: {
@@ -309,11 +309,11 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
          */
         [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true,
         job::Event::POST_UPDATE);
-      requestSpeedChange(target_speed, false);
+      requestSpeedChange(target_speed, continuous);
       break;
     }
     case speed_change::Transition::STEP: {
-      requestSpeedChange(target_speed, false);
+      requestSpeedChange(target_speed, continuous);
       setLinearVelocity(target_speed);
       break;
     }
@@ -333,7 +333,7 @@ void EntityBase::requestSpeedChange(
         target_speed, transition, constraint.value, continuous);
       break;
     case speed_change::Constraint::Type::TIME:
-      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
+      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value, continuous);
       break;
     case speed_change::Constraint::Type::NONE:
       requestSpeedChange(target_speed, continuous);
