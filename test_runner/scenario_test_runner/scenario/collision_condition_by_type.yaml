@@ -1,0 +1,425 @@
+OpenSCENARIO:
+  FileHeader:
+    description: "Scenario where test collision conditions by type"
+    author: "abco20"
+    date: "2024-10-17T05:57:14.376Z"
+    revMajor: 1
+    revMinor: 0
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: vehicle0
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+      - name: vehicle1
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+      - name: barricade
+        MiscObject:
+          mass: 1.0
+          miscObjectCategory: obstacle
+          name: ""
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0.5
+            Dimensions:
+              width: 3
+              length: 1
+              height: 1
+          Properties:
+            Property: []
+      - name: pedestrian0
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+      - name: pedestrian1
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+      - name: pedestrian2
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ''
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: vehicle0
+            PrivateAction:
+              TeleportAction:
+                Position:
+                  LanePosition:
+                      roadId: ""
+                      laneId: "34513"
+                      s: 10
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+          - entityRef: vehicle1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                        roadId: ""
+                        laneId: "34513"
+                        s: 8
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+          - entityRef: barricade
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: "34513"
+                      s: 10
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+          - entityRef: pedestrian0
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                        roadId: ""
+                        laneId: "34513"
+                        s: 20
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: -1
+          - entityRef: pedestrian1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                        roadId: ""
+                        laneId: "34513"
+                        s: 25
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: -1
+          - entityRef: pedestrian2
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                        roadId: ""
+                        laneId: "34513"
+                        s: 30
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: -1
+    Story:
+      - name: CollisionStory
+        Act:
+          - name: CollisionAct
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: CollisionManeuverGroup
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: check_if_vehicle0_collides_with_another_vehicle_type_entity
+                    Event:
+                      - name: CollisionEvent
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'echo vehicle0 collided with another vehicle type entity.'
+                        StartTrigger:
+                          ConditionGroup:
+                            Condition:
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByEntityCondition:
+                                  TriggeringEntities:
+                                    triggeringEntitiesRule: any
+                                    EntityRef: [ entityRef: vehicle0 ]
+                                  EntityCondition:
+                                    CollisionCondition:
+                                      ByType: [ type: vehicle ]
+                  - name: check_if_vehicle1_collides_with_another_miscellaneous_type_entity
+                    Event:
+                      - name: CollisionEvent
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'echo vehicle1 collided with another miscellaneous type entity.'
+                        StartTrigger:
+                          ConditionGroup:
+                            Condition:
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByEntityCondition:
+                                  TriggeringEntities:
+                                    triggeringEntitiesRule: any
+                                    EntityRef: [ entityRef: vehicle1 ]
+                                  EntityCondition:
+                                    CollisionCondition:
+                                      ByType: [ type: miscellaneous ]
+                  - name: check_if_vehicle0_collides_with_pedestrian0
+                    Event:
+                      - name: CollisionEvent
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'echo vehicle0 collided with pedestrian0.'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByEntityCondition:
+                                  TriggeringEntities:
+                                    triggeringEntitiesRule: any
+                                    EntityRef: [ entityRef: vehicle0 ]
+                                  EntityCondition:
+                                    CollisionCondition:
+                                      ByType: [ type: pedestrian ]
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByEntityCondition:
+                                  TriggeringEntities:
+                                    triggeringEntitiesRule: any
+                                    EntityRef: [ entityRef: vehicle0 ]
+                                  EntityCondition:
+                                    CollisionCondition:
+                                      EntityRef:
+                                          entityRef: pedestrian0
+                  - name: check_if_vehicle0_collides_with_pedestrian1
+                    Event:
+                      - name: CollisionEvent
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'echo vehicle0 collided with pedestrian1.'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByEntityCondition:
+                                  TriggeringEntities:
+                                    triggeringEntitiesRule: any
+                                    EntityRef: [ entityRef: vehicle0 ]
+                                  EntityCondition:
+                                    CollisionCondition:
+                                      ByType: [ type: pedestrian ]
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByEntityCondition:
+                                  TriggeringEntities:
+                                    triggeringEntitiesRule: any
+                                    EntityRef: [ entityRef: vehicle0 ]
+                                  EntityCondition:
+                                    CollisionCondition:
+                                      EntityRef:
+                                          entityRef: pedestrian1
+                  - name: check_if_vehicle0_collides_with_pedestrian2
+                    Event:
+                      - name: CollisionEvent
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'echo vehicle0 collided with pedestrian2.'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByEntityCondition:
+                                  TriggeringEntities:
+                                    triggeringEntitiesRule: any
+                                    EntityRef: [ entityRef: vehicle0 ]
+                                  EntityCondition:
+                                    CollisionCondition:
+                                      ByType: [ type: pedestrian ]
+                              - name: ""
+                                delay: 0
+                                conditionEdge: none
+                                ByEntityCondition:
+                                  TriggeringEntities:
+                                    triggeringEntitiesRule: any
+                                    EntityRef: [ entityRef: vehicle0 ]
+                                  EntityCondition:
+                                    CollisionCondition:
+                                      EntityRef:
+                                          entityRef: pedestrian2
+            StartTrigger:
+              ConditionGroup:
+                Condition:
+                  - name: ""
+                    delay: 0
+                    conditionEdge: none
+                    ByValueCondition:
+                      SimulationTimeCondition:
+                        rule: greaterThan
+                        value: 0
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: "success if"
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: CollisionAct
+                                      storyboardElementType: act
+                                      state: completeState
+                        Action:
+                          - name: "return EXIT_SUCCESS"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: "if (0 < t)"
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup:
+        - Condition:
+            - name: "if (300 < t)"
+              delay: 0
+              conditionEdge: none
+              ByValueCondition:
+                SimulationTimeCondition:
+                  value: 300
+                  rule: greaterThan

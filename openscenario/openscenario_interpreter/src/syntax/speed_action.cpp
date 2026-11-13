@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <valarray>
 
 namespace openscenario_interpreter
@@ -55,7 +57,9 @@ auto SpeedAction::accomplished() -> bool
   };
 
   auto check = [this](auto && actor) {
-    auto evaluation = actor.apply([](const auto & object) { return evaluateSpeed(object); });
+    const auto evaluation = actor.apply([this](const auto & actor) {
+      return SpeedCondition::evaluate(global().entities, actor, std::nullopt);
+    });
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       return not evaluation.size() or
              equal_to<std::valarray<double>>()(
@@ -66,14 +70,18 @@ auto SpeedAction::accomplished() -> bool
         case SpeedTargetValueType::delta:
           return not evaluation.size() or
                  equal_to<std::valarray<double>>()(
-                   evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
+                   SpeedCondition::evaluate(
+                     global().entities, speed_action_target.as<RelativeTargetSpeed>().entity_ref,
+                     std::nullopt) +
                      speed_action_target.as<RelativeTargetSpeed>().value,
                    evaluation)
                    .min();
         case SpeedTargetValueType::factor:
           return not evaluation.size() or
                  equal_to<std::valarray<double>>()(
-                   evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
+                   SpeedCondition::evaluate(
+                     global().entities, speed_action_target.as<RelativeTargetSpeed>().entity_ref,
+                     std::nullopt) *
                      speed_action_target.as<RelativeTargetSpeed>().value,
                    evaluation)
                    .min();
@@ -115,7 +123,7 @@ auto SpeedAction::start() -> void
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       each.first.apply([&](const auto & object) {
-        applySpeedAction(
+        runtime().entities().applySpeedAction(
           object, speed_action_target.as<AbsoluteTargetSpeed>().value,
           static_cast<traffic_simulator::speed_change::Transition>(
             speed_action_dynamics.dynamics_shape),
@@ -123,7 +131,7 @@ auto SpeedAction::start() -> void
       });
     } else {
       each.first.apply([&](const auto & object) {
-        applySpeedAction(
+        runtime().entities().applySpeedAction(
           object,
           static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
             speed_action_target.as<RelativeTargetSpeed>()),

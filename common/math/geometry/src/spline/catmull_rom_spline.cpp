@@ -27,7 +27,7 @@ namespace math
 namespace geometry
 {
 auto CatmullRomSpline::getPolygon(
-  const double width, const size_t num_points, const double z_offset)
+  const double width, const std::size_t num_points, const double z_offset)
   -> std::vector<geometry_msgs::msg::Point>
 {
   if (num_points == 0) {
@@ -36,7 +36,7 @@ auto CatmullRomSpline::getPolygon(
   std::vector<geometry_msgs::msg::Point> points;
   std::vector<geometry_msgs::msg::Point> left_bounds = getLeftBounds(width, num_points, z_offset);
   std::vector<geometry_msgs::msg::Point> right_bounds = getRightBounds(width, num_points, z_offset);
-  for (size_t i = 0; i < static_cast<size_t>(left_bounds.size() - 1); i++) {
+  for (std::size_t i = 0; i < left_bounds.size() - 1; i++) {
     geometry_msgs::msg::Point pr_0 = right_bounds[i];
     geometry_msgs::msg::Point pl_0 = left_bounds[i];
     geometry_msgs::msg::Point pr_1 = right_bounds[i + 1];
@@ -52,23 +52,22 @@ auto CatmullRomSpline::getPolygon(
 }
 
 auto CatmullRomSpline::getRightBounds(
-  const double width, const size_t num_points, const double z_offset) const
+  const double width, const std::size_t num_points, const double z_offset) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
-  for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
+  for (std::size_t i = 0; i < num_points + 1; i++) {
     double s = step_size * static_cast<double>(i);
     points.emplace_back(
-      [this](
-        const double width, const double s, const double z_offset) -> geometry_msgs::msg::Point {
-        geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+      [this](const double local_width, const double local_s, const double local_z_offset) {
+        geometry_msgs::msg::Vector3 vec = getNormalVector(local_s);
         double theta = std::atan2(vec.y, vec.x);
-        geometry_msgs::msg::Point p = getPoint(s);
+        geometry_msgs::msg::Point p = getPoint(local_s);
         geometry_msgs::msg::Point point;
-        point.x = p.x + 0.5 * width * std::cos(theta);
-        point.y = p.y + 0.5 * width * std::sin(theta);
-        point.z = p.z + z_offset;
+        point.x = p.x + 0.5 * local_width * std::cos(theta);
+        point.y = p.y + 0.5 * local_width * std::sin(theta);
+        point.z = p.z + local_z_offset;
         return point;
       }(width, s, z_offset));
   }
@@ -76,23 +75,22 @@ auto CatmullRomSpline::getRightBounds(
 }
 
 auto CatmullRomSpline::getLeftBounds(
-  const double width, const size_t num_points, const double z_offset) const
+  const double width, const std::size_t num_points, const double z_offset) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
-  for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
+  for (std::size_t i = 0; i < num_points + 1; i++) {
     double s = step_size * static_cast<double>(i);
     points.emplace_back(
-      [this](
-        const double width, const double s, const double z_offset) -> geometry_msgs::msg::Point {
-        geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+      [this](const double local_width, const double local_s, const double local_z_offset) {
+        geometry_msgs::msg::Vector3 vec = getNormalVector(local_s);
         double theta = std::atan2(vec.y, vec.x);
-        geometry_msgs::msg::Point p = getPoint(s);
+        geometry_msgs::msg::Point p = getPoint(local_s);
         geometry_msgs::msg::Point point;
-        point.x = p.x - 0.5 * width * std::cos(theta);
-        point.y = p.y - 0.5 * width * std::sin(theta);
-        point.z = p.z + z_offset;
+        point.x = p.x - 0.5 * local_width * std::cos(theta);
+        point.y = p.y - 0.5 * local_width * std::sin(theta);
+        point.z = p.z + local_z_offset;
         return point;
       }(width, s, z_offset));
   }
@@ -103,6 +101,12 @@ auto CatmullRomSpline::getTrajectory(
   const double start_s, const double end_s, const double resolution, const double offset) const
   -> std::vector<geometry_msgs::msg::Point>
 {
+  if (std::fabs(resolution) <= std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR(
+      "Resolution should not be zero.",
+      "This message is not originally intended to be displayed, if you see it, please contact ",
+      "the developer of traffic_simulator.");
+  }
   if (start_s > end_s) {
     std::vector<geometry_msgs::msg::Point> ret;
     double s = start_s;
@@ -124,8 +128,70 @@ auto CatmullRomSpline::getTrajectory(
   }
 }
 
-CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
-: control_points(control_points), line_segments_(getLineSegments(control_points)), total_length_(0)
+auto CatmullRomSpline::getTrajectoryPoses(
+  const double start_s, const double end_s, const double resolution) const
+  -> std::vector<geometry_msgs::msg::Pose>
+{
+  if (std::fabs(resolution) <= std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR(
+      "Resolution should not be zero.",
+      "This message is not originally intended to be displayed, if you see it, please contact ",
+      "the developer of traffic_simulator.");
+  }
+  if (start_s > end_s) {
+    std::vector<geometry_msgs::msg::Pose> ret;
+    double s = start_s;
+    while (s > end_s) {
+      ret.emplace_back(getPose(s));
+      s = s - std::fabs(resolution);
+    }
+    ret.emplace_back(getPose(end_s));
+    return ret;
+  } else {
+    std::vector<geometry_msgs::msg::Pose> ret;
+    double s = start_s;
+    while (s < end_s) {
+      ret.emplace_back(getPose(s));
+      s = s + std::fabs(resolution);
+    }
+    ret.emplace_back(getPose(end_s));
+    return ret;
+  }
+}
+
+CatmullRomSpline::CatmullRomSpline(
+  const geometry_msgs::msg::Point & start_point,
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+: CatmullRomSpline([start_point, trajectory] {
+    if (!trajectory) {
+      THROW_SIMULATION_ERROR(
+        "Trajectory is empty.",
+        "This message is not originally intended to be displayed, if you see it, please contact "
+        "the developer of traffic_simulator.");
+    }
+    std::vector<geometry_msgs::msg::Point> control_points;
+    control_points.reserve(trajectory->shape.vertices.size() + 2UL);
+    control_points.emplace_back(start_point);
+    for (const auto & vertex : trajectory->shape.vertices) {
+      control_points.emplace_back(vertex.position.position);
+    }
+    if (trajectory->closed) {
+      control_points.emplace_back(control_points[0]);
+    }
+    return control_points;
+  }())
+{
+}
+
+CatmullRomSpline::CatmullRomSpline(
+  const std::vector<geometry_msgs::msg::Point> & raw_control_points)
+: control_points([raw_control_points]() {
+    std::vector<geometry_msgs::msg::Point> ret = raw_control_points;
+    ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+    return ret;
+  }()),
+  line_segments_(getLineSegments(control_points)),
+  total_length_(0)
 {
   switch (control_points.size()) {
     case 0:
@@ -139,13 +205,13 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       break;
     /// @note In this case, spline is interpreted as line segment.
     case 2:
-      total_length_ = line_segments_[0].getLength();
+      total_length_ = line_segments_[0].length;
       break;
     /// @note In this case, spline is interpreted as curve.
     default:
       [this](const auto & control_points) -> void {
-        size_t n = control_points.size() - 1;
-        for (size_t i = 0; i < n; i++) {
+        std::size_t n = control_points.size() - 1;
+        for (std::size_t i = 0; i < n; i++) {
           if (i == 0) {
             double ax = 0;
             double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;
@@ -171,7 +237,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           } else if (i == (n - 1)) {
             double ax = 0;
             double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
@@ -197,7 +263,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           } else {
             double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
                         3 * control_points[i + 1].x + control_points[i + 2].x;
@@ -229,12 +295,11 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
             bz = bz * 0.5;
             cz = cz * 0.5;
             dz = dz * 0.5;
-            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
           }
         }
         for (const auto & curve : curves_) {
           length_list_.emplace_back(curve.getLength());
-          maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
         }
         total_length_ = 0;
         for (const auto & length : length_list_) {
@@ -246,7 +311,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   }
 }
 
-auto CatmullRomSpline::getCurveIndexAndS(const double s) const -> std::pair<size_t, double>
+auto CatmullRomSpline::getCurveIndexAndS(const double s) const -> std::pair<std::size_t, double>
 {
   if (s < 0) {
     return std::make_pair(0, s);
@@ -256,7 +321,7 @@ auto CatmullRomSpline::getCurveIndexAndS(const double s) const -> std::pair<size
       curves_.size() - 1, s - (total_length_ - curves_[curves_.size() - 1].getLength()));
   }
   double current_s = 0;
-  for (size_t i = 0; i < curves_.size(); i++) {
+  for (std::size_t i = 0; i < curves_.size(); i++) {
     double prev_s = current_s;
     current_s = current_s + length_list_[i];
     if (prev_s <= s && s < current_s) {
@@ -266,11 +331,12 @@ auto CatmullRomSpline::getCurveIndexAndS(const double s) const -> std::pair<size
   THROW_SIMULATION_ERROR("failed to calculate curve index");  // LCOV_EXCL_LINE
 }
 
-auto CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double s) const -> double
+auto CatmullRomSpline::getSInSplineCurve(const std::size_t curve_index, const double s) const
+  -> double
 {
-  size_t n = curves_.size();
+  std::size_t n = curves_.size();
   double ret = 0;
-  for (size_t i = 0; i < n; i++) {
+  for (std::size_t i = 0; i < n; i++) {
     if (i == curve_index) {
       return ret + s;
     } else {
@@ -281,8 +347,8 @@ auto CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double 
 }
 
 auto CatmullRomSpline::getCollisionPointsIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
-  -> std::set<double>
+  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward,
+  const std::optional<std::pair<double, double>> & s_range) const -> std::set<double>
 {
   if (polygon.size() <= 1) {
     THROW_SIMULATION_ERROR(
@@ -292,22 +358,45 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
       "developer of traffic_simulator.");
   }
   /// @note If the spline has three or more control points.
-  const auto get_collision_point_2d_with_curve =
-    [this](const auto & polygon, const auto search_backward) -> std::set<double> {
+  const auto get_collision_point_2d_with_curve = [this, &s_range](
+                                                   const auto & local_polygon,
+                                                   const auto local_search_backward) {
     std::set<double> s_value_candidates;
-    for (size_t i = 0; i < curves_.size(); ++i) {
-      /// @note The polygon is assumed to be closed
-      const auto s = curves_[i].getCollisionPointsIn2D(polygon, search_backward, true, true);
-      std::for_each(s.begin(), s.end(), [&s_value_candidates, i, this](const auto & s) {
-        s_value_candidates.insert(getSInSplineCurve(i, s));
-      });
+    auto current_curve_start_s = 0.0;
+
+    const auto is_curve_in_range = [this, &s_range](
+                                     const auto & curve, const auto & current_curve_start_s) {
+      bool is_in_range{false};
+      // range starts after beginning of current curve or on current curve
+      if (
+        (current_curve_start_s >= s_range->first) ||
+        (current_curve_start_s + curve.getLength()) > s_range->first) {
+        // beginning of current curve is before end of range
+        if (current_curve_start_s <= s_range->second) {
+          is_in_range = true;
+        }
+      }
+      return is_in_range;
+    };
+
+    for (const auto & curve : curves_) {
+      if (s_range == std::nullopt || is_curve_in_range(curve, current_curve_start_s)) {
+        /// @note The local_polygon is assumed to be closed
+        const auto s =
+          curve.getCollisionPointsIn2D(local_polygon, local_search_backward, true, true);
+        std::for_each(
+          s.begin(), s.end(), [&s_value_candidates, &current_curve_start_s, this](const auto & s) {
+            s_value_candidates.insert(current_curve_start_s + s);
+          });
+      }
+      current_curve_start_s += curve.getLength();
     }
     return s_value_candidates;
   };
   /// @note If the spline has two control points. (Same as single line segment.)
-  const auto get_collision_point_2d_with_line = [this](const auto & polygon) -> std::set<double> {
+  const auto get_collision_point_2d_with_line = [this](const auto & local_polygon) {
     std::set<double> s_value_candidates;
-    for (const auto & line : getLineSegments(polygon)) {
+    for (const auto & line : getLineSegments(local_polygon)) {
       if (static_cast<int>(line_segments_.size()) != 1) {
         THROW_SIMULATION_ERROR(
           "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
@@ -316,16 +405,16 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
-      if (const auto s = line_segments_[0].getIntersection2DSValue(line, true)) {
+      if (const auto s = line_segments_[0].get2DIntersectionSValue(line, true)) {
         s_value_candidates.insert(s.value());
       }
     }
     return s_value_candidates;
   };
   /// @note If the spline has one control point. (Same as point.)
-  const auto get_collision_point_2d_with_point = [this](const auto & polygon) -> std::set<double> {
+  const auto get_collision_point_2d_with_point = [this](const auto & local_polygon) {
     std::set<double> s_value_candidates;
-    for (const auto & line : getLineSegments(polygon)) {
+    for (const auto & line : getLineSegments(local_polygon)) {
       if (line.isIntersect2D(control_points[0])) {
         s_value_candidates.insert(0.0);
       }
@@ -359,10 +448,10 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
  * @return std::optional<double> Denormalized s values along the frenet coordinate of the spline curve.
  */
 auto CatmullRomSpline::getCollisionPointIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
-  -> std::optional<double>
+  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward,
+  const std::optional<std::pair<double, double>> & s_range) const -> std::optional<double>
 {
-  std::set<double> s_value_candidates = getCollisionPointsIn2D(polygon, search_backward);
+  std::set<double> s_value_candidates = getCollisionPointsIn2D(polygon, search_backward, s_range);
   if (s_value_candidates.empty()) {
     return std::nullopt;
   }
@@ -376,9 +465,9 @@ auto CatmullRomSpline::getCollisionPointIn2D(
   const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
   const bool search_backward) const -> std::optional<double>
 {
-  size_t n = curves_.size();
+  std::size_t n = curves_.size();
   if (search_backward) {
-    for (size_t i = 0; i < n; i++) {
+    for (std::size_t i = 0; i < n; i++) {
       auto s = curves_[n - 1 - i].getCollisionPointIn2D(point0, point1, search_backward, true);
       if (s) {
         return getSInSplineCurve(n - 1 - i, s.value());
@@ -386,7 +475,7 @@ auto CatmullRomSpline::getCollisionPointIn2D(
     }
     return std::nullopt;
   } else {
-    for (size_t i = 0; i < n; i++) {
+    for (std::size_t i = 0; i < n; i++) {
       auto s = curves_[i].getCollisionPointIn2D(point0, point1, search_backward, true);
       if (s) {
         return getSInSplineCurve(i, s.value());
@@ -428,13 +517,13 @@ auto CatmullRomSpline::getSValue(
       return line_segments_[0].getSValue(pose, threshold_distance, true);
     default:
       double s = 0;
-      for (size_t i = 0; i < curves_.size(); i++) {
-        auto s_value = curves_[i].getSValue(pose, threshold_distance, true);
+      for (const auto & curve : curves_) {
+        auto s_value = curve.getSValue(pose, threshold_distance, true);
         if (s_value) {
           s = s + s_value.value();
           return s;
         }
-        s = s + curves_[i].getLength();
+        s = s + curve.getLength();
       }
       return std::nullopt;
   }
@@ -471,8 +560,8 @@ auto CatmullRomSpline::getSquaredDistanceIn2D(
       }
       return line_segments_[0].getSquaredDistanceIn2D(point, s, true);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getSquaredDistanceIn2D(point, index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getSquaredDistanceIn2D(point, s_value, true);
   }
 }
 
@@ -509,8 +598,8 @@ auto CatmullRomSpline::getSquaredDistanceVector(
       }
       return line_segments_[0].getSquaredDistanceVector(point, s, true);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getSquaredDistanceVector(point, index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getSquaredDistanceVector(point, s_value, true);
   }
 }
 
@@ -543,8 +632,8 @@ auto CatmullRomSpline::getPoint(const double s) const -> geometry_msgs::msg::Poi
       }
       return line_segments_[0].getPoint(s, true);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getPoint(index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getPoint(s_value, true);
   }
 }
 
@@ -561,10 +650,36 @@ auto CatmullRomSpline::getPoint(const double s, const double offset) const
   return point;
 }
 
+/**
+ * @brief Get approximation of min and max altitude - from the control points
+ */
+auto CatmullRomSpline::getAltitudeRange() const -> std::pair<double, double>
+{
+  if (control_points.empty()) {
+    THROW_SIMULATION_ERROR("Control points are missing.");
+  } else if (const auto [min_z_it, max_z_it] = std::minmax_element(
+               control_points.begin(), control_points.end(),
+               [](const auto & lhs, const auto & rhs) { return lhs.z < rhs.z; });
+             min_z_it == control_points.end() || max_z_it == control_points.end()) {
+    THROW_SIMULATION_ERROR("Control points are invalid.");
+  } else {
+    return {min_z_it->z, max_z_it->z};
+  }
+}
+
 auto CatmullRomSpline::getMaximum2DCurvature() const -> double
 {
+  if (curves_.empty()) {
+    THROW_SEMANTIC_ERROR(
+      "Curves are empty. We cannot determine the maximum 2D curvature of the spline.",
+      "This message is not originally intended to be displayed, if you see it, please contact "
+      "the developer of traffic_simulator.");
+  }
+  /// @note Maximum 2D curvature is empty means that it is not calculated yet.
   if (maximum_2d_curvatures_.empty()) {
-    THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");  // LCOV_EXCL_LINE
+    for (const auto & curve : curves_) {
+      maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
+    }
   }
   const auto [min, max] =
     std::minmax_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
@@ -598,8 +713,8 @@ auto CatmullRomSpline::getNormalVector(const double s) const -> geometry_msgs::m
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getNormalVector(index_and_s.second, true);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getNormalVector(s_value, true);
   }
 }
 
@@ -628,13 +743,21 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
           "contact the developer of traffic_simulator.");
       }
       if (0 <= s && s <= getLength()) {
-        return line_segments_[0].getVector();
+        return line_segments_[0].vector;
       }
       THROW_SIMULATION_ERROR(
         "Invalid S value is specified, while getting tangent vector.",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
+      /**
+       * @note The current implementation uses `index_and_s` instead of structured binding
+       * (`const auto [index, s_value] = getCurveIndexAndS(s)`) because some tests fail
+       * when using structured binding. The root cause of these test failures is under investigation.
+       */
+      // const auto [index, s_value] = getCurveIndexAndS(s);
+      // return curves_[index].getTangentVector(s_value, true);
+
       const auto index_and_s = getCurveIndexAndS(s);
       return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
   }
@@ -666,8 +789,8 @@ auto CatmullRomSpline::getPose(const double s, const bool fill_pitch) const
       }
       return line_segments_[0].getPose(s, true, fill_pitch);
     default:
-      const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getPose(index_and_s.second, true, fill_pitch);
+      const auto [index, s_value] = getCurveIndexAndS(s);
+      return curves_[index].getPose(s_value, true, fill_pitch);
   }
 }
 
@@ -677,7 +800,7 @@ auto CatmullRomSpline::checkConnection() const -> bool
     THROW_SIMULATION_ERROR(                                    // LCOV_EXCL_LINE
       "number of control points and curves does not match.");  // LCOV_EXCL_LINE
   }
-  for (size_t i = 0; i < curves_.size(); i++) {
+  for (std::size_t i = 0; i < curves_.size(); i++) {
     const auto control_point0 = control_points[i];
     const auto control_point1 = control_points[i + 1];
     const auto p0 = curves_[i].getPoint(0, false);

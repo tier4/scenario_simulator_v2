@@ -23,8 +23,47 @@ namespace geometry
 {
 double CatmullRomSubspline::getLength() const { return end_s_ - start_s_; }
 
+/**
+ * @brief Get approximation of min and max altitude in the segment - from the control points
+ */
+std::pair<double, double> CatmullRomSubspline::getAltitudeRange() const
+{
+  if (spline_) {
+    std::optional<double> min_altitude;
+    std::optional<double> max_altitude;
+    const auto try_altitude = [&min_altitude, &max_altitude](const double altitude) {
+      if (!min_altitude.has_value() || altitude < min_altitude.value()) {
+        min_altitude = altitude;
+      }
+      if (!max_altitude.has_value() || altitude > max_altitude.value()) {
+        max_altitude = altitude;
+      }
+    };
+
+    assert(spline_->getLengths().size() == spline_->control_points.size() - 1);
+    double control_point_s = 0.0;
+    for (std::size_t i = 0; i < spline_->control_points.size(); ++i) {
+      if (i > 0) {
+        /// @note Increate control point s for all but the first control points
+        control_point_s += spline_->getLengths().at(i - 1);
+      }
+
+      if (start_s_ <= control_point_s && control_point_s <= end_s_) {
+        try_altitude(spline_->control_points.at(i).z);
+      }
+    }
+
+    return {
+      min_altitude.value_or(std::numeric_limits<double>::min()),
+      max_altitude.value_or(std::numeric_limits<double>::max())};
+  } else {
+    return {std::numeric_limits<double>::min(), std::numeric_limits<double>::max()};
+  }
+}
+
 std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
+  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward,
+  const std::optional<std::pair<double, double>> & s_range) const
 {
   /// @note Make sure end is greater than start, otherwise the spline is invalid
   if (end_s_ < start_s_) {
@@ -36,8 +75,10 @@ std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
       "This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   }
-
-  std::set<double> s_value_candidates = spline_->getCollisionPointsIn2D(polygon);
+  std::optional<std::pair<double, double>> s_subrange =
+    s_range ? std::make_pair(s_range->first + start_s_, s_range->second + start_s_) : s_range;
+  std::set<double> s_value_candidates =
+    spline_->getCollisionPointsIn2D(polygon, search_backward, s_subrange);
 
   if (s_value_candidates.empty()) {
     return std::nullopt;
@@ -60,6 +101,12 @@ std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
     return *(--end) - start_s_;  // end is past the last element, so we need the one before
   }
   return *begin - start_s_;
+}
+
+auto CatmullRomSubspline::getSquaredDistanceIn2D(
+  const geometry_msgs::msg::Point & point, const double s) const -> double
+{
+  return spline_->getSquaredDistanceIn2D(point, start_s_ + s);
 }
 }  // namespace geometry
 }  // namespace math

@@ -31,7 +31,9 @@ auto convertQuaternionToEulerAngle(const T & q)
 {
   tf2::Quaternion tf_quat(q.x, q.y, q.z, q.w);
   tf2::Matrix3x3 mat(tf_quat);
-  double roll, pitch, yaw;
+  double roll;
+  double pitch;
+  double yaw;
   mat.getRPY(roll, pitch, yaw);
   return geometry_msgs::build<geometry_msgs::msg::Vector3>().x(roll).y(pitch).z(yaw);
 }

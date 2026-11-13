@@ -16,16 +16,14 @@
 #define TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_
 
 #include <algorithm>
-#include <autoware_auto_system_msgs/msg/emergency_state.hpp>
-#include <boost/filesystem.hpp>
-#include <concealer/autoware.hpp>
 #include <concealer/field_operator_application.hpp>
+#include <filesystem>
+#include <get_parameter/get_parameter.hpp>
 #include <memory>
 #include <optional>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
 
@@ -33,14 +31,8 @@ namespace traffic_simulator
 {
 namespace entity
 {
-class EgoEntity : public VehicleEntity
+class EgoEntity : public VehicleEntity, private concealer::FieldOperatorApplication
 {
-  const std::unique_ptr<concealer::FieldOperatorApplication> field_operator_application;
-
-  static auto makeFieldOperatorApplication(
-    const Configuration &, const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &)
-    -> std::unique_ptr<concealer::FieldOperatorApplication>;
-
   bool is_controlled_by_simulator_{false};
   std::optional<double> target_speed_;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
@@ -51,7 +43,6 @@ public:
 
   explicit EgoEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &);
 
@@ -64,8 +55,6 @@ public:
   auto operator=(EgoEntity &&) -> EgoEntity & = delete;
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
-
-  auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication & override;
 
   auto getCurrentAction() const -> std::string override;
 
@@ -86,22 +75,36 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  auto onUpdate(const double current_time, const double step_time) -> void override;
+  auto updateFieldOperatorApplication() -> void;
+
+  void onUpdate(double current_time, double step_time) override;
 
   void requestAcquirePosition(const CanonicalizedLaneletPose &) override;
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
+  void requestAcquirePosition(
+    const CanonicalizedLaneletPose &, const traffic_simulator::RouteOption &) override;
+
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override;
+
+  void requestAcquirePosition(
+    const geometry_msgs::msg::Pose &, const traffic_simulator::RouteOption &) override;
 
   void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
 
+  void requestAssignRoute(
+    const std::vector<CanonicalizedLaneletPose> &, const traffic_simulator::RouteOption &) override;
+
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
+
+  void requestAssignRoute(
+    const std::vector<geometry_msgs::msg::Pose> &, const traffic_simulator::RouteOption &) override;
 
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 
-  void requestLaneChange(const lanelet::Id) override;
+  auto requestLaneChange(const lanelet::Id) -> void override;
 
-  auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
+  auto requestLaneChange(const lane_change::Parameter &) -> void override;
 
   auto requestSpeedChange(
     const double, const speed_change::Transition, const speed_change::Constraint,
@@ -111,7 +114,13 @@ public:
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool continuous) -> void override;
 
-  void requestClearRoute() override;
+  auto requestClearRoute() -> void;
+
+  auto requestReplanRoute(
+    const std::vector<geometry_msgs::msg::PoseStamped> & route,
+    const bool allow_goal_modification = false) -> void;
+
+  auto requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void;
 
   auto isControlledBySimulator() const -> bool override;
 
@@ -132,8 +141,15 @@ public:
 
   auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
 
+  template <typename ParameterType>
+  auto setParameter(const std::string & name, const ParameterType & default_value = {})
+    -> ParameterType
+  {
+    return declare_parameter<ParameterType>(name, default_value);
+  }
+
   template <typename... Ts>
-  auto setStatus(Ts &&... xs)
+  auto setStatus(Ts &&... xs) -> void
   {
     if (status_->getTime() > 0 && not isControlledBySimulator()) {
       THROW_SEMANTIC_ERROR(
@@ -143,8 +159,16 @@ public:
       EntityBase::setStatus(std::forward<decltype(xs)>(xs)...);
     }
   }
+
+  auto engage() -> void;
+  auto isEngaged() const -> bool;
+  auto isEngageable() const -> bool;
+  auto sendCooperateCommand(const std::string & module_name, const std::string & command) -> void;
+  auto getMinimumRiskManeuverBehaviorName() const -> std::string;
+  auto getMinimumRiskManeuverStateName() const -> std::string;
+  auto getEmergencyStateName() const -> std::string;
+  auto getTurnIndicatorsCommandName() const -> std::string;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
-
 #endif  // TRAFFIC_SIMULATOR__ENTITY__EGO_ENTITY_HPP_

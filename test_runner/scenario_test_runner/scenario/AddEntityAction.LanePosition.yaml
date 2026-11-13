@@ -1,0 +1,192 @@
+OpenSCENARIO:
+  FileHeader:
+    author: Tatsuya Yamasaki
+    date: '2026-11-06T00:00:00+09:00'
+    description: |
+      Test AddEntityAction with LanePosition.
+      The entity "target" is added 20 m ahead of the entity "reference" on the same
+      lane, and must face the same direction as the lane.
+      Orientation is omitted, so it is interpreted as relative with h = p = r = 0.
+    revMajor: 1
+    revMinor: 3
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: reference
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+      - name: target
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: reference
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34696'
+                      s: 10
+                      offset: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      dynamicsShape: step
+                      value: 0
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+    Story:
+      - name: ''
+        Act:
+          - name: add
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: target
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: add
+                            GlobalAction:
+                              EntityAction:
+                                entityRef: target
+                                AddEntityAction:
+                                  Position:
+                                    LanePosition:
+                                      roadId: ''
+                                      laneId: '34696'
+                                      s: 30
+                                      offset: 0
+                          - name: stop
+                            PrivateAction:
+                              LongitudinalAction:
+                                SpeedAction:
+                                  SpeedActionDynamics:
+                                    dynamicsDimension: time
+                                    dynamicsShape: step
+                                    value: 0
+                                  SpeedActionTarget:
+                                    AbsoluteTargetSpeed:
+                                      value: 0
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: check
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: success
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                # Wait for a few seconds to allow visual check on RViz.
+                                - name: heading
+                                  delay: 3
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      # Compare the map pose of the target with the lane at
+                                      # the same place. The one-argument form is not used
+                                      # because it reads the heading from the LaneletPose.
+                                      name: RelativeHeadingCondition(target, 34696, 30)
+                                      rule: lessThan
+                                      value: 0.1
+                                - name: position
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: target
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: entity
+                                        freespace: false
+                                        # cspell:disable
+                                        relativeDistanceType: euclidianDistance
+                                        # cspell:enable
+                                        rule: lessThan
+                                        value: 0.1
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34696'
+                                            s: 30
+                                            offset: 0
+                      - name: failure
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 10
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 1
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

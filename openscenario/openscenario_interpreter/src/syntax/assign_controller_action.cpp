@@ -34,9 +34,10 @@ AssignControllerAction::AssignControllerAction(const ComplexType & controller)
 AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node,
-      std::make_pair("Controller",       [&](const auto & node) { return make<Controller>(node, scope);        }),
-      std::make_pair("CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make(); })))
+    choice(node, {
+      { "Controller",       [&](const auto & node) { return make<Controller>(node, scope);        } },
+      { "CatalogReference", [&](const auto & node) { return CatalogReference(node, scope).make(); } },
+    }))
 // clang-format on
 {
 }

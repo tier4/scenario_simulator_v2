@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__FILE_HPP_
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
@@ -33,7 +33,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct File
 {
-  const boost::filesystem::path filepath;
+  const std::filesystem::path filepath;
 
   explicit File();
 
@@ -43,7 +43,7 @@ struct File
 
   auto isDirectory() const -> bool;
 
-  operator boost::filesystem::path() const;
+  operator std::filesystem::path() const;
 
   operator String() const;
 };

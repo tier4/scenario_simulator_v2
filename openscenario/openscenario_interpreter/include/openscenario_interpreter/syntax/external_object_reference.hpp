@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__EXTERNAL_OBJECT_REFERENCE_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__EXTERNAL_OBJECT_REFERENCE_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
@@ -42,4 +42,4 @@ struct ExternalObjectReference
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__EXTERNAL_OBJECT_REFERENCE_HPP_

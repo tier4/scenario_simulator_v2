@@ -20,6 +20,7 @@
 #include <QPainter>
 #include <algorithm>
 #include <iomanip>
+#include <memory>
 #include <rviz_common/display_context.hpp>
 #include <rviz_common/uniform_string_stream.hpp>
 #include <string>
@@ -31,7 +32,7 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
 : condition_groups_collection_ptr_(std::make_shared<std::vector<ConditionGroups>>())
 {
   /// @note Get screen info of default display
-  const Screen * screen_info = DefaultScreenOfDisplay(XOpenDisplay(NULL));
+  const Screen * screen_info = DefaultScreenOfDisplay(XOpenDisplay(nullptr));
 
   /// @note Fixed height for a 4k resolution screen
   /// @sa https://github.com/tier4/scenario_simulator_v2/pull/1033#discussion_r1412781103
@@ -47,7 +48,7 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
    * but the initial value of 35.0 is set to ensure a default size that is likely suitable for most screens. 
    * The scaling factor adjusts this size to ensure readability across various resolutions.
    */
-  const float text_size = scale * 35.0;
+  const float text_size = scale * 35.0f;
 
   /// @note Define initial value of left edge position of condition results panel
   const int left = 0;
@@ -59,46 +60,46 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
    * The purpose of this calculation is to position the top edge of the panel at an appropriate place on the screen, 
    * again scaling according to screen resolution to maintain a consistent look across different devices.
    */
-  const int top = static_cast<int>(std::round(450 * scale));
+  const auto top = static_cast<int>(std::round(450 * scale));
 
   /**
    * @note Define initial value of horizontal length of condition results panel.
    * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
    * Also, this number can be set via the rviz GUI.
    */
-  const int length = static_cast<int>(std::round(2000 * scale));
+  const auto length = static_cast<int>(std::round(2000 * scale));
 
   /**
    * @note Define initial value of width of condition results panel.
    * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
    * Also, this number can be set via the rviz GUI.
    */
-  const int width = static_cast<int>(std::round(2000 * scale));
+  const auto width = static_cast<int>(std::round(2000 * scale));
 
-  property_topic_name_ = new rviz_common::properties::StringProperty(
+  property_topic_name_ = std::make_unique<rviz_common::properties::StringProperty>(
     "Topic", "/simulation/context", "The topic on which to publish simulation context.", this,
     SLOT(updateTopic()), this);
-  property_text_color_ = new rviz_common::properties::ColorProperty(
+  property_text_color_ = std::make_unique<rviz_common::properties::ColorProperty>(
     "Text Color", QColor(255, 255, 255), "text color", this, SLOT(updateVisualization()), this);
-  property_left_ = new rviz_common::properties::IntProperty(
+  property_left_ = std::make_unique<rviz_common::properties::IntProperty>(
     "Left", left, "Left of the plotter window", this, SLOT(updateVisualization()), this);
   property_left_->setMin(0);
-  property_top_ = new rviz_common::properties::IntProperty(
+  property_top_ = std::make_unique<rviz_common::properties::IntProperty>(
     "Top", top, "Top of the plotter window", this, SLOT(updateVisualization()));
   property_top_->setMin(0);
 
-  property_length_ = new rviz_common::properties::IntProperty(
+  property_length_ = std::make_unique<rviz_common::properties::IntProperty>(
     "Length", length, "Length of the plotter window", this, SLOT(updateVisualization()), this);
   property_length_->setMin(10);
-  property_width_ = new rviz_common::properties::IntProperty(
+  property_width_ = std::make_unique<rviz_common::properties::IntProperty>(
     "Width", width, "Width of the plotter window", this, SLOT(updateVisualization()), this);
   property_width_->setMin(10);
-  property_value_scale_ = new rviz_common::properties::FloatProperty(
+  property_value_scale_ = std::make_unique<rviz_common::properties::FloatProperty>(
     "Value Scale", text_size,
     "This property controls the scaling factor for the text size on the panel. Setting a higher "
     "value results in larger text, making the displayed information easier to read.",
     this, SLOT(updateVisualization()), this);
-  property_value_scale_->setMin(0.01);
+  property_value_scale_->setMin(0.01f);
 }
 
 VisualizationConditionGroupsDisplay::~VisualizationConditionGroupsDisplay()
@@ -170,10 +171,9 @@ void VisualizationConditionGroupsDisplay::processMessage(const Context::ConstSha
 
   QPainter painter(&hud);
   painter.setRenderHint(QPainter::Antialiasing, true);
-  // QColor text_color = property_text_color_->getColor();
   QColor text_color(property_text_color_->getColor());
   text_color.setAlpha(255);
-  painter.setPen(QPen(text_color, static_cast<int>(2), Qt::SolidLine));
+  painter.setPen(QPen(text_color, 2, Qt::SolidLine));
   QFont font = painter.font();
   font.setPixelSize(std::max(static_cast<int>(property_value_scale_->getFloat()), 1));
   font.setBold(true);
@@ -261,7 +261,7 @@ void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_
   std::string event_name;
   try {
     event_name = event_node["name"].as<std::string>();
-  } catch (const YAML::BadConversion & e) {
+  } catch (const YAML::BadConversion &) {
     event_name = "";
   }
   if (event_name.empty()) {

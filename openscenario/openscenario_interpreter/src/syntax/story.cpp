@@ -49,18 +49,18 @@ auto Story::run() -> void
   }
 }
 
-auto operator<<(nlohmann::json & json, const Story & story) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const Story & story) -> boost::json::object &
 {
   json["name"] = story.name;
 
   json["currentState"] = boost::lexical_cast<std::string>(story.state());
 
-  json["Act"] = nlohmann::json::array();
+  auto & acts = json["Act"].emplace_array();
 
   for (auto && act : story.elements) {
-    nlohmann::json json_act;
+    boost::json::object json_act(json.storage());
     json_act << act.as<Act>();
-    json["Act"].push_back(json_act);
+    acts.push_back(std::move(json_act));
   }
 
   return json;

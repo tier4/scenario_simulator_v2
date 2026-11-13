@@ -25,21 +25,23 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Precipitation 1.2 ----------------------------------------------------
- *
- * <xsd:complexType name="Precipitation">
- *   <xsd:attribute name="intensity" type="Double">
- *     <xsd:annotation>
- *       <xsd:appinfo>
- *         deprecated
- *       </xsd:appinfo>
- *     </xsd:annotation>
- *   </xsd:attribute>
- *   <xsd:attribute name="precipitationType" type="PrecipitationType" use="required"/>
- *   <xsd:attribute name="precipitationIntensity" type="Double"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Precipitation (OpenSCENARIO XML 1.3.1)
+
+   Defines a precipitation by type and value of a weather.
+
+   <xsd:complexType name="Precipitation">
+     <xsd:attribute name="intensity" type="Double">
+       <xsd:annotation>
+         <xsd:appinfo>
+           deprecated
+         </xsd:appinfo>
+       </xsd:annotation>
+     </xsd:attribute>
+     <xsd:attribute name="precipitationType" type="PrecipitationType" use="required"/>
+     <xsd:attribute name="precipitationIntensity" type="Double"/>
+   </xsd:complexType>
+ */
 struct Precipitation
 {
   const Double intensity;  // DEPRECATED: The intensity of the precipitation. Range: [0..1].

@@ -3,9 +3,11 @@
 
 <package format="3">
   <name>openscenario_preprocessor</name>
-  <version>4.0.2</version>
+  <version>25.0.22</version>
   <description>Example package for TIER IV OpenSCENARIO Interpreter</description>
   <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <algorithm>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_map_acc_geared.hpp>
 
 // copied from https://github.com/tier4/autoware.universe/blob/v0.17.0/common/interpolation/src/linear_interpolation.cpp
@@ -65,7 +65,7 @@ bool CSVLoader::readCSV(Table & result, const char delim)
 {
   std::ifstream ifs(csv_path_);
   if (!ifs.is_open()) {
-    std::cerr << "Cannot open " << csv_path_.c_str() << std::endl;
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("CSVLoader"), "Cannot open " << csv_path_.c_str());
     return false;
   }
 
@@ -111,8 +111,10 @@ bool CSVLoader::validateMap(const Map & map, const bool is_col_decent)
     }
   }
   if (is_invalid) {
-    std::cerr << "index around (i,j) is invalid ( " << invalid_index_pair.first << ", "
-              << invalid_index_pair.second << " )" << std::endl;
+    RCLCPP_ERROR_STREAM(
+      rclcpp::get_logger("CSVLoader"), "index around (i,j) is invalid ( "
+                                         << invalid_index_pair.first << ", "
+                                         << invalid_index_pair.second << " )");
     return false;
   }
   return true;
@@ -121,20 +123,22 @@ bool CSVLoader::validateMap(const Map & map, const bool is_col_decent)
 bool CSVLoader::validateData(const Table & table, const std::string & csv_path)
 {
   if (table.empty()) {
-    std::cerr << "The table is empty." << std::endl;
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("CSVLoader"), "The table is empty.");
     return false;
   }
   if (table[0].size() < 2) {
-    std::cerr << "Cannot read " << csv_path.c_str() << " CSV file should have at least 2 column"
-              << std::endl;
+    RCLCPP_ERROR_STREAM(
+      rclcpp::get_logger("CSVLoader"),
+      "Cannot read " << csv_path.c_str() << " CSV file should have at least 2 column");
     return false;
   }
   // validate map size
   for (size_t i = 1; i < table.size(); i++) {
     // validate row size
     if (table[0].size() != table[i].size()) {
-      std::cerr << "Cannot read " << csv_path.c_str()
-                << ". Each row should have a same number of columns" << std::endl;
+      RCLCPP_ERROR_STREAM(
+        rclcpp::get_logger("CSVLoader"),
+        "Cannot read " << csv_path.c_str() << ". Each row should have a same number of columns");
       return false;
     }
   }
@@ -178,9 +182,10 @@ double CSVLoader::clampValue(
   const double max_value = *std::max_element(ranges.begin(), ranges.end());
   const double min_value = *std::min_element(ranges.begin(), ranges.end());
   if (val < min_value || max_value < val) {
-    std::cerr << "Input " << name << ": " << val
-              << " is out of range. use closest value. Please update the conversion map"
-              << std::endl;
+    RCLCPP_ERROR_STREAM(
+      rclcpp::get_logger("CSVLoader"),
+      "Input " << name << ": " << val
+               << " is out of range. use closest value. Please update the conversion map");
     return std::min(std::max(val, min_value), max_value);
   }
   return val;
@@ -280,7 +285,7 @@ Eigen::VectorXd SimModelDelaySteerMapAccGeared::calcModel(
 void SimModelDelaySteerMapAccGeared::updateStateWithGear(
   Eigen::VectorXd & state, const Eigen::VectorXd & prev_state, const uint8_t gear, const double dt)
 {
-  using autoware_auto_vehicle_msgs::msg::GearCommand;
+  using autoware_vehicle_msgs::msg::GearCommand;
   if (
     gear == GearCommand::DRIVE || gear == GearCommand::DRIVE_2 || gear == GearCommand::DRIVE_3 ||
     gear == GearCommand::DRIVE_4 || gear == GearCommand::DRIVE_5 || gear == GearCommand::DRIVE_6 ||

@@ -29,29 +29,31 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Weather 1.2 ---------------------------------------------------
- *
- * <xsd:complexType name="Weather">
- * 　　<xsd:all>
- * 　　　　<xsd:element name="Sun" type="Sun" minOccurs="0"/>
- * 　　　　<xsd:element name="Fog" type="Fog" minOccurs="0"/>
- * 　　　　<xsd:element name="Precipitation" type="Precipitation" minOccurs="0"/>
- * 　　　　<xsd:element name="Wind" type="Wind" minOccurs="0"/>
- * 　　　　<xsd:element name="DomeImage" type="DomeImage" minOccurs="0"/>
- * 　　</xsd:all>
- * 　　<xsd:attribute name="cloudState" type="CloudState">
- * 　　　<xsd:annotation>
- * 　　　　　<xsd:appinfo>
- * 　　　　　　　deprecated
- * 　　　　　</xsd:appinfo>
- * 　　　</xsd:annotation>
- * 　　</xsd:attribute>
- * 　　<xsd:attribute name="atmosphericPressure" type="Double"/>
- * 　　<xsd:attribute name="temperature" type="Double"/>
- * 　　<xsd:attribute name="fractionalCloudCover" type="FractionalCloudCover"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Weather (OpenSCENARIO XML 1.3.1)
+
+   Defines the environment conditions of a scenario, e.g. time of day, weather and road condition. If one of the conditions is missing it means that it doesn't change.
+
+   <xsd:complexType name="Weather">
+     <xsd:all>
+        <xsd:element name="Sun" type="Sun" minOccurs="0"/>
+        <xsd:element name="Fog" type="Fog" minOccurs="0"/>
+        <xsd:element name="Precipitation" type="Precipitation" minOccurs="0"/>
+        <xsd:element name="Wind" type="Wind" minOccurs="0"/>
+        <xsd:element name="DomeImage" type="DomeImage" minOccurs="0"/>
+    </xsd:all>
+    <xsd:attribute name="cloudState" type="CloudState">
+      <xsd:annotation>
+          <xsd:appinfo>
+              deprecated
+          </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="atmosphericPressure" type="Double"/>
+    <xsd:attribute name="temperature" type="Double"/>
+    <xsd:attribute name="fractionalCloudCover" type="FractionalCloudCover"/>
+   </xsd:complexType>
+*/
 struct Weather
 {
   /*

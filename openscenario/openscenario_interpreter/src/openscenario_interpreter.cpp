@@ -15,15 +15,19 @@
 #define OPENSCENARIO_INTERPRETER_NO_EXTENSION
 
 #include <algorithm>
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <sstream>
 #include <status_monitor/status_monitor.hpp>
+#include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
@@ -36,12 +40,21 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
+  evaluate_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
+    "/simulation/interpreter/execution_time/evaluate", rclcpp::QoS(1).transient_local())),
+  update_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
+    "/simulation/interpreter/execution_time/update", rclcpp::QoS(1).transient_local())),
+  output_time_publisher(create_publisher<tier4_simulation_msgs::msg::UserDefinedValue>(
+    "/simulation/interpreter/execution_time/output", rclcpp::QoS(1).transient_local())),
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
   output_directory("/tmp"),
   publish_empty_context(false),
-  record(false)
+  record(false),
+  record_option(""),
+  record_storage_id(""),
+  scenario_runtime(std::make_shared<ScenarioRuntime>())
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
@@ -49,6 +62,12 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(output_directory);
   DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
+  DECLARE_PARAMETER(record_option);
+  DECLARE_PARAMETER(record_storage_id);
+
+  SpeedCondition::compatibility =
+    boost::lexical_cast<Compatibility>(common::getParameter<std::string>(
+      get_node_parameters_interface(), "speed_condition", "legacy"));
 }
 
 Interpreter::~Interpreter() {}
@@ -66,20 +85,18 @@ auto Interpreter::currentScenarioDefinition() const -> const std::shared_ptr<Sce
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
   const auto logic_file = currentScenarioDefinition()->road_network.logic_file;
+  const auto is_directly_lanelet2_map_file =
+    not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm";
+  const auto map_files_path =
+    is_directly_lanelet2_map_file ? logic_file.filepath.parent_path() : logic_file;
 
-  auto configuration = traffic_simulator::Configuration(
-    logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path());
-  {
-    configuration.auto_sink = false;
-    configuration.scenario_path = osc_path;
-
-    // XXX DIRTY HACK!!!
-    if (not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm") {
-      configuration.lanelet2_map_file = logic_file.filepath.filename().string();
-    }
+  // XXX DIRTY HACK!!!
+  if (is_directly_lanelet2_map_file) {
+    return traffic_simulator::Configuration(
+      map_files_path, logic_file.filepath.filename().string(), osc_path);
+  } else {
+    return traffic_simulator::Configuration(map_files_path, osc_path);
   }
-
-  return configuration;
 }
 
 auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
@@ -108,17 +125,18 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(output_directory);
       GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
+      GET_PARAMETER(record_option);
+      GET_PARAMETER(record_storage_id);
 
-      script = std::make_shared<OpenScenario>(osc_path);
+      script = std::make_shared<OpenScenario>(osc_path, scenario_runtime);
+
+      common::status_monitor.updateThreshold(
+        std::chrono::seconds(common::getParameter<std::int64_t>("status_monitor_threshold", 10)));
 
       // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
-      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
-        if (not has_parameter("consider_pose_by_road_slope")) {
-          declare_parameter("consider_pose_by_road_slope", false);
-        }
-        return get_parameter("consider_pose_by_road_slope").as_bool();
-      }());
+      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
+        common::getParameter<bool>("consider_pose_by_road_slope"));
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
@@ -135,44 +153,6 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
     });
 }
 
-auto Interpreter::engage() const -> void
-{
-  for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
-    if (
-      scenario_object.template is<ScenarioObject>() and
-      scenario_object.template as<ScenarioObject>().is_added and
-      scenario_object.template as<ScenarioObject>().object_controller.isAutoware()) {
-      asFieldOperatorApplication(name).engage();
-    }
-  }
-}
-
-auto Interpreter::engageable() const -> bool
-{
-  return std::all_of(
-    std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
-      const auto & [name, scenario_object] = each;
-      return not scenario_object.template is<ScenarioObject>() or
-             not scenario_object.template as<ScenarioObject>().is_added or
-             not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             asFieldOperatorApplication(name).engageable();
-    });
-}
-
-auto Interpreter::engaged() const -> bool
-{
-  return std::all_of(
-    std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
-      const auto & [name, scenario_object] = each;
-      return not scenario_object.template is<ScenarioObject>() or
-             not scenario_object.template as<ScenarioObject>().is_added or
-             not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
-             asFieldOperatorApplication(name).engaged();
-    });
-}
-
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
   auto evaluate_storyboard = [this]() {
@@ -182,25 +162,65 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         deactivate();
       },
       [this]() {
-        withTimeoutHandler(defaultTimeoutHandler(), [this]() {
+        const auto evaluate_time = execution_timer.invoke("evaluate", [this]() {
           if (std::isnan(evaluateSimulationTime())) {
-            if (not waiting_for_engagement_to_be_completed and engageable()) {
-              engage();
-              waiting_for_engagement_to_be_completed = true;  // NOTE: DIRTY HACK!!!
-            } else if (engaged()) {
+            if (std::all_of(
+                  currentScenarioDefinition()->entities.begin(),
+                  currentScenarioDefinition()->entities.end(), [this](const auto & each) {
+                    return std::apply(
+                      [this](const auto & name, const Object & object) {
+                        return not object.is<ScenarioObject>() or
+                               not object.as<ScenarioObject>().is_added or
+                               not object.as<ScenarioObject>().object_controller.isAutoware() or
+                               NonStandardOperation::isEngaged(name);
+                      },
+                      each);
+                  })) {
               activateNonUserDefinedControllers();
-              waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
             }
           } else if (currentScenarioDefinition()) {
             currentScenarioDefinition()->evaluate();
           } else {
             throw Error("No script evaluable.");
           }
-
-          SimulatorCore::update();
-
-          publishCurrentContext();
         });
+
+        const auto update_time =
+          execution_timer.invoke("update", []() { SimulatorCore::update(); });
+
+        const auto output_time =
+          execution_timer.invoke("output", [this]() { publishCurrentContext(); });
+
+        auto generate_double_user_defined_value_message = [](double value) {
+          tier4_simulation_msgs::msg::UserDefinedValue message;
+          message.type.data = tier4_simulation_msgs::msg::UserDefinedValueType::DOUBLE;
+          message.value = std::to_string(value);
+          return message;
+        };
+        evaluate_time_publisher->publish(generate_double_user_defined_value_message(
+          std::chrono::duration<double>(evaluate_time).count()));
+        update_time_publisher->publish(generate_double_user_defined_value_message(
+          std::chrono::duration<double>(update_time).count()));
+        output_time_publisher->publish(generate_double_user_defined_value_message(
+          std::chrono::duration<double>(output_time).count()));
+
+        if (auto time_until_trigger = timer->time_until_trigger(); time_until_trigger.count() < 0) {
+          /*
+            Ideally, the scenario should be terminated with an error if the total
+            time for the ScenarioDefinition evaluation and the traffic_simulator's
+            updateFrame exceeds the time allowed for a single frame. However, we
+            have found that many users are in environments where it is not possible
+            to run the simulator stably at 30 FPS (the default setting) while
+            running Autoware. In order to prioritize comfortable daily use, we
+            decided to give up full reproducibility of the scenario and only provide
+            warnings.
+          */
+          RCLCPP_WARN_STREAM(
+            get_logger(),
+            "Your machine is not powerful enough to run the scenario at the specified frame rate ("
+              << local_frame_rate << " Hz). Current frame execution exceeds "
+              << -time_until_trigger.count() / 1.e6 << " milliseconds.");
+        }
       });
   };
 
@@ -215,8 +235,22 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          record::start(
-            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
+          std::vector<std::string> options{
+            "-a", "-o", std::filesystem::path(osc_path).replace_extension("").string()};
+
+          if (not record_storage_id.empty()) {
+            options.insert(options.end(), {"-s", record_storage_id});
+          }
+
+          if (not record_option.empty()) {
+            // split the record_option string with space.
+            std::istringstream iss(record_option);
+            std::copy(
+              std::istream_iterator<std::string>(iss), std::istream_iterator<std::string>(),
+              std::back_inserter(options));
+          }
+
+          record::start(options);
         }
 
         SimulatorCore::activate(
@@ -237,11 +271,23 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         execution_timer.clear();
 
         publisher_of_context->on_activate();
+        evaluate_time_publisher->on_activate();
+        update_time_publisher->on_activate();
+        output_time_publisher->on_activate();
 
         assert(publisher_of_context->is_activated());
 
         if (currentScenarioDefinition()) {
           currentScenarioDefinition()->storyboard.init.evaluateInstantaneousActions();
+
+          for (const auto & [name, object] : currentScenarioDefinition()->entities) {
+            if (
+              object.template is<ScenarioObject>() and
+              object.template as<ScenarioObject>().is_added and
+              object.template as<ScenarioObject>().object_controller.isAutoware()) {
+              NonStandardOperation::engage(name);
+            }
+          }
         } else {
           throw Error("No script evaluable.");
         }
@@ -279,7 +325,8 @@ auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
   timer.reset();
   scenarios.clear();
   script.reset();
-  SimulatorCore::deactivate();
+  common::status_monitor.overrideThreshold(
+    simulator_core_shutdown_threshold, SimulatorCore::deactivate);
   return Interpreter::Result::SUCCESS;  // => Finalized
 }
 
@@ -287,12 +334,13 @@ auto Interpreter::publishCurrentContext() const -> void
 {
   Context context;
   {
-    nlohmann::json json;
+    boost::json::monotonic_resource mr;
+    boost::json::object json(&mr);
     context.stamp = now();
     if (publish_empty_context) {
       context.data = "";
     } else {
-      context.data = (json << *script).dump();
+      context.data = boost::json::serialize(json << *script);
     }
     context.time = evaluateSimulationTime();
   }
@@ -307,33 +355,34 @@ auto Interpreter::reset() -> void
   if (publisher_of_context->is_activated()) {
     publisher_of_context->on_deactivate();
   }
-
-  if (not has_parameter("initialize_duration")) {
-    declare_parameter<int>("initialize_duration", 30);
+  if (evaluate_time_publisher->is_activated()) {
+    evaluate_time_publisher->on_deactivate();
+  }
+  if (update_time_publisher->is_activated()) {
+    update_time_publisher->on_deactivate();
+  }
+  if (output_time_publisher->is_activated()) {
+    output_time_publisher->on_deactivate();
   }
 
   /*
-     Although we have not analyzed the details yet, the process of deactivating
-     the simulator core takes quite a long time (especially the
-     traffic_simulator::API::despawnEntities function is slow). During the
-     process, the interpreter becomes unresponsive, which often resulted in the
-     status monitor thread judging the interpreter as "not good". Therefore, we
-     will increase the threshold of the judgment only during the process of
-     deactivating the simulator core.
-
-     The threshold value here is set to the value of initialize_duration, but
-     there is no rationale for this; it should be larger than the original
-     threshold value of the status monitor and long enough for the simulator
-     core to be deactivated.
+  Interpreter::reset() and Interpreter::on_shutdown() functions are slow,
+  because they call in sequence:
+  openscenario_interpreter::SimulatorCore::deactivate()
+  traffic_simulator::API::despawnEntities()
+  traffic_simulator::API::despawn()
+  traffic_simulator:entity::EntityManager::despawnEntity()
+  concealer::FieldOperatorApplication::~FieldOperatorApplication()
+  The destructor waits for autoware process group to die.
   */
   common::status_monitor.overrideThreshold(
-    std::chrono::seconds(get_parameter("initialize_duration").as_int()), SimulatorCore::deactivate);
+    simulator_core_shutdown_threshold, SimulatorCore::deactivate);
 
   scenarios.pop_front();
 
   // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
   // INFO_STREAM.
-  boost::apply_visitor(
+  std::visit(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
       [&](const common::junit::Failure & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
@@ -341,7 +390,11 @@ auto Interpreter::reset() -> void
     result);
 
   if (record) {
-    record::stop();
+    /*
+    openscenario_interpreter::record::stop() is also slower,
+    as it sleeps for 3s and then waits until rosbag saving is finished.
+    */
+    common::status_monitor.overrideThreshold(simulator_core_shutdown_threshold, record::stop);
   }
 }
 }  // namespace openscenario_interpreter

@@ -31,16 +31,12 @@ class FollowLaneAction : public entity_behavior::VehicleActionNode
 {
 public:
   FollowLaneAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
-  void getBlackBoardValues();
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
+  void getBlackBoardValues() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {};
-    BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
-    for (const auto & parent_port : parent_ports) {
-      ports.emplace(parent_port.first, parent_port.second);
-    }
-    return ports;
+    return entity_behavior::VehicleActionNode::providedPorts();
   }
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;
   const std::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
@@ -48,6 +44,13 @@ public:
 
 private:
   std::optional<traffic_simulator::LaneletPose> target_lanelet_pose_;
+  bool use_trajectory_based_front_entity_detection_;
+  double trajectory_based_detection_offset_;
+  static constexpr double waypoint_interval = 1.0;
+  static constexpr double front_entity_stop_margin = 5.0;
+  static constexpr double bounding_box_half_factor = 0.5;
+  static constexpr double stop_line_margin = 5.0;
+  static constexpr double conflicting_entity_margin = 3.0;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

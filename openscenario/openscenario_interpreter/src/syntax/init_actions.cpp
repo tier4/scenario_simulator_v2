@@ -154,30 +154,31 @@ auto InitActions::runNonInstantaneousActions() -> void
   }
 }
 
-auto operator<<(nlohmann::json & json, const InitActions & init_actions) -> nlohmann::json &
+auto operator<<(boost::json::object & json, const InitActions & init_actions)
+  -> boost::json::object &
 {
-  json["GlobalAction"] = nlohmann::json::array();
+  auto & global_actions = json["GlobalAction"].emplace_array();
 
   for (const auto & init_action : init_actions.global_actions) {
-    nlohmann::json action;
+    boost::json::object action(json.storage());
     action["type"] = makeTypename(init_action.as<GlobalAction>().type());
-    json["GlobalAction"].push_back(action);
+    global_actions.push_back(std::move(action));
   }
 
-  json["UserDefinedAction"] = nlohmann::json::array();
+  auto & user_defined_actions = json["UserDefinedAction"].emplace_array();
 
   for (const auto & init_action : init_actions.user_defined_actions) {
-    nlohmann::json action;
+    boost::json::object action(json.storage());
     action["type"] = makeTypename(init_action.as<UserDefinedAction>().type());
-    json["UserDefinedAction"].push_back(action);
+    user_defined_actions.push_back(std::move(action));
   }
 
-  json["Private"] = nlohmann::json::array();
+  auto & privates = json["Private"].emplace_array();
 
   for (const auto & init_action : init_actions.privates) {
-    nlohmann::json action;
+    boost::json::object action(json.storage());
     action << init_action.as<Private>();
-    json["Private"].push_back(action);
+    privates.push_back(std::move(action));
   }
 
   return json;

@@ -3,19 +3,19 @@
 ## File format
 
 Result files should follow the JUnit format.  
-[This package](https://github.com/tier4/scenario_simulator_v2/tree/master/common/simple_junit) helps you to output JUnit-formatted files.
+[This header](https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator/include/traffic_simulator/utils/junit5.hpp) helps you to output JUnit-formatted files.
 An example of the result file is below:
 
 ```xml
 <?xml version="1.0"?>
 <testsuites>
-	<testsuite name="example_suite">
-		<testcase name="example_case">
-			<error type="InternalError" message="foo" />
-			<failure type="Failure" message="Expected success" />
-		</testcase>
-	</testsuite>
-	<testsuite name="example_suites" />
+ <testsuite name="example_suite">
+  <testcase name="example_case">
+   <error type="InternalError" message="foo" />
+   <failure type="Failure" message="Expected success" />
+  </testcase>
+ </testsuite>
+ <testsuite name="example_suites" />
 </testsuites>
 ```
 
@@ -77,12 +77,12 @@ Output format should be like below:
 If you want to know all exception types defined in the scenario simulator exception package, please refer to [this code](https://github.com/tier4/scenario_simulator_v2/blob/master/common/scenario_simulator_exception/include/scenario_simulator_exception/exception.hpp) and [this document](ErrorCategories.md).  
 (ERROR_MESSAGE) is an error message from an exception.
 
-## Usage of simple_junit
+## Usage of junit5.hpp
 
 Sample codes are below:
 
 ```c++
-#include <simple_junit/junit5.hpp>
+#include <traffic_simulator/utils/junit5.hpp>
 
 int main()
 {
@@ -101,13 +101,13 @@ If you run this code, result.junit.xml should be like below:
 ```xml
 <?xml version="1.0"?>
 <testsuites>
-	<testsuite name="example_suite">
-		<testcase name="example_case">
-			<error type="example_error" message="error_test_case" />
-			<failure type="example_failure" message="failure_test_case" />
-		</testcase>
-	</testsuite>
-	<testsuite name="example_suites" />
+ <testsuite name="example_suite">
+  <testcase name="example_case">
+   <error type="example_error" message="error_test_case" />
+   <failure type="example_failure" message="failure_test_case" />
+  </testcase>
+ </testsuite>
+ <testsuite name="example_suites" />
 </testsuites>
 ```
 

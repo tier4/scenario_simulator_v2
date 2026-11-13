@@ -7,13 +7,13 @@ repositories:
     type: git
     url: https://github.com/autowarefoundation/autoware_msgs.git
     version: main
-  autoware_auto_msgs:
-    type: git
-    url: https://github.com/tier4/autoware_auto_msgs.git
-    version: tier4/main
   autoware_cmake:
     type: git
     url: https://github.com/autowarefoundation/autoware_cmake.git
+    version: main
+  autoware_internal_msgs:
+    type: git
+    url: https://github.com/autowarefoundation/autoware_internal_msgs.git
     version: main
   autoware_utils:
     type: git
@@ -31,3 +31,7 @@ repositories:
     type: git
     url: https://github.com/tier4/tier4_autoware_msgs.git
     version: tier4/universe # for Autoware.Universe (TIER IV)
+  agnocast:
+    type: git
+    url: https://github.com/tier4/agnocast.git
+    version: 2.0.1

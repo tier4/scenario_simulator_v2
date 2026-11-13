@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/functional/curry.hpp>
 #include <openscenario_interpreter/regex/function_call_expression.hpp>
@@ -39,9 +38,12 @@ struct MagicSubscription : private T
   {
     std::atomic_bool stop_requested = false;
 
-    std::mutex mutex;
+    /// @note Synchronizes access to `thrown` to avoid data races between spin thread and rethrow().
+    std::mutex exception_mutex;
 
     std::exception_ptr thrown;
+
+    rclcpp::executors::SingleThreadedExecutor executor;
 
     std::thread thread;
 
@@ -49,14 +51,15 @@ struct MagicSubscription : private T
     : rclcpp::Node("magic_subscription"), thread([this]() {
         while (rclcpp::ok() and not stop_requested) {
           try {
-            rclcpp::spin_some(get_node_base_interface());
+            executor.spin_some();
           } catch (...) {
-            auto lock = std::lock_guard(mutex);
+            auto lock = std::lock_guard(exception_mutex);
             thrown = std::current_exception();
           }
         }
       })
     {
+      executor.add_node(get_node_base_interface());
     }
 
     ~Node()
@@ -68,7 +71,7 @@ struct MagicSubscription : private T
 
     auto rethrow()
     {
-      if (auto lock = std::lock_guard(mutex); thrown) {
+      if (auto lock = std::lock_guard(exception_mutex); thrown) {
         std::rethrow_exception(thrown);
       }
     }
@@ -80,6 +83,10 @@ struct MagicSubscription : private T
 
   typename rclcpp::Subscription<T>::SharedPtr subscription;
 
+  /// @note Protects access to the stored message,
+  /// ensuring get() and callback() are synchronized.
+  mutable std::mutex message_mutex;
+
   explicit MagicSubscription(const std::string & topic_name)
   {
     if (not count++) {
@@ -87,8 +94,10 @@ struct MagicSubscription : private T
     }
 
     subscription = node->template create_subscription<T>(
-      topic_name, rclcpp::QoS(1).best_effort(),
-      [this](const typename T::SharedPtr message) { static_cast<T &>(*this) = *message; });
+      topic_name, rclcpp::QoS(1).best_effort(), [this](const typename T::SharedPtr message) {
+        std::lock_guard<std::mutex> lock(message_mutex);
+        static_cast<T &>(*this) = *message;
+      });
   }
 
   ~MagicSubscription()
@@ -98,9 +107,10 @@ struct MagicSubscription : private T
     }
   }
 
-  auto get() const -> const auto &
+  auto get() const -> T
   {
     node->rethrow();
+    std::lock_guard<std::mutex> lock(message_mutex);
     return static_cast<const T &>(*this);
   }
 };
@@ -113,30 +123,32 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
   if (std::smatch result; std::regex_match(name, result, std::regex(R"(([^.]+)\.(.+))"))) {
     const std::unordered_map<std::string, std::function<Object()>> dispatch{
       std::make_pair(
-        "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
+        "currentState",
+        [result, state_string = value]() {
+          if (state_string == "EMERGENCY") {
+            std::stringstream what;
+            what
+              << "Current version of scenario_simulator_v2 does not support the use of 'EMERGENCY' "
+                 "as a value for 'currentState' in UserDefinedValueCondition. Please use "
+                 "'currentEmergencyState' or `currentMinimumRiskManeuverState.state`(preferred) "
+                 "instead.";
+            throw common::Error(what.str());
+          } else {
+            return make<String>(evaluateCurrentState(result.str(1)));
+          }
+        }),
       std::make_pair(
         "currentMinimumRiskManeuverState.behavior",
-        [result]() {
-          return make<String>(
-            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverBehaviorName());
-        }),
+        [result]() { return make<String>(getMinimumRiskManeuverBehaviorName(result.str(1))); }),
       std::make_pair(
         "currentMinimumRiskManeuverState.state",
-        [result]() {
-          return make<String>(
-            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverStateName());
-        }),
+        [result]() { return make<String>(getMinimumRiskManeuverStateName(result.str(1))); }),
       std::make_pair(
         "currentEmergencyState",
-        [result]() {
-          return make<String>(asFieldOperatorApplication(result.str(1)).getEmergencyStateName());
-        }),
+        [result]() { return make<String>(getEmergencyStateName(result.str(1))); }),
       std::make_pair(
         "currentTurnIndicatorsState",
-        [result]() {
-          return make<String>(boost::lexical_cast<String>(
-            asFieldOperatorApplication(result.str(1)).getTurnIndicatorsCommand()));
-        }),
+        [result]() { return make<String>(getTurnIndicatorsCommandName(result.str(1))); }),
     };
     evaluate_value = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, FunctionCallExpression::pattern())) {
@@ -150,7 +162,8 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
                 return make<Double>(evaluateRelativeHeading(xs[0]));
               case 3:  // RelativeHeadingCondition(<ENTITY-REF>, <LANE-ID>, <S>)
                 return make<Double>(evaluateRelativeHeading(
-                  xs[0], LanePosition("", xs[1], 0, boost::lexical_cast<Double>(xs[2]))));
+                  xs[0], static_cast<NativeWorldPosition>(
+                           LanePosition("", xs[1], 0, boost::lexical_cast<Double>(xs[2])))));
               default:
                 return make<Double>(Double::nan());
             }

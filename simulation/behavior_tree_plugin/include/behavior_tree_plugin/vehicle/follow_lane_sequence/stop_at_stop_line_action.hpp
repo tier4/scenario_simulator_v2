@@ -31,15 +31,11 @@ class StopAtStopLineAction : public entity_behavior::VehicleActionNode
 {
 public:
   StopAtStopLineAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {};
-    BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
-    for (const auto & parent_port : parent_ports) {
-      ports.emplace(parent_port.first, parent_port.second);
-    }
-    return ports;
+    return entity_behavior::VehicleActionNode::providedPorts();
   }
   std::optional<double> calculateTargetSpeed(double current_velocity);
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;
@@ -47,8 +43,12 @@ public:
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
 
 private:
-  bool stopped_;
   std::optional<double> distance_to_stopline_;
+  static constexpr double waypoint_interval = 1.0;
+  static constexpr double bounding_box_half_factor = 0.5;
+  static constexpr double stop_margin = 1.0;
+  static constexpr double front_stopline_margin = 5.0;
+  static constexpr double velocity_epsilon = 0.001;
 };
 }  // namespace follow_lane_sequence
 }  // namespace vehicle

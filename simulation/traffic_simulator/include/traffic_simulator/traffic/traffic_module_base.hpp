@@ -36,7 +36,7 @@ class TrafficModuleBase
 {
 public:
   TrafficModuleBase() {}
-  virtual void execute(const double current_time, const double step_time) = 0;
+  virtual auto execute(const double current_time, const double step_time) -> void = 0;
   virtual auto appendDebugMarker(visualization_msgs::msg::MarkerArray &) const -> void{};
 };
 }  // namespace traffic

@@ -28,7 +28,6 @@ class MiscObjectEntity : public EntityBase
 public:
   explicit MiscObjectEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
   void onUpdate(double, double) override;
@@ -46,7 +45,7 @@ public:
 
   ~MiscObjectEntity() override = default;
 
-  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override { return {}; }
+  auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> override { return {}; }
 
   std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
@@ -67,22 +66,24 @@ public:
 
   void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool) override;
 
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override
+  void requestAssignRoute(
+    const std::vector<CanonicalizedLaneletPose> &, const RouteOption &) override
   {
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
 
-  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override
+  void requestAssignRoute(
+    const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) override
   {
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
 
-  void requestAcquirePosition(const CanonicalizedLaneletPose &) override
+  void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOption &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &, const RouteOption &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }
@@ -95,15 +96,30 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
-  void setVelocityLimit(double) override{};
+  void setVelocityLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setAccelerationLimit(double) override {}
+  void setAccelerationLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setAccelerationRateLimit(double) override {}
+  void setAccelerationRateLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setDecelerationLimit(double) override {}
+  void setDecelerationLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
-  void setDecelerationRateLimit(double) override {}
+  void setDecelerationRateLimit(double) override
+  {
+    /// @note Misc object entity does not move, so this function is no operation.
+  }
 
   auto getMaxAcceleration() const -> double override
   {

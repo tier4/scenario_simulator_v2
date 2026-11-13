@@ -18,7 +18,6 @@
 #include <deque>
 #include <memory>
 #include <traffic_simulator/data_type/entity_status.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -26,8 +25,9 @@ namespace traffic_simulator
 class RoutePlanner
 {
 public:
-  explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+  explicit RoutePlanner(const traffic_simulator::RoutingGraphType &);
 
+  auto getWholeRouteLanelets() const -> lanelet::Ids { return whole_lanelet_ids_; }
   auto getRouteLanelets(const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon = 100)
     -> lanelet::Ids;
 
@@ -43,7 +43,7 @@ private:
   auto updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void;
 
   std::optional<lanelet::Ids> route_;
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+  const traffic_simulator::RoutingGraphType routing_graph_type_;
 
   /*
      What we need is a queue, but we need to be able to iterate over the
@@ -51,6 +51,7 @@ private:
      which is not iterable.
   */
   std::deque<traffic_simulator::CanonicalizedLaneletPose> waypoint_queue_;
+  lanelet::Ids whole_lanelet_ids_;
 };
 }  // namespace traffic_simulator
 

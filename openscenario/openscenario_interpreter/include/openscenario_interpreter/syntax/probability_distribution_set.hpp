@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
-#define OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_HPP_
 
 #include <openscenario_interpreter/syntax/probability_distribution_set_element.hpp>
 #include <random>
@@ -22,16 +22,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ProbabilityDistributionSet 1.2 -----------------------------------------
- *
- *  <xsd:complexType name="ProbabilityDistributionSet">
- *    <xsd:sequence>
- *      <xsd:element name="Element" type="ProbabilityDistributionSetElement" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   ProbabilityDistributionSet (OpenSCENARIO XML 1.3.1)
 
+   Container for a set of single values with a defined probability.
+
+   <xsd:complexType name="ProbabilityDistributionSet">
+     <xsd:sequence>
+       <xsd:element name="Element" type="ProbabilityDistributionSetElement" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct ProbabilityDistributionSet : public ComplexType, private Scope
 {
   const std::vector<ProbabilityDistributionSetElement> elements;
@@ -60,4 +61,4 @@ struct ProbabilityDistributionSet : public ComplexType, private Scope
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__PROBABILITY_DISTRIBUTION_SET_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PROBABILITY_DISTRIBUTION_SET_HPP_

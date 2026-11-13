@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__UNIFORM_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__UNIFORM_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__UNIFORM_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__UNIFORM_DISTRIBUTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
@@ -23,15 +23,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- UniformDistribution 1.2 ------------------------------------------------
- *
- *  <xsd:complexType name="UniformDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="Range" type="Range"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   UniformDistribution (OpenSCENARIO XML 1.3.1)
+
+   Uniform distribution which can be applied to a single parameter.
+
+   <xsd:complexType name="UniformDistribution">
+     <xsd:sequence>
+       <xsd:element name="Range" type="Range"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct UniformDistribution : public ComplexType, private Scope
 {
   const Range range;
@@ -46,4 +48,4 @@ struct UniformDistribution : public ComplexType, private Scope
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__UNIFORM_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__UNIFORM_DISTRIBUTION_HPP_

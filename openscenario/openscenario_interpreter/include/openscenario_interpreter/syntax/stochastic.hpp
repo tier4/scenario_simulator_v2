@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__STOCHASTIC_HPP_
-#define OPENSCENARIO_INTERPRETER__STOCHASTIC_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -25,19 +25,19 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Stochastic 1.2 ---------------------------------------------------------
- *
- *  <xsd:complexType name="Stochastic">
- *    <xsd:sequence>
- *      <xsd:element name="StochasticDistribution"
- *        type="StochasticDistribution" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="numberOfTestRuns" type="UnsignedInt" use="required"/>
- *    <xsd:attribute name="randomSeed" type="Double"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Stochastic (OpenSCENARIO XML 1.3.1)
 
+   Top level container for all stochastic distribution elements.
+
+   <xsd:complexType name="Stochastic">
+     <xsd:sequence>
+       <xsd:element name="StochasticDistribution" type="StochasticDistribution" maxOccurs="unbounded"/>
+     </xsd:sequence>
+     <xsd:attribute name="numberOfTestRuns" type="UnsignedInt" use="required"/>
+     <xsd:attribute name="randomSeed" type="Double"/>
+   </xsd:complexType>
+*/
 struct Stochastic : public ComplexType
 {
   const UnsignedInt number_of_test_runs;
@@ -50,4 +50,4 @@ struct Stochastic : public ComplexType
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__STOCHASTIC_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_HPP_

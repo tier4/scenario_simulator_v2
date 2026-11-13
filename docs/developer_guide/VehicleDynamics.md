@@ -2,7 +2,6 @@
 
 In this section, we describe the vehicle model which is implemented in scenario_simulator_v2.
 
-
 ## Vehicle Model Types
 
 Pose is calculated by bicycle kinematics model.
@@ -26,6 +25,7 @@ Uses velocity command. The steering and velocity vary following a first-order de
 Uses acceleration command. The steering and acceleration vary following a first-order delay model.
 
 ## Vehicle Model Parameters
+
 | Name                 | Type   | Description                                          | IDEAL_STEER | IDEAL_ACCEL | DELAY_STEER | DELAY_STEER_ACC | Default value | unit    |
 |----------------------|--------|------------------------------------------------------|-------------|-------------|-------------|-----------------|---------------|---------|
 | vel_time_delay       | double | dead time for the velocity input                     | x           | x           | o           | x               | 0.25          | [s]     |

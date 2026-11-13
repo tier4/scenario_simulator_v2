@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DISTRIBUTION_SET_HPP_
-#define OPENSCENARIO_INTERPRETER__DISTRIBUTION_SET_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_HPP_
 
 #include <openscenario_interpreter/syntax/distribution_set_element.hpp>
 
@@ -21,15 +21,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionSet 1.2 ----------------------------------------------------
- *
- *  <xsd:complexType name="DistributionSet">
- *    <xsd:sequence>
- *      <xsd:element name="Element" type="DistributionSetElement" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DistributionSet (OpenSCENARIO XML 1.3.1)
+
+   A set of possible values which can occur in a deterministic distribution.
+
+   <xsd:complexType name="DistributionSet">
+     <xsd:sequence>
+       <xsd:element name="Element" type="DistributionSetElement" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct DistributionSet : private Scope, public ComplexType
 {
   const std::list<DistributionSetElement> elements;
@@ -38,4 +40,4 @@ struct DistributionSet : private Scope, public ComplexType
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DISTRIBUTION_SET_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_HPP_

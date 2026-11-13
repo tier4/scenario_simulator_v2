@@ -1,0 +1,8 @@
+ament_add_gtest(test_catmull_rom_spline test_catmull_rom_spline.cpp)
+target_link_libraries(test_catmull_rom_spline geometry)
+
+ament_add_gtest(test_catmull_rom_subspline test_catmull_rom_subspline.cpp)
+target_link_libraries(test_catmull_rom_subspline geometry)
+
+ament_add_gtest(test_hermite_curve test_hermite_curve.cpp)
+target_link_libraries(test_hermite_curve geometry)

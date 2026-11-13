@@ -11,4 +11,9 @@ install(
   DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/
   DESTINATION lib/${PROJECT_NAME})
 
+install(
+  PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/conversion.py
+           ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}/validation.py
+  DESTINATION lib/${PROJECT_NAME})
+
 ament_package()

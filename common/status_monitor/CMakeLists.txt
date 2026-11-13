@@ -11,11 +11,12 @@ endif()
 find_package(Boost REQUIRED COMPONENTS date_time)
 find_package(Threads REQUIRED)
 find_package(ament_cmake_auto REQUIRED)
+find_package(rclcpp REQUIRED)
 
 ament_auto_find_build_dependencies()
 
 ament_auto_add_library(${PROJECT_NAME} SHARED src/${PROJECT_NAME}.cpp)
 
-target_link_libraries(${PROJECT_NAME} Boost::date_time Threads::Threads)
+target_link_libraries(${PROJECT_NAME} Boost::date_time Threads::Threads rclcpp::rclcpp)
 
 ament_auto_package()

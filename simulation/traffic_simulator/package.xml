@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>4.0.2</version>
+  <version>25.0.22</version>
   <description>control traffic flow</description>
 
-  <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
 
   <license>Apache License 2.0</license>
 
@@ -12,7 +15,6 @@
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>ament_index_cpp</depend>
-  <depend>arithmetic</depend>
   <depend>autoware_lanelet2_extension</depend>
   <depend>concealer</depend>
   <depend>color_names</depend>
@@ -36,13 +38,15 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>tier4_debug_msgs</depend>
-  <depend>autoware_auto_perception_msgs</depend>
   <depend>autoware_perception_msgs</depend>
+  <depend>autoware_map_msgs</depend>
   <depend>tinyxml2_vendor</depend>
   <depend>pluginlib</depend>
   <depend>traffic_simulator_msgs</depend>
   <depend>visualization_msgs</depend>
   <depend>geometry</depend>
+  <depend>get_parameter</depend>
+  <depend>yaml-cpp</depend>
 
   <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_lint_auto</test_depend>

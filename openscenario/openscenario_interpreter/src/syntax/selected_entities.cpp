@@ -35,9 +35,10 @@ SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
   // clang-format off
   // This function call is added to check the correctness of the syntax.
   // DO NOT REMOVE unless syntax check is conducted in another way.
-  choice(tree,
-    std::pair{"EntityRef", [](const auto &) { return unspecified; }},
-    std::pair{"ByType",    [](const auto &) { return unspecified; }});
+  choice(tree, {
+    { "EntityRef", [](const auto &) { return unspecified; } },
+    { "ByType",    [](const auto &) { return unspecified; } },
+  });
   // clang-format on
 }
 }  // namespace syntax

@@ -18,13 +18,26 @@ endif()
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 find_package(Boost REQUIRED thread)
+find_package(cppzmq QUIET)
 find_package(rclcpp REQUIRED)
+include(FetchContent)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
+# lint_cmake: -readability/wonkycase
+
+FetchContent_Declare(osi-cpp GIT_REPOSITORY https://github.com/OpenSimulationInterface/osi-cpp.git GIT_TAG v3.8.0)
+FetchContent_MakeAvailable(osi-cpp)
+FetchContent_GetProperties(osi-cpp)
+
+if(NOT osi-cpp_POPULATED)
+  FetchContent_Populate(osi-cpp)
+  add_subdirectory(${osi-cpp_SOURCE_DIR} ${osi-cpp_BINARY_DIR})
+endif()
+
 set(PROTO_FILES
-  "proto/autoware_auto_control_msgs.proto"
-  "proto/autoware_auto_vehicle_msgs.proto"
+  "proto/autoware_control_msgs.proto"
+  "proto/autoware_vehicle_msgs.proto"
   "proto/builtin_interfaces.proto"
   "proto/geometry_msgs.proto"
   "proto/rosgraph_msgs.proto"
@@ -32,10 +45,23 @@ set(PROTO_FILES
   "proto/std_msgs.proto"
   "proto/traffic_simulator_msgs.proto"
 )
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
+set(PROTO_OUTPUT_DIR ${CMAKE_BINARY_DIR}/proto/${PROJECT_NAME})
+
+# Ensure the output directory exists
+file(MAKE_DIRECTORY ${PROTO_OUTPUT_DIR})
+
+protobuf_generate(
+  PROTOS ${PROTO_FILES}
+  APPEND_PATH
+  LANGUAGE cpp
+  OUT_VAR PROTO_SRCS
+  IMPORT_DIRS proto/
+  PROTOC_OUT_DIR ${PROTO_OUTPUT_DIR}
+)
+
 include_directories(
   include
-  ${CMAKE_BINARY_DIR}
+  ${CMAKE_BINARY_DIR}/proto/
 )
 
 ament_auto_add_library(simulation_interface SHARED
@@ -43,13 +69,16 @@ ament_auto_add_library(simulation_interface SHARED
   src/zmq_multi_client.cpp
   src/conversions.cpp
   src/constants.cpp
+  src/operators.cpp
   ${PROTO_SRCS}
 )
 target_link_libraries(simulation_interface
   ${PROTOBUF_LIBRARY}
+  open_simulation_interface
   pthread
   sodium
   zmq
+  $<TARGET_NAME_IF_EXISTS:cppzmq>
 )
 
 install(TARGETS simulation_interface
@@ -60,8 +89,9 @@ install(TARGETS simulation_interface
   INCLUDES DESTINATION include)
 
 install(
-  FILES ${PROTO_HDRS}
-  DESTINATION include
+  DIRECTORY ${CMAKE_BINARY_DIR}/proto/
+            ${open_simulation_interface_BINARY_DIR}/include/osi3/
+  DESTINATION include/
 )
 
 install(

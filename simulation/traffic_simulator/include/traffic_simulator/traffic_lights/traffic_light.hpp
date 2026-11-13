@@ -15,6 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
+#include <lanelet2_core/geometry/Lanelet.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
+
 #include <color_names/color_names.hpp>
 #include <cstdint>
 #include <geometry_msgs/msg/point.hpp>
@@ -25,14 +28,14 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
-#include <simulation_interface/conversions.hpp>
 #include <stdexcept>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <visualization_msgs/msg/marker.hpp>
 
 namespace traffic_simulator
 {
@@ -45,13 +48,15 @@ struct TrafficLight
       yellow,
       red,
       white,
+      unknown,
     } value;
 
     // clang-format off
-    static_assert(static_cast<std::uint8_t>(green ) == 0b0000'0000);
-    static_assert(static_cast<std::uint8_t>(yellow) == 0b0000'0001);
-    static_assert(static_cast<std::uint8_t>(red   ) == 0b0000'0010);
-    static_assert(static_cast<std::uint8_t>(white ) == 0b0000'0011);
+    static_assert(static_cast<std::uint8_t>(green  ) == 0b0000'0000);
+    static_assert(static_cast<std::uint8_t>(yellow ) == 0b0000'0001);
+    static_assert(static_cast<std::uint8_t>(red    ) == 0b0000'0010);
+    static_assert(static_cast<std::uint8_t>(white  ) == 0b0000'0011);
+    static_assert(static_cast<std::uint8_t>(unknown) == 0b0000'0100);
     // clang-format on
 
     constexpr Color(const Value value = green) : value(value) {}
@@ -64,6 +69,7 @@ struct TrafficLight
       std::make_pair("red", red),
       std::make_pair("white", white),
       std::make_pair("yellow", yellow),
+      std::make_pair("unknown", unknown),
 
       // BACKWARD COMPATIBILITY
       std::make_pair("Green", green),
@@ -132,26 +138,29 @@ struct TrafficLight
       circle,
       cross,
       arrow,
+      unknown,
     };
 
     // clang-format off
-    static_assert(static_cast<std::uint8_t>(Category::circle) == 0b0000'0000);
-    static_assert(static_cast<std::uint8_t>(Category::cross ) == 0b0000'0001);
-    static_assert(static_cast<std::uint8_t>(Category::arrow ) == 0b0000'0010);
+    static_assert(static_cast<std::uint8_t>(Category::circle ) == 0b0000'0000);
+    static_assert(static_cast<std::uint8_t>(Category::cross  ) == 0b0000'0001);
+    static_assert(static_cast<std::uint8_t>(Category::arrow  ) == 0b0000'0010);
+    static_assert(static_cast<std::uint8_t>(Category::unknown) == 0b0000'0011);
     // clang-format on
 
     enum Value : std::uint16_t {
       // clang-format off
-      circle      =                      static_cast<std::uint8_t>(Category::circle),
-      cross       =                      static_cast<std::uint8_t>(Category::cross ),
-      left        = (0b0000'1000 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      down        = (0b0000'0100 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      up          = (0b0000'0010 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      right       = (0b0000'0001 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      lower_left  = (0b0000'1100 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      upper_left  = (0b0000'1010 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      lower_right = (0b0000'0101 << 8) | static_cast<std::uint8_t>(Category::arrow ),
-      upper_right = (0b0000'0011 << 8) | static_cast<std::uint8_t>(Category::arrow ),
+      circle      =                      static_cast<std::uint8_t>(Category::circle ),
+      cross       =                      static_cast<std::uint8_t>(Category::cross  ),
+      left        = (0b0000'1000 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      down        = (0b0000'0100 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      up          = (0b0000'0010 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      right       = (0b0000'0001 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      lower_left  = (0b0000'1100 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      upper_left  = (0b0000'1010 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      lower_right = (0b0000'0101 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      upper_right = (0b0000'0011 << 8) | static_cast<std::uint8_t>(Category::arrow  ),
+      unknown     =                      static_cast<std::uint8_t>(Category::unknown),
       // clang-format on
     } value;
 
@@ -166,6 +175,7 @@ struct TrafficLight
     static_assert(static_cast<std::uint16_t>(upper_left ) == 0b0000'1010'0000'0010);
     static_assert(static_cast<std::uint16_t>(lower_right) == 0b0000'0101'0000'0010);
     static_assert(static_cast<std::uint16_t>(upper_right) == 0b0000'0011'0000'0010);
+    static_assert(static_cast<std::uint16_t>(unknown    ) == 0b0000'0000'0000'0011);
     // clang-format on
 
     constexpr Shape(const Value value = circle) : value(value) {}
@@ -183,6 +193,7 @@ struct TrafficLight
       std::make_pair("upperLeft", Shape::upper_left),
       std::make_pair("lowerRight", Shape::lower_right),
       std::make_pair("upperRight", Shape::upper_right),
+      std::make_pair("unknown", Shape::unknown),
 
       // BACKWARD COMPATIBILITY
       std::make_pair("straight", Shape::up),
@@ -252,61 +263,85 @@ struct TrafficLight
 
     explicit operator simulation_api_schema::TrafficLight() const
     {
-      auto color = [this]() {
+      const auto color = [this]() {
+        auto color_message = simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
         switch (std::get<Color>(value).value) {
           case Color::green:
-            return simulation_api_schema::TrafficLight_Color_GREEN;
+            color_message = simulation_api_schema::TrafficLight_Color_GREEN;
+            break;
           case Color::yellow:
-            return simulation_api_schema::TrafficLight_Color_AMBER;
+            color_message = simulation_api_schema::TrafficLight_Color_AMBER;
+            break;
           case Color::red:
-            return simulation_api_schema::TrafficLight_Color_RED;
+            color_message = simulation_api_schema::TrafficLight_Color_RED;
+            break;
           case Color::white:
-            return simulation_api_schema::TrafficLight_Color_WHITE;
-          default:
-            throw common::SyntaxError(std::get<Color>(value), " is not supported color.");
+            color_message = simulation_api_schema::TrafficLight_Color_WHITE;
+            break;
+          case Color::unknown:
+            color_message = simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
+            break;
         }
+        return color_message;
       };
 
-      auto status = [this]() {
+      const auto status = [this]() {
+        auto status_message = simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
         switch (std::get<Status>(value).value) {
           case Status::solid_on:
-            return simulation_api_schema::TrafficLight_Status_SOLID_ON;
+            status_message = simulation_api_schema::TrafficLight_Status_SOLID_ON;
+            break;
           case Status::solid_off:
-            return simulation_api_schema::TrafficLight_Status_SOLID_OFF;
+            status_message = simulation_api_schema::TrafficLight_Status_SOLID_OFF;
+            break;
           case Status::flashing:
-            return simulation_api_schema::TrafficLight_Status_FLASHING;
+            status_message = simulation_api_schema::TrafficLight_Status_FLASHING;
+            break;
           case Status::unknown:
-            return simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
-          default:
-            throw common::SyntaxError(std::get<Status>(value), " is not supported as a status.");
+            status_message = simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
+            break;
         }
+        return status_message;
       };
 
-      auto shape = [this]() {
+      const auto shape = [this]() {
+        auto shape_message = simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
         switch (std::get<Shape>(value).value) {
           case Shape::circle:
-            return simulation_api_schema::TrafficLight_Shape_CIRCLE;
+            shape_message = simulation_api_schema::TrafficLight_Shape_CIRCLE;
+            break;
           case Shape::cross:
-            return simulation_api_schema::TrafficLight_Shape_CROSS;
+            shape_message = simulation_api_schema::TrafficLight_Shape_CROSS;
+            break;
           case Shape::left:
-            return simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
+            break;
           case Shape::down:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
+            break;
           case Shape::up:
-            return simulation_api_schema::TrafficLight_Shape_UP_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_UP_ARROW;
+            break;
           case Shape::right:
-            return simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
+            break;
           case Shape::lower_left:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
+            break;
           case Shape::lower_right:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
+            break;
           case Shape::upper_left:
-            return simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
+            shape_message = simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
+            break;
           case Shape::upper_right:
-            return simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
-          default:
-            throw common::SyntaxError(std::get<Shape>(value), " is not supported as a shape.");
+            shape_message = simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
+            break;
+          case Shape::unknown:
+            shape_message = simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
+            break;
         }
+        return shape_message;
       };
 
       simulation_api_schema::TrafficLight traffic_light_bulb_proto;
@@ -318,17 +353,113 @@ struct TrafficLight
 
       return traffic_light_bulb_proto;
     }
+
+    explicit operator traffic_simulator_msgs::msg::TrafficLightBulbV1() const
+    {
+      const auto color = [this] {
+        auto color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+        switch (std::get<Color>(value).value) {
+          case Color::green:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::GREEN;
+            break;
+          case Color::yellow:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::AMBER;
+            break;
+          case Color::red:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::RED;
+            break;
+          case Color::white:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::WHITE;
+            break;
+          case Color::unknown:
+            color_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+            break;
+        }
+        return color_message;
+      };
+
+      const auto status = [this] {
+        auto status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+        switch (std::get<Status>(value).value) {
+          case Status::solid_on:
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_ON;
+            break;
+          case Status::solid_off:
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::SOLID_OFF;
+            break;
+          case Status::flashing:
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::FLASHING;
+            break;
+          case Status::unknown:
+            status_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+            break;
+        }
+        return status_message;
+      };
+
+      const auto shape = [this] {
+        auto shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+        switch (std::get<Shape>(value).value) {
+          case Shape::circle:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::CIRCLE;
+            break;
+          case Shape::cross:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::CROSS;
+            break;
+          case Shape::left:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::LEFT_ARROW;
+            break;
+          case Shape::down:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_ARROW;
+            break;
+          case Shape::up:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_ARROW;
+            break;
+          case Shape::right:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::RIGHT_ARROW;
+            break;
+          case Shape::lower_left:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_LEFT_ARROW;
+            break;
+          case Shape::lower_right:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::DOWN_RIGHT_ARROW;
+            break;
+          case Shape::upper_left:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_LEFT_ARROW;
+            break;
+          case Shape::upper_right:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UP_RIGHT_ARROW;
+            break;
+          case Shape::unknown:
+            shape_message = traffic_simulator_msgs::msg::TrafficLightBulbV1::UNKNOWN;
+            break;
+        }
+        return shape_message;
+      };
+
+      traffic_simulator_msgs::msg::TrafficLightBulbV1 msg;
+      msg.color = color();
+      msg.status = status();
+      msg.shape = shape();
+      // NOTE: confidence will be overwritten
+      msg.confidence = 1.0;
+      // NOTE: unused data member 'enum_revision' for
+      // traffic_simulator_msgs::msg::TrafficLightBulbV1
+      return msg;
+    }
   };
 
+  explicit TrafficLight(const lanelet::Id);
+
   const lanelet::Id way_id;
+
+  const lanelet::Ids regulatory_elements_ids;
 
   double confidence = 1.0;
 
   std::set<Bulb> bulbs;
 
-  const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
-
-  explicit TrafficLight(const lanelet::Id, hdmap_utils::HdMapUtils &);
+  const std::map<Color, std::optional<geometry_msgs::msg::Point>> positions;
 
   auto clear() { bulbs.clear(); }
 
@@ -344,31 +475,45 @@ struct TrafficLight
   template <typename Markers, typename Now>
   auto draw(Markers & markers, const Now & now, const std::string & frame_id) const
   {
-    auto optional_position = [this](auto && bulb) {
-      try {
-        return positions.at(bulb.hash() & 0b1111'0000'1111'1111);  // NOTE: Ignore status
-      } catch (const std::out_of_range &) {
-        return std::optional<geometry_msgs::msg::Point>(std::nullopt);
-      }
+    auto create_bulb_marker = [&](const Color & color, const bool is_on) {
+      visualization_msgs::msg::Marker marker;
+      marker.header.stamp = now;
+      marker.header.frame_id = frame_id;
+      marker.action = visualization_msgs::msg::Marker::ADD;
+      marker.ns = "bulb";
+      marker.id = way_id << 2 | static_cast<int>(color.value);
+      marker.type = visualization_msgs::msg::Marker::SPHERE;
+      marker.pose.position = positions.at(color).value();
+      marker.pose.orientation = geometry_msgs::msg::Quaternion();
+      marker.scale.x = 0.3;
+      marker.scale.y = 0.3;
+      marker.scale.z = 0.3;
+      marker.color = color_names::makeColorMsg(boost::lexical_cast<std::string>(color));
+      marker.color.a = is_on ? 1.0 : 0.3;
+      return marker;
     };
 
+    std::set<Color> added_colors;
+
+    // Place on markers for actual bulbs
     for (const auto & bulb : bulbs) {
-      if (optional_position(bulb).has_value() and bulb.is(Shape::Category::circle)) {
-        visualization_msgs::msg::Marker marker;
-        marker.header.stamp = now;
-        marker.header.frame_id = frame_id;
-        marker.action = marker.ADD;
-        marker.ns = "bulb";
-        marker.id = way_id;
-        marker.type = marker.SPHERE;
-        marker.pose.position = optional_position(bulb).value();
-        marker.pose.orientation = geometry_msgs::msg::Quaternion();
-        marker.scale.x = 0.3;
-        marker.scale.y = 0.3;
-        marker.scale.z = 0.3;
-        marker.color =
-          color_names::makeColorMsg(boost::lexical_cast<std::string>(std::get<Color>(bulb.value)));
-        markers.push_back(marker);
+      // NOTE: Status is ignored intentionally
+      if (bulb.is(Shape::Category::circle)) {
+        const auto color = std::get<Color>(bulb.value);
+        const auto position = positions.find(color);
+        if (position == positions.end() or not position->second.has_value()) {
+          continue;
+        }
+
+        markers.push_back(create_bulb_marker(color, true));
+        added_colors.insert(color);
+      }
+    }
+
+    // Place solidOff markers for other positions
+    for (const auto & [color, position] : positions) {
+      if (position.has_value() and added_colors.find(color) == added_colors.end()) {
+        markers.push_back(create_bulb_marker(color, false));
       }
     }
   }
@@ -390,12 +535,27 @@ struct TrafficLight
     simulation_api_schema::TrafficSignal traffic_signal_proto;
 
     traffic_signal_proto.set_id(way_id);
+    for (const auto & relation_id : regulatory_elements_ids) {
+      traffic_signal_proto.add_relation_ids(relation_id);
+    }
     for (const auto & bulb : bulbs) {
       auto traffic_light_bulb_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
       traffic_light_bulb_proto.set_confidence(confidence);
       *traffic_signal_proto.add_traffic_light_status() = traffic_light_bulb_proto;
     }
     return traffic_signal_proto;
+  }
+
+  explicit operator traffic_simulator_msgs::msg::TrafficLightV1() const
+  {
+    traffic_simulator_msgs::msg::TrafficLightV1 traffic_signal;
+    traffic_signal.lanelet_way_id = way_id;
+    for (const auto & bulb : bulbs) {
+      auto traffic_light_bulb = static_cast<traffic_simulator_msgs::msg::TrafficLightBulbV1>(bulb);
+      traffic_light_bulb.confidence = confidence;
+      traffic_signal.traffic_light_bulbs.push_back(traffic_light_bulb);
+    }
+    return traffic_signal;
   }
 };
 }  // namespace traffic_simulator

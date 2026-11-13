@@ -8,17 +8,6 @@ Each NPC has a behavior tree and follows the user's commands.
 ## C++ API
 
 The traffic simulator provides C++ APIs to control the NPC behavior in simulation.
-You can also see the detailed documentation of the API classes [here](https://tier4.github.io/scenario_simulator_v2-api-docs/classtraffic__simulator_1_1API.html).
-
-
-<iframe 
-  class="hatenablogcard" 
-  style="width:100%;height:155px;max-width:450px;" 
-  title="embree" 
-  src="https://hatenablog-parts.com/embed?url=https://tier4.github.io/scenario_simulator_v2-api-docs/classtraffic__simulator_1_1API.html" 
-  width="300" height="150" frameborder="0" scrolling="no">
-</iframe>
-
 
 ### Minimal example
 
@@ -79,14 +68,15 @@ public:
 private:
   void update()
   {
-    if (api_.reachPosition("ego",
+    const auto entity = getEntity("ego");
+    if (entity->isNearbyPosition(
       traffic_simulator::helper::constructLaneletPose(34615, 10.0), 5))
     {
       api_.requestAcquirePosition("ego",
         traffic_simulator::helper::constructLaneletPose(35026, 0.0) );
       api_.setTargetSpeed("npc2", 13, true);
     }
-    if (api_.reachPosition("ego",
+    if (entity->isNearbyPosition(
       traffic_simulator::helper::constructLaneletPose(34579, 0.0), 5))
     {
       api_.setTargetSpeed("npc2", 3, true);

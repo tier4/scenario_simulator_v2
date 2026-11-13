@@ -25,17 +25,19 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RoadCondition 1.2 ---------------------------------------------------
- *
- * <xsd:complexType name="RoadCondition">
- *   <xsd:sequence>
- *     <xsd:element name="Properties" type="Properties" minOccurs="0"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="frictionScaleFactor" type="Double" use="required"/>
- *   <xsd:attribute name="wetness" type="Wetness"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   RoadCondition (OpenSCENARIO XML 1.3.1)
+
+   DDefinition of the road friction scale factor. Can be augmented with the addition of optional road properties.
+
+   <xsd:complexType name="RoadCondition">
+     <xsd:sequence>
+       <xsd:element name="Properties" type="Properties" minOccurs="0"/>
+     </xsd:sequence>
+     <xsd:attribute name="frictionScaleFactor" type="Double" use="required"/>
+     <xsd:attribute name="wetness" type="Wetness"/>
+   </xsd:complexType>
+*/
 struct RoadCondition
 {
   const Double friction_scale_factor;  // Friction scale factor. Range: [0..inf[.

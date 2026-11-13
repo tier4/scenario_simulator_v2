@@ -15,12 +15,11 @@
 #ifndef TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 #define TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 
-#include <concealer/autoware.hpp>
+#include <concealer/autoware_universe.hpp>
 #include <memory>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
@@ -30,6 +29,7 @@ namespace vehicle_simulation
 enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
+  DELAY_STEER_ACC_GEARED_WO_FALL_GUARD,
   DELAY_STEER_MAP_ACC_GEARED,
   DELAY_STEER_VEL,
   IDEAL_STEER_ACC,
@@ -40,10 +40,12 @@ enum class VehicleModelType {
 class EgoEntitySimulation
 {
 public:
-  const std::unique_ptr<concealer::Autoware> autoware;
+  const std::unique_ptr<concealer::AutowareUniverse> autoware;
 
 private:
   const VehicleModelType vehicle_model_type_;
+
+  const double wheel_base_;
 
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
@@ -51,7 +53,9 @@ private:
 
   traffic_simulator::CanonicalizedEntityStatus status_;
 
-  geometry_msgs::msg::Pose initial_pose_;
+  const geometry_msgs::msg::Pose initial_pose_;
+
+  const Eigen::Matrix3d initial_rotation_matrix_;
 
   static auto getVehicleModelType() -> VehicleModelType;
 
@@ -65,14 +69,12 @@ private:
   Eigen::Vector3d world_relative_position_;
 
 public:
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
-private:
-  auto calculateEgoPitch() const -> double;
+  auto calculateAccelerationBySlope() const -> double;
 
-  auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
+private:
+  auto getCurrentPose(const double pitch_angle = 0.0) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
@@ -88,14 +90,14 @@ public:
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::EntityStatus &,
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time,
-    const bool consider_acceleration_by_road_slope);
+    const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope);
 
   auto overwrite(
-    const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
-    double step_time, bool npc_logic_started) -> void;
+    const traffic_simulator_msgs::msg::EntityStatus & status, const double current_time,
+    const double step_time, bool is_npc_logic_started) -> void;
 
-  auto update(double time, double step_time, bool npc_logic_started) -> void;
+  auto update(const double current_time, const double step_time, const bool is_npc_logic_started)
+    -> void;
 
   auto requestSpeedChange(double value) -> void;
 
@@ -103,7 +105,7 @@ public:
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
-  auto updateStatus(double time, double step_time) -> void;
+  auto updateStatus(const double current_time, const double step_time) -> void;
 };
 }  // namespace vehicle_simulation
 

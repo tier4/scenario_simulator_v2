@@ -23,10 +23,11 @@ DeterministicSingleParameterDistributionType::DeterministicSingleParameterDistri
   const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : Group(
-    choice(node,
-      std::make_pair("DistributionSet",         [&](auto && node){ return make<DistributionSet        >(node, scope);}),
-      std::make_pair("DistributionRange",       [&](auto && node){ return make<DistributionRange      >(node, scope);}),
-      std::make_pair("UserDefinedDistribution", [&](auto && node){ return make<UserDefinedDistribution>(node, scope);})))
+    choice(node, {
+      { "DistributionSet",         [&](auto && node) { return make<DistributionSet        >(node, scope); } },
+      { "DistributionRange",       [&](auto && node) { return make<DistributionRange      >(node, scope); } },
+      { "UserDefinedDistribution", [&](auto && node) { return make<UserDefinedDistribution>(node, scope); } },
+    }))
 // clang-format on
 {
 }

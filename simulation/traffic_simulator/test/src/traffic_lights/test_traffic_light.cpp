@@ -19,6 +19,7 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 using TrafficLight = traffic_simulator::TrafficLight;
 using Color = TrafficLight::Color;
@@ -81,6 +82,15 @@ TEST(Color, Color)
     EXPECT_TRUE(boost::lexical_cast<Color>("amber") == Color::yellow);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
   }
+
+  {
+    const auto color = Color("unknown");
+
+    EXPECT_TRUE(color == Color::unknown);
+    EXPECT_TRUE(color.is(Color::unknown));
+    EXPECT_TRUE(boost::lexical_cast<Color>("unknown") == Color::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "unknown");
+  }
 }
 
 /**
@@ -132,6 +142,15 @@ TEST(Color, make)
     EXPECT_TRUE(color.is(Color::yellow));
     EXPECT_TRUE(boost::lexical_cast<Color>(color) == Color::yellow);
     EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
+  }
+
+  {
+    const auto color = Color::make("unknown");
+
+    EXPECT_TRUE(color == Color::unknown);
+    EXPECT_TRUE(color.is(Color::unknown));
+    EXPECT_TRUE(boost::lexical_cast<Color>(color) == Color::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "unknown");
   }
 }
 
@@ -349,6 +368,17 @@ TEST(Shape, Shape)
     EXPECT_TRUE(boost::lexical_cast<Shape>("upperRight") == Shape::upper_right);
     EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "upperRight");
   }
+
+  {
+    const auto shape = Shape("unknown");
+
+    EXPECT_TRUE(shape == Shape::unknown);
+    EXPECT_TRUE(shape.is(Shape::unknown));
+    EXPECT_TRUE(shape.is(Shape::Category::unknown));
+    EXPECT_TRUE(shape.category() == Shape::Category::unknown);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("unknown") == Shape::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "unknown");
+  }
 }
 
 /**
@@ -465,10 +495,21 @@ TEST(Shape, make)
     EXPECT_TRUE(boost::lexical_cast<Shape>("upperRight") == Shape::upper_right);
     EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "upperRight");
   }
+
+  {
+    const auto shape = Shape::make("unknown");
+
+    EXPECT_TRUE(shape == Shape::unknown);
+    EXPECT_TRUE(shape.is(Shape::unknown));
+    EXPECT_TRUE(shape.is(Shape::Category::unknown));
+    EXPECT_TRUE(shape.category() == Shape::Category::unknown);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("unknown") == Shape::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "unknown");
+  }
 }
 
 /**
- * @note Test basic functionality. Test function behavior when called with invalid name. 
+ * @note Test basic functionality. Test function behavior when called with invalid name.
  */
 TEST(Shape, make_wrong)
 {
@@ -481,10 +522,14 @@ TEST(Shape, make_wrong)
 TEST(Bulb, hash)
 {
   // clang-format off
+  //byte1:   Color,  e.g. 00000000 green,           00000001 yellow,         00000010 red
+  //byte2:   Status, e.g. 00000000 solid on,        00000001 solid off,      00000010 flashing
+  //byte3&4: Shape,  e.g. 00000000 00000000 circle, 00000000 00000001 cross, 00001000 00000010 left
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::yellow, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0001'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::red,    Status::solid_on,  Shape::circle     ).hash() == 0b0000'0010'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::white,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0011'0000'0000'0000'0000'0000'0000);
+  static_assert(Bulb(Color::unknown, Status::solid_on, Shape::circle     ).hash() == 0b0000'0100'0000'0000'0000'0000'0000'0000);
 
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
   static_assert(Bulb(Color::green,  Status::solid_off, Shape::circle     ).hash() == 0b0000'0000'0000'0001'0000'0000'0000'0000);
@@ -501,6 +546,7 @@ TEST(Bulb, hash)
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::upper_left ).hash() == 0b0000'0000'0000'0000'0000'1010'0000'0010);
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::lower_right).hash() == 0b0000'0000'0000'0000'0000'0101'0000'0010);
   static_assert(Bulb(Color::green,  Status::solid_on,  Shape::upper_right).hash() == 0b0000'0000'0000'0000'0000'0011'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::unknown    ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0011);
   // clang-format on
 }
 
@@ -713,25 +759,21 @@ class TrafficLightTest : public testing::Test
 {
 protected:
   TrafficLightTest()
-  : map_manager(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0))
   {
+    const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                              "/map/standard_map/lanelet2_map.osm";
+    traffic_simulator::lanelet_map::activate(lanelet_path);
   }
-  hdmap_utils::HdMapUtils map_manager;
 };
 
 /**
  * @note test if function correctly determines if a given bulb
- * is in the bulbs vector given a Color, Status, Shape triple.
+ * is in the bulbs vector, passing the Color, Status, Shape triple.
  */
 TEST_F(TrafficLightTest, contains_colorStatusShape)
 {
   {
-    auto traffic_light = TrafficLight(34802, map_manager);
+    auto traffic_light = TrafficLight(34802);
 
     traffic_light.bulbs.emplace(Color::red, Status::flashing, Shape::circle);
     traffic_light.bulbs.emplace(Color::green, Status::solid_on, Shape::right);
@@ -742,7 +784,7 @@ TEST_F(TrafficLightTest, contains_colorStatusShape)
   }
 
   {
-    auto traffic_light = TrafficLight(34802, map_manager);
+    auto traffic_light = TrafficLight(34802);
 
     traffic_light.bulbs.emplace("red flashing circle");
     traffic_light.bulbs.emplace("green solidOn right");
@@ -757,7 +799,7 @@ TEST_F(TrafficLightTest, contains_colorStatusShape)
  */
 TEST_F(TrafficLightTest, set_valid)
 {
-  auto traffic_light = TrafficLight(34802, map_manager);
+  auto traffic_light = TrafficLight(34802);
 
   traffic_light.set("red flashing circle, green solidOn right");
 

@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_DEFINITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SCENARIO_DEFINITION_HPP_
 
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
@@ -58,7 +58,8 @@ struct ScenarioDefinition
 
   friend auto operator<<(std::ostream &, const ScenarioDefinition &) -> std::ostream &;
 
-  friend auto operator<<(nlohmann::json &, const ScenarioDefinition &) -> nlohmann::json &;
+  friend auto operator<<(boost::json::object &, const ScenarioDefinition &)
+    -> boost::json::object &;
 };
 
 }  // namespace syntax

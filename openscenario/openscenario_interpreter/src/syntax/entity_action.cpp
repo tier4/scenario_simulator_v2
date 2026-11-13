@@ -23,9 +23,10 @@ inline namespace syntax
 EntityAction::EntityAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node,
-      std::make_pair(   "AddEntityAction", [&](auto && node) { return make<   AddEntityAction>(node, scope); }),
-      std::make_pair("DeleteEntityAction", [&](auto && node) { return make<DeleteEntityAction>(node, scope); }))),
+    choice(node, {
+      {    "AddEntityAction", [&](auto && node) { return make<   AddEntityAction>(node, scope); } },
+      { "DeleteEntityAction", [&](auto && node) { return make<DeleteEntityAction>(node, scope); } },
+    })),
   entity_ref(readAttribute<String>("entityRef", node, scope), scope)
 // clang-format on
 {

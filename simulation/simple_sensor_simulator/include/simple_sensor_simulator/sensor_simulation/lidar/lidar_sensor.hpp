@@ -15,13 +15,16 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__LIDAR_SENSOR_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
-#include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <agnocast_wrapper/agnocast_wrapper.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <memory>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
+#include <simple_sensor_simulator/sensor_simulation/lidar/lidar_noise_model_v1.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <string>
 #include <vector>
@@ -36,7 +39,7 @@ protected:
   simulation_api_schema::LidarConfiguration configuration_;
 
   Raycaster raycaster_;
-  std::vector<std::string> detected_objects_;
+  std::set<std::string> detected_objects_;
 
   explicit LidarSensorBase(
     const double current_simulation_time,
@@ -52,15 +55,17 @@ public:
     const double current_simulation_time, const std::vector<traffic_simulator_msgs::EntityStatus> &,
     const rclcpp::Time & current_ros_time) -> void = 0;
 
-  auto getDetectedObjects() const -> const std::vector<std::string> & { return detected_objects_; }
+  auto getDetectedObjects() const -> const std::set<std::string> & { return detected_objects_; }
 };
 
 template <typename T>
 class LidarSensor : public LidarSensorBase
 {
-  const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
+  const agnocast_wrapper::PublisherPtr<T> publisher_ptr_;
 
   std::queue<std::pair<sensor_msgs::msg::PointCloud2, double>> queue_pointcloud_;
+
+  std::unique_ptr<LidarNoiseModelV1> noise_model_v1_ = nullptr;
 
   auto raycast(const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
     -> T;
@@ -69,10 +74,27 @@ public:
   explicit LidarSensor(
     const double current_simulation_time,
     const simulation_api_schema::LidarConfiguration & configuration,
-    const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
+    const agnocast_wrapper::PublisherPtr<T> & publisher_ptr)
   : LidarSensorBase(current_simulation_time, configuration), publisher_ptr_(publisher_ptr)
   {
     raycaster_.setDirection(configuration);
+    const std::string topic_name = publisher_ptr_->get_topic_name();
+    const std::string version_parameter_name = topic_name + ".noise.model.version";
+
+    if (auto & parameter_node = common::getParameterNode();
+        parameter_node.has_parameter(version_parameter_name)) {
+      const auto version = common::getParameter<int>(version_parameter_name);
+      if (version == 1) {
+        const auto seed = common::getParameter<int>(topic_name + ".seed");
+        noise_model_v1_ = std::make_unique<LidarNoiseModelV1>(topic_name, seed);
+      } else {
+        throw common::Error(
+          "Unexpected noise model version for LiDAR sensor: ", version,
+          ". Expected version is 1 for now.");
+      }
+    } else {
+      // If parameter doesn't exist, no noise model is used
+    }
   }
 
   auto update(
@@ -94,9 +116,10 @@ public:
       not queue_pointcloud_.empty() and
       current_simulation_time - queue_pointcloud_.front().second >=
         configuration_.lidar_sensor_delay()) {
-      const auto pointcloud = queue_pointcloud_.front().first;
+      auto pointcloud = agnocast_wrapper::create_message(publisher_ptr_);
+      *pointcloud = queue_pointcloud_.front().first;
       queue_pointcloud_.pop();
-      publisher_ptr_->publish(pointcloud);
+      publisher_ptr_->publish(std::move(pointcloud));
     }
   }
 

@@ -34,28 +34,26 @@ class LaneChangeAction : public entity_behavior::VehicleActionNode
 {
 public:
   LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {
-      BT::InputPort<traffic_simulator::lane_change::Parameter>("lane_change_parameters")};
-    BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
-    for (const auto & parent_port : parent_ports) {
-      ports.emplace(parent_port.first, parent_port.second);
-    }
-    return ports;
+    return BT::PortsList(
+             {BT::InputPort<traffic_simulator::lane_change::Parameter>("lane_change_parameters")}) +
+           entity_behavior::VehicleActionNode::providedPorts();
   }
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;
   const std::optional<traffic_simulator_msgs::msg::Obstacle> calculateObstacle(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints) override;
-  void getBlackBoardValues();
+  void getBlackBoardValues() override;
 
 private:
   std::optional<math::geometry::HermiteCurve> curve_;
   double current_s_;
-  double target_s_;
   double lane_change_velocity_;
   std::optional<traffic_simulator::lane_change::Parameter> lane_change_parameters_;
+  std::optional<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose>
+    target_canonicalized_lanelet_pose_;
 };
 }  // namespace vehicle
 }  // namespace entity_behavior

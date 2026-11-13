@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/operator.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
@@ -43,12 +45,27 @@ RelativeWorldPosition::operator geometry_msgs::msg::Point() const
 
 RelativeWorldPosition::operator NativeLanePosition() const
 {
-  throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, LaneletPose);
+  return toNativeLanePosition(static_cast<NativeWorldPosition>(*this));
 }
 
 RelativeWorldPosition::operator NativeWorldPosition() const
 {
-  throw UNSUPPORTED_CONVERSION_DETECTED(RelativeWorldPosition, geometry_msgs::msg::Pose);
+  auto world_origin_pose = geometry_msgs::msg::Pose();
+  world_origin_pose.orientation.w = 1;
+
+  const auto reference_pose_in_world =
+    makeNativeRelativeWorldPosition(world_origin_pose, entity_ref);
+
+  using math::geometry::operator*;
+
+  auto target_pose_in_world = geometry_msgs::msg::Pose();
+  target_pose_in_world.position.x = reference_pose_in_world.position.x + dx;
+  target_pose_in_world.position.y = reference_pose_in_world.position.y + dy;
+  target_pose_in_world.position.z = reference_pose_in_world.position.z + dz;
+  target_pose_in_world.orientation =
+    reference_pose_in_world.orientation * math::geometry::convertEulerAngleToQuaternion(
+                                            static_cast<geometry_msgs::msg::Vector3>(orientation));
+  return target_pose_in_world;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

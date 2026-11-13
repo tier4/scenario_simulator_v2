@@ -20,11 +20,15 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator_msgs/msg/entity_subtype.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 
 #include "catalogs.hpp"
 #include "expect_eq_macros.hpp"
+
+constexpr auto convertDegToRad(const double deg) -> double { return deg / 180.0 * M_PI; }
+constexpr auto convertRadToDeg(const double rad) -> double { return rad * 180.0 / M_PI; }
 
 auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
 {
@@ -36,6 +40,15 @@ auto makeBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg
   return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
     .center(makePoint(1.0, center_y))
     .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(4.0).y(2.0).z(1.5));
+}
+
+auto makeCustom2DBoundingBox(
+  const double x, const double y, const double x_offset = 0.0, const double y_offset = 0.0)
+  -> traffic_simulator_msgs::msg::BoundingBox
+{
+  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
+    .center(geometry_msgs::build<geometry_msgs::msg::Point>().x(x_offset).y(y_offset).z(0.0))
+    .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(x).y(y).z(0.0));
 }
 
 auto makeSmallBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
@@ -51,6 +64,19 @@ auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
     geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(yaw));
 }
 
+auto makePose(const double x, const double y, const double z, const double yaw_deg)
+  -> geometry_msgs::msg::Pose
+{
+  /**
+   * @note +x axis is  0 degrees; +y axis is 90 degrees
+   */
+  return geometry_msgs::build<geometry_msgs::msg::Pose>()
+    .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(x).y(y).z(z))
+    .orientation(math::geometry::convertEulerAngleToQuaternion(
+      geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(
+        convertDegToRad(yaw_deg))));
+}
+
 auto makePose(
   geometry_msgs::msg::Point position,
   geometry_msgs::msg::Quaternion orientation = geometry_msgs::msg::Quaternion())
@@ -60,27 +86,22 @@ auto makePose(
     orientation);
 }
 
-auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
+auto activateLaneletWrapper(const std::string map_name) -> void
 {
-  return std::make_shared<hdmap_utils::HdMapUtils>(
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
-    geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-      .latitude(35.9037067912303)
-      .longitude(139.9337945139059)
-      .altitude(0.0));
+  const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                            "/map/" + map_name + "/lanelet2_map.osm";
+  traffic_simulator::lanelet_map::activate(lanelet_path);
 }
 
 auto makeCanonicalizedLaneletPose(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils, const lanelet::Id id = 120659,
-  const double s = 0.0, const double offset = 0.0)
+  const lanelet::Id id = 120659, const double s = 0.0, const double offset = 0.0)
   -> traffic_simulator::lanelet_pose::CanonicalizedLaneletPose
 {
   return traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
-    traffic_simulator::helper::constructLaneletPose(id, s, offset), hdmap_utils);
+    traffic_simulator::helper::constructLaneletPose(id, s, offset));
 }
 
 auto makeEntityStatus(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
   const std::string name = "default_entity_name",
@@ -95,15 +116,14 @@ auto makeEntityStatus(
     .name(name)
     .bounding_box(bbox)
     .action_status(traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0))
-    .pose(hdmap_utils->toMapPose(static_cast<traffic_simulator::LaneletPose>(pose)).pose)
+    .pose(traffic_simulator::pose::toMapPose(pose))
     .lanelet_pose(static_cast<traffic_simulator::LaneletPose>(pose))
     .lanelet_pose_valid(true);
 }
 
 auto makeEntityStatus(
-  std::shared_ptr<hdmap_utils::HdMapUtils> /* hdmap_utils */, geometry_msgs::msg::Pose pose,
-  traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "default_entity_name",
+  geometry_msgs::msg::Pose pose, traffic_simulator_msgs::msg::BoundingBox bbox,
+  const double speed = 0.0, const std::string name = "default_entity_name",
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::EntityStatus
 {
@@ -121,7 +141,6 @@ auto makeEntityStatus(
 }
 
 auto makeCanonicalizedEntityStatus(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose canonicalized_lanelet_pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
   const std::string name = "default_entity_name",
@@ -129,14 +148,14 @@ auto makeCanonicalizedEntityStatus(
   -> traffic_simulator::entity_status::CanonicalizedEntityStatus
 {
   return traffic_simulator::entity_status::CanonicalizedEntityStatus(
-    makeEntityStatus(hdmap_utils, canonicalized_lanelet_pose, bbox, speed, name, type),
+    makeEntityStatus(canonicalized_lanelet_pose, bbox, speed, name, type),
     canonicalized_lanelet_pose);
 }
 
 auto makeCanonicalizedEntityStatus(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils, geometry_msgs::msg::Pose pose,
-  traffic_simulator_msgs::msg::BoundingBox bbox, const double matching_distance = 1.0,
-  const double speed = 0.0, const std::string name = "default_entity_name",
+  geometry_msgs::msg::Pose pose, traffic_simulator_msgs::msg::BoundingBox bbox,
+  const double matching_distance = 1.0, const double speed = 0.0,
+  const std::string name = "default_entity_name",
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::entity_status::CanonicalizedEntityStatus
 {
@@ -144,9 +163,9 @@ auto makeCanonicalizedEntityStatus(
     (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == type ||
      traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == type);
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
-    pose, bbox, include_crosswalk, matching_distance, hdmap_utils);
+    pose, bbox, include_crosswalk, matching_distance);
   return traffic_simulator::entity_status::CanonicalizedEntityStatus(
-    makeEntityStatus(hdmap_utils, pose, bbox, speed, name, type), canonicalized_lanelet_pose);
+    makeEntityStatus(pose, bbox, speed, name, type), canonicalized_lanelet_pose);
 }
 
 #endif  // TRAFFIC_SIMULATOR__TEST__ENTITY_HELPER_FUNCTIONS_HPP_

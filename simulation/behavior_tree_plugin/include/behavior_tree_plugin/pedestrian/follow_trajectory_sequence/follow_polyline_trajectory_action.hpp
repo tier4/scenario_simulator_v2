@@ -1,4 +1,4 @@
-// Copyright 2023 TIER IV, Inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ struct FollowPolylineTrajectoryAction : public PedestrianActionNode
 
   static auto providedPorts() -> BT::PortsList;
 
-  auto tick() -> BT::NodeStatus override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior

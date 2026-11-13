@@ -31,15 +31,11 @@ class YieldAction : public entity_behavior::VehicleActionNode
 {
 public:
   YieldAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
   static BT::PortsList providedPorts()
   {
-    BT::PortsList ports = {};
-    BT::PortsList parent_ports = entity_behavior::VehicleActionNode::providedPorts();
-    for (const auto & parent_port : parent_ports) {
-      ports.emplace(parent_port.first, parent_port.second);
-    }
-    return ports;
+    return entity_behavior::VehicleActionNode::providedPorts();
   }
   std::optional<double> calculateTargetSpeed();
   const traffic_simulator_msgs::msg::WaypointsArray calculateWaypoints() override;

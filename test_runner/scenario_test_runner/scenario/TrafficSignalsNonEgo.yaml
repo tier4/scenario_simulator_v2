@@ -1,0 +1,186 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: "2021-02-01T08:31:04.600Z"
+    description: ""
+    author: ""
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController:
+        - name: controller-1
+          Phase:
+            - name: "phase-1"
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "green" }
+            - name: "phase-2"
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "red" }
+                - { trafficSignalId: "34802", state: "red solidOn right" }
+            - name: "phase-3"
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "green" }
+                - { trafficSignalId: "34802 v2i_detected", state: "yellow" }
+            - name: "phase-4"
+              duration: 3
+              TrafficSignalState:
+                - { trafficSignalId: "34802", state: "red" }
+                - { trafficSignalId: "34802 v2i", state: "green" }
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: "34513"
+                      s: 0
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ""
+                        laneId: "34630"
+                        s: 20
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+        UserDefinedAction:
+          - CustomCommandAction:
+              type: EnableTrafficSignalV2IFeatureAction@v1(34802)
+    Story:
+      - name: ""
+        Act:
+          - name: V2IFeatureToggle
+            # V2I sync: ON (0-3s) -> OFF (3-6s) -> ON (6-12s)
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: "disable_v2i_sync_at_3s"
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 3
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: DisableTrafficSignalV2IFeatureAction@v1(34802)
+                      - name: "enable_v2i_sync_at_6s"
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 6
+                                      rule: greaterOrEqual
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: EnableTrafficSignalV2IFeatureAction@v1(34802)
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 12
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup:
+        - Condition:
+            - name: ""
+              delay: 0
+              conditionEdge: none
+              ByValueCondition:
+                SimulationTimeCondition:
+                  value: 300
+                  rule: greaterThan

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_SINGLE_PARAMETER_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__DETERMINISTIC_SINGLE_PARAMETER_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_SINGLE_PARAMETER_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_SINGLE_PARAMETER_DISTRIBUTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/deterministic_single_parameter_distribution_type.hpp>
@@ -23,16 +23,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicSingleParameterDistribution 1.2 ---------------------------
- *
- *  <xsd:complexType name="DeterministicSingleParameterDistribution">
- *    <xsd:sequence>
- *      <xsd:group ref="DeterministicSingleParameterDistributionType"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="parameterName" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DeterministicSingleParameterDistribution (OpenSCENARIO XML 1.3.1)
+
+   Container for a deterministic distribution which is applied to a single parameter.
+
+   <xsd:complexType name="DeterministicSingleParameterDistribution">
+     <xsd:sequence>
+       <xsd:group ref="DeterministicSingleParameterDistributionType"/>
+     </xsd:sequence>
+     <xsd:attribute name="parameterName" type="String" use="required"/>
+   </xsd:complexType>
+*/
 struct DeterministicSingleParameterDistribution
 : public DeterministicSingleParameterDistributionType
 {
@@ -42,4 +44,4 @@ struct DeterministicSingleParameterDistribution
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_SINGLE_PARAMETER_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_SINGLE_PARAMETER_DISTRIBUTION_HPP_

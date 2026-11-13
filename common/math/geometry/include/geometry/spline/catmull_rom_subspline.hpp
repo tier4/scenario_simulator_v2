@@ -32,6 +32,7 @@ namespace geometry
 class CatmullRomSubspline : public CatmullRomSplineInterface
 {
 public:
+  ~CatmullRomSubspline() override = default;
   explicit CatmullRomSubspline(
     std::shared_ptr<math::geometry::CatmullRomSpline> spline, const double start_s,
     const double end_s)
@@ -41,9 +42,14 @@ public:
 
   double getLength() const override;
 
+  std::pair<double, double> getAltitudeRange() const override;
+
   std::optional<double> getCollisionPointIn2D(
-    const std::vector<geometry_msgs::msg::Point> & polygon,
-    const bool search_backward = false) const override;
+    const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward = false,
+    const std::optional<std::pair<double, double>> & s_range = std::nullopt) const override;
+
+  auto getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, const double s) const
+    -> double override;
 
 private:
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;

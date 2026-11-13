@@ -2,15 +2,18 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>behavior_tree_plugin</name>
-  <version>4.0.2</version>
+  <version>25.0.22</version>
   <description>Behavior tree plugin for traffic_simulator</description>
-  <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>behaviortree_cpp_v3</depend>
   <depend>geometry</depend>
+  <depend>get_parameter</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>traffic_simulator</depend>

@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OPEN_SCENARIO_HPP_
 
-#include <boost/filesystem.hpp>
-#include <nlohmann/json.hpp>
+#include <boost/json.hpp>
+#include <filesystem>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/file_header.hpp>
 #include <openscenario_interpreter/syntax/open_scenario_category.hpp>
@@ -38,7 +38,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct OpenScenario : public Scope
 {
-  const boost::filesystem::path pathname;  // for substitution syntax '$(dirname)'
+  const std::filesystem::path pathname;  // for substitution syntax '$(dirname)'
 
   pugi::xml_document script;
 
@@ -48,14 +48,14 @@ struct OpenScenario : public Scope
 
   std::size_t frame = 0;
 
-  explicit OpenScenario(const boost::filesystem::path &);
+  explicit OpenScenario(const std::filesystem::path &, std::shared_ptr<ScenarioRuntime>);
 
   auto evaluate() -> Object;
 
-  auto load(const boost::filesystem::path &) -> const pugi::xml_node &;
+  auto load(const std::filesystem::path &) -> const pugi::xml_node &;
 };
 
-auto operator<<(nlohmann::json &, const OpenScenario &) -> nlohmann::json &;
+auto operator<<(boost::json::object &, const OpenScenario &) -> boost::json::object &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

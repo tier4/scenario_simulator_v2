@@ -28,36 +28,36 @@ class TaskQueue
 {
   using Thunk = std::function<void()>;
 
+  std::atomic<bool> finalized;
+
+  mutable std::mutex thunks_mutex;
+
   std::queue<Thunk> thunks;
 
-  std::mutex thunks_mutex;
+  std::exception_ptr thrown;
 
   std::thread dispatcher;
 
-  std::atomic<bool> is_stop_requested = false;
+  auto front() const -> Thunk;
 
-  std::atomic<bool> is_thrown = false;
-
-  std::exception_ptr thrown;
+  auto pop() -> void;
 
 public:
   explicit TaskQueue();
 
-  void stopAndJoin();
-
   ~TaskQueue();
 
   template <typename F>
-  decltype(auto) delay(F && f)
+  auto delay(F && f) -> void
   {
     rethrow();
-    std::unique_lock lk(thunks_mutex);
+    auto lock = std::unique_lock(thunks_mutex);
     thunks.emplace(std::forward<F>(f));
   }
 
-  bool exhausted() const noexcept;
+  auto empty() const -> bool;
 
-  void rethrow() const;
+  auto rethrow() const -> void;
 };
 }  // namespace concealer
 
