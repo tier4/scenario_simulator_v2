@@ -51,7 +51,7 @@ public:                                         \
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        std::optional<double>)
   DEFINE_GETTER_SETTER(Obstacle,                                         std::optional<traffic_simulator_msgs::msg::Obstacle>)
-  DEFINE_GETTER_SETTER(OtherEntityStatus,                                EntityStatusDict)
+  DEFINE_GETTER_SETTER(OtherEntityStatus,                                traffic_simulator::OtherEntityStatuses)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(ReferenceTrajectory,                              std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(TargetSpeed,                                      std::optional<double>)

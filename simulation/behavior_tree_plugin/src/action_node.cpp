@@ -34,7 +34,6 @@
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -94,7 +93,8 @@ auto ActionNode::getBlackBoardValues() -> void
       "failed to get input matching_distance_for_lanelet_pose_calculation in ActionNode");
   }
 
-  if (!getInput<EntityStatusDict>("other_entity_status", other_entity_status_)) {
+  if (!getInput<traffic_simulator::OtherEntityStatuses>(
+        "other_entity_status", other_entity_status_)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status_ in ActionNode");
   }
   if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets_)) {
@@ -353,8 +353,7 @@ auto intersectsTrajectory(
 
 auto detectEntityCollisions(
   const QuadrilateralData & data,
-  const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
-    other_entity_status,
+  const traffic_simulator::OtherEntityStatuses & other_entity_status,
   const std::string & entity_name) -> std::optional<std::pair<std::string, double>>
 {
   if (data.polygons.empty()) {

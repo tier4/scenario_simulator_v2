@@ -18,6 +18,7 @@
 #include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
+#include <traffic_simulator/data_type/other_entity_statuses.hpp>
 
 namespace traffic_simulator
 {
@@ -62,9 +63,16 @@ struct RelativeTargetSpeed
   double getAbsoluteValue(
     const CanonicalizedEntityStatus & status,
     const std::unordered_map<std::string, CanonicalizedEntityStatus> & other_status) const;
+  double getAbsoluteValue(
+    const CanonicalizedEntityStatus & status, const OtherEntityStatuses & other_status) const;
   std::string reference_entity_name;
   Type type;
   double value;
+
+private:
+  template <typename Statuses>
+  double getAbsoluteValueImpl(
+    const CanonicalizedEntityStatus & status, const Statuses & other_status) const;
 };
 }  // namespace speed_change
 }  // namespace traffic_simulator
