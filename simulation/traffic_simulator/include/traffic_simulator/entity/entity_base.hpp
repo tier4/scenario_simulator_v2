@@ -386,8 +386,8 @@ private:
     const speed_change::Transition transition, const double acceleration, const bool continuous)
     -> void;
   virtual auto requestSpeedChangeWithTimeConstraint(
-    const double target_speed, const speed_change::Transition, const double acceleration_time)
-    -> void;
+    const double target_speed, const speed_change::Transition, const double acceleration_time,
+    const bool continuous = false) -> void;
   virtual auto requestSpeedChangeWithTimeConstraint(
     const speed_change::RelativeTargetSpeed & target_speed,
     const speed_change::Transition transition, const double time) -> void;
