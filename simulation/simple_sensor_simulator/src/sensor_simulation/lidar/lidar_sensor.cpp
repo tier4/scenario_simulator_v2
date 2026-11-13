@@ -28,6 +28,8 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
   const rclcpp::Time & current_ros_time) -> sensor_msgs::msg::PointCloud2
 {
   std::optional<geometry_msgs::msg::Pose> lidar_pose;
+  std::vector<Raycaster::Entity> raycast_entities;
+  raycast_entities.reserve(entities.size());
 
   for (const auto & entity : entities) {
     if (configuration_.entity() == entity.name()) {
@@ -36,33 +38,23 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
       lidar_pose = pose;
       lidar_pose->position.z += entity.bounding_box().dimensions().z();
     } else {
-      geometry_msgs::msg::Pose pose;
-      simulation_interface::toMsg(entity.pose(), pose);
-      auto rotation = math::geometry::getRotationMatrix(pose.orientation);
-      geometry_msgs::msg::Point center_point;
-      simulation_interface::toMsg(entity.bounding_box().center(), center_point);
-      Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
-      center = rotation * center;
-      pose.position.x = pose.position.x + center.x();
-      pose.position.y = pose.position.y + center.y();
-      pose.position.z = pose.position.z + center.z();
-      raycaster_.addPrimitive<simple_sensor_simulator::primitives::Box>(
-        entity.name(),                           //
-        entity.bounding_box().dimensions().x(),  //
-        entity.bounding_box().dimensions().y(),  //
-        entity.bounding_box().dimensions().z(),  //
-        pose);
+      raycast_entities.emplace_back(entity);
     }
   }
 
   if (lidar_pose) {
-    std::vector<double> vertical_angles;
-    for (const auto vertical_angle : configuration_.vertical_angles()) {
-      vertical_angles.push_back(vertical_angle);
+    auto result = raycaster_.raycast(lidar_pose.value(), raycast_entities);
+    detected_objects_ = result.getDetectedEntityNames();
+
+    if (noise_model_v1_) {
+      noise_model_v1_->applyNoise(result, lidar_pose.value());
     }
-    const auto pointcloud = raycaster_.raycast("base_link", current_ros_time, lidar_pose.value());
-    detected_objects_ = raycaster_.getDetectedObject();
-    return pointcloud;
+
+    sensor_msgs::msg::PointCloud2 pointcloud_msg;
+    pcl::toROSMsg(*(result.cloud), pointcloud_msg);
+    pointcloud_msg.header.frame_id = "base_link";
+    pointcloud_msg.header.stamp = current_ros_time;
+    return pointcloud_msg;
   } else {
     throw simple_sensor_simulator::SimulationRuntimeError("failed to find ego vehicle");
   }

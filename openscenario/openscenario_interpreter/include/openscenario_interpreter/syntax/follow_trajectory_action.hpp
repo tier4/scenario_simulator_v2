@@ -55,7 +55,6 @@ inline namespace syntax
  *
  * -------------------------------------------------------------------------- */
 struct FollowTrajectoryAction : private Scope,
-                                private SimulatorCore::ActionApplication,
                                 private SimulatorCore::ConditionEvaluation,
                                 private SimulatorCore::NonStandardOperation
 {

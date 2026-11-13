@@ -15,8 +15,8 @@
 #ifndef SIMULATION_INTERFACE__TEST__EXPECT_EQUAL_MACROS_HPP_
 #define SIMULATION_INTERFACE__TEST__EXPECT_EQUAL_MACROS_HPP_
 
-#include <geometry_msgs.pb.h>
 #include <gtest/gtest.h>
+#include <simulation_interface/geometry_msgs.pb.h>
 
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/point.hpp>

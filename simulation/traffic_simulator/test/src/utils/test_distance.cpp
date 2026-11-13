@@ -20,6 +20,7 @@
 #include <numeric>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
@@ -34,52 +35,19 @@ int main(int argc, char ** argv)
 class distanceTest_FourTrackHighwayMap : public testing::Test
 {
 protected:
-  distanceTest_FourTrackHighwayMap()
-  : hdmap_utils_ptr(std::make_shared<hdmap_utils::HdMapUtils>(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/four_track_highway/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.22312494055522)
-        .longitude(138.8024583466017)
-        .altitude(0.0)))
-  {
-    activateLaneletWrapper("four_track_highway");
-  }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  distanceTest_FourTrackHighwayMap() { activateLaneletWrapper("four_track_highway"); }
 };
 
 class distanceTest_StandardMap : public testing::Test
 {
 protected:
-  distanceTest_StandardMap()
-  : hdmap_utils_ptr(std::make_shared<hdmap_utils::HdMapUtils>(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/standard_map/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0)))
-  {
-    activateLaneletWrapper("standard_map");
-  }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  distanceTest_StandardMap() { activateLaneletWrapper("standard_map"); }
 };
 
 class distanceTest_IntersectionMap : public testing::Test
 {
 protected:
-  distanceTest_IntersectionMap()
-  : hdmap_utils_ptr(std::make_shared<hdmap_utils::HdMapUtils>(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/intersection/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.64200728302)
-        .longitude(139.74821144562)
-        .altitude(0.0)))
-  {
-    activateLaneletWrapper("intersection");
-  }
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  distanceTest_IntersectionMap() { activateLaneletWrapper("intersection"); }
 };
 
 /**
@@ -244,8 +212,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOppos
     ASSERT_TRUE(pose_from.has_value());
 
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, traffic_simulator::RoutingConfiguration(),
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, traffic_simulator::RoutingConfiguration());
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -266,8 +233,7 @@ TEST_F(distanceTest_StandardMap, longitudinalDistance_noAdjacent_noOpposite_noCh
     ASSERT_TRUE(pose_from.has_value());
 
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, traffic_simulator::RoutingConfiguration(),
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, traffic_simulator::RoutingConfiguration());
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 60.0, 1.0);
   }
@@ -289,8 +255,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_adjacent_noOpposit
     ASSERT_TRUE(pose_from.has_value());
 
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, traffic_simulator::RoutingConfiguration(),
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), true, false, traffic_simulator::RoutingConfiguration());
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -311,8 +276,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_adjacent_noOpposit
     ASSERT_TRUE(pose_from.has_value());
 
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, traffic_simulator::RoutingConfiguration(),
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), true, false, traffic_simulator::RoutingConfiguration());
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 20.0, 1.0);
   }
@@ -336,8 +300,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOppos
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
   {
@@ -351,8 +314,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOppos
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -375,8 +337,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOppos
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 145.0, 1.0);
   }
@@ -391,8 +352,7 @@ TEST_F(distanceTest_FourTrackHighwayMap, longitudinalDistance_noAdjacent_noOppos
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_NEAR(result.value(), 178.0, 1.0);
   }
@@ -414,8 +374,7 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_noAdjacent_noOpposite_
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
     EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 118.0, 1.0));
   }
   {
@@ -429,8 +388,7 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_noAdjacent_noOpposite_
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
     EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 195.0, 1.0));
   }
   {
@@ -444,8 +402,7 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_noAdjacent_noOpposite_
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
     EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 257.0, 1.0));
   }
   {
@@ -459,8 +416,7 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_noAdjacent_noOpposite_
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), false, false, lane_changeable_routing_configuration);
     EXPECT_NO_THROW(EXPECT_NEAR(result.value(), 228.0, 1.0));
   }
 }
@@ -483,8 +439,7 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_ch
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
   {
@@ -498,8 +453,7 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_ch
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration);
     EXPECT_FALSE(result.has_value());
   }
 }
@@ -520,8 +474,7 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_ch
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_DOUBLE_EQ(result.value(), 97.648110014340688);
   }
@@ -536,8 +489,7 @@ TEST_F(distanceTest_IntersectionMap, longitudinalDistance_adjacent_noOpposite_ch
     traffic_simulator::RoutingConfiguration lane_changeable_routing_configuration;
     lane_changeable_routing_configuration.allow_lane_change = true;
     const auto result = traffic_simulator::distance::longitudinalDistance(
-      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration,
-      hdmap_utils_ptr);
+      pose_from.value(), pose_to.value(), true, false, lane_changeable_routing_configuration);
     ASSERT_TRUE(result.has_value());
     EXPECT_DOUBLE_EQ(result.value(), 127.99532311325152);
   }

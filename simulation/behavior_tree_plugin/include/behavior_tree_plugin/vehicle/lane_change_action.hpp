@@ -34,7 +34,8 @@ class LaneChangeAction : public entity_behavior::VehicleActionNode
 {
 public:
   LaneChangeAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
   static BT::PortsList providedPorts()
   {
     return BT::PortsList(
@@ -49,9 +50,10 @@ public:
 private:
   std::optional<math::geometry::HermiteCurve> curve_;
   double current_s_;
-  double target_s_;
   double lane_change_velocity_;
   std::optional<traffic_simulator::lane_change::Parameter> lane_change_parameters_;
+  std::optional<traffic_simulator::lanelet_pose::CanonicalizedLaneletPose>
+    target_canonicalized_lanelet_pose_;
 };
 }  // namespace vehicle
 }  // namespace entity_behavior

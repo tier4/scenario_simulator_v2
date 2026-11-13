@@ -34,7 +34,8 @@ struct FollowPolylineTrajectoryAction : public PedestrianActionNode
 
   static auto providedPorts() -> BT::PortsList;
 
-  auto tick() -> BT::NodeStatus override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
 };
 }  // namespace pedestrian
 }  // namespace entity_behavior

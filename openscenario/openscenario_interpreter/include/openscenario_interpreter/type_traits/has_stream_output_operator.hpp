@@ -16,7 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_STREAM_OUTPUT_OPERATOR_HPP_
 
 #include <iostream>
-#include <openscenario_interpreter/type_traits/void_t.hpp>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
@@ -29,7 +29,7 @@ struct HasStreamOutputOperator : public std::false_type
 
 template <typename T>
 struct HasStreamOutputOperator<
-  T, void_t<decltype(std::declval<std::ostream &>() << std::declval<const T &>())>>
+  T, std::void_t<decltype(std::declval<std::ostream &>() << std::declval<const T &>())>>
 : public std::true_type
 {
 };

@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
@@ -70,7 +71,7 @@ auto LaneChangeAction::start() -> void
   for (const auto & accomplishment : accomplishments) {
     if (lane_change_target.is<AbsoluteTargetLane>()) {
       accomplishment.first.apply([&](const auto & object) {
-        applyLaneChangeAction(
+        runtime().entities().applyLaneChangeAction(
           object, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
           static_cast<traffic_simulator::lane_change::TrajectoryShape>(
             lane_change_action_dynamics.dynamics_shape),
@@ -78,7 +79,7 @@ auto LaneChangeAction::start() -> void
       });
     } else {
       accomplishment.first.apply([&](const auto & object) {
-        applyLaneChangeAction(
+        runtime().entities().applyLaneChangeAction(
           object, static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
           static_cast<traffic_simulator::lane_change::TrajectoryShape>(
             lane_change_action_dynamics.dynamics_shape),

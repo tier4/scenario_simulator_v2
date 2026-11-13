@@ -88,55 +88,56 @@ struct LegacyAutowareState
          - https://github.com/autowarefoundation/autoware.universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/document/autoware-state.md
          - https://github.com/autowarefoundation/autoware_universe/blob/e60daf7d1c85208eaac083b90c181e224c2ac513/system/autoware_default_adapi/src/compatibility/autoware_state.cpp#L80-L141
       */
-      switch (localization_state.state) {
-        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNKNOWN:
-        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED:
-        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZING:
-          return initializing;
+      if (
+        localization_state.state ==
+          autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNKNOWN or
+        route_state.state == autoware_adapi_v1_msgs::msg::RouteState::UNKNOWN or
+        operation_mode_state.mode == autoware_adapi_v1_msgs::msg::OperationModeState::UNKNOWN) {
+        return initializing;
+      } else {
+        switch (localization_state.state) {
+          case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED:
+          case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZING:
+            return initializing;
 
-        case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZED:
-          switch (route_state.state) {
-            case autoware_adapi_v1_msgs::msg::RouteState::UNKNOWN:
-              return initializing;
+          case autoware_adapi_v1_msgs::msg::LocalizationInitializationState::INITIALIZED:
+            switch (route_state.state) {
+              case autoware_adapi_v1_msgs::msg::RouteState::ARRIVED:
+                if (const auto duration = now - rclcpp::Time(route_state.stamp);
+                    duration.seconds() < 2.0) {
+                  return arrived_goal;
+                }
+                [[fallthrough]];
 
-            case autoware_adapi_v1_msgs::msg::RouteState::ARRIVED:
-              if (const auto duration = now - rclcpp::Time(route_state.stamp);
-                  duration.seconds() < 2.0) {
-                return arrived_goal;
-              }
-              [[fallthrough]];
+              case autoware_adapi_v1_msgs::msg::RouteState::UNSET:
+                return waiting_for_route;
 
-            case autoware_adapi_v1_msgs::msg::RouteState::UNSET:
-              return waiting_for_route;
+              case autoware_adapi_v1_msgs::msg::RouteState::SET:
+              case autoware_adapi_v1_msgs::msg::RouteState::CHANGING:
+                switch (operation_mode_state.mode) {
+                  case autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS:
+                  case autoware_adapi_v1_msgs::msg::OperationModeState::LOCAL:
+                  case autoware_adapi_v1_msgs::msg::OperationModeState::REMOTE:
+                    if (operation_mode_state.is_autoware_control_enabled) {
+                      return driving;
+                    }
+                    [[fallthrough]];
 
-            case autoware_adapi_v1_msgs::msg::RouteState::SET:
-            case autoware_adapi_v1_msgs::msg::RouteState::CHANGING:
-              switch (operation_mode_state.mode) {
-                case autoware_adapi_v1_msgs::msg::OperationModeState::UNKNOWN:
-                  return initializing;
+                  case autoware_adapi_v1_msgs::msg::OperationModeState::STOP:
+                    return operation_mode_state.is_autonomous_mode_available ? waiting_for_engage
+                                                                             : planning;
 
-                case autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS:
-                case autoware_adapi_v1_msgs::msg::OperationModeState::LOCAL:
-                case autoware_adapi_v1_msgs::msg::OperationModeState::REMOTE:
-                  if (operation_mode_state.is_autoware_control_enabled) {
-                    return driving;
-                  }
-                  [[fallthrough]];
+                  default:
+                    return undefined;
+                }
 
-                case autoware_adapi_v1_msgs::msg::OperationModeState::STOP:
-                  return operation_mode_state.is_autonomous_mode_available ? waiting_for_engage
-                                                                           : planning;
+              default:
+                return undefined;
+            }
 
-                default:
-                  return undefined;
-              }
-
-            default:
-              return undefined;
-          }
-
-        default:
-          return undefined;
+          default:
+            return undefined;
+        }
       }
     }())
   {

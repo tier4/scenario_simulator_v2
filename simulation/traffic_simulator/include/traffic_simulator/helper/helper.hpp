@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
 #define TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <algorithm>
 #include <cmath>
@@ -57,7 +57,7 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
  * @return LaneletPose
  */
 LaneletPose constructLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
+  const lanelet::Id lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
   double yaw = 0);
 
 /**

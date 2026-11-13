@@ -29,11 +29,20 @@ Phase::Phase(const pugi::xml_node & node, Scope & scope)
 
 auto Phase::evaluate() const -> Object
 {
-  for (auto && traffic_signal_state : traffic_signal_states) {
+  // To address multiple state entries that have same ID,
+  // do not clear one by one in evaluate for-loop.
+  clearStates();
+  for (const auto & traffic_signal_state : traffic_signal_states) {
     traffic_signal_state.evaluate();
   }
-
   return unspecified;
+}
+
+auto Phase::clearStates() const -> void
+{
+  for (const auto & traffic_signal_state : traffic_signal_states) {
+    traffic_signal_state.clear();
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

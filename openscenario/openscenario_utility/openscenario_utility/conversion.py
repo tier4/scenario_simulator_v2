@@ -21,6 +21,7 @@ from itertools import product
 from pathlib import Path
 from re import sub
 from sys import exit, stderr
+from typing import List
 from pkg_resources import resource_string
 
 import math
@@ -40,8 +41,19 @@ def iota(start, step, stop):
         start = start + step
 
 
+def normalize_yaml_bools(obj):
+    if isinstance(obj, dict):
+        return {k: normalize_yaml_bools(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [normalize_yaml_bools(i) for i in obj]
+    elif isinstance(obj, bool):
+        return "true" if obj else "false"
+    else:
+        return obj
+
+
 class MacroExpander:
-    def __init__(self, rules, schema):
+    def __init__(self, rules, schema: xmlschema.XMLSchema):
 
         self.rules = rules
 
@@ -65,12 +77,14 @@ class MacroExpander:
                     )
 
     def __call__(self, xosc: str, output: Path, basename: str):
-        paths = []
+        paths: List[Path] = []
 
         for index, bindings in enumerate(product(*self.specs)):
             target = deepcopy(xosc)
 
-            for binding in bindings:
+            # Use "maximal munch" technique to avoid replace a part of a longer macro with a shorter macro
+            sorted_bindings = sorted(bindings, key=lambda x: len(str(x[0])), reverse=True)
+            for binding in sorted_bindings:
                 target = sub(str(binding[0]), str(binding[1]), target)
 
             if self.specs:
@@ -78,22 +92,21 @@ class MacroExpander:
             else:
                 paths.append(output.joinpath(basename + ".xosc"))
 
+            try:
+                self.schema.validate(target)
+            except xmlschema.XMLSchemaValidationError as exception:
+                print("File: " + str(paths[-1]), file=stderr)
+                print("", file=stderr)
+                print("Error: " + str(exception), file=stderr)
+                exit()
+
             with paths[-1].open(mode="w") as file:
                 file.write(target)
-
-                try:
-                    self.schema.validate(target)
-
-                except xmlschema.XMLSchemaValidationError as exception:
-                    print("File: " + str(paths[-1]), file=stderr)
-                    print("", file=stderr)
-                    print("Error: " + str(exception), file=stderr)
-                    exit()
 
         return paths
 
 
-def load_yaml(path):
+def load_yaml(path: Path):
     if path.exists():
         with path.open("r") as file:
             return yaml.safe_load(file)
@@ -102,6 +115,45 @@ def load_yaml(path):
             "\x1b[31mNo such file or directory: " + str(path) + "\x1b[0m", file=stderr
         )
         exit()
+
+
+def expand_dotted_keys(node):
+    #
+    # A.B.c: { ... }
+    #
+    # => A: { B: { c: { ... } } }
+    #
+    # Keys sharing the same head are merged:
+    #
+    # A.B.c: x
+    # A.D.e: y
+    #
+    # => A: { B: { c: x }, D: { e: y } }
+    #
+    def merge(target, source):
+        for tag, value in source.items():
+            if tag not in target:
+                target[tag] = value
+            elif isinstance(target[tag], dict) and isinstance(value, dict):
+                merge(target[tag], value)
+            else:
+                print(f"\x1b[31mDuplicated key: {tag}\x1b[0m", file=stderr)
+                exit(1)
+
+    if isinstance(node, dict):
+        result = {}
+
+        for tag, value in node.items():
+            tag, dot, rest = tag.partition(".")
+            merge(result, {tag: expand_dotted_keys({rest: value} if dot else value)})
+
+        return result
+
+    elif isinstance(node, list):
+        return [expand_dotted_keys(each) for each in node]
+
+    else:
+        return node
 
 
 def from_yaml(keyword, node):
@@ -170,38 +222,31 @@ def convert(input: Path, output: Path, verbose: bool = True):
     )
 
     yaml = load_yaml(input)
+    yaml = normalize_yaml_bools(yaml)
+    yaml = expand_dotted_keys(yaml)
 
     macroexpand = MacroExpander(yaml.pop("ScenarioModifiers", None), schema)
 
-    xosc, errors = schema.encode(
+    # Just convert to XML, no validation (performed later)
+    xosc = schema.encode(
         from_yaml("OpenSCENARIO", yaml),
         indent=2,
         preserve_root=True,
         unordered=True,  # Reorder elements
-        validation="lax",  # The "strict" mode is too strict than we would like.
+        validation="skip",
     )
 
-    if not schema.is_valid(xosc) and len(errors) != 0:
-        print(
-            "Error: " + str(errors[0]), file=stderr
-        )  # Other than the first is not important.
-        exit()
+    paths = macroexpand(
+        xmlschema.XMLResource(xosc).tostring(),
+        output,
+        input.stem,
+    )
 
-    else:
-        paths = macroexpand(
-            xmlschema.XMLResource(xosc)
-            .tostring()
-            .replace("True", "true")
-            .replace("False", "false"),
-            output,
-            input.stem,
-        )
+    if verbose:
+        for each in paths:
+            print(each)
 
-        if verbose:
-            for each in paths:
-                print(each)
-
-        return paths
+    return paths
 
 
 def main():

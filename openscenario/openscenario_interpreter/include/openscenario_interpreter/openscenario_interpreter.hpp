@@ -15,12 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
-#include <boost/variant.hpp>
 #include <chrono>
 #include <lifecycle_msgs/msg/state.hpp>
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
@@ -31,8 +31,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <simple_junit/junit5.hpp>
 #include <tier4_simulation_msgs/msg/user_defined_value.hpp>
+#include <traffic_simulator/utils/junit5.hpp>
 #include <utility>
 
 #define INTERPRETER_INFO_STREAM(...) \
@@ -49,6 +49,9 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
                     private SimulatorCore::ConditionEvaluation,
                     private SimulatorCore::NonStandardOperation
 {
+  /// @note Needs to be longer than the SIGINT + SIGTERM signals timeout duration.
+  static inline constexpr std::chrono::seconds simulator_core_shutdown_threshold{30};
+
   using Context = openscenario_interpreter_msgs::msg::Context;
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
@@ -74,9 +77,13 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   bool record;
 
+  String record_option;
+
   String record_storage_id;
 
   std::shared_ptr<OpenScenario> script;
+
+  const std::shared_ptr<ScenarioRuntime> scenario_runtime;
 
   std::list<std::shared_ptr<ScenarioDefinition>> scenarios;
 
@@ -84,7 +91,7 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   common::JUnit5 results;
 
-  boost::variant<common::junit::Pass, common::junit::Failure, common::junit::Error> result;
+  std::variant<common::junit::Pass, common::junit::Failure, common::junit::Error> result;
 
   ExecutionTimer<> execution_timer;
 
@@ -123,13 +130,13 @@ public:
   {
     result = T(std::forward<decltype(xs)>(xs)...);
 
-    results.name = boost::filesystem::path(osc_path).parent_path().parent_path().string();
+    results.name = std::filesystem::path(osc_path).parent_path().parent_path().string();
 
-    const auto suite_name = boost::filesystem::path(osc_path).parent_path().filename().string();
+    const auto suite_name = std::filesystem::path(osc_path).parent_path().filename().string();
 
-    const auto case_name = boost::filesystem::path(osc_path).stem().string();
+    const auto case_name = std::filesystem::path(osc_path).stem().string();
 
-    boost::apply_visitor(
+    std::visit(
       overload(
         [&](const common::junit::Pass & it) {
           results.testsuite(suite_name).testcase(case_name).pass.push_back(it);
@@ -142,10 +149,9 @@ public:
         }),
       result);
 
-    results.write_to(
-      (boost::filesystem::path(output_directory) / "result.junit.xml").c_str(), "  ");
+    results.write_to((std::filesystem::path(output_directory) / "result.junit.xml").c_str(), "  ");
 
-    execution_timer.save(boost::filesystem::path(output_directory) / "execution_timer.json");
+    execution_timer.save(std::filesystem::path(output_directory) / "execution_timer.json");
   }
 
   template <typename ExceptionHandler, typename Thunk>

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <boost/filesystem/operations.hpp>  // boost::filesystem::is_directory
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
 
@@ -29,9 +28,9 @@ File::File(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto File::isDirectory() const -> bool { return boost::filesystem::is_directory(filepath); }
+auto File::isDirectory() const -> bool { return std::filesystem::is_directory(filepath); }
 
-File::operator boost::filesystem::path() const { return filepath; }
+File::operator std::filesystem::path() const { return filepath; }
 
 File::operator String() const { return filepath.string(); }
 }  // namespace syntax

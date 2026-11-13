@@ -2,8 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>scenario_test_runner</name>
-  <version>15.1.3</version>
+  <version>25.0.22</version>
   <description>scenario test runner package</description>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
   <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -15,11 +17,11 @@
   <depend>openscenario_preprocessor_msgs</depend>
   <depend>openscenario_utility</depend>
   <depend>openscenario_visualization</depend>
-  <depend>python-yamale-pip</depend>
   <depend>python3-pytest</depend>
   <depend>python3-xmlschema</depend>
   <depend>rclpy</depend>
   <depend>simple_sensor_simulator</depend>
+  <test_depend>replay_testing</test_depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

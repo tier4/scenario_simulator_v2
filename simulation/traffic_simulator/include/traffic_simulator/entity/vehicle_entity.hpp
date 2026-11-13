@@ -61,7 +61,6 @@ public:
 
   explicit VehicleEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 
@@ -98,13 +97,16 @@ public:
 
   auto onUpdate(const double current_time, const double step_time) -> void override;
 
-  void requestAcquirePosition(const CanonicalizedLaneletPose &);
+  void requestAcquirePosition(const CanonicalizedLaneletPose &, const RouteOption &) override;
 
-  void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
+  void requestAcquirePosition(
+    const geometry_msgs::msg::Pose & map_pose, const RouteOption &) override;
 
-  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
+  void requestAssignRoute(
+    const std::vector<geometry_msgs::msg::Pose> &, const RouteOption &) override;
 
-  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
+  void requestAssignRoute(
+    const std::vector<CanonicalizedLaneletPose> &, const RouteOption &) override;
 
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
@@ -127,6 +129,12 @@ public:
 
   void setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLightsBase> &) override;
 
+  // Per-entity lateral collision margin (meters)
+  void setLateralCollisionThreshold(const std::optional<double> & value)
+  {
+    behavior_plugin_ptr_->setLateralCollisionThreshold(value);
+  }
+
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
 private:
@@ -134,7 +142,8 @@ private:
 
   const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
 
-  traffic_simulator::RoutePlanner route_planner_;
+  traffic_simulator::RoutePlanner route_planner_{
+    traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER};
 
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 

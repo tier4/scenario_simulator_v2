@@ -35,6 +35,7 @@ public:
 
   // Ego member functions
   MOCK_METHOD(void, engage, (), ());
+  MOCK_METHOD(bool, isEngaged, (), (const));
   MOCK_METHOD(bool, isEngageable, (), (const));
   MOCK_METHOD(bool, setParameterMock, (const std::string &, const bool &), (const));
   MOCK_METHOD(void, requestAssignRoute, (const std::vector<geometry_msgs::msg::Pose> &), ());
@@ -119,6 +120,9 @@ public:
     ());
   MOCK_METHOD(void, attachLidarSensor, (const simulation_api_schema::LidarConfiguration &), ());
   MOCK_METHOD(
+    bool, attachImuSensor,
+    (const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration), ());
+  MOCK_METHOD(
     void, attachDetectionSensor, (const simulation_api_schema::DetectionSensorConfiguration &), ());
   MOCK_METHOD(
     bool, attachOccupancyGridSensor, (simulation_api_schema::OccupancyGridSensorConfiguration), ());
@@ -136,7 +140,6 @@ public:
   MOCK_METHOD(double, getCurrentTime, (), ());
   MOCK_METHOD(void, getEntityMock, (const std::string &), (const));
   MOCK_METHOD(void, getEgoEntityMock, (const std::string &), (const));
-  MOCK_METHOD(void, getHdmapUtilsMock, (), ());
   MOCK_METHOD(bool, isEntityExist, (const std::string &), ());
   MOCK_METHOD(bool, checkCollision, (const std::string &, const std::string &), ());
 
@@ -156,14 +159,6 @@ public:
     return *ego_entity_;
   }
 
-  /// Real member function required for the canonicalization of the lanelet pose in TestExecutor.InitializeWithNoNPCs test
-  auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
-  {
-    getHdmapUtilsMock();
-
-    return hdmap_utils_ptr_;
-  }
-
   auto setEntityStatusNecessaryValues(
     double time, geometry_msgs::msg::Pose map_pose, geometry_msgs::msg::Twist twist) -> void
   {
@@ -171,14 +166,6 @@ public:
     entity_status_.pose = map_pose;
     entity_status_.action_status.twist = twist;
   }
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_ =
-    std::make_shared<hdmap_utils::HdMapUtils>(
-      ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0));
 
   const std::string ego_name_ = "ego";
   const std::shared_ptr<::testing::StrictMock<MockEntity>> ego_entity_ =
@@ -210,6 +197,7 @@ TEST(TestExecutor, InitializeWithNoNPCs)
   EXPECT_CALL(*MockAPI, attachLidarSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachDetectionSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachOccupancyGridSensor).Times(1).InSequence(sequence);
+  EXPECT_CALL(*MockAPI, attachImuSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*mock_ego, setParameterMock).Times(1).InSequence(sequence);
   EXPECT_CALL(*mock_ego, requestAssignRoute).Times(1).InSequence(sequence);
   EXPECT_CALL(*mock_ego, engage).Times(1).InSequence(sequence);

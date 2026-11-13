@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <traffic_simulator/helper/ostream_helpers.hpp>
+#include <unordered_map>
 
 namespace traffic_simulator
 {

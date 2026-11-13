@@ -15,10 +15,13 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
+#include <geometry/bounding_box.hpp>
 #include <memory>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -52,13 +55,13 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> YieldAction::calculat
 
 const traffic_simulator_msgs::msg::WaypointsArray YieldAction::calculateWaypoints()
 {
-  if (!canonicalized_entity_status->isInLanelet()) {
+  if (!canonicalized_entity_status_->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (canonicalized_entity_status->getTwist().linear.x >= 0) {
+  if (canonicalized_entity_status_->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
     double horizon = getHorizon();
-    const auto lanelet_pose = canonicalized_entity_status->getLaneletPose();
+    const auto lanelet_pose = canonicalized_entity_status_->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
       lanelet_pose.s, lanelet_pose.s + horizon, 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
@@ -78,33 +81,36 @@ std::optional<double> YieldAction::calculateTargetSpeed()
    * @brief hard coded parameter!! 1.0 is a stop margin
    */
   double rest_distance =
-    distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
-  if (rest_distance < calculateStopDistance(behavior_parameter.dynamic_constraints)) {
+    distance_to_stop_target_.value() - (math::geometry::getDistancesFromCenterToEdge(vehicle_parameters.bounding_box).front + 1.0);
+  if (rest_distance < calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
     return 0;
   }
-  return canonicalized_entity_status->getTwist().linear.x;
+  return canonicalized_entity_status_->getTwist().linear.x;
 }
 
-BT::NodeStatus YieldAction::tick()
+bool YieldAction::checkPreconditions()
 {
-  getBlackBoardValues();
   if (
-    request != traffic_simulator::behavior::Request::NONE &&
-    request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
-    return BT::NodeStatus::FAILURE;
+    request_ != traffic_simulator::behavior::Request::NONE &&
+    request_ != traffic_simulator::behavior::Request::FOLLOW_LANE) {
+    return false;
+  } else if (!behavior_parameter_.see_around) {
+    return false;
+  } else if (!canonicalized_entity_status_->isInLanelet()) {
+    return false;
+  } else {
+    return true;
   }
-  if (!behavior_parameter.see_around) {
-    return BT::NodeStatus::FAILURE;
-  }
-  if (!canonicalized_entity_status->isInLanelet()) {
-    return BT::NodeStatus::FAILURE;
-  }
-  const auto right_of_way_entities = getRightOfWayEntities(route_lanelets);
-  if (right_of_way_entities.empty()) {
-    if (!target_speed) {
-      target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+}
+
+BT::NodeStatus YieldAction::doAction()
+{
+  if (!traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
+    if (!target_speed_) {
+      target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
     }
-    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
+    setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
     const auto waypoints = calculateWaypoints();
     if (waypoints.waypoints.empty()) {
       return BT::NodeStatus::FAILURE;
@@ -114,12 +120,12 @@ BT::NodeStatus YieldAction::tick()
     setOutput("obstacle", obstacle);
     return BT::NodeStatus::SUCCESS;
   }
-  distance_to_stop_target_ = getYieldStopDistance(route_lanelets);
-  target_speed = calculateTargetSpeed();
-  if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+  distance_to_stop_target_ = getYieldStopDistance(route_lanelets_);
+  target_speed_ = calculateTargetSpeed();
+  if (!target_speed_) {
+    target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
   }
-  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed.value()));
+  setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;

@@ -15,10 +15,31 @@
 #ifndef COMMON__GET_PARAMETER_HPP_
 #define COMMON__GET_PARAMETER_HPP_
 
+#include <unistd.h>
+
 #include <rclcpp/rclcpp.hpp>
 
 namespace common
 {
+/**
+ * @brief Get the Node object for parameter obtaining.
+ * This provides a one node for parameter obtaining for the whole executable, as opposed to template
+ * function that creates a new node for each type of parameter. To guarantee the node name is unique
+ * (Autoware in some versions requires this to run) we append the process id.
+ */
+inline auto getParameterNode() -> rclcpp::Node &
+{
+  if (not rclcpp::ok()) {
+    rclcpp::init(0, nullptr);
+  }
+  static rclcpp::Node node{
+    [](std::string name_base) { return name_base + "_pid" + std::to_string(getpid()); }(__func__),
+    "simulation",
+    // NOTE: enable automatically_declare_parameters_from_overrides to read parameters from yaml without declaration
+    rclcpp::NodeOptions().automatically_declare_parameters_from_overrides(true)};
+  return node;
+}
+
 template <typename T>
 auto getParameter(
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
@@ -33,8 +54,7 @@ auto getParameter(
 template <typename T>
 auto getParameter(const std::string & name, T value = {})
 {
-  static auto node = rclcpp::Node(__func__, "simulation");
-  return getParameter(node.get_node_parameters_interface(), name, value);
+  return getParameter(getParameterNode().get_node_parameters_interface(), name, value);
 }
 }  // namespace common
 

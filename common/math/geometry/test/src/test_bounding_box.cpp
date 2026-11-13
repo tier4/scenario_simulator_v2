@@ -196,6 +196,39 @@ TEST(BoundingBox, getClosestPosesWithIntersection)
   ASSERT_FALSE(actual);
 }
 
+TEST(BoundingBox, getClosestPointOnPolygonAtVertex)
+{
+  const auto pose = geometry_msgs::msg::Pose();
+  const auto bounding_box = makeBbox(2.0, 2.0, 2.0);
+  const auto polygon = math::geometry::toPolygon2D(pose, bounding_box);
+  const auto query_point = math::geometry::toBoostPoint(makePoint(1.0, 1.0));
+  const auto result = math::geometry::getClosestPointOnPolygon(query_point, polygon);
+  EXPECT_DOUBLE_EQ(result.x(), 1.0);
+  EXPECT_DOUBLE_EQ(result.y(), 1.0);
+}
+
+TEST(BoundingBox, getClosestPointOnPolygonNearEdge)
+{
+  const auto pose = geometry_msgs::msg::Pose();
+  const auto bounding_box = makeBbox(2.0, 2.0, 2.0);
+  const auto polygon = math::geometry::toPolygon2D(pose, bounding_box);
+  const auto query_point = math::geometry::toBoostPoint(makePoint(0.5, 2.0));
+  const auto result = math::geometry::getClosestPointOnPolygon(query_point, polygon);
+  EXPECT_DOUBLE_EQ(result.x(), 0.5);
+  EXPECT_DOUBLE_EQ(result.y(), 1.0);
+}
+
+TEST(BoundingBox, getClosestPointOnPolygonDiagonal)
+{
+  const auto pose = geometry_msgs::msg::Pose();
+  const auto bounding_box = makeBbox(2.0, 2.0, 2.0);
+  const auto polygon = math::geometry::toPolygon2D(pose, bounding_box);
+  const auto query_point = math::geometry::toBoostPoint(makePoint(2.0, 2.0));
+  const auto result = math::geometry::getClosestPointOnPolygon(query_point, polygon);
+  EXPECT_DOUBLE_EQ(result.x(), 1.0);
+  EXPECT_DOUBLE_EQ(result.y(), 1.0);
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

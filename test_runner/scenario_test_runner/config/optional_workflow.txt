@@ -1,1 +1,0 @@
-$(find-pkg-share scenario_test_runner)/scenario/execution_time_test.yaml

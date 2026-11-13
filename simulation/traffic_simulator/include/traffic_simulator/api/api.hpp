@@ -15,13 +15,15 @@
 #ifndef TRAFFIC_SIMULATOR__API__API_HPP_
 #define TRAFFIC_SIMULATOR__API__API_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
 #include <std_msgs/msg/float64.hpp>
+#include <traffic_simulator/api/entity_behavior.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
@@ -30,19 +32,6 @@
 
 namespace traffic_simulator
 {
-struct VehicleBehavior : public entity::VehicleEntity::BuiltinBehavior
-{
-  static auto autoware() noexcept -> const std::string &
-  {
-    static const std::string name = "Autoware";
-    return name;
-  }
-};
-
-struct PedestrianBehavior : public entity::PedestrianEntity::BuiltinBehavior
-{
-};
-
 class API
 {
 public:
@@ -68,9 +57,7 @@ public:
       [this](const std::string & name) { despawn(name); }, entity_manager_ptr_,
       configuration.auto_sink_entity_types)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
-      node, entity_manager_ptr_->getHdmapUtils(),
-      common::getParameter<std::string>(
-        node_parameters_, "architecture_type", "awf/universe/20240605"))),
+      node, getROS2Parameter<std::string>("architecture_type", "awf/universe/20240605"))),
     real_time_factor_subscriber_(rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {
@@ -242,11 +229,18 @@ public:
     const std::string & first_entity_name, const std::string & second_entity_name) const -> bool;
 
   // traffics, lanelet
-  auto getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
-
   auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>;
 
   auto getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>;
+
+  auto getV2IDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>;
+
+  auto getConventionalDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>;
+
+  auto setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled) -> void;
+
+  auto isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool;
+
   /**
    * @brief Add a traffic source to the simulation
    * @param radius The radius defining the area on which entities will be spawned

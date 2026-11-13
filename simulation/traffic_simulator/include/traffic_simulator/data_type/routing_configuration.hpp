@@ -22,6 +22,10 @@ namespace traffic_simulator
 {
 struct RoutingConfiguration
 {
+  RoutingConfiguration() = default;
+  explicit RoutingConfiguration(const bool allow_lane_change)
+  : allow_lane_change(allow_lane_change){};
+
   bool allow_lane_change = false;
   traffic_simulator::RoutingGraphType routing_graph_type =
     traffic_simulator::RoutingGraphType::VEHICLE_WITH_ROAD_SHOULDER;

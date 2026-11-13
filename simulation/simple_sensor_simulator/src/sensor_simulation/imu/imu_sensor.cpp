@@ -43,15 +43,17 @@ auto ImuSensor<sensor_msgs::msg::Imu>::generateMessage(
   auto twist = status.action_status.twist;
   auto accel = status.action_status.accel;
 
-  // Apply noise
-  if (noise_standard_deviation_orientation_ > 0.0) {
-    applyNoise(orientation_rpy, noise_distribution_orientation_);
-  }
-  if (noise_standard_deviation_twist_ > 0.0) {
-    applyNoise(twist.angular, noise_distribution_twist_);
-  }
-  if (noise_standard_deviation_acceleration_ > 0.0) {
-    applyNoise(accel.linear, noise_distribution_acceleration_);
+  if (not override_legacy_configuration_) {
+    // Apply noise
+    if (noise_standard_deviation_orientation_ > 0.0) {
+      applyNoise(orientation_rpy, noise_distribution_orientation_);
+    }
+    if (noise_standard_deviation_twist_ > 0.0) {
+      applyNoise(twist.angular, noise_distribution_twist_);
+    }
+    if (noise_standard_deviation_acceleration_ > 0.0) {
+      applyNoise(accel.linear, noise_distribution_acceleration_);
+    }
   }
 
   // Apply gravity

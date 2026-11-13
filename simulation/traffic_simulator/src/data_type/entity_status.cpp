@@ -25,7 +25,6 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
 : canonicalized_lanelet_pose_{canonicalized_lanelet_pose},
   entity_status_{may_non_canonicalized_entity_status}
 {
-  assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());
   if (canonicalized_lanelet_pose_) {
     entity_status_.lanelet_pose_valid = true;
     entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
@@ -44,6 +43,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
     entity_status_.lanelet_pose_valid = false;
     entity_status_.lanelet_pose = LaneletPose();
   }
+  assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj)

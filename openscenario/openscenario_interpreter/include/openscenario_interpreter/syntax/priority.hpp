@@ -21,34 +21,41 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- PRIORITY ---------------------------------------------------------------
- *
- *  <xsd:simpleType name="Priority">
- *    <xsd:union>
- *      <xsd:simpleType>
- *        <xsd:restriction base="xsd:string">
- *          <xsd:enumeration value="overwrite"/>
- *          <xsd:enumeration value="skip"/>
- *          <xsd:enumeration value="parallel"/>
- *        </xsd:restriction>
- *      </xsd:simpleType>
- *      <xsd:simpleType>
- *        <xsd:restriction base="parameter"/>
- *      </xsd:simpleType>
- *    </xsd:union>
- *  </xsd:simpleType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Priority (OpenSCENARIO XML 1.3.1)
+
+   Rules that govern interaction between events that belong to the same maneuver.
+
+   <xsd:simpleType name="Priority">
+     <xsd:union>
+       <xsd:simpleType>
+         <xsd:restriction base="xsd:string">
+           <xsd:enumeration value="overwrite">
+             <xsd:annotation>
+               <xsd:appinfo>
+                 deprecated
+               </xsd:appinfo>
+             </xsd:annotation>
+           </xsd:enumeration>
+           <xsd:enumeration value="override"/>
+           <xsd:enumeration value="parallel"/>
+           <xsd:enumeration value="skip"/>
+         </xsd:restriction>
+       </xsd:simpleType>
+       <xsd:simpleType>
+         <xsd:restriction base="parameter"/>
+       </xsd:simpleType>
+     </xsd:union>
+   </xsd:simpleType>
+*/
 struct Priority
 {
   enum value_type {
 
     /*
-       If a starting event has priority Overwrite, all events in running state,
-       within the same scope (maneuver) as the starting event, should be issued
-       a stop command (stop transition).
+      overwrite is deprecated and deleted from internal enum.
     */
-    overwrite,
+    // overwrite,
 
     /*
        If a starting event has priority Skip, then it will not be run if there
@@ -60,6 +67,13 @@ struct Priority
        Execute in parallel to other events.
     */
     parallel,
+
+    /*
+      If a starting event has priority Override, all events in running state,
+      within the same scope (maneuver) as the starting event,
+      should be issued a stop command (stop transition).
+    */
+    override,
   } value;
 
   Priority() = default;

@@ -61,18 +61,19 @@ public:
   Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
   Subscriber<priority::PathWithLaneId> getPathWithLaneId;
 
-  Publisher<AccelWithCovarianceStamped>   setAcceleration;
-  Publisher<Odometry, NormalDistribution> setOdometry;
-  Publisher<PoseWithCovarianceStamped>    setPose;
-  Publisher<SteeringReport>               setSteeringReport;
-  Publisher<GearReport>                   setGearReport;
-  Publisher<ControlModeReport>            setControlModeReport;
-  Publisher<VelocityReport>               setVelocityReport;
-  Publisher<TurnIndicatorsReport>         setTurnIndicatorsReport;
+  Publisher<AccelWithCovarianceStamped>                    setAcceleration;
+  Publisher<Odometry, NormalDistribution>                  setOdometry;
+  Publisher<PoseWithCovarianceStamped, NormalDistribution> setPose;
+  Publisher<SteeringReport>                                setSteeringReport;
+  Publisher<GearReport>                                    setGearReport;
+  Publisher<ControlModeReport>                             setControlModeReport;
+  Publisher<VelocityReport, NormalDistribution>            setVelocityReport;
+  Publisher<TurnIndicatorsReport>                          setTurnIndicatorsReport;
 
   std::atomic<geometry_msgs::msg::Accel> current_acceleration;
   std::atomic<geometry_msgs::msg::Pose>  current_pose;
   std::atomic<geometry_msgs::msg::Twist> current_twist;
+  std::atomic<float>                     current_steering_tire_angle{0.0f};
   // clang-format on
 
 private:
@@ -82,8 +83,6 @@ private:
 
   const rclcpp::TimerBase::SharedPtr vehicle_state_update_timer;
 
-  std::thread spinner;
-
   std::atomic<bool> is_stop_requested = false;
 
   std::atomic<std::uint8_t> current_control_mode = ControlModeReport::AUTONOMOUS;
@@ -91,6 +90,8 @@ private:
   std::atomic<bool> is_thrown = false;
 
   std::exception_ptr thrown;
+
+  std::thread spinner;
 
 public:
   CONCEALER_PUBLIC explicit AutowareUniverse(bool);

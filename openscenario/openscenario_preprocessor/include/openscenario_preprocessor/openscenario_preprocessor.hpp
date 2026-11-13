@@ -17,6 +17,7 @@
 
 #include <concealer/execute.hpp>
 #include <deque>
+#include <filesystem>
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_preprocessor_msgs/srv/check_derivative_remained.hpp>
@@ -45,7 +46,7 @@ struct ScenarioSet
     return response;
   }
 
-  boost::filesystem::path path;
+  std::filesystem::path path;
 
   float frame_rate;
 };
@@ -58,7 +59,7 @@ public:
 private:
   void preprocessScenario(ScenarioSet &);
 
-  [[nodiscard]] bool validateXOSC(const boost::filesystem::path &, bool);
+  [[nodiscard]] bool validateXOSC(const std::filesystem::path &, bool);
 
   rclcpp::Service<openscenario_preprocessor_msgs::srv::Load>::SharedPtr load_server;
 

@@ -26,19 +26,21 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Environment 1.2 ----------------------------------------------------
- *
- * <xsd:complexType name="Environment">
- *   <xsd:all>
- *     <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
- *     <xsd:element name="TimeOfDay" type="TimeOfDay" minOccurs="0"/>
- *     <xsd:element name="Weather" type="Weather" minOccurs="0"/>
- *     <xsd:element name="RoadCondition" type="RoadCondition" minOccurs="0"/>
- *   </xsd:all>
- *   <xsd:attribute name="name" type="String" use="required"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Environment (OpenSCENARIO XML 1.3.1)
+
+   Defines the environment conditions of a scenario, e.g. time of day, weather and road condition. If one of the conditions is missing it means that it doesn't change.
+
+   <xsd:complexType name="Environment">
+     <xsd:all>
+       <xsd:element name="ParameterDeclarations" type="ParameterDeclarations" minOccurs="0"/>
+       <xsd:element name="TimeOfDay" type="TimeOfDay" minOccurs="0"/>
+       <xsd:element name="Weather" type="Weather" minOccurs="0"/>
+       <xsd:element name="RoadCondition" type="RoadCondition" minOccurs="0"/>
+     </xsd:all>
+     <xsd:attribute name="name" type="String" use="required"/>
+   </xsd:complexType>
+*/
 struct Environment : public Scope
 {
   /*

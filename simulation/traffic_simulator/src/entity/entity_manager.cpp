@@ -12,10 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/distance.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <rclcpp/logging.hpp>
 #include <std_msgs/msg/header.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
+#include <unordered_map>
+#include <vector>
 
 namespace traffic_simulator
 {
@@ -75,8 +81,11 @@ auto EntityManager::update(const double current_time, const double step_time) ->
     entity_ptr->setOtherStatus(all_status);
   }
   all_status.clear();
+
+  std::shared_ptr<EuclideanDistancesMap> distances = calculateEuclideanDistances();
+
   for (const auto & [name, entity_ptr] : entities_) {
-    all_status.try_emplace(name, updateNpcLogic(name, current_time, step_time));
+    all_status.try_emplace(name, updateNpcLogic(name, current_time, step_time, distances));
   }
   for (const auto & [name, entity_ptr] : entities_) {
     entity_ptr->setOtherStatus(all_status);
@@ -112,15 +121,17 @@ auto EntityManager::update(const double current_time, const double step_time) ->
 }
 
 auto EntityManager::updateNpcLogic(
-  const std::string & name, const double current_time, const double step_time)
-  -> const CanonicalizedEntityStatus &
+  const std::string & name, const double current_time, const double step_time,
+  const std::shared_ptr<EuclideanDistancesMap> & distances) -> const CanonicalizedEntityStatus &
 {
+  /// @note Maybe replaced by RCLCPP_DEBUG and ROS logging level
   if (configuration_.verbose) {
-    std::cout << "update " << name << " behavior" << std::endl;
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("EntityManager"), "update " << name << " behavior");
   }
   auto & entity = getEntity(name);
   // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
   if (npc_logic_started_) {
+    entity.setEuclideanDistancesMap(distances);
     entity.onUpdate(current_time, step_time);
   } else if (entity.is<entity::EgoEntity>()) {
     entity.as<EgoEntity>().updateFieldOperatorApplication();
@@ -128,7 +139,7 @@ auto EntityManager::updateNpcLogic(
   return entity.getCanonicalizedStatus();
 }
 
-auto EntityManager::updateHdmapMarker() const -> void
+auto EntityManager::updateLaneletMarker() const -> void
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();
@@ -353,10 +364,19 @@ auto EntityManager::despawnEntity(const std::string & name) -> bool
   return isEntityExist(name) && entities_.erase(name);
 }
 
-// traffics, lanelet
-auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
+auto EntityManager::calculateEuclideanDistances() -> std::shared_ptr<EuclideanDistancesMap>
 {
-  return hdmap_utils_ptr_;
+  std::shared_ptr<EuclideanDistancesMap> distances = std::make_shared<EuclideanDistancesMap>();
+  for (auto && [name_from, entity_from] : entities_) {
+    for (auto && [name_to, entity_to] : entities_) {
+      if (const auto pair = std::minmax(name_from, name_to);
+          distances->find(pair) == distances->end() && name_from != name_to) {
+        distances->emplace(
+          pair, math::geometry::getDistance(entity_from->getMapPose(), entity_to->getMapPose()));
+      }
+    }
+  }
+  return distances;
 }
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -1,0 +1,134 @@
+OpenSCENARIO:
+  FileHeader:
+    author: Kotaro Yoshimoto
+    date: '2025-12-24T00:00:00+09:00'
+    description: |
+      Test Event priority="parallel".
+    revMajor: 1
+    revMinor: 3
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: car
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: car
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 10
+                      offset: 0
+    Story:
+      - name: story
+        Act:
+          - name: act
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: car
+                Maneuver:
+                  - name: ''
+                    Event:
+                      # SpeedAction(3s): should NOT be stopped by parallel
+                      - name: event1
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: speed
+                            PrivateAction:
+                              LongitudinalAction:
+                                SpeedAction:
+                                  SpeedActionDynamics:
+                                    dynamicsDimension: time
+                                    dynamicsShape: linear
+                                    value: 3
+                                  SpeedActionTarget:
+                                    AbsoluteTargetSpeed:
+                                      value: 10
+                      # priority=parallel: should NOT stop event1
+                      - name: event2
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: noop
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: ':'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0.5
+                                      rule: greaterThan
+                      # exit_success: event1 completed (parallel didn't stop it)
+                      - name: exit_success
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: exit
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: event1
+                                      storyboardElementType: event
+                                      state: completeState
+                      # exit_failure: timeout
+                      - name: exit_failure
+                        priority: parallel
+                        maximumExecutionCount: 1
+                        Action:
+                          - name: exit
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 5
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

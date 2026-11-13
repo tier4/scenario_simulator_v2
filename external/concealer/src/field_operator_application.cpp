@@ -80,6 +80,7 @@ auto toModuleType(const std::string & module_name)
 FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 : rclcpp::Node("concealer_user", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
   process_id(pid),
+  autoware_shutdown_timeout(common::getParameter<int>("autoware_shutdown_timeout", 20)),
   time_limit(std::chrono::steady_clock::now() + std::chrono::seconds(common::getParameter<int>("initialize_duration"))),
   getAutowareState("/autoware/state", rclcpp::QoS(1), *this),
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
@@ -92,7 +93,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
   getLocalizationState("/api/localization/initialization_state", rclcpp::QoS(1).transient_local(), *this),
 #endif
-  getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1), *this, [this](const auto & message) {
+  getMrmState("/api/fail_safe/mrm_state", rclcpp::QoS(1).transient_local(), *this, [this](const auto & message) {
     auto state_name_of = [](auto state) constexpr {
       switch (state) {
         case MrmState::MRM_FAILED:
@@ -145,25 +146,42 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
     minimum_risk_maneuver_behavior = behavior_name_of(message.behavior);
   }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
-  getOperationModeState("/api/operation_mode/state", rclcpp::QoS(1), *this),
+  getOperationModeState("/api/operation_mode/state", rclcpp::QoS(1).transient_local(), *this),
 #endif
   getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1), *this),
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
-  getRouteState("/api/routing/state", rclcpp::QoS(1), *this),
+  getRouteState("/api/routing/state", rclcpp::QoS(1).transient_local(), *this),
 #endif
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
   requestClearRoute("/api/routing/clear_route", *this),
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
   requestEngage("/api/external/set/engage", *this),
-  requestInitialPose("/api/localization/initialize", *this),
-  // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
+  requestInitialPose("/api/localization/initialize", *this, std::chrono::seconds(common::getParameter<int>("initialize_localization"))),
+  // NOTE: routing takes a long time to return. But the specified duration is not decided by any technical reasons.
+  requestSetRoute("/api/routing/set_route", *this, std::chrono::seconds(10)),
   requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
   requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
   requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
-  requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this)
-{
-}
+  requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
+  requestChangeToStop("/api/operation_mode/change_to_stop", *this)
 // clang-format on
+{
+  executor.add_node(get_node_base_interface());
+
+  /*
+     In case of reusing the same Autoware instance for multiple scenarios (launch_autoware:=False),
+     we need to ensure that Autoware is in a safe STOP state before starting the next scenario.
+     Without this, Autoware may start driving unexpectedly when the next scenario starts.
+  */
+  task_queue.delay([this] {
+    /*
+       To ensure that Autoware is in a safe state, request to change to stop.
+       Ideally, we should check the operation state and only request if it's not already in STOP mode.
+       TODO: Implement state check to avoid unnecessary requests (when LegacyAutowareState is being refactored).
+    */
+    requestChangeToStop(std::make_shared<ChangeOperationMode::Request>(), 30);
+  });
+}
 
 FieldOperatorApplication::~FieldOperatorApplication()
 {
@@ -181,14 +199,35 @@ FieldOperatorApplication::~FieldOperatorApplication()
       }
     }();
 
-    const auto timeout = []() {
+    const auto timeout = [this]() {
       auto timeout = timespec();
-      timeout.tv_sec = common::getParameter<int>("sigterm_timeout", 5);
+      /*
+         The deadline for the Autoware launch process to exit by itself. The
+         deadline must sit between the escalation `ros2 launch` applies to the
+         Autoware nodes (10 seconds) and `sigterm_timeout`, the escalation
+         ROS 2 launch applies to this process (30 seconds in the launch
+         files), or the fallback below never runs.
+
+         Read in the constructor: `common::getParameter` can throw, and a
+         destructor is implicitly noexcept.
+      */
+      timeout.tv_sec = autoware_shutdown_timeout.count();
       timeout.tv_nsec = 0;
       return timeout;
     }();
 
-    if (::kill(process_id, SIGINT); sigtimedwait(&sigset, nullptr, &timeout) < 0) {
+    if (::kill(process_id, SIGINT) < 0) {
+      RCLCPP_ERROR_STREAM(
+        get_logger(), "SIGINT to the Autoware launch process "
+                        << process_id
+                        << " failed: " << std::system_error(errno, std::system_category()).what());
+    } else {
+      RCLCPP_INFO_STREAM(
+        get_logger(), "Sent SIGINT to the Autoware launch process "
+                        << process_id << ", waiting " << timeout.tv_sec << " seconds.");
+    }
+
+    if (sigtimedwait(&sigset, nullptr, &timeout) < 0) {
       switch (errno) {
         case EINTR:
           /*
@@ -208,7 +247,11 @@ FieldOperatorApplication::~FieldOperatorApplication()
              timeout period.
           */
           RCLCPP_ERROR_STREAM(get_logger(), "Autoware launch process does not respond. Kill it.");
-          killpg(process_id, SIGKILL);
+          if (::killpg(process_id, SIGKILL) < 0) {
+            RCLCPP_ERROR_STREAM(
+              get_logger(),
+              "killpg failed: " << std::system_error(errno, std::system_category()).what());
+          }
           break;
 
         default:
@@ -219,8 +262,8 @@ FieldOperatorApplication::~FieldOperatorApplication()
           */
           RCLCPP_ERROR_STREAM(
             get_logger(),
-            "The parameter sigterm_timeout specified a value less than zero or greater than or "
-            "equal to 1000 million.");
+            "The parameter autoware_shutdown_timeout specified a value less than zero or greater "
+            "than or equal to 1000 million.");
           break;
       }
     }
@@ -232,6 +275,10 @@ FieldOperatorApplication::~FieldOperatorApplication()
       } else {
         RCLCPP_ERROR_STREAM(get_logger(), std::system_error(errno, std::system_category()).what());
       }
+    } else {
+      RCLCPP_INFO_STREAM(
+        get_logger(),
+        "The Autoware launch process " << process_id << " exited with status " << status << ".");
     }
 
     process_id = 0;
@@ -269,8 +316,19 @@ auto FieldOperatorApplication::engage() -> void
           "The simulator attempted to request Autoware to engage, but was aborted because "
           "Autoware's current state is ",
           state, ".");
+      case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
+        waitForAutowareStateToBe(
+          LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
+        [[fallthrough]];
+      case LegacyAutowareState::waiting_for_route:
+        // The route has been sent but has not yet reached Autoware.
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
+        [[fallthrough]];
       case LegacyAutowareState::planning:
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_engage);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_engage:
         requestEngage(
@@ -280,7 +338,11 @@ auto FieldOperatorApplication::engage() -> void
             return request;
           }(),
           30);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_engage, LegacyAutowareState::driving);
         time_limit = std::decay_t<decltype(time_limit)>::max();
+        break;
+      case LegacyAutowareState::driving:
         break;
     }
   });
@@ -309,7 +371,12 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
             "The simulator attempted to initialize Autoware, but aborted because Autoware's "
             "current state is ",
             state, ".");
+        case LegacyAutowareState::undefined:
+          waitForAutowareStateToBe(
+            LegacyAutowareState::undefined, LegacyAutowareState::initializing);
+          [[fallthrough]];
         case LegacyAutowareState::initializing:
+        case LegacyAutowareState::waiting_for_route:
           requestInitialPose(
             [&]() {
               auto request =
@@ -324,18 +391,81 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
               return request;
             }(),
             30);
+          waitForAutowareStateToBe(
+            LegacyAutowareState::initializing, LegacyAutowareState::waiting_for_route);
           break;
       }
     });
   }
 }
 
-auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseStamped> & route)
+auto FieldOperatorApplication::plan(
+  const std::vector<geometry_msgs::msg::PoseStamped> & route, const bool allow_goal_modification)
   -> void
 {
   assert(not route.empty());
 
-  task_queue.delay([this, route] {
+  std::vector<geometry_msgs::msg::Pose> waypoints;
+  if (route.size() > 1) {
+    std::transform(
+      route.begin(), route.end() - 1, std::back_inserter(waypoints),
+      [](const auto & stamped_pose) { return stamped_pose.pose; });
+  }
+
+  RouteOption route_option;
+  if (DetectMember_allow_goal_modification<RouteOption>::value) {
+    route_option.allow_goal_modification = allow_goal_modification;
+  }
+
+  plan(route.back().pose, waypoints, route_option);
+}
+
+template <
+  typename Request, typename Waypoint,
+  typename = std::enable_if_t<
+    std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoutePoints::Request> ||
+    std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoute::Request> > >
+static auto make(
+  const geometry_msgs::msg::Pose & goal, const std::vector<Waypoint> & waypoints,
+  const FieldOperatorApplication::RouteOption & option) -> std::shared_ptr<Request>
+{
+  auto request = std::make_shared<Request>();
+
+  request->header.frame_id = "map";
+  request->goal = goal;
+
+  if constexpr (std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>) {
+    request->waypoints.assign(waypoints.begin(), waypoints.end());
+  } else if constexpr (std::is_same_v<Request, autoware_adapi_v1_msgs::srv::SetRoute::Request>) {
+    request->segments.assign(waypoints.begin(), waypoints.end());
+  }
+
+  /*
+     NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request
+     type was created on 2022/09/05 [1], and the
+     autoware_adapi_v1_msgs::msg::Option type data member was added
+     to the autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type
+     on 2023/04/12 [2]. Therefore, we cannot expect
+     autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always
+     have a data member `option`.
+
+     [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
+     [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
+  */
+  if constexpr (
+    DetectMember_option<Request>::value and
+    DetectMember_allow_goal_modification<decltype(std::declval<Request>().option)>::value) {
+    request->option.allow_goal_modification = option.allow_goal_modification;
+  }
+
+  return request;
+}
+
+auto FieldOperatorApplication::plan(
+  const geometry_msgs::msg::Pose & goal, const std::vector<geometry_msgs::msg::Pose> & waypoints,
+  const RouteOption & option) -> void
+{
+  task_queue.delay([this, goal, waypoints, option]() {
     switch (const auto state = getLegacyAutowareState(); state.value) {
       default:
         throw common::AutowareError(
@@ -343,44 +473,44 @@ auto FieldOperatorApplication::plan(const std::vector<geometry_msgs::msg::PoseSt
           "current state is ",
           state, ".");
       case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
       case LegacyAutowareState::arrived_goal:
-        waitForAutowareStateToBe(LegacyAutowareState::waiting_for_route);
+        waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
         [[fallthrough]];
       case LegacyAutowareState::waiting_for_route:
-        requestSetRoutePoints(
-          [&]() {
-            auto request = std::make_shared<SetRoutePoints::Request>();
+        requestSetRoutePoints(make<SetRoutePoints::Request>(goal, waypoints, option), 30);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
+        break;
+    }
+  });
+}
 
-            request->header = route.back().header;
-            request->goal = route.back().pose;
-
-            for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-              request->waypoints.push_back(each.pose);
-            }
-
-            /*
-               NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request
-               type was created on 2022/09/05 [1], and the
-               autoware_adapi_v1_msgs::msg::Option type data member was added
-               to the autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type
-               on 2023/04/12 [2]. Therefore, we cannot expect
-               autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always
-               have a data member `option`.
-
-               [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
-               [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
-             */
-            if constexpr (
-              DetectMember_option<SetRoutePoints::Request>::value and
-              DetectMember_allow_goal_modification<
-                decltype(std::declval<SetRoutePoints::Request>().option)>::value) {
-              request->option.allow_goal_modification = common::getParameter<bool>(
-                get_node_parameters_interface(), "allow_goal_modification");
-            }
-
-            return request;
-          }(),
-          30);
+auto FieldOperatorApplication::plan(
+  const geometry_msgs::msg::Pose & goal,
+  const std::vector<autoware_adapi_v1_msgs::msg::RouteSegment> & waypoints,
+  const RouteOption & option) -> void
+{
+  task_queue.delay([this, goal, waypoints, option]() {
+    switch (const auto state = getLegacyAutowareState(); state.value) {
+      default:
+        throw common::AutowareError(
+          "The simulator attempted to send a goal to Autoware, but was aborted because Autoware's "
+          "current state is ",
+          state, ".");
+      case LegacyAutowareState::initializing:
+        // The initial pose has been sent but has not yet reached Autoware.
+      case LegacyAutowareState::arrived_goal:
+        waitForAutowareStateToBe(state, LegacyAutowareState::waiting_for_route);
+        [[fallthrough]];
+      case LegacyAutowareState::waiting_for_route:
+        requestSetRoute(make<SetRoute::Request>(goal, waypoints, option), 30);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::waiting_for_route, LegacyAutowareState::planning);
+        waitForAutowareStateToBe(
+          LegacyAutowareState::planning, LegacyAutowareState::waiting_for_engage);
         break;
     }
   });
@@ -554,7 +684,8 @@ auto FieldOperatorApplication::spinSome() -> void
         }
       }
     }
-    rclcpp::spin_some(get_node_base_interface());
+
+    executor.spin_some();
   }
 }
 }  // namespace concealer

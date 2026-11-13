@@ -15,7 +15,7 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__TEST__UTILS__HELPER_FUNCTIONS_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__TEST__UTILS__HELPER_FUNCTIONS_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <cmath>
 #include <geometry_msgs/msg/point.hpp>

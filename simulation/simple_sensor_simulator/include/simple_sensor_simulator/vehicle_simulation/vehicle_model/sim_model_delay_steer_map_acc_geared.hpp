@@ -19,6 +19,7 @@
 #include <fstream>
 #include <iostream>
 #include <queue>
+#include <rclcpp/logging.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
 #include <sstream>
 #include <string>
@@ -164,8 +165,9 @@ public:
     CSVLoader csv(csv_path);
     std::vector<std::vector<std::string>> table;
     if (!csv.readCSV(table)) {
-      std::cerr << "[SimModelDelaySteerMapAccGeared]: failed to read acceleration map from "
-                << csv_path << std::endl;
+      RCLCPP_ERROR_STREAM(
+        rclcpp::get_logger("SimModelDelaySteerMapAccGeared"),
+        "failed to read acceleration map from " << csv_path);
       return false;
     }
 
@@ -174,8 +176,9 @@ public:
     acc_index_ = CSVLoader::getColumnIndex(table);
     acceleration_map_ = CSVLoader::getMap(table);
 
-    std::cout << "[SimModelDelaySteerMapAccGeared]: success to read acceleration map from "
-              << csv_path << std::endl;
+    RCLCPP_INFO_STREAM(
+      rclcpp::get_logger("SimModelDelaySteerMapAccGeared"),
+      "success to read acceleration map from " << csv_path);
     return true;
   }
 
