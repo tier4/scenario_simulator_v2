@@ -123,10 +123,6 @@ public:
   auto applyTeleportAction(const std::string &, const traffic_simulator::CanonicalizedLaneletPose &)
     -> void;
 
-  auto applyTeleportAction(
-    const std::string &, const std::string &, const geometry_msgs::msg::Point &,
-    const geometry_msgs::msg::Vector3 &) -> void;
-
   auto applyWalkStraightAction(const std::string &) -> void;
 };
 }  // namespace openscenario_interpreter

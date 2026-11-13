@@ -71,13 +71,11 @@ auto TeleportAction::teleport(
     },
     [&](const RelativeWorldPosition & position) {
       return entities.applyTeleportAction(
-        entity_ref, position.entity_ref, static_cast<geometry_msgs::msg::Point>(position),
-        static_cast<geometry_msgs::msg::Vector3>(position.orientation));
+        entity_ref, static_cast<geometry_msgs::msg::Pose>(position));
     },
     [&](const RelativeObjectPosition & position) {
       return entities.applyTeleportAction(
-        entity_ref, position.entity_ref, static_cast<geometry_msgs::msg::Point>(position),
-        static_cast<geometry_msgs::msg::Vector3>(position.orientation));
+        entity_ref, static_cast<geometry_msgs::msg::Pose>(position));
     },
     [&](const LanePosition & position) {
       return entities.applyTeleportAction(

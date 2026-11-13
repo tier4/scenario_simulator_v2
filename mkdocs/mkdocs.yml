@@ -1,5 +1,6 @@
 repo_url: https://github.com/tier4/scenario_simulator_v2
 site_name: Scenario testing framework for Autoware
+docs_dir: ../docs
 theme:
   name: material
   feature:

@@ -1,0 +1,17 @@
+/**:
+  ros__parameters:
+    # NOTE: The values in this file were hard-coded in ego_entity_simulation.cpp as fallbacks and were moved here as they were to keep backward compatibility.
+    # NOTE: this file does not include vel_lim, vel_rate_lim, steer_lim and wheel_base, because they always override with VehicleParameters
+    vehicle_model_type: "IDEAL_STEER_VEL"  # Introduced as "IDEAL_STEER" in #351 (2021-06) and renamed in #696 (2022-02). Equal to the default of autoware_simple_planning_simulator.
+    acc_time_delay: 0.1                    # Unchanged since #338 (2021-06). Equal to the default of autoware_simple_planning_simulator.
+    acc_time_constant: 0.1                 # Unchanged since #338 (2021-06). Equal to the default of autoware_simple_planning_simulator.
+    steer_rate_lim: 5.0                    # Unchanged since #338 (2021-06). Equal to the default of autoware_simple_planning_simulator.
+    steer_time_delay: 0.24                 # Introduced as 0.3 in #338 (2021-06) and changed to 0.24 in #652 (2021-12). Equal to the default of autoware_simple_planning_simulator.
+    steer_time_constant: 0.27              # Introduced as 0.3 in #338 (2021-06) and changed to 0.27 in #652 (2021-12). Equal to the default of autoware_simple_planning_simulator.
+    steer_dead_band: 0.0                   # Introduced as deadzone_delta_steer in #338 (2021-06) and reintroduced under this name in #1144 (2023-12). Equal to the default of autoware_simple_planning_simulator.
+    steer_bias: 0.0                        # Unchanged since #1355 (2025-03). Equal to the default of autoware_simple_planning_simulator.
+    vel_time_delay: 0.1                    # Introduced as 0.25 in #338 (2021-06) and has been 0.1 since #351 (2021-06) for an unrecorded reason. The default of autoware_simple_planning_simulator is 0.25.
+    vel_time_constant: 0.1                 # Introduced as 0.5 in #338 (2021-06) and has been 0.1 since #351 (2021-06) for an unrecorded reason. The default of autoware_simple_planning_simulator is 0.5.
+    debug_acc_scaling_factor: 1.0          # Unchanged since #1144 (2023-12). Equal to the default of autoware_simple_planning_simulator.
+    debug_steer_scaling_factor: 1.0        # Unchanged since #1144 (2023-12). Equal to the default of autoware_simple_planning_simulator.
+    acceleration_map_path: ""              # Unchanged since #1144 (2023-12). autoware_simple_planning_simulator has no default for this parameter.
