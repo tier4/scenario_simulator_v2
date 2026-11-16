@@ -6,7 +6,9 @@
   <description>
       A simulation plugin for reactive, context-aware trajectory planning with dynamic obstacle avoidance.
   </description>
-  <maintainer email="taiga.takano.2@tier4.jp">Taiga Takano</maintainer>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
