@@ -39,6 +39,7 @@ public:
     const geometry_msgs::msg::Point & start_point,
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory);
   auto getLength() const -> double override { return total_length_; }
+  auto getAltitudeRange() const -> std::pair<double, double> override;
   auto getMaximum2DCurvature() const -> double;
   auto getPoint(const double s) const -> geometry_msgs::msg::Point;
   auto getPoint(const double s, const double offset) const -> geometry_msgs::msg::Point;
@@ -70,6 +71,7 @@ public:
   auto getPolygon(const double width, const size_t num_points = 30, const double z_offset = 0)
     -> std::vector<geometry_msgs::msg::Point>;
   const std::vector<geometry_msgs::msg::Point> control_points;
+  auto getLengths() const -> const std::vector<double> & { return length_list_; }
   virtual ~CatmullRomSpline() = default;
 
 private:

@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ADD_ENTITY_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/assign_controller_action.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <pugixml.hpp>
@@ -34,9 +33,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AddEntityAction : private Scope,
-                         private SimulatorCore::ActionApplication,
-                         private SimulatorCore::NonStandardOperation
+struct AddEntityAction : private Scope
 {
   const Position position;
 

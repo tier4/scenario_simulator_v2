@@ -21,8 +21,9 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-OpenScenario::OpenScenario(const boost::filesystem::path & pathname)
-: Scope(this),
+OpenScenario::OpenScenario(
+  const std::filesystem::path & pathname, std::shared_ptr<ScenarioRuntime> scenario_runtime)
+: Scope(this, std::move(scenario_runtime)),
   pathname(pathname),
   file_header(readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), local())),
   category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, local()))
@@ -35,7 +36,7 @@ auto OpenScenario::evaluate() -> Object
   return category.evaluate();
 }
 
-auto OpenScenario::load(const boost::filesystem::path & filepath) -> const pugi::xml_node &
+auto OpenScenario::load(const std::filesystem::path & filepath) -> const pugi::xml_node &
 {
   if (const auto result = script.load_file(filepath.string().c_str()); not result) {
     throw SyntaxError(result.description(), ": ", filepath);

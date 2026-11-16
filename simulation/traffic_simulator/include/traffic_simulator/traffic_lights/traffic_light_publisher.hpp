@@ -18,7 +18,6 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
@@ -29,7 +28,8 @@ class TrafficLightPublisherBase
 public:
   virtual auto publish(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
+    const simulation_api_schema::UpdateTrafficLightsRequest & request,
+    const TrafficLightStatePredictions * predictions = nullptr) const -> void = 0;
 
   virtual ~TrafficLightPublisherBase() = default;
 };
@@ -53,14 +53,16 @@ public:
 
   static auto generateMessage(
     const rclcpp::Time &, const simulation_api_schema::UpdateTrafficLightsRequest & request,
-    const std::string & frame = "") -> std::unique_ptr<MessageType>;
+    const std::string & frame = "", const TrafficLightStatePredictions * predictions = nullptr)
+    -> std::unique_ptr<MessageType>;
 
   auto publish(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override
+    const simulation_api_schema::UpdateTrafficLightsRequest & request,
+    const TrafficLightStatePredictions * predictions = nullptr) const -> void override
   {
     traffic_light_state_array_publisher_->publish(
-      generateMessage(current_ros_time, request, frame_));
+      generateMessage(current_ros_time, request, frame_, predictions));
   }
 
 private:

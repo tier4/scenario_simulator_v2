@@ -23,22 +23,24 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Sun 1.2 -------------------------------------------------
- *
- * <xsd:complexType name="Sun">
- *   <xsd:attribute name="azimuth" type="Double" use="required"/>
- *   <xsd:attribute name="elevation" type="Double" use="required"/>
- *   <xsd:attribute name="intensity" type="Double">
- *    <xsd:annotation>
- *      <xsd:appinfo>
- *        deprecated
- *      </xsd:appinfo>
- *    </xsd:annotation>
- *   </xsd:attribute>
- *   <xsd:attribute name="illuminance" type="Double"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Sun (OpenSCENARIO XML 1.3.1)
+
+   Specification of sun properties.
+
+   <xsd:complexType name="Sun">
+     <xsd:attribute name="azimuth" type="Double" use="required"/>
+     <xsd:attribute name="elevation" type="Double" use="required"/>
+     <xsd:attribute name="intensity" type="Double">
+      <xsd:annotation>
+        <xsd:appinfo>
+          deprecated
+        </xsd:appinfo>
+      </xsd:annotation>
+     </xsd:attribute>
+     <xsd:attribute name="illuminance" type="Double"/>
+   </xsd:complexType>
+*/
 struct Sun
 {
   const Double azimuth;  // Azimuth of the sun, counted clockwise, 0=north, PI/2 = east, PI=south,

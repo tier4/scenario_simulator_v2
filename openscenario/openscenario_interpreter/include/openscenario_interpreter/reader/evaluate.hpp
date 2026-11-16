@@ -17,7 +17,6 @@
 
 #include <iomanip>
 #include <openscenario_interpreter/object.hpp>
-#include <openscenario_interpreter/utility/variant.hpp>
 #include <type_traits>
 
 #include "openscenario_interpreter/utility/demangle.hpp"

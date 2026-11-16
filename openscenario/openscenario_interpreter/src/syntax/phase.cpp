@@ -23,39 +23,26 @@ inline namespace syntax
 Phase::Phase(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   duration(readAttribute<Double>("duration", node, scope, Double::infinity())),
-  traffic_signal_states(readElements<TrafficSignalState, 0>("TrafficSignalState", node, scope)),
-  grouped_states([this]() {
-    std::map<
-      std::pair<lanelet::Id, TrafficSignalState::TrafficSignalType>,
-      std::vector<const TrafficSignalState *>>
-      groups;
-    for (const auto & traffic_signal_state : traffic_signal_states) {
-      auto key =
-        std::make_pair(traffic_signal_state.id(), traffic_signal_state.trafficSignalType());
-      groups[key].push_back(&traffic_signal_state);
-    }
-    return groups;
-  }())
+  traffic_signal_states(readElements<TrafficSignalState, 0>("TrafficSignalState", node, scope))
 {
 }
 
 auto Phase::evaluate() const -> Object
 {
-  for (const auto & [key, states] : grouped_states) {
-    const auto & [id, type] = key;
-    // clear states before adding
-    if (type == TrafficSignalState::TrafficSignalType::conventional) {
-      clearConventionalTrafficLightsState(id);
-    } else if (type == TrafficSignalState::TrafficSignalType::v2i) {
-      clearV2ITrafficLightsState(id);
-    }
-    // then add states
-    for (size_t i = 0; i < states.size(); ++i) {
-      states[i]->evaluate();
-    }
+  // To address multiple state entries that have same ID,
+  // do not clear one by one in evaluate for-loop.
+  clearStates();
+  for (const auto & traffic_signal_state : traffic_signal_states) {
+    traffic_signal_state.evaluate();
   }
-
   return unspecified;
+}
+
+auto Phase::clearStates() const -> void
+{
+  for (const auto & traffic_signal_state : traffic_signal_states) {
+    traffic_signal_state.clear();
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

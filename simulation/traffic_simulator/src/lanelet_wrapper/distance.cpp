@@ -17,6 +17,7 @@
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
@@ -28,7 +29,7 @@ auto lateralDistance(
   const LaneletPose & from, const LaneletPose & to,
   const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
-  const auto route = route::route(from.lanelet_id, to.lanelet_id, routing_configuration);
+  const auto route = route::routeFromGraph(from.lanelet_id, to.lanelet_id, routing_configuration);
   if (route.empty()) {
     return std::nullopt;
   } else if (not routing_configuration.allow_lane_change) {
@@ -77,9 +78,9 @@ auto longitudinalDistance(
       [next_lanelet](const lanelet::Id id) { return id == next_lanelet; });
   };
 
-  /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
+  /// @sa https://tier4.github.io/scenario_simulator_v2/developer_guide/DistanceCalculation/
   if (const auto route =
-        route::route(from_pose.lanelet_id, to_pose.lanelet_id, routing_configuration);
+        route::routeFromGraph(from_pose.lanelet_id, to_pose.lanelet_id, routing_configuration);
       not route.empty() || from_pose.lanelet_id == to_pose.lanelet_id) {
     /// @note horizontal bar must intersect with the lanelet spline, so the distance was set arbitrarily to 10 meters.
     static constexpr double matching_distance = 10.0;
@@ -176,6 +177,87 @@ auto distanceToStopLine(const std::vector<Point> & route_waypoints, const lanele
     return route_spline.getCollisionPointIn2D(
       lanelet_wrapper::lanelet_map::stopLinePolygon(stop_line_id));
   }
+}
+
+// TrafficLightStopLine
+auto distanceToTrafficLightStopLine(
+  const SplineInterface & route_spline, const lanelet::Id traffic_light_id) -> std::optional<double>
+{
+  if (route_spline.getLength() <= 0) {
+    return std::nullopt;
+  } else {
+    const auto stop_lines = traffic_lights::trafficLightStopLinesPoints(traffic_light_id);
+    for (const auto & stop_line : stop_lines) {
+      if (const auto collision_point = route_spline.getCollisionPointIn2D(stop_line)) {
+        return collision_point;
+      }
+    }
+    return std::nullopt;
+  }
+}
+
+auto distanceToTrafficLightStopLine(
+  const std::vector<Point> & route_waypoints, const lanelet::Id traffic_light_id)
+  -> std::optional<double>
+{
+  if (route_waypoints.empty()) {
+    return std::nullopt;
+  } else {
+    return distanceToTrafficLightStopLine(Spline{route_waypoints}, traffic_light_id);
+  }
+}
+
+auto distanceToTrafficLightStopLine(
+  const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
+  -> std::optional<double>
+{
+  if (const auto & traffic_light_ids =
+        lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(route_lanelets);
+      traffic_light_ids.empty()) {
+    return std::nullopt;
+  } else {
+    std::optional<double> min_distance{std::nullopt};
+    for (const auto traffic_light_id : traffic_light_ids) {
+      if (
+        const auto & collision_point =
+          distanceToTrafficLightStopLine(route_spline, traffic_light_id)) {
+        if (not min_distance.has_value() or collision_point.value() < min_distance.value()) {
+          min_distance = collision_point;
+        }
+      }
+    }
+    return min_distance;
+  }
+}
+
+auto distanceToTrafficLightStopLine(
+  const lanelet::Ids & route_lanelets, const std::vector<Point> & route_waypoints)
+  -> std::optional<double>
+{
+  if (route_waypoints.empty()) {
+    return std::nullopt;
+  } else {
+    return distanceToTrafficLightStopLine(route_lanelets, Spline{route_waypoints});
+  }
+}
+
+// Crosswalk
+auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanelet::Id crosswalk_id)
+  -> std::optional<double>
+{
+  if (route_waypoints.empty()) {
+    return std::nullopt;
+  } else {
+    return distanceToCrosswalk(Spline{route_waypoints}, crosswalk_id);
+  }
+}
+
+auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id crosswalk_id)
+  -> std::optional<double>
+{
+  constexpr bool search_in_backward_direction{false};
+  return route_spline.getCollisionPointIn2D(
+    lanelet_wrapper::lanelet_map::laneletPolygon(crosswalk_id), search_in_backward_direction);
 }
 }  // namespace distance
 }  // namespace lanelet_wrapper

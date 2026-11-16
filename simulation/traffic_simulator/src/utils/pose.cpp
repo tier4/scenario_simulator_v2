@@ -234,7 +234,7 @@ auto isAltitudeMatching(
   const CanonicalizedLaneletPose & lanelet_pose,
   const CanonicalizedLaneletPose & target_lanelet_pose) -> bool
 {
-  return lanelet_wrapper::pose::isAltitudeMatching(
+  return lanelet_wrapper::pose::isAltitudeWithinThreshold(
     lanelet_pose.getAltitude(), target_lanelet_pose.getAltitude());
 }
 
@@ -281,7 +281,6 @@ auto boundingBoxRelativePose(
 }
 
 /// @note Relative LaneletPose
-/// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const RoutingConfiguration & routing_configuration) -> LaneletPose
@@ -376,13 +375,10 @@ auto isInLanelet(const geometry_msgs::msg::Point & point, const lanelet::Id lane
   return lanelet_wrapper::lanelet_map::isInLanelet(lanelet_id, point);
 }
 
-/// @todo HdMapUtils will be removed when lanelet_wrapper::distance is added
-auto isAtEndOfLanelets(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
+auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
 {
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  return hdmap_utils_ptr->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
+  return lanelet_wrapper::route::followingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
          lanelet_wrapper::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
@@ -392,12 +388,10 @@ auto findRoutableAlternativeLaneletPoseFrom(
   -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
 {
   /// @note search_distance should be minimal, just to check nearest neighbour lanelets
-  constexpr auto search_distance{3.0};
-  /// @note default_match_to_lane_reduction_ratio is constant described in hdmap_utils.hpp
-  constexpr auto default_match_to_lane_reduction_ratio{0.8};
-  constexpr auto include_crosswalk{false};
+  constexpr double search_distance{3.0};
+  constexpr bool include_crosswalk{false};
   /**
-   * @note route::route requires routing_configuration,
+   * @note route::routeFromGraph requires routing_configuration,
    * 'allow_lane_change = true' is needed to check distances to entities on neighbour lanelets
    */
   RoutingConfiguration routing_configuration;
@@ -406,16 +400,17 @@ auto findRoutableAlternativeLaneletPoseFrom(
   /// @note if there is already a route from_lanelet_id->to_lanelet_id, return it
   /// if not, transform the 'to_lanelet_id' position into the nearby lanelets and search for a route in relation to them
   if (const auto to_lanelet_id = to_canonicalized_lanelet_pose.getLaneletPose().lanelet_id;
-      !route::route(from_lanelet_id, to_lanelet_id, routing_configuration).empty()) {
+      !route::routeFromGraph(from_lanelet_id, to_lanelet_id, routing_configuration).empty()) {
     return to_canonicalized_lanelet_pose;
   } else if (const auto nearby_lanelet_ids = lanelet_wrapper::pose::findMatchingLanes(
                static_cast<geometry_msgs::msg::Pose>(to_canonicalized_lanelet_pose),
                to_bounding_box, include_crosswalk, search_distance,
-               default_match_to_lane_reduction_ratio, routing_configuration.routing_graph_type);
+               lanelet_wrapper::pose::DEFAULT_MATCH_TO_LANE_REDUCTION_RATIO,
+               routing_configuration.routing_graph_type);
              nearby_lanelet_ids.has_value()) {
     std::vector<std::pair<CanonicalizedLaneletPose, lanelet::Ids>> routes;
     for (const auto & [distance, lanelet_id] : nearby_lanelet_ids.value()) {
-      if (auto route = route::route(from_lanelet_id, lanelet_id, routing_configuration);
+      if (auto route = route::routeFromGraph(from_lanelet_id, lanelet_id, routing_configuration);
           lanelet_id == to_lanelet_id || route.empty()) {
         continue;
       } else if (const auto lanelet_pose = lanelet_wrapper::pose::toLaneletPose(

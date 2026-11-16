@@ -16,7 +16,7 @@
 #define OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -89,7 +89,7 @@ public:
         .c_str());
   }
 
-  auto validate(const boost::filesystem::path & xml_file) -> void
+  auto validate(const std::filesystem::path & xml_file) -> void
   {
     parser->parse(xml_file.string().c_str());
   }

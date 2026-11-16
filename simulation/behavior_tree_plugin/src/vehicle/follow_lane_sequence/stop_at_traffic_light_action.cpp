@@ -14,9 +14,12 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
+#include <geometry/bounding_box.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -77,7 +80,7 @@ std::optional<double> StopAtTrafficLightAction::calculateTargetSpeed(double curr
    * @brief hard coded parameter!! 1.0 is a stop margin
    */
   double rest_distance =
-    distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
+    distance_to_stop_target_.value() - (math::geometry::getDistancesFromCenterToEdge(vehicle_parameters.bounding_box).front + 1.0);
   if (rest_distance < calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
     return 0;
   }
@@ -94,7 +97,8 @@ bool StopAtTrafficLightAction::checkPreconditions()
     return false;
   } else if (!behavior_parameter_.see_around) {
     return false;
-  } else if (!getRightOfWayEntities(route_lanelets_).empty()) {
+  } else if (traffic_simulator::route::isNeedToRightOfWay(
+               route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return false;
   } else {
     return true;
@@ -110,7 +114,8 @@ BT::NodeStatus StopAtTrafficLightAction::doAction()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_stop_target_ = getDistanceToTrafficLightStopLine(route_lanelets_, *trajectory);
+  distance_to_stop_target_ =
+    traffic_lights_->getDistanceToActiveTrafficLightStopLine(route_lanelets_, *trajectory);
   std::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
     if (distance_to_stop_target_.value() > getHorizon()) {

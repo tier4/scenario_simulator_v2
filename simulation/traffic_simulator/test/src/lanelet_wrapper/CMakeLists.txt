@@ -1,0 +1,17 @@
+ament_add_gtest(test_lanelet_wrapper_lanelet_map test_lanelet_map.cpp)
+target_link_libraries(test_lanelet_wrapper_lanelet_map traffic_simulator)
+
+ament_add_gtest(test_lanelet_wrapper_pose test_pose.cpp)
+target_link_libraries(test_lanelet_wrapper_pose traffic_simulator)
+
+ament_add_gtest(test_lanelet_wrapper_distance test_distance.cpp)
+target_link_libraries(test_lanelet_wrapper_distance traffic_simulator)
+
+ament_add_gtest(test_lanelet_wrapper_route test_route.cpp)
+target_link_libraries(test_lanelet_wrapper_route traffic_simulator)
+
+ament_add_gtest(test_lanelet_wrapper_lane_change test_lane_change.cpp)
+target_link_libraries(test_lanelet_wrapper_lane_change traffic_simulator)
+
+ament_add_gtest(test_lanelet_wrapper_traffic_lights test_traffic_lights.cpp)
+target_link_libraries(test_lanelet_wrapper_traffic_lights traffic_simulator)

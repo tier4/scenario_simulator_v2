@@ -14,6 +14,8 @@
 
 #include "context_gamma_planner/planner/pedestrian/follow_lane_planner.hpp"
 
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+
 namespace context_gamma_planner::pedestrian
 {
 
@@ -21,12 +23,11 @@ FollowLanePlanner::FollowLanePlanner(const double goal_threshold) : GoalPlannerB
 {
 }
 
-void FollowLanePlanner::setWaypoints(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-  const std::vector<lanelet::Id> & route_ids)
+void FollowLanePlanner::setWaypoints(const std::vector<lanelet::Id> & route_ids)
 {
   goal_poses_.clear();
-  for (const auto & point : hdmap_utils->getCenterPoints(route_ids)) {
+  for (const auto & point :
+       traffic_simulator::lanelet_wrapper::lanelet_map::centerPoints(route_ids)) {
     geometry_msgs::msg::Pose pose;
     pose.position = point;
     goal_poses_.emplace_back(pose);

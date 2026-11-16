@@ -14,22 +14,23 @@
 
 #include <boost/algorithm/string.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state.hpp>
+#include <regex>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-TrafficSignalState::TrafficSignalType::TrafficSignalType(const std::string & string)
-: value([&]() {
+TrafficSignalState::TrafficSignalChannelType::TrafficSignalChannelType(const std::string & string)
+: value([&] {
     if (string == "conventional") {
       return conventional;
     } else if (string == "v2i") {
       return v2i;
     } else {
       throw Error(
-        "TrafficSignalState: Invalid traffic signal type '", string,
+        "TrafficSignalState: Invalid traffic signal channel type '", string,
         "'. Valid values are 'conventional' or 'v2i'.");
     }
   }())
@@ -37,34 +38,73 @@ TrafficSignalState::TrafficSignalType::TrafficSignalType(const std::string & str
 }
 
 TrafficSignalState::TrafficSignalState(const pugi::xml_node & node, Scope & scope)
-: traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
+: scenario_runtime(scope.runtime()),
+  traffic_signal_id(readAttribute<String>("trafficSignalId", node, scope)),
   state(readAttribute<String>("state", node, scope)),
-  parsed_traffic_signal_id(parseTrafficSignalId(traffic_signal_id))
+  target(traffic_signal_id)
 {
+  if (not isDetected() and state.find("unknown") != std::string::npos) {
+    throw Error(
+      "TrafficSignalState: The state '", state,
+      "' contains 'unknown' which is not allowed for ground truth traffic lights. "
+      "'unknown' is reserved for traffic light perception simulation.");
+  }
+}
+
+auto TrafficSignalState::clear() const -> void
+{
+  auto & traffic_signals = scenario_runtime.trafficSignals();
+  switch (channelType()) {
+    case TrafficSignalChannelType::conventional:
+      if (isDetected()) {
+        traffic_signals.clearConventionalDetectedTrafficLightsState(id());
+      } else {
+        traffic_signals.clearConventionalTrafficLightsState(id());
+      }
+      break;
+    case TrafficSignalChannelType::v2i:
+      if (isDetected()) {
+        traffic_signals.clearV2IDetectedTrafficLightsState(id());
+      } else {
+        traffic_signals.clearV2ITrafficLightsState(id());
+      }
+      break;
+    default:
+      throw Error("Unknown traffic signal channel type has set to TrafficSignalState");
+  }
 }
 
 auto TrafficSignalState::evaluate() const -> Object
 {
-  switch (trafficSignalType()) {
-    case TrafficSignalType::conventional:
-      addConventionalTrafficLightsState(id(), state);
+  auto & traffic_signals = scenario_runtime.trafficSignals();
+  switch (channelType()) {
+    case TrafficSignalChannelType::conventional:
+      if (isDetected()) {
+        traffic_signals.addConventionalDetectedTrafficLightsState(id(), state);
+      } else {
+        traffic_signals.addConventionalTrafficLightsState(id(), state);
+      }
       break;
-    case TrafficSignalType::v2i:
-      addV2ITrafficLightsState(id(), state);
+    case TrafficSignalChannelType::v2i:
+      if (isDetected()) {
+        traffic_signals.addV2IDetectedTrafficLightsState(id(), state);
+      } else {
+        traffic_signals.addV2ITrafficLightsState(id(), state);
+      }
       break;
     default:
-      throw Error("Unknown traffic signal type has set to TrafficSignalState");
+      throw Error("Unknown traffic signal channel type has set to TrafficSignalState");
   }
   return unspecified;
 }
 
-auto TrafficSignalState::parseTrafficSignalId(const std::string & traffic_signal_id)
-  -> std::pair<lanelet::Id, TrafficSignalType>
+TrafficSignalState::TargetTrafficSignalChannel::TargetTrafficSignalChannel(
+  const std::string & traffic_signal_id)
+: channel(TrafficSignalChannelType::conventional), detected(false)
 {
   std::vector<std::string> parts;
   boost::split(parts, traffic_signal_id, boost::is_space(), boost::token_compress_on);
 
-  lanelet::Id id;
   try {
     id = boost::lexical_cast<lanelet::Id>(parts[0]);
   } catch (const boost::bad_lexical_cast &) {
@@ -73,20 +113,25 @@ auto TrafficSignalState::parseTrafficSignalId(const std::string & traffic_signal
       "'. Expected a numeric lanelet ID.");
   }
 
-  TrafficSignalType type = [&]() {
-    switch (parts.size()) {
-      case 1:
-        return TrafficSignalType(TrafficSignalType::conventional);
-      case 2:
-        return TrafficSignalType(parts[1]);
-      default:
-        throw Error(
-          "TrafficSignalState: trafficSignalId '", traffic_signal_id,
-          "' has invalid format. Expected format: '<id>' or '<id> <type>'.");
+  if (parts.size() == 1) {
+    channel = TrafficSignalChannelType::conventional;
+    detected = false;
+  } else if (parts.size() == 2) {
+    static const std::regex pattern(R"(^(conventional|v2i)(_detected)?$)");
+    std::smatch match;
+    if (std::regex_match(parts[1], match, pattern)) {
+      channel = TrafficSignalChannelType(match[1].str());
+      detected = match[2].matched;
+    } else {
+      throw Error(
+        "TrafficSignalState: Invalid traffic signal channel type '", parts[1],
+        "'. Expected 'conventional', 'conventional_detected', 'v2i', or 'v2i_detected'.");
     }
-  }();
-
-  return {id, type};
+  } else {
+    throw Error(
+      "TrafficSignalState: trafficSignalId '", traffic_signal_id,
+      "' has invalid format. Expected format: '<id>' or '<id> <channel_type>'.");
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

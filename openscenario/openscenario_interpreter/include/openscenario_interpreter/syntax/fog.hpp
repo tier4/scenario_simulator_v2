@@ -24,16 +24,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Fog 1.2 ------------------------------------------------------------
- *
- * <xsd:complexType name="Fog">
- *   <xsd:all>
- *     <xsd:element name="BoundingBox" type="BoundingBox" minOccurs="0"/>
- *   </xsd:all>
- *   <xsd:attribute name="visualRange" type="Double" use="required"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Fog (OpenSCENARIO XML 1.3.1)
+
+   Defines fog at simulation runtime.
+
+   <xsd:complexType name="Fog">
+     <xsd:all>
+       <xsd:element name="BoundingBox" type="BoundingBox" minOccurs="0"/>
+     </xsd:all>
+     <xsd:attribute name="visualRange" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct Fog
 {
   const Double visual_range;  // Unit: [m]. Range: [0..inf[.
