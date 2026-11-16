@@ -1,0 +1,27 @@
+[project]
+name = "docs"
+version = "0.7.0"
+description = "A scenario-based simulation framework for Autoware"
+authors = [{ name = "Masaya Kataoka", email = "ms.kataoka@gmail.com" }]
+requires-python = ">=3.10"
+license = "Apache-2.0"
+dependencies = [
+    "mkdocs>=1.5.0,<2",
+    "mkdocs-material>=9.1.19,<10",
+    "pymdown-extensions~=10.1",
+    "fontawesome-markdown>=0.2.6,<0.3",
+    "markdown>=3.3.0",
+    "python-markdown-math>=0.8,<0.10",
+    "plantuml-markdown>=3.9.2,<4",
+    "mkdocs-codeinclude-plugin>=0.2.1,<0.3",
+    "mkdocs-git-revision-date-localized-plugin>=1.2.0,<2",
+    "mkdocs-awesome-pages-plugin>=2.9.2,<3",
+    "plantuml>=0.3.0,<0.4",
+    "mkdocs-redirects>=1.2.1,<2",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+fontawesome-markdown = { git = "https://github.com/jordanauge/fontawesome-markdown", rev = "c00e2d0beb00f0e581b8a108e6205047e73dc492" }

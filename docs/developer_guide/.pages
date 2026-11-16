@@ -1,5 +1,3 @@
-# cspell: ignore TIERIV
-
 nav:
     - About: About.md
     - AutowareAPI.md

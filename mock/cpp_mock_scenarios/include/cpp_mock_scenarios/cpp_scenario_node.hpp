@@ -18,9 +18,9 @@
 #include <limits>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <simple_junit/junit5.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/utils/junit5.hpp>
 #include <vector>
 
 namespace cpp_mock_scenarios

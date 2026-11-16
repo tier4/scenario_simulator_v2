@@ -48,7 +48,7 @@ struct OpenScenario : public Scope
 
   std::size_t frame = 0;
 
-  explicit OpenScenario(const std::filesystem::path &);
+  explicit OpenScenario(const std::filesystem::path &, std::shared_ptr<ScenarioRuntime>);
 
   auto evaluate() -> Object;
 

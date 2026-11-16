@@ -6,7 +6,6 @@
 # Docker files
 .dockerignore
 Dockerfile*
-docker-bake.hcl
 
 # Python cache
 __pycache__/
