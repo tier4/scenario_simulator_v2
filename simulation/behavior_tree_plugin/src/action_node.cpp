@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <algorithm>
+#include <boost/container/small_vector.hpp>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <cmath>
 #include <geometry/bounding_box.hpp>
@@ -277,10 +278,14 @@ namespace
 namespace bg = boost::geometry;
 using BoostPolygon = math::geometry::boost_polygon;
 using AxisAlignedBox = bg::model::box<math::geometry::boost_point>;
+template <typename Point, typename Allocator>
+using SmallVectorPointList = boost::container::small_vector<Point, 5, Allocator>;
+using SmallVectorPolygon =
+  bg::model::polygon<math::geometry::boost_point, true, true, SmallVectorPointList>;
 
 struct QuadrilateralData
 {
-  std::vector<BoostPolygon> polygons;
+  std::vector<SmallVectorPolygon> polygons;
   std::vector<AxisAlignedBox> segment_bounds;
   std::vector<double> longitudinal_starts;
   std::optional<AxisAlignedBox> trajectory_bounds;
@@ -328,7 +333,7 @@ auto buildQuadrilateralData(
   for (std::size_t i = 0; i < num_segments; ++i) {
     data.longitudinal_starts.emplace_back(step_size * static_cast<double>(i));
 
-    BoostPolygon polygon;
+    SmallVectorPolygon polygon;
     auto & outer = polygon.outer();
     outer.reserve(5);
     // Add a closing point because Boost.Geometry requires the first and last points to match.

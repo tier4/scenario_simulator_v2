@@ -201,8 +201,9 @@ std::optional<double> HermiteCurve::getSValue(
   geometry_msgs::msg::Point p1;
   p0.y = threshold_distance;
   p1.y = -threshold_distance;
-  const auto line = math::geometry::transformPoints(pose, {p0, p1});
-  const auto s = getCollisionPointIn2D(line[0], line[1], false);
+  const auto transformed_p0 = math::geometry::transformPoint(pose, p0);
+  const auto transformed_p1 = math::geometry::transformPoint(pose, p1);
+  const auto s = getCollisionPointIn2D(transformed_p0, transformed_p1, false);
   if (!s) {
     return std::nullopt;
   }
