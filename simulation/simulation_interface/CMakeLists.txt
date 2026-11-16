@@ -24,7 +24,6 @@ include(FetchContent)
 include(FindProtobuf REQUIRED)
 ament_auto_find_build_dependencies()
 
-# cSpell:ignore wonkycase
 # lint_cmake: -readability/wonkycase
 
 FetchContent_Declare(osi-cpp GIT_REPOSITORY https://github.com/OpenSimulationInterface/osi-cpp.git GIT_TAG v3.8.0)

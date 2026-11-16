@@ -53,6 +53,8 @@ struct FieldOperatorApplication : public rclcpp::Node
 {
   pid_t process_id;
 
+  std::chrono::seconds autoware_shutdown_timeout;
+
   bool initialized = false;
 
   std::atomic<bool> finalized = false;

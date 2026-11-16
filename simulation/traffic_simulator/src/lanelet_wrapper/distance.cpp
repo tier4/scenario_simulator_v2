@@ -78,7 +78,7 @@ auto longitudinalDistance(
       [next_lanelet](const lanelet::Id id) { return id == next_lanelet; });
   };
 
-  /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
+  /// @sa https://tier4.github.io/scenario_simulator_v2/developer_guide/DistanceCalculation/
   if (const auto route =
         route::routeFromGraph(from_pose.lanelet_id, to_pose.lanelet_id, routing_configuration);
       not route.empty() || from_pose.lanelet_id == to_pose.lanelet_id) {

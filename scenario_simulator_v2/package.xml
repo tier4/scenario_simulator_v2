@@ -4,7 +4,9 @@
   <name>scenario_simulator_v2</name>
   <version>25.0.22</version>
   <description>scenario testing framework for Autoware</description>
-  <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

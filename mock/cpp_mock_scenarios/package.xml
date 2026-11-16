@@ -4,7 +4,9 @@
   <name>cpp_mock_scenarios</name>
   <version>25.0.22</version>
   <description>C++ mock scenarios</description>
-  <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -14,7 +16,6 @@
 
   <depend>generate_parameter_library</depend>
   <depend>kashiwanoha_map</depend>
-  <depend>simple_junit</depend>
   <depend>simple_sensor_simulator</depend>
   <depend>traffic_simulator</depend>
 
