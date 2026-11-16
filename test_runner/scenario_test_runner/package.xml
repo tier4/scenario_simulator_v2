@@ -12,6 +12,7 @@
   <buildtool_depend>ament_cmake_python</buildtool_depend>
   <depend>ament_copyright</depend>
   <depend>ament_pep257</depend>
+  <depend>default_vehicle_description</depend>
   <depend>openscenario_interpreter</depend>
   <depend>openscenario_preprocessor</depend>
   <depend>openscenario_preprocessor_msgs</depend>

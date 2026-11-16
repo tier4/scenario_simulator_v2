@@ -156,7 +156,7 @@ wheels = [
 [[package]]
 name = "docs"
 version = "0.7.0"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "fontawesome-markdown" },
     { name = "markdown" },

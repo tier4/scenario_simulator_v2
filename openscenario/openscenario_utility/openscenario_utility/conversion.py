@@ -117,6 +117,45 @@ def load_yaml(path: Path):
         exit()
 
 
+def expand_dotted_keys(node):
+    #
+    # A.B.c: { ... }
+    #
+    # => A: { B: { c: { ... } } }
+    #
+    # Keys sharing the same head are merged:
+    #
+    # A.B.c: x
+    # A.D.e: y
+    #
+    # => A: { B: { c: x }, D: { e: y } }
+    #
+    def merge(target, source):
+        for tag, value in source.items():
+            if tag not in target:
+                target[tag] = value
+            elif isinstance(target[tag], dict) and isinstance(value, dict):
+                merge(target[tag], value)
+            else:
+                print(f"\x1b[31mDuplicated key: {tag}\x1b[0m", file=stderr)
+                exit(1)
+
+    if isinstance(node, dict):
+        result = {}
+
+        for tag, value in node.items():
+            tag, dot, rest = tag.partition(".")
+            merge(result, {tag: expand_dotted_keys({rest: value} if dot else value)})
+
+        return result
+
+    elif isinstance(node, list):
+        return [expand_dotted_keys(each) for each in node]
+
+    else:
+        return node
+
+
 def from_yaml(keyword, node):
 
     if isinstance(node, dict):
@@ -184,6 +223,7 @@ def convert(input: Path, output: Path, verbose: bool = True):
 
     yaml = load_yaml(input)
     yaml = normalize_yaml_bools(yaml)
+    yaml = expand_dotted_keys(yaml)
 
     macroexpand = MacroExpander(yaml.pop("ScenarioModifiers", None), schema)
 
