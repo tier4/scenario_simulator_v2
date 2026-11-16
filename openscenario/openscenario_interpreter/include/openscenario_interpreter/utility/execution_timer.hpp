@@ -19,6 +19,7 @@
 #include <boost/accumulators/statistics.hpp>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <functional>

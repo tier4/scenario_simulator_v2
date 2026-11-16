@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cstdint>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/traffic_signal_state_action.hpp>

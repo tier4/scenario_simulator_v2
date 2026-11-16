@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cstdint>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/traffic_signal_operations.hpp>
 #include <traffic_simulator/api/api.hpp>

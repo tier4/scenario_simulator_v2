@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <boost/json.hpp>
+#include <cstdint>
 #include <get_parameter/get_parameter.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
