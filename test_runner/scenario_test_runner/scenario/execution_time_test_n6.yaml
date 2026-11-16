@@ -2,7 +2,7 @@ OpenSCENARIO:
   FileHeader:
     author: 'Kotaro Yoshimoto'
     date: '2025-01-28T18:06:53+09:00'
-    description: 'scenario for execution time test'
+    description: 'scenario for execution time test with 6 vehicles'
     revMajor: 1
     revMinor: 3
   ParameterDeclarations:
