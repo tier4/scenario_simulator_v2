@@ -106,6 +106,7 @@ std::vector<geometry_msgs::msg::Point> transformPoints(
   const geometry_msgs::msg::Pose & pose, const std::vector<geometry_msgs::msg::Point> & points)
 {
   std::vector<geometry_msgs::msg::Point> ret;
+  ret.reserve(points.size());
   std::transform(
     points.begin(), points.end(), std::back_inserter(ret),
     [pose](const geometry_msgs::msg::Point & point) { return transformPoint(pose, point); });
@@ -117,6 +118,7 @@ std::vector<geometry_msgs::msg::Point> transformPoints(
   const std::vector<geometry_msgs::msg::Point> & points)
 {
   std::vector<geometry_msgs::msg::Point> ret;
+  ret.reserve(points.size());
   std::transform(
     points.begin(), points.end(), std::back_inserter(ret),
     [pose, sensor_pose](const geometry_msgs::msg::Point & point) {

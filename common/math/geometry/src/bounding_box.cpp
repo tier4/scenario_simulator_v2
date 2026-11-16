@@ -132,6 +132,7 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   const double length_extension_rear)
 {
   std::vector<geometry_msgs::msg::Point> points;
+  points.reserve(4);
   auto distances_from_center_to_edge = getDistancesFromCenterToEdge(bounding_box);
   geometry_msgs::msg::Point p0;
   p0.x = distances_from_center_to_edge.front + length_extension_front;
@@ -220,6 +221,7 @@ boost_point toBoostPoint(const geometry_msgs::msg::Point & point)
 boost_polygon toBoostPolygon(const std::vector<geometry_msgs::msg::Point> & points)
 {
   boost_polygon poly;
+  poly.outer().reserve(5);
   poly.outer().push_back(toBoostPoint(points[0]));
   poly.outer().push_back(toBoostPoint(points[1]));
   poly.outer().push_back(toBoostPoint(points[2]));

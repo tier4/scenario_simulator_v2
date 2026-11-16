@@ -313,6 +313,7 @@ auto getLineSegments(
     return {};
   } else {
     std::vector<LineSegment> seg;
+    seg.reserve(points.size() - 1 + (close_start_end ? 1 : 0));
     for (size_t i = 0; i < points.size() - 1; i++) {
       if (points[i] != points[i + 1]) {
         seg.emplace_back(points[i], points[i + 1]);

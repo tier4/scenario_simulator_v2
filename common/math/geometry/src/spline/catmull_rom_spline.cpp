@@ -211,6 +211,8 @@ CatmullRomSpline::CatmullRomSpline(
     default:
       [this](const auto & control_points) -> void {
         std::size_t n = control_points.size() - 1;
+        curves_.reserve(n);
+        length_list_.reserve(n);
         for (std::size_t i = 0; i < n; i++) {
           if (i == 0) {
             double ax = 0;
