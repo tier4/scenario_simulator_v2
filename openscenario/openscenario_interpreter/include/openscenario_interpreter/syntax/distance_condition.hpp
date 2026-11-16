@@ -127,9 +127,6 @@ struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvalua
   auto evaluate() -> Object;
 };
 
-// Ignore spell miss due to OpenSCENARIO standard.
-// cspell: ignore euclidian
-
 // clang-format off
 template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined, false>(const EntityRef &, const Position &) -> double;
 template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined, true >(const EntityRef &, const Position &) -> double;

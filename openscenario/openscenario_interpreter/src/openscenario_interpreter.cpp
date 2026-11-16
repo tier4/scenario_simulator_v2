@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <boost/json.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <openscenario_interpreter/openscenario_interpreter.hpp>
 #include <openscenario_interpreter/record.hpp>
 #include <openscenario_interpreter/syntax/object_controller.hpp>
@@ -26,6 +27,7 @@
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <sstream>
 #include <status_monitor/status_monitor.hpp>
+#include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
@@ -67,7 +69,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   post_process_client(
     post_process_client_node
       ->create_client<openscenario_interpreter_msgs::srv::PostProcess>(
-        "/scenario_post_processor/post_process"))
+        "/scenario_post_processor/post_process")),
+  scenario_runtime(std::make_shared<ScenarioRuntime>())
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
@@ -145,7 +148,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(post_process_command);
       GET_PARAMETER(post_process_timeout);
 
-      script = std::make_shared<OpenScenario>(osc_path);
+      script = std::make_shared<OpenScenario>(osc_path, scenario_runtime);
 
       common::status_monitor.updateThreshold(
         std::chrono::seconds(common::getParameter<std::int64_t>("status_monitor_threshold", 10)));

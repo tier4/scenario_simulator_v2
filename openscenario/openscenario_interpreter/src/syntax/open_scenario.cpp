@@ -21,8 +21,9 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-OpenScenario::OpenScenario(const std::filesystem::path & pathname)
-: Scope(this),
+OpenScenario::OpenScenario(
+  const std::filesystem::path & pathname, std::shared_ptr<ScenarioRuntime> scenario_runtime)
+: Scope(this, std::move(scenario_runtime)),
   pathname(pathname),
   file_header(readElement<FileHeader>("FileHeader", load(pathname).child("OpenSCENARIO"), local())),
   category(readElement<OpenScenarioCategory>("OpenSCENARIO", script, local()))

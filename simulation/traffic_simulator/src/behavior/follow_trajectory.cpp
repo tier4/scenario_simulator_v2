@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <arithmetic/floating_point/comparison.hpp>
 #include <geometry/quaternion/direction_to_quaternion.hpp>
 #include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/quaternion_to_euler.hpp>
@@ -102,8 +101,9 @@ auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time,
   const double matching_distance, std::optional<double> target_speed) -> std::optional<EntityStatus>
 {
-  using math::arithmetic::isApproximatelyEqualTo;
-  using math::arithmetic::isDefinitelyLessThan;
+  constexpr auto is_definitely_less_than = [](const double a, const double b) {
+    return (b - a) > std::numeric_limits<double>::epsilon() * std::max(std::abs(a), std::abs(b));
+  };
 
   using math::geometry::operator+;
   using math::geometry::operator-;
@@ -756,7 +756,7 @@ auto makeUpdatedStatus(
 
     /// @note handle intermediate waypoint with arrival time defined
     /// @note use step_time/2 threshold to account for floating point accumulation errors
-    if (isDefinitelyLessThan(remaining_time, step_time / 2.0)) {
+    if (is_definitely_less_than(remaining_time, step_time / 2.0)) {
       if (this_step_distance >= distance or distance < FollowWaypointController::local_epsilon) {
         log_waypoint_action("Reached on time", "Recurse", this_step_distance);
         return discard_previous_waypoint_and_recurse();
@@ -790,7 +790,7 @@ auto makeUpdatedStatus(
       if (not isfinite(remaining_time)) {
         log_waypoint_action("Reached and immobile (no time)", "Complete");
         return std::nullopt;
-      } else if (isDefinitelyLessThan(remaining_time, step_time / 2.0)) {
+      } else if (is_definitely_less_than(remaining_time, step_time / 2.0)) {
         log_waypoint_action("Reached and immobile on time", "Complete");
         return std::nullopt;
       } else {

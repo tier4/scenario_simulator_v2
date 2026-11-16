@@ -16,6 +16,7 @@
 #include <boost/lexical_cast.hpp>
 #include <cassert>
 #include <iterator>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
@@ -88,10 +89,12 @@ auto EnvironmentFrame::lookupFrame(const Prefixed<Name> & prefixed_name) const
   }
 }
 
-Scope::Scope(const OpenScenario * const open_scenario)
+Scope::Scope(
+  const OpenScenario * const open_scenario, std::shared_ptr<ScenarioRuntime> scenario_runtime)
 : open_scenario(open_scenario),
   frame(new EnvironmentFrame()),
-  scenario_definition(std::make_shared<ScenarioDefinition>())
+  scenario_definition(std::make_shared<ScenarioDefinition>()),
+  scenario_runtime(std::move(scenario_runtime))
 {
 }
 
@@ -99,6 +102,7 @@ Scope::Scope(const std::string & name, const Scope & outer)
 : open_scenario(outer.open_scenario),
   frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
   scenario_definition(outer.scenario_definition),
+  scenario_runtime(outer.scenario_runtime),
   name(name),
   actors(outer.actors)
 {
@@ -125,6 +129,8 @@ auto Scope::global() -> ScenarioDefinition &
 auto Scope::local() const noexcept -> const Scope & { return *this; }
 
 auto Scope::local() noexcept -> Scope & { return *this; }
+
+auto Scope::runtime() const noexcept -> ScenarioRuntime & { return *scenario_runtime; }
 
 auto Scope::insert(const Name & identifier, const Object & object) -> void
 {

@@ -84,6 +84,7 @@ def launch_setup(context, *args, **kwargs):
     architecture_type                           = LaunchConfiguration("architecture_type",                           default="awf/universe/20240605")
     autoware_launch_file                        = LaunchConfiguration("autoware_launch_file",                        default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package                     = LaunchConfiguration("autoware_launch_package",                     default=default_autoware_launch_package_of(architecture_type.perform(context)))
+    autoware_shutdown_timeout                   = LaunchConfiguration("autoware_shutdown_timeout",                   default=20)
     consider_acceleration_by_road_slope         = LaunchConfiguration("consider_acceleration_by_road_slope",         default=False)
     consider_pose_by_road_slope                 = LaunchConfiguration("consider_pose_by_road_slope",                 default=True)
     enable_perf                                 = LaunchConfiguration("enable_perf",                                 default=False)
@@ -114,7 +115,7 @@ def launch_setup(context, *args, **kwargs):
     rviz_config                                 = LaunchConfiguration("rviz_config",                                 default=default_rviz_config_file())
     scenario                                    = LaunchConfiguration("scenario",                                    default=Path("/dev/null"))
     sensor_model                                = LaunchConfiguration("sensor_model",                                default="")
-    sigterm_timeout                             = LaunchConfiguration("sigterm_timeout",                             default=8)
+    sigterm_timeout                             = LaunchConfiguration("sigterm_timeout",                             default=30)
     simulate_localization                       = LaunchConfiguration("simulate_localization",                       default=True)
     speed_condition                             = LaunchConfiguration("speed_condition",                             default="legacy")
     status_monitor_threshold                    = LaunchConfiguration("status_monitor_threshold",                    default=10)
@@ -125,7 +126,7 @@ def launch_setup(context, *args, **kwargs):
     use_custom_centerline                       = LaunchConfiguration("use_custom_centerline",                       default=True)
     use_sim_time                                = LaunchConfiguration("use_sim_time",                                default=False)
     use_trajectory_based_front_entity_detection = LaunchConfiguration("use_trajectory_based_front_entity_detection", default=False)
-    vehicle_model                               = LaunchConfiguration("vehicle_model",                               default="")
+    vehicle_model                               = LaunchConfiguration("vehicle_model",                               default="default_vehicle")
     vehicle_id                                  = LaunchConfiguration("vehicle_id",                                  default="default")
     # Godot simulator options
     godot_executable                            = LaunchConfiguration("godot_executable",                            default="/home/kotaroyoshimoto/Downloads/godot_autoware_simulator.x86_64")
@@ -180,6 +181,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"architecture_type                           := {architecture_type.perform(context)}")
     print(f"autoware_launch_file                        := {autoware_launch_file.perform(context)}")
     print(f"autoware_launch_package                     := {autoware_launch_package.perform(context)}")
+    print(f"autoware_shutdown_timeout                   := {autoware_shutdown_timeout.perform(context)}")
     print(f"consider_acceleration_by_road_slope         := {consider_acceleration_by_road_slope.perform(context)}")
     print(f"consider_pose_by_road_slope                 := {consider_pose_by_road_slope.perform(context)}")
     print(f"enable_perf                                 := {enable_perf.perform(context)}")
@@ -256,6 +258,7 @@ def launch_setup(context, *args, **kwargs):
             {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
+            {"autoware_shutdown_timeout": autoware_shutdown_timeout},
             {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"enable_stuck_jump": enable_stuck_jump},
@@ -272,7 +275,6 @@ def launch_setup(context, *args, **kwargs):
             {"post_process_timeout": post_process_timeout},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
-            {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
             {"status_monitor_threshold": status_monitor_threshold},
@@ -288,74 +290,69 @@ def launch_setup(context, *args, **kwargs):
         ]
 
         def collect_vehicle_parameters():
-            if vehicle_model_name:
-                description = get_package_share_directory(vehicle_model_name + "_description")
-                if use_carla:
-                    return [
-                        description + "/config/vehicle_info.param.yaml",
-                        {"vehicle_model_type": "EXTERNAL"},
-                        {"/localization/acceleration.enabled": False},
-                        {"/localization/kinematic_state.enabled": False},
-                        {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
-                        {"/vehicle/status/steering_status.enabled": False},
-                        {"/vehicle/status/gear_status.enabled": False},
-                        {"/vehicle/status/velocity_status.enabled": False},
-                        {"/vehicle/status/turn_indicators_status.enabled": False},
-                        {"tf.enabled": False},
-                    ]
-                elif use_godot_sim:
-                    return [
-                        description + "/config/vehicle_info.param.yaml",
-                        {"vehicle_model_type": "EXTERNAL"},
-                        # Disable all concealer publishers (replaces group-level publish_localization / publish_vehicle_state)
-                        # Localization publishers (simulate_localization=True topics)
-                        {"/localization/acceleration.enabled": False},
-                        {"/localization/kinematic_state.enabled": False},
-                        {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
-                        # Vehicle state publishers
-                        {"/vehicle/status/steering_status.enabled": False},
-                        {"/vehicle/status/gear_status.enabled": False},
-                        {"/vehicle/status/control_mode.enabled": False},
-                        {"/vehicle/status/velocity_status.enabled": False},
-                        {"/vehicle/status/turn_indicators_status.enabled": False},
-                        # TF broadcaster
-                        {"tf.enabled": False},
-                        # Service servers (Godot advertises these via rosbridge instead)
-                        {"/control/control_mode_request.enabled": False},
-                    ]
-                elif use_external_perfect_tracker_sim:
-                    return [
-                        description + "/config/vehicle_info.param.yaml",
-                        {"vehicle_model_type": "EXTERNAL_PERFECT_TRAJECTORY_TRACKER"},
-                        # Disable concealer publishers; autoware_perfect_tracker publishes
-                        # these topics directly to avoid duplicate publishers.
-                        {"/localization/acceleration.enabled": False},
-                        {"/localization/kinematic_state.enabled": False},
-                        {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
-                        {"/vehicle/status/steering_status.enabled": False},
-                        {"/vehicle/status/gear_status.enabled": False},
-                        {"/vehicle/status/control_mode.enabled": False},
-                        {"/vehicle/status/velocity_status.enabled": False},
-                        {"/vehicle/status/turn_indicators_status.enabled": False},
-                        {"tf.enabled": False},
-                        {"/control/control_mode_request.enabled": False},
-                    ]
-                elif use_perfect_tracker_sim:
-                    return [
-                        description + "/config/vehicle_info.param.yaml",
-                        description + "/config/simulator_model.param.yaml",
-                        {"vehicle_model_type": "PERFECT_TRAJECTORY_TRACKER"},
-                    ]
-                else:
-                    return [
-                        description + "/config/vehicle_info.param.yaml",
-                        description + "/config/simulator_model.param.yaml",
-                    ]
-            else:
-                return []
+            default_description = Path(
+                get_package_share_directory("default_vehicle_description")
+            )
+            description = Path(get_package_share_directory(vehicle_model_name + "_description"))
+            result = [
+                str(default_description / "config" / "simulator_model.param.yaml"),
+                str(description / "config" / "vehicle_info.param.yaml"),
+                str(description / "config" / "simulator_model.param.yaml"),
+            ]
+            # Overrides for non-default simulation backends. Later entries take precedence
+            # over the files above, so vehicle_model_type is replaced here.
+            if use_carla:
+                result += [
+                    {"vehicle_model_type": "EXTERNAL"},
+                    {"/localization/acceleration.enabled": False},
+                    {"/localization/kinematic_state.enabled": False},
+                    {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
+                    {"/vehicle/status/steering_status.enabled": False},
+                    {"/vehicle/status/gear_status.enabled": False},
+                    {"/vehicle/status/velocity_status.enabled": False},
+                    {"/vehicle/status/turn_indicators_status.enabled": False},
+                    {"tf.enabled": False},
+                ]
+            elif use_godot_sim:
+                result += [
+                    {"vehicle_model_type": "EXTERNAL"},
+                    # Disable all concealer publishers (replaces group-level publish_localization / publish_vehicle_state)
+                    # Localization publishers (simulate_localization=True topics)
+                    {"/localization/acceleration.enabled": False},
+                    {"/localization/kinematic_state.enabled": False},
+                    {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
+                    # Vehicle state publishers
+                    {"/vehicle/status/steering_status.enabled": False},
+                    {"/vehicle/status/gear_status.enabled": False},
+                    {"/vehicle/status/control_mode.enabled": False},
+                    {"/vehicle/status/velocity_status.enabled": False},
+                    {"/vehicle/status/turn_indicators_status.enabled": False},
+                    # TF broadcaster
+                    {"tf.enabled": False},
+                    # Service servers (Godot advertises these via rosbridge instead)
+                    {"/control/control_mode_request.enabled": False},
+                ]
+            elif use_external_perfect_tracker_sim:
+                result += [
+                    {"vehicle_model_type": "EXTERNAL_PERFECT_TRAJECTORY_TRACKER"},
+                    # Disable concealer publishers; autoware_perfect_tracker publishes
+                    # these topics directly to avoid duplicate publishers.
+                    {"/localization/acceleration.enabled": False},
+                    {"/localization/kinematic_state.enabled": False},
+                    {"/simulation/debug/localization/pose_estimator/pose_with_covariance.enabled": False},
+                    {"/vehicle/status/steering_status.enabled": False},
+                    {"/vehicle/status/gear_status.enabled": False},
+                    {"/vehicle/status/control_mode.enabled": False},
+                    {"/vehicle/status/velocity_status.enabled": False},
+                    {"/vehicle/status/turn_indicators_status.enabled": False},
+                    {"tf.enabled": False},
+                    {"/control/control_mode_request.enabled": False},
+                ]
+            elif use_perfect_tracker_sim:
+                result += [{"vehicle_model_type": "PERFECT_TRAJECTORY_TRACKER"}]
+            return result
 
-        if (it := collect_vehicle_parameters()) != []:
-            parameters += it
+        parameters += collect_vehicle_parameters()
 
         def format_autoware_parameters(items):
             return [key + ":=" + value for key, value in items]
@@ -396,6 +393,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("architecture_type",                           default_value=architecture_type                          ),
         DeclareLaunchArgument("autoware_launch_file",                        default_value=autoware_launch_file                       ),
         DeclareLaunchArgument("autoware_launch_package",                     default_value=autoware_launch_package                    ),
+        DeclareLaunchArgument("autoware_shutdown_timeout",                   default_value=autoware_shutdown_timeout                  ),
         DeclareLaunchArgument("consider_acceleration_by_road_slope",         default_value=consider_acceleration_by_road_slope        ),
         DeclareLaunchArgument("consider_pose_by_road_slope",                 default_value=consider_pose_by_road_slope                ),
         DeclareLaunchArgument("enable_perf",                                 default_value=enable_perf                                ),
