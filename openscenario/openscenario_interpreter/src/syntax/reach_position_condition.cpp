@@ -65,9 +65,9 @@ auto ReachPositionCondition::visualize() const -> void
     marker.type = visualization_msgs::msg::Marker::SPHERE;
     marker.action = visualization_msgs::msg::Marker::ADD;
     marker.pose = center;
-    marker.scale.x = radius;
-    marker.scale.y = radius;
-    marker.scale.z = radius;
+    marker.scale.x = 2 * radius;
+    marker.scale.y = 2 * radius;
+    marker.scale.z = 2 * radius;
     marker.color.a = 0.3f;
     marker.color.r = 0.0;
     marker.color.g = 1.0;
