@@ -28,9 +28,14 @@ class VisualizationBuffer
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr publisher;
   std::vector<visualization_msgs::msg::Marker> markers;
 
+  const rclcpp::Duration lifetime;
+
 public:
   template <typename Node>
-  VisualizationBuffer(Node && node, const std::string topic = "/simulation/interpreter/markers")
+  VisualizationBuffer(
+    Node && node, const rclcpp::Duration & lifetime,
+    const std::string topic = "/simulation/interpreter/markers")
+  : lifetime(lifetime)
   {
     publisher = rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, topic, rclcpp::QoS(rclcpp::KeepLast(1)));
@@ -39,10 +44,10 @@ public:
   static auto active() { return static_cast<bool>(buffer); }
 
   template <typename Node>
-  static auto activate(const Node & node) -> void
+  static auto activate(const Node & node, const rclcpp::Duration & lifetime) -> void
   {
     if (not active()) {
-      buffer = std::make_unique<VisualizationBuffer>(node);
+      buffer = std::make_unique<VisualizationBuffer>(node, lifetime);
     } else {
       throw Error("The visualization buffer has already been instantiated.");
     }
@@ -60,6 +65,9 @@ public:
     if (active()) {
       visualization_msgs::msg::MarkerArray message;
       message.markers = buffer->markers;
+      for (auto & marker : message.markers) {
+        marker.lifetime = buffer->lifetime;
+      }
       buffer->publisher->publish(message);
       buffer->markers.clear();
     }

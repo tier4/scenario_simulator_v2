@@ -266,7 +266,19 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
           shared_from_this(), makeCurrentConfiguration(), local_real_time_factor, local_frame_rate);
 
         if (publish_visualization) {
-          VisualizationBuffer::activate(shared_from_this());
+          /*
+             Markers are republished every frame while their condition is
+             evaluated. Giving them a lifetime lets the ones that are no longer
+             updated expire instead of staying in Rviz forever.
+
+             A lifetime of exactly one frame period made the markers blink
+             slightly even when no frame was late, because the arrival of the
+             next message jitters. Two frame periods absorb that jitter, while
+             a frame that is late by more than one period still shows up as a
+             blink of the markers.
+          */
+          VisualizationBuffer::activate(
+            shared_from_this(), rclcpp::Duration(2 * currentLocalFrameRate()));
         }
 
         /*
