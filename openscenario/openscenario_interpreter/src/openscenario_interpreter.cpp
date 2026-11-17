@@ -164,7 +164,6 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       [this](auto &&...) {
         publishCurrentContext();
         VisualizationBuffer::flush();
-        VisualizationBuffer::deactivate();
         deactivate();
       },
       [this]() {
@@ -350,6 +349,7 @@ auto Interpreter::on_shutdown(const rclcpp_lifecycle::State &) -> Result
   timer.reset();
   scenarios.clear();
   script.reset();
+  VisualizationBuffer::deactivate();
   common::status_monitor.overrideThreshold(
     simulator_core_shutdown_threshold, SimulatorCore::deactivate);
   return Interpreter::Result::SUCCESS;  // => Finalized
@@ -389,6 +389,8 @@ auto Interpreter::reset() -> void
   if (output_time_publisher->is_activated()) {
     output_time_publisher->on_deactivate();
   }
+
+  VisualizationBuffer::deactivate();
 
   /*
   Interpreter::reset() and Interpreter::on_shutdown() functions are slow,
