@@ -75,6 +75,8 @@ auto operator<<(boost::json::object & json, const Storyboard & datum) -> boost::
     stories.push_back(std::move(each));
   }
 
+  json["StopTrigger"].emplace_object() << datum.stop_trigger;
+
   return json;
 }
 }  // namespace syntax

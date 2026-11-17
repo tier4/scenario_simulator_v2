@@ -262,5 +262,23 @@ DistancesFromCenterToEdge getDistancesFromCenterToEdge(
   return distances;
 }
 
+boost_point getClosestPointOnPolygon(const boost_point & query_point, const boost_polygon & polygon)
+{
+  auto min_distance = std::numeric_limits<double>::max();
+  boost_point closest_point;
+
+  const auto & vertices = polygon.outer();
+  for (size_t i = 0; i < vertices.size(); ++i) {
+    const auto projected_point =
+      pointToSegmentProjection(query_point, vertices[i], vertices[(i + 1) % vertices.size()]);
+    const auto distance = boost::geometry::distance(query_point, projected_point);
+    if (distance < min_distance) {
+      min_distance = distance;
+      closest_point = projected_point;
+    }
+  }
+
+  return closest_point;
+}
 }  // namespace geometry
 }  // namespace math

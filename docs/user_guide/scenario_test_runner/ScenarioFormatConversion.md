@@ -1,4 +1,5 @@
 # Scenario Format Conversion
+
 ### TIER IV Format V2 -> OpenSCENARIO Format
 
 To convert OpenSCENARIO, use these arguments
@@ -10,13 +11,15 @@ To convert OpenSCENARIO, use these arguments
 
 You can execute scenario conversion by using ros2 command
 
-```
+```bash
 ros2 run openscenario_utility conversion.py --input /path/to/scenario.yaml --output /path/to/output/directory
 ```
 
 ### Scenario Modifiers
+
 ScenarioModifiers and OpenSCENARIO are defined as below.
-```
+
+```yaml
 ScenarioModifiers:
   ScenarioModifier:
     - name: <string>
@@ -36,6 +39,7 @@ OpenSCENARIO:
   .
   .
 ```
+
 `name` expresses a variable: It is not case-sensitive, but its attributes must be the lower snake case, and it is converted to a variable in its list during parameter distribution.
 You can find more details in the test folder.
 
@@ -43,6 +47,7 @@ You can find more details in the test folder.
 Initial parameter distribution is from start to end while increasing a value.
 
 ### Parameter Distribution Example
+
 ex)
 start: 10
 stop: 20
@@ -51,6 +56,7 @@ if step is 2 distributed parameter is 10 , 20
 if step is 3 distributed parameter is 10 , 15, 20
 
 attention or int
+
 - if step is one, only parameter of start is used
 - if step is zero, it returns error
 - the number of simulation is factorial to number of  steps

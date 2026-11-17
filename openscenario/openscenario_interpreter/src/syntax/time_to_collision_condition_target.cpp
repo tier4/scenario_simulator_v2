@@ -25,9 +25,10 @@ inline namespace syntax
 TimeToCollisionConditionTarget::TimeToCollisionConditionTarget(
   const pugi::xml_node & node, Scope & scope)
 // clang-format off
-: ComplexType(choice(node,
-    std::make_pair( "Position", [&](auto && node) { return make<Position>(std::forward<decltype(node)>(node), scope); }),
-    std::make_pair("EntityRef", [&](auto && node) { return make<  Entity>(std::forward<decltype(node)>(node), scope); })))
+: ComplexType(choice(node, {
+    {  "Position", [&](auto && node) { return make<Position>(node, scope); } },
+    { "EntityRef", [&](auto && node) { return make<  Entity>(node, scope); } },
+  }))
 // clang-format on
 {
   if (is<EntitySelection>()) {

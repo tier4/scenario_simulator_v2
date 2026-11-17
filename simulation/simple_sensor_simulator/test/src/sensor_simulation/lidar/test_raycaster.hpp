@@ -37,7 +37,10 @@ protected:
   : raycaster_(std::make_unique<Raycaster>()),
     config_(utils::constructLidarConfiguration("ego", "awf/universe/20240605", 0.0, 0.1)),
     origin_(utils::makePose(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)),
-    box_pose_(utils::makePose(5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0))
+    box_pose_(utils::makePose(5.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0)),
+    dummy_entity_status_(utils::makeEntity(
+      box_name_, EntityType::VEHICLE, box_pose_,
+      utils::makeDimensions(box_depth_, box_width_, box_height_)))
   {
     raycaster_->setDirection(config_);
   }
@@ -55,6 +58,8 @@ protected:
 
   geometry_msgs::msg::Pose origin_;
   geometry_msgs::msg::Pose box_pose_;
+
+  traffic_simulator_msgs::EntityStatus dummy_entity_status_;
 };
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__TEST__TEST_RAYCASTER_HPP_

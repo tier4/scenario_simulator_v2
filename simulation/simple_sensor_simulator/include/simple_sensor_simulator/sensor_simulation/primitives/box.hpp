@@ -15,7 +15,7 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__BOX_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <simple_sensor_simulator/sensor_simulation/primitives/primitive.hpp>
 

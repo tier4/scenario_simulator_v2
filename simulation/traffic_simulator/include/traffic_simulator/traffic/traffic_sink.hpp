@@ -81,6 +81,7 @@ public:
    * @param config TrafficSink configuration
    */
   explicit TrafficSink(
+    const std::function<void(const std::string &)> & despawn_function,
     const std::shared_ptr<entity::EntityManager> entity_manager_ptr,
     const TrafficSinkConfig & config);
   /** 
@@ -95,8 +96,9 @@ public:
 private:
   auto isEntitySinkable(const std::string & entity_name) const noexcept(false) -> bool;
 
-  const TrafficSinkConfig config_;
+  const std::function<void(const std::string &)> despawn_;
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
+  const TrafficSinkConfig config_;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator

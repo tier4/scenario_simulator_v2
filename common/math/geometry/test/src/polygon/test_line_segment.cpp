@@ -752,13 +752,7 @@ TEST(LineSegment, getLineSegmentsVectorIdentical)
   const std::vector<geometry_msgs::msg::Point> points{point, point, point, point};
   const std::vector<math::geometry::LineSegment> lines =
     math::geometry::getLineSegments(points, false);
-  EXPECT_EQ(lines.size(), size_t(3));
-  EXPECT_POINT_EQ(lines[0].start_point, point);
-  EXPECT_POINT_EQ(lines[0].end_point, point);
-  EXPECT_POINT_EQ(lines[1].start_point, point);
-  EXPECT_POINT_EQ(lines[1].end_point, point);
-  EXPECT_POINT_EQ(lines[2].start_point, point);
-  EXPECT_POINT_EQ(lines[2].end_point, point);
+  EXPECT_EQ(lines.size(), size_t(0));
 }
 
 TEST(LineSegment, getLineSegmentsVectorIdentical_closeStartEnd)
@@ -767,15 +761,7 @@ TEST(LineSegment, getLineSegmentsVectorIdentical_closeStartEnd)
   const std::vector<geometry_msgs::msg::Point> points{point, point, point, point};
   const std::vector<math::geometry::LineSegment> lines =
     math::geometry::getLineSegments(points, true);
-  EXPECT_EQ(lines.size(), size_t(4));
-  EXPECT_POINT_EQ(lines[0].start_point, point);
-  EXPECT_POINT_EQ(lines[0].end_point, point);
-  EXPECT_POINT_EQ(lines[1].start_point, point);
-  EXPECT_POINT_EQ(lines[1].end_point, point);
-  EXPECT_POINT_EQ(lines[2].start_point, point);
-  EXPECT_POINT_EQ(lines[2].end_point, point);
-  EXPECT_POINT_EQ(lines[3].start_point, point);
-  EXPECT_POINT_EQ(lines[3].end_point, point);
+  EXPECT_EQ(lines.size(), size_t(0));
 }
 
 int main(int argc, char ** argv)

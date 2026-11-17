@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SPEED_ACTION_HPP_
 
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/speed_action_target.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -37,8 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SpeedAction : private Scope,  // NOTE: Required for access to actors
-                     private SimulatorCore::ActionApplication
+struct SpeedAction : private Scope  // NOTE: Required for access to actors
 {
   const TransitionDynamics speed_action_dynamics;
 

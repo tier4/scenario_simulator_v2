@@ -3,7 +3,7 @@
 Behavior plugin enables support multiple type of NPC behaviors.
 Default behavior plugin implementation is [here](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/behavior_tree_plugin).
 
-Behavior plugin use pluginlib and plugin class should be inherited [this base class](https://tier4.github.io/scenario_simulator_v2-api-docs/classentity__behavior_1_1BehaviorPluginBase.html).
+Behavior plugin use pluginlib and plugin class should be inherited [this base class](https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator/include/traffic_simulator/behavior/behavior_plugin_base.hpp).
 
 Example of the behavior plugin class is below.
 
@@ -98,14 +98,19 @@ If you want to develop behavior plugin, first, you have to add three functions b
 ```C++
 void configure(const rclcpp::Logger & logger) override;
 ```
+
 configure plugin class, this function only calls once at the start of simulation.
+
 ```C++
 void update(double current_time, double step_time) override;
 ```
+
 update plugin class, this function calls once in every frame in simulation.
+
 ```C++
 const std::string & getCurrentAction() const override;
 ```
+
 return current actions of NPC, this result only use for visualization.
 
 After that, you have to define getter and setters for each data.  

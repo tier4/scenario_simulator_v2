@@ -31,7 +31,8 @@ class MoveBackwardAction : public entity_behavior::VehicleActionNode
 {
 public:
   MoveBackwardAction(const std::string & name, const BT::NodeConfiguration & config);
-  BT::NodeStatus tick() override;
+  bool checkPreconditions() override;
+  BT::NodeStatus doAction() override;
   void getBlackBoardValues() override;
   static BT::PortsList providedPorts()
   {

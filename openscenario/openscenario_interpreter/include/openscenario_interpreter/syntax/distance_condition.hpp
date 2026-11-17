@@ -124,16 +124,13 @@ struct DistanceCondition : private Scope,
   }
 
   void visualize() const;
-                             
+
   static auto evaluate(
     const Entities *, const Entity &, const Position &, CoordinateSystem, RelativeDistanceType,
     RoutingAlgorithm, Boolean) -> double;
 
   auto evaluate() -> Object;
 };
-
-// Ignore spell miss due to OpenSCENARIO standard.
-// cspell: ignore euclidian
 
 // clang-format off
 template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined, false>(const EntityRef &, const Position &) -> double;

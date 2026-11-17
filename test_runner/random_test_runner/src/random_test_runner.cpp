@@ -67,10 +67,13 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
   std::string map_path =
     ament_index_cpp::get_package_share_directory(test_suite_params.map_name) + "/map";
 
+  const std::set<std::uint8_t> auto_sink_entity_types{
+    traffic_simulator_msgs::msg::EntityType::VEHICLE,
+    traffic_simulator_msgs::msg::EntityType::PEDESTRIAN};
+
   message = fmt::format("Map path found: {}", map_path);
   RCLCPP_INFO_STREAM(get_logger(), message);
-
-  traffic_simulator::Configuration configuration(map_path);
+  traffic_simulator::Configuration configuration(map_path, "", auto_sink_entity_types);
   configuration.simulator_host = test_control_parameters.simulator_host;
   auto lanelet_utils = std::make_shared<LaneletUtils>(configuration.lanelet2_map_path());
 
@@ -150,12 +153,12 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
     architectureTypeFromString(this->declare_parameter<std::string>("architecture_type", ""));
   tp.simulator_host = this->declare_parameter<std::string>("simulator_host", "localhost");
 
-  if (!tp.input_dir.empty() && !boost::filesystem::is_directory(tp.input_dir)) {
+  if (!tp.input_dir.empty() && !std::filesystem::is_directory(tp.input_dir)) {
     throw std::runtime_error(
       fmt::format("Input directory {} does not exists or is not a directory", tp.input_dir));
   }
 
-  if (tp.output_dir.empty() || !boost::filesystem::is_directory(tp.output_dir)) {
+  if (tp.output_dir.empty() || !std::filesystem::is_directory(tp.output_dir)) {
     throw std::runtime_error(fmt::format(
       "Output directory {} is empty, does not exists or is not a directory", tp.output_dir));
   }

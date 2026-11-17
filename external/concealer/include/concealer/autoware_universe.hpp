@@ -26,15 +26,15 @@
 #include <autoware_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_vehicle_msgs/srv/control_mode_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
-#include <concealer/publisher_wrapper.hpp>
-#include <concealer/subscriber_wrapper.hpp>
+#include <concealer/path_with_lane_id.hpp>
+#include <concealer/publisher.hpp>
+#include <concealer/subscriber.hpp>
 #include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 
 namespace concealer
 {
@@ -50,30 +50,30 @@ public:
   using GearCommand                 = autoware_vehicle_msgs::msg::GearCommand;
   using GearReport                  = autoware_vehicle_msgs::msg::GearReport;
   using Odometry                    = nav_msgs::msg::Odometry;
-  using PathWithLaneId              = tier4_planning_msgs::msg::PathWithLaneId;
   using PoseWithCovarianceStamped   = geometry_msgs::msg::PoseWithCovarianceStamped;
   using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
   using TurnIndicatorsCommand       = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
   using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport              = autoware_vehicle_msgs::msg::VelocityReport;
 
-  SubscriberWrapper<Control>               getCommand;
-  SubscriberWrapper<GearCommand>           getGearCommand;
-  SubscriberWrapper<TurnIndicatorsCommand> getTurnIndicatorsCommand;
-  SubscriberWrapper<PathWithLaneId>        getPathWithLaneId;
+  Subscriber<Control>                  getCommand;
+  Subscriber<GearCommand>              getGearCommand;
+  Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
+  Subscriber<priority::PathWithLaneId> getPathWithLaneId;
 
-  PublisherWrapper<AccelWithCovarianceStamped> setAcceleration;
-  PublisherWrapper<Odometry>                   setOdometry;
-  PublisherWrapper<PoseWithCovarianceStamped>  setPose;
-  PublisherWrapper<SteeringReport>             setSteeringReport;
-  PublisherWrapper<GearReport>                 setGearReport;
-  PublisherWrapper<ControlModeReport>          setControlModeReport;
-  PublisherWrapper<VelocityReport>             setVelocityReport;
-  PublisherWrapper<TurnIndicatorsReport>       setTurnIndicatorsReport;
+  Publisher<AccelWithCovarianceStamped>                    setAcceleration;
+  Publisher<Odometry, NormalDistribution>                  setOdometry;
+  Publisher<PoseWithCovarianceStamped, NormalDistribution> setPose;
+  Publisher<SteeringReport>                                setSteeringReport;
+  Publisher<GearReport>                                    setGearReport;
+  Publisher<ControlModeReport>                             setControlModeReport;
+  Publisher<VelocityReport, NormalDistribution>            setVelocityReport;
+  Publisher<TurnIndicatorsReport>                          setTurnIndicatorsReport;
 
   std::atomic<geometry_msgs::msg::Accel> current_acceleration;
   std::atomic<geometry_msgs::msg::Pose>  current_pose;
   std::atomic<geometry_msgs::msg::Twist> current_twist;
+  std::atomic<float>                     current_steering_tire_angle{0.0f};
   // clang-format on
 
 private:
@@ -83,8 +83,6 @@ private:
 
   const rclcpp::TimerBase::SharedPtr vehicle_state_update_timer;
 
-  std::thread localization_and_vehicle_state_update_thread;
-
   std::atomic<bool> is_stop_requested = false;
 
   std::atomic<std::uint8_t> current_control_mode = ControlModeReport::AUTONOMOUS;
@@ -93,16 +91,14 @@ private:
 
   std::exception_ptr thrown;
 
+  std::thread spinner;
+
 public:
   CONCEALER_PUBLIC explicit AutowareUniverse(bool);
 
   ~AutowareUniverse();
 
   auto rethrow() -> void;
-
-  auto updateLocalization() -> void;
-
-  auto updateVehicleState() -> void;
 
   auto getVehicleCommand() const -> std::tuple<double, double, double, double, int>;
 

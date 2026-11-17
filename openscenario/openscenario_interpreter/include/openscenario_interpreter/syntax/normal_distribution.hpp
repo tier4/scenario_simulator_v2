@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__NORMAL_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__NORMAL_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__NORMAL_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__NORMAL_DISTRIBUTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -25,18 +25,19 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- NormalDistribution 1.2 -------------------------------------------------
- *
- *  <xsd:complexType name="NormalDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="Range" type="Range"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="expectedValue" type="Double" use="required"/>
- *    <xsd:attribute name="variance" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   NormalDistribution (OpenSCENARIO XML 1.3.1)
 
+   Normal distribution which can be applied to a single parameter.
+
+   <xsd:complexType name="NormalDistribution">
+     <xsd:sequence>
+       <xsd:element name="Range" type="Range" minOccurs="0"/>
+     </xsd:sequence>
+     <xsd:attribute name="expectedValue" type="Double" use="required"/>
+     <xsd:attribute name="variance" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct NormalDistribution : public ComplexType, private Scope
 {
   const Range range;
@@ -55,4 +56,4 @@ struct NormalDistribution : public ComplexType, private Scope
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__NORMAL_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__NORMAL_DISTRIBUTION_HPP_

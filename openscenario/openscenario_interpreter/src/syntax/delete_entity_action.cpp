@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/entity_operations.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/delete_entity_action.hpp>
 
 namespace openscenario_interpreter
@@ -21,7 +22,7 @@ inline namespace syntax
 {
 auto DeleteEntityAction::operator()(const EntityRef & entity_ref) const -> void
 {
-  applyDeleteEntityAction(entity_ref);
+  runtime().entities().applyDeleteEntityAction(entity_ref);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

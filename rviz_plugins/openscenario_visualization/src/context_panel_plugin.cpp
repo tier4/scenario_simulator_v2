@@ -25,7 +25,7 @@ namespace openscenario_visualization
 ContextPanel::ContextPanel(QWidget * parent) : Panel(parent), ui_(new Ui::ContextPanel())
 {
   node_ = std::make_shared<rclcpp::Node>("context_panel", "openscenario_visualization");
-  using namespace std::chrono_literals;
+  executor_.add_node(node_);
   ui_->setupUi(this);
   ui_->TopicSelect->addItem("/simulation/context");
   topic_query_thread_ = std::thread(&ContextPanel::updateTopicCandidates, this);
@@ -183,9 +183,10 @@ void ContextPanel::update_display()
 
 void ContextPanel::spin()
 {
+  using namespace std::chrono_literals;
   while (runnning_) {
-    rclcpp::spin_some(node_);
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    executor_.spin_some();
+    std::this_thread::sleep_for(10ms);
   }
 }
 

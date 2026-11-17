@@ -8,6 +8,7 @@ Since EgoEntity is controlled in map coordinates by Autoware rather than in lane
 This process is implemented [API](https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/simulation/traffic_simulator/src/api/api.cpp#L302) -> [EgoEntity::setMapPose](https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/simulation/traffic_simulator/src/entity/ego_entity.cpp#L294-L300) -> [EgoEntity::setStatus](https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/simulation/traffic_simulator/src/entity/ego_entity.cpp#L309-L320).
 
 ### Search for matching lanes
+
 This process branches off into 2.  
 
 1. [Obtain a candidate lane for matching from Autoware planner output.](https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/simulation/traffic_simulator/src/entity/ego_entity.cpp#L296)
@@ -40,7 +41,7 @@ While the do-nothing behavior plugin is running, Entity does not move, so the la
 
 ### Pedestrian Entity (with Behavior-Tree)
 
-Planning is done in map coordinates in the `walk_straight` and `follow_polyline_trajectory` actions. 
+Planning is done in map coordinates in the `walk_straight` and `follow_polyline_trajectory` actions.
 
 In the `walk_straight` Action, [the pose in the lane coordinate system is calculated.](https://github.com/tier4/scenario_simulator_v2/blob/6f87603e2aaaddfd8ceb08645cb3933fe3b74515/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L59-L62)  
 The procedure for calculating the pose in the lane coordinate system at this time is as follows.  

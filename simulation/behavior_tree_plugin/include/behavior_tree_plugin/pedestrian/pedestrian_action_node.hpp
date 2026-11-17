@@ -24,6 +24,7 @@
 
 namespace entity_behavior
 {
+enum class SeeAroundMode { blind, aware };
 class PedestrianActionNode : public ActionNode
 {
 public:
@@ -33,7 +34,6 @@ public:
   {
     // clang-format off
     return BT::PortsList({
-      BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
       BT::InputPort<traffic_simulator_msgs::msg::PedestrianParameters>("pedestrian_parameters"),
     }) + entity_behavior::ActionNode::providedPorts();
     // clang-format on
@@ -44,7 +44,7 @@ public:
   auto calculateUpdatedEntityStatus(double target_speed) const -> traffic_simulator::EntityStatus;
 
 protected:
-  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+  SeeAroundMode should_respect_see_around;
 };
 }  // namespace entity_behavior
 

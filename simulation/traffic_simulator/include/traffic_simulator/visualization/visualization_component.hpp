@@ -122,6 +122,8 @@ private:
    * @brief buffers for generated markers.
    */
   std::unordered_map<std::string, visualization_msgs::msg::MarkerArray> markers_;
+  bool use_trajectory_based_front_entity_detection_;
+  double trajectory_based_detection_offset_;
 };
 }  // namespace traffic_simulator
 

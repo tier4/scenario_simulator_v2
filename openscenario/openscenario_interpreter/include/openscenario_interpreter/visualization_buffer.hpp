@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace openscenario_interpreter
 {

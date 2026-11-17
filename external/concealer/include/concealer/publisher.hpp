@@ -1,0 +1,217 @@
+// Copyright 2015 TIER IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef CONCEALER__PUBLISHER_HPP_
+#define CONCEALER__PUBLISHER_HPP_
+
+#include <autoware_vehicle_msgs/msg/velocity_report.hpp>
+#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <get_parameter/get_parameter.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include <random>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/imu.hpp>
+
+namespace concealer
+{
+template <typename>
+struct Identity
+{
+  explicit constexpr Identity(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &)
+  {
+  }
+
+  template <typename T>
+  constexpr auto operator()(T && x) const -> decltype(auto)
+  {
+    return std::forward<decltype(x)>(x);
+  }
+};
+
+template <typename ValueType>
+struct NormalDistributionError
+{
+  static_assert(std::is_floating_point_v<std::decay_t<ValueType> >, "Unsupported error type");
+
+  std::normal_distribution<ValueType> additive, multiplicative;
+
+  explicit NormalDistributionError(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+    const std::string & prefix)
+  // clang-format off
+  : additive(
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".additive.mean")),
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".additive.standard_deviation"))),
+    multiplicative(
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".multiplicative.mean")),
+      static_cast<ValueType>(common::getParameter<double>(node, prefix + ".multiplicative.standard_deviation")))
+  // clang-format on
+  {
+  }
+
+  auto apply(std::mt19937_64 & engine, const ValueType value) -> ValueType
+  {
+    return value * (multiplicative(engine) + static_cast<ValueType>(1)) + additive(engine);
+  }
+};
+
+template <typename>
+struct NormalDistribution;
+
+/**
+ * @brief Provides common components for obtaining the seed and initializing the pseudo random number generator engine
+ * obtains the seed from the parameter <topic>.seed
+ * initializes `engine` appropriately
+ */
+struct RandomNumberEngine
+{
+  const std::random_device::result_type seed;
+
+  std::mt19937_64 engine;
+
+  explicit RandomNumberEngine(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node,
+    const std::string & topic);
+};
+
+template <>
+struct NormalDistribution<nav_msgs::msg::Odometry> : public RandomNumberEngine
+{
+  double speed_threshold;
+
+  // clang-format off
+  NormalDistributionError<double> position_local_x_error,
+                                  position_local_y_error,
+                                  position_local_z_error,
+                                  orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error,
+                                  linear_x_error,
+                                  linear_y_error,
+                                  linear_z_error,
+                                  angular_x_error,
+                                  angular_y_error,
+                                  angular_z_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(nav_msgs::msg::Odometry odometry) -> nav_msgs::msg::Odometry;
+};
+
+template <>
+struct NormalDistribution<autoware_vehicle_msgs::msg::VelocityReport> : public RandomNumberEngine
+{
+  double speed_threshold;
+
+  // clang-format off
+  NormalDistributionError<float> longitudinal_velocity_error,
+                                 lateral_velocity_error,
+                                 heading_rate_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(autoware_vehicle_msgs::msg::VelocityReport velocity_report)
+    -> autoware_vehicle_msgs::msg::VelocityReport;
+};
+
+template <>
+struct NormalDistribution<geometry_msgs::msg::PoseWithCovarianceStamped> : public RandomNumberEngine
+{
+  // clang-format off
+  NormalDistributionError<double> position_local_x_error,
+                                  position_local_y_error,
+                                  position_local_z_error,
+                                  orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error,
+                                  covariance_diagonal_x_x_error,
+                                  covariance_diagonal_y_y_error,
+                                  covariance_diagonal_z_z_error,
+                                  covariance_diagonal_roll_roll_error,
+                                  covariance_diagonal_pitch_pitch_error,
+                                  covariance_diagonal_yaw_yaw_error;
+  // clang-format on
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(geometry_msgs::msg::PoseWithCovarianceStamped pose)
+    -> geometry_msgs::msg::PoseWithCovarianceStamped;
+};
+
+template <>
+struct NormalDistribution<sensor_msgs::msg::Imu> : public RandomNumberEngine
+{
+  // clang-format off
+  NormalDistributionError<double> orientation_r_error,
+                                  orientation_p_error,
+                                  orientation_y_error,
+                                  angular_velocity_x_error,
+                                  angular_velocity_y_error,
+                                  angular_velocity_z_error,
+                                  linear_acceleration_x_error,
+                                  linear_acceleration_y_error,
+                                  linear_acceleration_z_error,
+                                  orientation_covariance_diagonal_roll_roll_error,
+                                  orientation_covariance_diagonal_pitch_pitch_error,
+                                  orientation_covariance_diagonal_yaw_yaw_error,
+                                  angular_velocity_covariance_diagonal_x_x_error,
+                                  angular_velocity_covariance_diagonal_y_y_error,
+                                  angular_velocity_covariance_diagonal_z_z_error,
+                                  linear_acceleration_covariance_diagonal_x_x_error,
+                                  linear_acceleration_covariance_diagonal_y_y_error,
+                                  linear_acceleration_covariance_diagonal_z_z_error;
+  // clang-format on
+
+  /// @note set this to false to disable randomization
+  bool active{true};
+
+  explicit NormalDistribution(
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &, const std::string &);
+
+  auto operator()(sensor_msgs::msg::Imu imu) -> sensor_msgs::msg::Imu;
+};
+
+template <typename Message, template <typename> typename Randomizer = Identity>
+class Publisher
+{
+  typename rclcpp::Publisher<Message>::SharedPtr publisher;
+
+  Randomizer<Message> randomize;
+
+public:
+  template <typename Node>
+  explicit Publisher(const std::string & topic, Node & node)
+  : publisher(node.template create_publisher<Message>(topic, rclcpp::QoS(1).reliable())),
+    randomize(node.get_node_parameters_interface(), topic)
+  {
+  }
+
+  template <typename... Ts>
+  auto operator()(Ts &&... xs) -> decltype(auto)
+  {
+    return publisher->publish(randomize(std::forward<decltype(xs)>(xs)...));
+  }
+
+  auto getRandomizer() const noexcept -> const Randomizer<Message> & { return randomize; }
+  auto getRandomizer() noexcept -> Randomizer<Message> & { return randomize; }
+};
+}  // namespace concealer
+
+#endif  // CONCEALER__PUBLISHER_HPP_

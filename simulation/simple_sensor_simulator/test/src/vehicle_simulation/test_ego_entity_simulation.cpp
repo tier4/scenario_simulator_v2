@@ -18,23 +18,26 @@
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <vector>
 
 using namespace vehicle_simulation;
 
 TEST(EgoEntitySimulation, calculateAccelerationBySlope)
 {
-  // initialize rclcpp for rosparam in EgoEntitySimulation class
-  rclcpp::init(0, nullptr);
+  // initialize rclcpp with parameters from default_vehicle_description package
+  const auto param_file =
+    ament_index_cpp::get_package_share_directory("default_vehicle_description") +
+    "/config/simulator_model.param.yaml";
+  const char * argv[] = {
+    "test_ego_entity_simulation", "--ros-args", "--params-file", param_file.c_str()};
+  int argc = 4;
+  rclcpp::init(argc, argv);
 
-  auto hdmap_utils = std::make_shared<hdmap_utils::HdMapUtils>(
-    ament_index_cpp::get_package_share_directory("traffic_simulator") +
-      "/map/slope/lanelet2_map.osm",
-    geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-      .latitude(0.0)
-      .longitude(-1.20294718763)
-      .altitude(0.0));
+  const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
+                            "/map/slope/lanelet2_map.osm";
+  traffic_simulator::lanelet_map::activate(lanelet_path);
 
   constexpr double gravity_acceleration = -9.81;
   // expected value in the lanelet(id:7)
@@ -53,10 +56,11 @@ TEST(EgoEntitySimulation, calculateAccelerationBySlope)
       initial_status.name = "ego";
       // use pitch-filled map pose
       initial_status.lanelet_pose_valid = false;
-      initial_status.pose = hdmap_utils->toMapPose(lanelet_pose, true).pose;
+      initial_status.pose =
+        traffic_simulator::lanelet_wrapper::pose::toMapPose(lanelet_pose, true).pose;
 
       EgoEntitySimulation ego_entity_simulation(
-        initial_status, traffic_simulator_msgs::msg::VehicleParameters(), 1.f / 30.f, hdmap_utils,
+        initial_status, traffic_simulator_msgs::msg::VehicleParameters(), 1.f / 30.f,
         rclcpp::Parameter("use_sim_time", false), consider_slope);
       return ego_entity_simulation.calculateAccelerationBySlope();
     };

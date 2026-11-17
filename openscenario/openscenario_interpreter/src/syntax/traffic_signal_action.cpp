@@ -22,9 +22,10 @@ inline namespace syntax
 TrafficSignalAction::TrafficSignalAction(const pugi::xml_node & node, Scope & scope)
 // clang-format off
 : ComplexType(
-    choice(node,
-      std::make_pair("TrafficSignalControllerAction", [&](const auto & node) { return make<TrafficSignalControllerAction>(node, scope); }),
-      std::make_pair("TrafficSignalStateAction",      [&](const auto & node) { return make<TrafficSignalStateAction     >(node, scope); })))
+    choice(node, {
+      { "TrafficSignalControllerAction", [&](const auto & node) { return make<TrafficSignalControllerAction>(node, scope); } },
+      { "TrafficSignalStateAction",      [&](const auto & node) { return make<TrafficSignalStateAction     >(node, scope); } },
+    }))
 // clang-format on
 {
 }

@@ -22,7 +22,6 @@
 #include <openscenario_interpreter/utility/print.hpp>
 #include <openscenario_interpreter/visualization_buffer.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 
 namespace openscenario_interpreter
 {

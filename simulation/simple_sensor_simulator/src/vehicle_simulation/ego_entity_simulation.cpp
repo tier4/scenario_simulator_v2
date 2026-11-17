@@ -20,36 +20,38 @@
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace vehicle_simulation
 {
-/// @todo find some shared space for this function
-template <typename T>
-static auto getParameter(const std::string & name, T value = {})
+auto getRequiredParameter(const std::string & name) -> rclcpp::Parameter
 {
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  node.declare_parameter<T>(name, value);
-  node.get_parameter<T>(name, value);
-
-  return value;
+  const auto node = common::getParameterNode().get_node_parameters_interface();
+  if (not node->has_parameter(name)) {
+    throw std::runtime_error(
+      "Required parameter '" + name +
+      "' is not set. "
+      "Please define it in description package.");
+  }
+  return node->get_parameter(name);
 }
 
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::EntityStatus & initial_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+
   const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
-: autoware(
-    std::make_unique<concealer::AutowareUniverse>(getParameter<bool>("simulate_localization"))),
+: autoware(std::make_unique<concealer::AutowareUniverse>(
+    common::getParameter<bool>("simulate_localization"))),
   vehicle_model_type_(getVehicleModelType()),
+  wheel_base_(common::getParameter(
+    "wheel_base", parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x)),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
   initial_pose_(status_.getMapPose()),
   initial_rotation_matrix_(math::geometry::getRotationMatrix(initial_pose_.orientation)),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
-  hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters)
 {
   setStatus(initial_status);
@@ -65,6 +67,7 @@ auto toString(const VehicleModelType datum) -> std::string
   switch (datum) {
     BOILERPLATE(DELAY_STEER_ACC);
     BOILERPLATE(DELAY_STEER_ACC_GEARED);
+    BOILERPLATE(DELAY_STEER_ACC_GEARED_WO_FALL_GUARD);
     BOILERPLATE(DELAY_STEER_MAP_ACC_GEARED);
     BOILERPLATE(DELAY_STEER_VEL);
     BOILERPLATE(IDEAL_STEER_ACC);
@@ -80,11 +83,13 @@ auto toString(const VehicleModelType datum) -> std::string
 auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
 {
   const auto vehicle_model_type =
-    getParameter<std::string>("vehicle_model_type", "IDEAL_STEER_VEL");
+    getRequiredParameter("vehicle_model_type").get_value<std::string>();
 
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
     {"DELAY_STEER_ACC_GEARED", VehicleModelType::DELAY_STEER_ACC_GEARED},
+    {"DELAY_STEER_ACC_GEARED_WO_FALL_GUARD",
+     VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD},
     {"DELAY_STEER_MAP_ACC_GEARED", VehicleModelType::DELAY_STEER_MAP_ACC_GEARED},
     {"DELAY_STEER_VEL", VehicleModelType::DELAY_STEER_VEL},
     {"IDEAL_STEER_ACC", VehicleModelType::IDEAL_STEER_ACC},
@@ -106,29 +111,23 @@ auto EgoEntitySimulation::makeSimulationModel(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
   -> const std::shared_ptr<SimModelInterface>
 {
-  auto node = rclcpp::Node("get_parameter", "simulation");
-
-  auto get_parameter = [&](const std::string & name, auto value = {}) {
-    node.declare_parameter<decltype(value)>(name, value);
-    node.get_parameter<decltype(value)>(name, value);
-    return value;
-  };
   // clang-format off
-  const auto acc_time_constant          = get_parameter("acc_time_constant",           0.1);
-  const auto acc_time_delay             = get_parameter("acc_time_delay",              0.1);
-  const auto acceleration_map_path      = get_parameter("acceleration_map_path",       std::string(""));
-  const auto debug_acc_scaling_factor   = get_parameter("debug_acc_scaling_factor",    1.0);
-  const auto debug_steer_scaling_factor = get_parameter("debug_steer_scaling_factor",  1.0);
-  const auto steer_lim                  = get_parameter("steer_lim",                   parameters.axles.front_axle.max_steering);  // 1.0
-  const auto steer_dead_band            = get_parameter("steer_dead_band",             0.0);
-  const auto steer_rate_lim             = get_parameter("steer_rate_lim",              5.0);
-  const auto steer_time_constant        = get_parameter("steer_time_constant",         0.27);
-  const auto steer_time_delay           = get_parameter("steer_time_delay",            0.24);
-  const auto vel_lim                    = get_parameter("vel_lim",                     parameters.performance.max_speed);  // 50.0
-  const auto vel_rate_lim               = get_parameter("vel_rate_lim",                parameters.performance.max_acceleration);  // 7.0
-  const auto vel_time_constant          = get_parameter("vel_time_constant",           0.1);  /// @note 0.5 is default value on simple_planning_simulator
-  const auto vel_time_delay             = get_parameter("vel_time_delay",              0.1);  /// @note 0.25 is default value on simple_planning_simulator
-  const auto wheel_base                 = get_parameter("wheel_base",                  parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
+  const auto acc_time_constant          = getRequiredParameter("acc_time_constant"          ).get_value<double>();
+  const auto acc_time_delay             = getRequiredParameter("acc_time_delay"             ).get_value<double>();
+  const auto acceleration_map_path      = getRequiredParameter("acceleration_map_path"      ).get_value<std::string>();
+  const auto debug_acc_scaling_factor   = getRequiredParameter("debug_acc_scaling_factor"   ).get_value<double>();
+  const auto debug_steer_scaling_factor = getRequiredParameter("debug_steer_scaling_factor" ).get_value<double>();
+  const auto steer_bias                 = getRequiredParameter("steer_bias"                 ).get_value<double>();
+  const auto steer_dead_band            = getRequiredParameter("steer_dead_band"            ).get_value<double>();
+  const auto steer_lim                  = common::getParameter("steer_lim",                 parameters.axles.front_axle.max_steering);
+  const auto steer_rate_lim             = getRequiredParameter("steer_rate_lim"             ).get_value<double>();
+  const auto steer_time_constant        = getRequiredParameter("steer_time_constant"        ).get_value<double>();
+  const auto steer_time_delay           = getRequiredParameter("steer_time_delay"           ).get_value<double>();
+  const auto vel_lim                    = common::getParameter("vel_lim",                   parameters.performance.max_speed);
+  const auto vel_rate_lim               = common::getParameter("vel_rate_lim",              parameters.performance.max_acceleration);
+  const auto vel_time_constant          = getRequiredParameter("vel_time_constant"          ).get_value<double>();
+  const auto vel_time_delay             = getRequiredParameter("vel_time_delay"             ).get_value<double>();
+  const auto wheel_base                 = common::getParameter("wheel_base",                parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
   // clang-format on
 
   switch (vehicle_model_type) {
@@ -142,6 +141,13 @@ auto EgoEntitySimulation::makeSimulationModel(
       return std::make_shared<SimModelDelaySteerAccGeared>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band,
+        debug_acc_scaling_factor, debug_steer_scaling_factor);
+
+    case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+      return std::make_shared<
+        autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
         debug_acc_scaling_factor, debug_steer_scaling_factor);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
@@ -180,12 +186,15 @@ auto EgoEntitySimulation::setAutowareStatus() -> void
   autoware->current_acceleration.store([this]() {
     geometry_msgs::msg::Accel message;
     message.linear.x = vehicle_model_ptr_->getAx();
+    message.linear.y = vehicle_model_ptr_->getWz() * vehicle_model_ptr_->getVx();
     return message;
   }());
 
   autoware->current_pose.store(status_.getMapPose());
 
   autoware->current_twist.store(getCurrentTwist());
+
+  autoware->current_steering_tire_angle.store(static_cast<float>(vehicle_model_ptr_->getSteer()));
 }
 
 void EgoEntitySimulation::requestSpeedChange(double value)
@@ -197,6 +206,10 @@ void EgoEntitySimulation::requestSpeedChange(double value)
     case VehicleModelType::DELAY_STEER_ACC_GEARED:
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       v << 0, 0, 0, value, 0, 0;
+      break;
+
+    case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+      v << 0, 0, 0, value, 0, 0, 0;
       break;
 
     case VehicleModelType::IDEAL_STEER_ACC:
@@ -227,6 +240,8 @@ auto EgoEntitySimulation::overwrite(
   using math::geometry::convertQuaternionToEulerAngle;
   using math::geometry::getRotationMatrix;
 
+  constexpr double min_linear_velocity_for_steer_calculation = 1e-9;
+
   autoware->rethrow();
 
   /*
@@ -249,19 +264,27 @@ auto EgoEntitySimulation::overwrite(
       relative_orientation.y = q.y();
       relative_orientation.z = q.z();
       relative_orientation.w = q.w();
-      return convertQuaternionToEulerAngle(relative_orientation).z -
-             (previous_linear_velocity_ ? *previous_angular_velocity_ : 0) * step_time;
+      return convertQuaternionToEulerAngle(relative_orientation).z;
     }();
 
     switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
+      case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
         state(5) = status.action_status.accel.linear.x;
         [[fallthrough]];
 
       case VehicleModelType::DELAY_STEER_VEL:
-        state(4) = 0;
+        if (
+          std::abs(status.action_status.twist.linear.x) <
+          min_linear_velocity_for_steer_calculation) {
+          state(4) = 0.0;
+        } else {
+          state(4) = std::atan(
+            (status.action_status.twist.angular.z * wheel_base_) /
+            status.action_status.twist.linear.x);
+        }
         [[fallthrough]];
 
       case VehicleModelType::IDEAL_STEER_ACC:
@@ -317,27 +340,15 @@ void EgoEntitySimulation::update(
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        /*
-           TODO FIX THIS!!!
-
-           THIS IS MAYBE INCORRECT.
-
-           SHOULD BE
-               gear_sign * acceleration + acceleration_by_slope
-           OR
-               signed_acceleration + acceleration_by_slope
-
-           Currently, acceleration is obtained as an unsigned value
-           (`acceleration`) and a signed value (`gear_sign`), but this is for
-           historical reasons and there is no longer any reason to do so.
-
-           Therefore, when resolving this TODO comment, the assignee should
-           remove `gear_sign` from the tuple returned by
-           `AutowareUniverse::getVehicleCommand`, and at the same time change
-           `acceleration` to a signed value.
-        */
-        input(0) = gear_sign * (acceleration + acceleration_by_slope);
+        input(0) = gear_sign * acceleration + acceleration_by_slope;
         input(1) = tire_angle;
+        break;
+
+      case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
+        input(0) = acceleration;
+        input(1) = autoware->getGearCommand().command;
+        input(2) = acceleration_by_slope;
+        input(3) = tire_angle;
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
@@ -364,11 +375,14 @@ void EgoEntitySimulation::update(
 
 auto EgoEntitySimulation::calculateAccelerationBySlope() const -> double
 {
-  if (consider_acceleration_by_road_slope_) {
+  if (consider_acceleration_by_road_slope_ && status_.isInLanelet()) {
     constexpr double gravity_acceleration = -9.81;
+    /// @todo why there is a need to recalculate orientation using getLaneletPose?
+    /// status_.getMapPose().orientation already contains the orientation
     const double ego_pitch_angle =
       math::geometry::convertQuaternionToEulerAngle(
-        hdmap_utils_ptr_->toMapPose(status_.getLaneletPose(), true).pose.orientation)
+        traffic_simulator::lanelet_wrapper::pose::toMapPose(status_.getLaneletPose(), true)
+          .pose.orientation)
         .y;
     return -std::sin(ego_pitch_angle) * gravity_acceleration;
   } else {
@@ -384,8 +398,7 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
   return current_twist;
 }
 
-auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
-  -> geometry_msgs::msg::Pose
+auto EgoEntitySimulation::getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose
 {
   using math::geometry::operator*;
   const auto relative_position =
@@ -409,6 +422,7 @@ auto EgoEntitySimulation::getCurrentAccel(const double step_time) const -> geome
   geometry_msgs::msg::Accel accel;
   if (previous_angular_velocity_) {
     accel.linear.x = vehicle_model_ptr_->getAx();
+    accel.linear.y = vehicle_model_ptr_->getWz() * vehicle_model_ptr_->getVx();
     accel.angular.z =
       (vehicle_model_ptr_->getWz() - previous_angular_velocity_.value()) / step_time;
   }
@@ -453,8 +467,7 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   /// value from EntityStatus, therefore canonicalization has to be done in advance,
   /// not inside CanonicalizedEntityStatus
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
-    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
-    hdmap_utils_ptr_);
+    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance);
   status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();
 }

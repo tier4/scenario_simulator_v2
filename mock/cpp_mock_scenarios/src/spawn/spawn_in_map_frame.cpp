@@ -29,8 +29,9 @@ class SpawnInMapFrameScenario : public cpp_mock_scenarios::CppScenarioNode
 public:
   explicit SpawnInMapFrameScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option)
+      "spawn_in_map_frame",
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
+      __FILE__, false, option)
   {
     start();
   }
@@ -39,9 +40,8 @@ private:
   void onUpdate() override
   {
     const auto map_pose = traffic_simulator::pose::toMapPose(
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        120545, 0.0, 0.0, api_.getHdmapUtils()));
-    if (api_.reachPosition("ego", map_pose, 0.1)) {
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(120545, 0.0, 0.0));
+    if (api_.getEntity("ego").isNearbyPosition(map_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     } else {
       stop(cpp_mock_scenarios::Result::FAILURE);
@@ -53,8 +53,7 @@ private:
     api_.spawn(
       "ego",
       traffic_simulator::pose::toMapPose(
-        traffic_simulator::helper::constructCanonicalizedLaneletPose(
-          120545, 0.0, 0.0, api_.getHdmapUtils())),
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(120545, 0.0, 0.0)),
       getVehicleParameters());
   }
 };

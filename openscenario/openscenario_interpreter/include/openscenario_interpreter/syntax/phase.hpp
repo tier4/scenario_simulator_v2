@@ -58,6 +58,8 @@ struct Phase
   explicit Phase(const pugi::xml_node &, Scope &);
 
   auto evaluate() const -> Object;
+
+  auto clearStates() const -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

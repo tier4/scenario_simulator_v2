@@ -60,6 +60,11 @@ struct Properties
 
   explicit Properties(const pugi::xml_node &, Scope &);
 
+  auto contains(const String & name) const -> bool
+  {
+    return properties.find(name) != std::end(properties);
+  }
+
   template <typename T>
   auto get(const String & name, const T & default_value) const -> auto
   {

@@ -101,6 +101,15 @@ public:
    */
   constexpr static double tolerance = 1e-7;
 
+  /**
+   * @brief check the value0 and value1 is equal or not with considering tolerance.
+   * @param value0 the value you want to compare
+   * @param value1 the value you want to compared
+   * @return true value0 and value1 are equal
+   * @return false value0 and value1 are not equal
+   */
+  auto isApproximatelyEqualTo(const double value0, const double value1) const -> bool;
+
 private:
   /**
    * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0
@@ -119,14 +128,6 @@ private:
   auto filterByRange(
     const std::vector<double> & values, const double min_value, const double max_value) const
     -> std::vector<double>;
-  /**
-   * @brief check the value0 and value1 is equal or not with considering tolerance.
-   * @param value0 the value you want to compare
-   * @param value1 the value you want to compared
-   * @return true value0 and value1 are equal
-   * @return false value0 and value1 are not equal
-   */
-  auto isApproximatelyEqualTo(const double value0, const double value1) const -> bool;
 };
 }  // namespace geometry
 }  // namespace math

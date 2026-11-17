@@ -54,7 +54,7 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, startUpdate_publishSignals)
   this->lights->startUpdate(20.0);
   const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
+    this->executor.spin_some();
   }
 
   // verify contents of messages
@@ -106,7 +106,7 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, startUpdate_publishSignalsLegacy)
   this->lights->startUpdate(20.0);
   const auto end = std::chrono::system_clock::now() + 1s;
   while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
+    this->executor.spin_some();
   }
 
   // verify contents of messages
@@ -159,7 +159,7 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, resetUpdate_publishSignals)
     this->lights->startUpdate(20.0);
     const auto end = std::chrono::system_clock::now() + 0.5s;
     while (std::chrono::system_clock::now() < end) {
-      rclcpp::spin_some(this->node_ptr);
+      this->executor.spin_some();
     }
   }
 
@@ -175,7 +175,7 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, resetUpdate_publishSignals)
     this->lights->resetUpdate(10.0);
     const auto end_reset = std::chrono::system_clock::now() + 0.5s;
     while (std::chrono::system_clock::now() < end_reset) {
-      rclcpp::spin_some(this->node_ptr);
+      this->executor.spin_some();
     }
   }
 
@@ -262,7 +262,7 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, resetUpdate_publishSignalsLegacy)
     this->lights->startUpdate(20.0);
     const auto end = std::chrono::system_clock::now() + 0.5s;
     while (std::chrono::system_clock::now() < end) {
-      rclcpp::spin_some(this->node_ptr);
+      this->executor.spin_some();
     }
   }
 
@@ -277,7 +277,7 @@ TEST_F(V2ITrafficLightsTestNewArchitecture, resetUpdate_publishSignalsLegacy)
     this->lights->resetUpdate(10.0);
     auto end_reset = std::chrono::system_clock::now() + 0.5s;
     while (std::chrono::system_clock::now() < end_reset) {
-      rclcpp::spin_some(this->node_ptr);
+      this->executor.spin_some();
     }
   }
 

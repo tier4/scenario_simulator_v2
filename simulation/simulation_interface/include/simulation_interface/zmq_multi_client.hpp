@@ -15,7 +15,7 @@
 #ifndef SIMULATION_INTERFACE__ZMQ_MULTI_CLIENT_HPP_
 #define SIMULATION_INTERFACE__ZMQ_MULTI_CLIENT_HPP_
 
-#include <simulation_api_schema.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
 
 #include <functional>
 #include <iostream>
@@ -25,7 +25,7 @@
 #include <simulation_interface/constants.hpp>
 #include <string>
 #include <thread>
-#include <zmqpp/zmqpp.hpp>
+#include <zmq.hpp>
 
 namespace zeromq
 {
@@ -89,9 +89,9 @@ public:
   const std::string hostname;
 
 private:
-  zmqpp::context context_;
-  const zmqpp::socket_type type_;
-  zmqpp::socket socket_;
+  zmq::context_t context_;
+  const zmq::socket_type type_;
+  zmq::socket_t socket_;
 
   bool is_running = true;
 };

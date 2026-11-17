@@ -15,15 +15,28 @@
 #ifndef GEOMETRY__VECTOR3__OPERATOR_HPP_
 #define GEOMETRY__VECTOR3__OPERATOR_HPP_
 
+#include <Eigen/Dense>
 #include <geometry/vector3/is_like_vector3.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
+#include <limits>
 
 namespace math
 {
 namespace geometry
 {
+template <
+  typename T, std::enable_if_t<std::conjunction_v<IsLikeVector3<T>>, std::nullptr_t> = nullptr>
+auto operator+(const T & v, const Eigen::Vector3d & eigen_v) -> T
+{
+  T result;
+  result.x = v.x + eigen_v.x();
+  result.y = v.y + eigen_v.y();
+  result.z = v.z + eigen_v.z();
+  return result;
+}
+
 template <
   typename T, typename U,
   std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, IsLikeVector3<U>>, std::nullptr_t> =
@@ -118,6 +131,16 @@ auto operator+=(T & a, const U & b) -> decltype(auto)
   a.y += b.y;
   a.z += b.z;
   return a;
+}
+
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, IsLikeVector3<U>>, std::nullptr_t> =
+    nullptr>
+auto operator==(const T & a, const U & b) -> bool
+{
+  constexpr decltype(a.x) e = std::numeric_limits<decltype(a.x)>::epsilon();
+  return (std::abs(a.x - b.x) < e) && (std::abs(a.y - b.y) < e) && (std::abs(a.z - b.z) < e);
 }
 }  // namespace geometry
 }  // namespace math

@@ -15,17 +15,19 @@
 #ifndef SIMULATION_INTERFACE__CONVERSIONS_HPP_
 #define SIMULATION_INTERFACE__CONVERSIONS_HPP_
 
-#include <builtin_interfaces.pb.h>
-#include <geometry_msgs.pb.h>
-#include <rosgraph_msgs.pb.h>
-#include <simulation_api_schema.pb.h>
-#include <std_msgs.pb.h>
-#include <traffic_simulator_msgs.pb.h>
+#include <osi_common.pb.h>
+#include <simulation_interface/builtin_interfaces.pb.h>
+#include <simulation_interface/geometry_msgs.pb.h>
+#include <simulation_interface/rosgraph_msgs.pb.h>
+#include <simulation_interface/simulation_api_schema.pb.h>
+#include <simulation_interface/std_msgs.pb.h>
+#include <simulation_interface/traffic_simulator_msgs.pb.h>
 
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
+#include <cstring>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
@@ -50,26 +52,26 @@
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
-#include <zmqpp/zmqpp.hpp>
+#include <zmq.hpp>
 
 namespace zeromq
 {
 template <typename Proto>
-zmqpp::message toZMQ(const Proto & proto)
+zmq::message_t toZMQ(const Proto & proto)
 {
-  zmqpp::message msg;
-  std::string serialized_str = "";
+  std::string serialized_str;
   proto.SerializeToString(&serialized_str);
-  msg << serialized_str;
+
+  zmq::message_t msg(serialized_str.size());
+  std::memcpy(msg.data(), serialized_str.data(), serialized_str.size());
   return msg;
 }
 
 template <typename Proto>
-Proto toProto(const zmqpp::message & msg)
+Proto toProto(const zmq::message_t & msg)
 {
-  std::string serialized_str = msg.get(0);
   Proto proto;
-  proto.ParseFromString(serialized_str);
+  proto.ParseFromArray(msg.data(), static_cast<int>(msg.size()));
   return proto;
 }
 }  // namespace zeromq
@@ -168,6 +170,7 @@ void toMsg(const rosgraph_msgs::Clock & proto, rosgraph_msgs::msg::Clock & time)
 void toProto(const std_msgs::msg::Header & header, std_msgs::Header & proto);
 void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header);
 
+// clang-format off
 #define DEFINE_CONVERSION(PACKAGE, TYPENAME)                               \
   auto toProto(const PACKAGE::msg::TYPENAME &, PACKAGE::TYPENAME &)->void; \
   auto toMsg(const PACKAGE::TYPENAME &, PACKAGE::msg::TYPENAME &)->void
@@ -201,6 +204,8 @@ auto toMsg(
         return TrafficLightBulbMessageType::GREEN;
       case TrafficLight_Color_WHITE:
         return TrafficLightBulbMessageType::WHITE;
+      case TrafficLight_Color_UNKNOWN_COLOR:
+        return TrafficLightBulbMessageType::UNKNOWN;
       default:
         return TrafficLightBulbMessageType::UNKNOWN;
     }
@@ -230,6 +235,8 @@ auto toMsg(
         return TrafficLightBulbMessageType::DOWN_RIGHT_ARROW;
       case TrafficLight_Shape_CROSS:
         return TrafficLightBulbMessageType::CROSS;
+      case TrafficLight_Shape_UNKNOWN_SHAPE:
+        return TrafficLightBulbMessageType::UNKNOWN;
       default:
         return TrafficLightBulbMessageType::UNKNOWN;
     }
@@ -244,6 +251,8 @@ auto toMsg(
         return TrafficLightBulbMessageType::SOLID_ON;
       case TrafficLight_Status_FLASHING:
         return TrafficLightBulbMessageType::FLASHING;
+      case TrafficLight_Status_UNKNOWN_STATUS:
+        return TrafficLightBulbMessageType::UNKNOWN;
       default:
         return TrafficLightBulbMessageType::UNKNOWN;
     }
@@ -254,6 +263,7 @@ auto toMsg(
   traffic_light_bulb_state.color = convert_color(proto.color());
   traffic_light_bulb_state.confidence = proto.confidence();
 }
+// clang-format on
 
 auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex &)
   -> traffic_simulator_msgs::Vertex;
@@ -271,6 +281,12 @@ auto toProtobufMessage(const traffic_simulator_msgs::msg::PolylineTrajectory &)
 
 auto toROS2Message(const traffic_simulator_msgs::PolylineTrajectory &)
   -> traffic_simulator_msgs::msg::PolylineTrajectory;
+
+template <typename T, typename... Ts>
+auto to(Ts &&...) -> T = delete;
+
+template <>
+auto to<osi3::Timestamp>(const builtin_interfaces::msg::Time &) -> osi3::Timestamp;
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_

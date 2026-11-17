@@ -25,9 +25,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sstream>
 
-// NOTE: Ignore spell miss due to OpenSCENARIO standard.
-// cspell: ignore euclidian
-
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -672,7 +669,9 @@ void DistanceCondition::visualize() const
     marker.pose.position.x = center.position.x - relative_pose.position.x / 2;
     marker.pose.position.y = center.position.y - relative_pose.position.y / 2;
     marker.pose.position.z = center.position.z - relative_pose.position.z / 2;
-    marker.text = std::to_string(distance(triggering_entity));
+    marker.text = std::to_string(evaluate(
+      global().entities, triggering_entity, position, coordinate_system, relative_distance_type,
+      routing_algorithm, freespace));
     marker.scale.z = 0.3;
     marker.color.a = 0.8f;
     marker.color.r = 1.0;

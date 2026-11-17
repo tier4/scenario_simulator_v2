@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <chrono>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
 #include <status_monitor/status_monitor.hpp>
@@ -22,12 +23,12 @@ MultiServer::~MultiServer() { thread_.join(); }
 
 void MultiServer::poll()
 {
-  constexpr long timeout_ms = 1L;
-  poller_.poll(timeout_ms);
-  if (poller_.has_input(socket_)) {
+  constexpr auto timeout_ms = std::chrono::milliseconds(1);
+  zmq::poll(&poll_item_, 1, timeout_ms);
+  if (poll_item_.revents & ZMQ_POLLIN) {
     simulation_api_schema::SimulationResponse sim_response;
-    zmqpp::message sim_request;
-    socket_.receive(sim_request);
+    zmq::message_t sim_request;
+    socket_.recv(sim_request, zmq::recv_flags::none);
     auto proto = toProto<simulation_api_schema::SimulationRequest>(sim_request);
     switch (proto.request_case()) {
       case simulation_api_schema::SimulationRequest::RequestCase::kInitialize:
@@ -91,7 +92,7 @@ void MultiServer::poll()
       }
     }
     auto msg = toZMQ(sim_response);
-    socket_.send(msg);
+    socket_.send(msg, zmq::send_flags::none);
   }
 }
 

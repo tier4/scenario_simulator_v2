@@ -23,13 +23,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionSetElement 1.2 ---------------------------------------------
- *
- *  <xsd:complexType name="DistributionSetElement">
- *    <xsd:attribute name="value" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * ------------------------------------------------------------------------ */
+/*
+   DistributionSetElement (OpenSCENARIO XML 1.3.1)
+
+   Indicates an element for a deterministic distribution.
+
+   <xsd:complexType name="DistributionSetElement">
+     <xsd:attribute name="value" type="String" use="required"/>
+   </xsd:complexType>
+*/
 struct DistributionSetElement
 {
   const String value;
