@@ -4505,7 +4505,7 @@ Visualization Manager:
           Name: Simple Sensor Simulator
       Enabled: true
       Name: Simulation
-      Enabled: true
+  Enabled: true
   Global Options:
     Background Color: 15; 20; 23
     Fixed Frame: map
