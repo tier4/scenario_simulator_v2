@@ -612,8 +612,12 @@ void DistanceCondition::visualize() const
     /// @todo implement visualization for other distance types
     return;
   }
-  auto center = static_cast<geometry_msgs::msg::Pose>(position);
-  center.orientation.w = 0;
+
+  const auto center = static_cast<geometry_msgs::msg::Pose>(position);
+
+  // The relative pose from this is the offset of the entity along the map axes.
+  auto origin = center;
+  origin.orientation = geometry_msgs::msg::Quaternion();
 
   const auto make_label_marker = [&](auto && triggering_entity) {
     visualization_msgs::msg::Marker marker;
@@ -642,12 +646,12 @@ void DistanceCondition::visualize() const
     marker.id = 3;
     marker.type = visualization_msgs::msg::Marker::LINE_STRIP;
     marker.action = visualization_msgs::msg::Marker::ADD;
-    auto relative_pose = makeNativeRelativeWorldPosition(center, triggering_entity.name());
+    auto relative_pose = makeNativeRelativeWorldPosition(origin, triggering_entity.name());
     marker.points.push_back(center.position);
     auto entity_position = center.position;
-    entity_position.x -= relative_pose.position.x;
-    entity_position.y -= relative_pose.position.y;
-    entity_position.z -= relative_pose.position.z;
+    entity_position.x += relative_pose.position.x;
+    entity_position.y += relative_pose.position.y;
+    entity_position.z += relative_pose.position.z;
     marker.points.push_back(entity_position);
     marker.scale.x = 0.1;
     marker.color.a = 0.8f;
@@ -665,10 +669,10 @@ void DistanceCondition::visualize() const
     marker.id = 4;
     marker.type = visualization_msgs::msg::Marker::TEXT_VIEW_FACING;
     marker.action = visualization_msgs::msg::Marker::ADD;
-    auto relative_pose = makeNativeRelativeWorldPosition(center, triggering_entity.name());
-    marker.pose.position.x = center.position.x - relative_pose.position.x / 2;
-    marker.pose.position.y = center.position.y - relative_pose.position.y / 2;
-    marker.pose.position.z = center.position.z - relative_pose.position.z / 2;
+    auto relative_pose = makeNativeRelativeWorldPosition(origin, triggering_entity.name());
+    marker.pose.position.x = center.position.x + relative_pose.position.x / 2;
+    marker.pose.position.y = center.position.y + relative_pose.position.y / 2;
+    marker.pose.position.z = center.position.z + relative_pose.position.z / 2;
     marker.text = std::to_string(evaluate(
       global().entities, triggering_entity, position, coordinate_system, relative_distance_type,
       routing_algorithm, freespace));
