@@ -15,12 +15,13 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__BEHAVIOR_PLUGIN_BASE_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__BEHAVIOR_PLUGIN_BASE_HPP_
 
+#include <geometry/spline/catmull_rom_subspline.hpp>
 #include <optional>
 #include <string>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
@@ -42,18 +43,18 @@ class BehaviorPluginBase
 {
 public:
   virtual ~BehaviorPluginBase() = default;
-  virtual void configure(const rclcpp::Logger & logger) = 0;
+  virtual auto configure(const rclcpp::Logger & logger) -> void = 0;
   virtual auto update(const double current_time, const double step_time) -> void = 0;
-  virtual auto getCurrentAction() -> const std::string & = 0;
+  virtual auto getCurrentAction() const -> const std::string & = 0;
 
   // clang-format off
-#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
-  virtual TYPE get##NAME() = 0;                    \
-  virtual void set##NAME(const TYPE & value) = 0;  \
-  auto get##NAME##Key() const->const std::string & \
-  {                                                \
-    static const std::string key = KEY;            \
-    return key;                                    \
+#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)                \
+  virtual auto get##NAME() -> TYPE = 0;                      \
+  virtual auto set##NAME(const TYPE & value) -> void = 0;    \
+  /*   */ auto get##NAME##Key() const -> const std::string & \
+  {                                                          \
+    static const std::string key = KEY;                      \
+    return key;                                              \
   }
 
   DEFINE_GETTER_SETTER(BehaviorParameter,                                "behavior_parameter",                             traffic_simulator_msgs::msg::BehaviorParameter)
@@ -63,7 +64,6 @@ public:
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, "matching_distance_for_lanelet_pose_calculation", double)
   DEFINE_GETTER_SETTER(EuclideanDistancesMap,                            "euclidean_distances_map",                        std::shared_ptr<EuclideanDistancesMap>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        "goal_poses",                                     std::vector<geometry_msgs::msg::Pose>)
-  DEFINE_GETTER_SETTER(HdMapUtils,                                       "hdmap_utils",                                    std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             "lane_change_parameters",                         traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        "lateral_collision_threshold",                    std::optional<double>)
   DEFINE_GETTER_SETTER(Obstacle,                                         "obstacle",                                       std::optional<traffic_simulator_msgs::msg::Obstacle>)

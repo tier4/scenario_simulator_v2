@@ -24,16 +24,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DomeImage 1.2 --------------------------------------------------------
- *
- * <xsd:complexType name="DomeImage">
- *   <xsd:sequence>
- *     <xsd:element name="DomeFile" type="File"/>
- *   </xsd:sequence>
- *   <xsd:attribute name="azimuthOffset" type="Double"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DomeImage (OpenSCENARIO XML 1.3.1)
+
+   Image reference to represent the sky and optionally the lighting if the image also contains lighting information.
+
+   <xsd:complexType name="DomeImage">
+     <xsd:sequence>
+       <xsd:element name="DomeFile" type="File"/>
+     </xsd:sequence>
+     <xsd:attribute name="azimuthOffset" type="Double"/>
+   </xsd:complexType>
+*/
 struct DomeImage
 {
   const Double azimuth_offset;  // Offset to north / y-axis of world coordinate system

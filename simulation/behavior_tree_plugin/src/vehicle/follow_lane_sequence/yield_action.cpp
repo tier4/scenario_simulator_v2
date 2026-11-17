@@ -15,10 +15,13 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
+#include <geometry/bounding_box.hpp>
 #include <memory>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -78,7 +81,7 @@ std::optional<double> YieldAction::calculateTargetSpeed()
    * @brief hard coded parameter!! 1.0 is a stop margin
    */
   double rest_distance =
-    distance_to_stop_target_.value() - (vehicle_parameters.bounding_box.dimensions.x * 0.5 + 1.0);
+    distance_to_stop_target_.value() - (math::geometry::getDistancesFromCenterToEdge(vehicle_parameters.bounding_box).front + 1.0);
   if (rest_distance < calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
     return 0;
   }
@@ -102,10 +105,10 @@ bool YieldAction::checkPreconditions()
 
 BT::NodeStatus YieldAction::doAction()
 {
-  const auto right_of_way_entities = getRightOfWayEntities(route_lanelets_);
-  if (right_of_way_entities.empty()) {
+  if (!traffic_simulator::route::isNeedToRightOfWay(
+        route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
     if (!target_speed_) {
-      target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+      target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
     }
     setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
     const auto waypoints = calculateWaypoints();
@@ -120,7 +123,7 @@ BT::NodeStatus YieldAction::doAction()
   distance_to_stop_target_ = getYieldStopDistance(route_lanelets_);
   target_speed_ = calculateTargetSpeed();
   if (!target_speed_) {
-    target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+    target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
   }
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   const auto waypoints = calculateWaypoints();

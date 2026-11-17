@@ -1,0 +1,13 @@
+/**:
+  ros__parameters:
+    # NOTE: all parameters in this file are not used for now. The parameters in scenario are used instead.
+    wheel_radius: 0.0     # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.
+    wheel_width: 0.0      # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.
+    wheel_base: 0.0       # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.
+    wheel_tread: 0.0      # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.
+    front_overhang: 0.0   # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.
+    rear_overhang: 0.0    # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.
+    left_overhang: 0.0    # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.
+    right_overhang: 0.0   # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.
+    vehicle_height: 0.0   # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.
+    max_steer_angle: 0.0  # Placeholder introduced together with this file in #1825. Not taken from any vehicle. The key follows vehicle_info.param.yaml of autoware_sample_vehicle_description.

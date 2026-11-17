@@ -15,6 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_HPP_
 #define TRAFFIC_SIMULATOR__LANELET_WRAPPER_HPP_
 
+#include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_core/primitives/BasicRegulatoryElements.h>
+#include <lanelet2_core/primitives/LaneletSequence.h>
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
@@ -23,6 +26,7 @@
 #include <filesystem>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
+#include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/point.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -31,7 +35,6 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/routing_configuration.hpp>
 #include <traffic_simulator/data_type/routing_graph_type.hpp>
-#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -60,6 +63,7 @@ namespace traffic_simulator
 namespace lanelet_wrapper
 {
 using BoundingBox = traffic_simulator_msgs::msg::BoundingBox;
+using Curve = math::geometry::HermiteCurve;
 using EntityType = traffic_simulator_msgs::msg::EntityType;
 using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 using Point = geometry_msgs::msg::Point;
@@ -143,22 +147,6 @@ private:
 class CenterPointsCache
 {
 public:
-  auto centerPoints(lanelet::Id lanelet_id) -> decltype(auto)
-  {
-    if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
-    }
-    return readData(lanelet_id);
-  }
-
-  auto centerPointsSpline(lanelet::Id lanelet_id) -> decltype(auto)
-  {
-    if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
-    }
-    return readDataSpline(lanelet_id);
-  }
-
   auto getCenterPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map)
     -> decltype(auto)
   {

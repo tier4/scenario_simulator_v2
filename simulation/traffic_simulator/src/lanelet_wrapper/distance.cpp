@@ -29,7 +29,7 @@ auto lateralDistance(
   const LaneletPose & from, const LaneletPose & to,
   const RoutingConfiguration & routing_configuration) -> std::optional<double>
 {
-  const auto route = route::route(from.lanelet_id, to.lanelet_id, routing_configuration);
+  const auto route = route::routeFromGraph(from.lanelet_id, to.lanelet_id, routing_configuration);
   if (route.empty()) {
     return std::nullopt;
   } else if (not routing_configuration.allow_lane_change) {
@@ -78,9 +78,9 @@ auto longitudinalDistance(
       [next_lanelet](const lanelet::Id id) { return id == next_lanelet; });
   };
 
-  /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
+  /// @sa https://tier4.github.io/scenario_simulator_v2/developer_guide/DistanceCalculation/
   if (const auto route =
-        route::route(from_pose.lanelet_id, to_pose.lanelet_id, routing_configuration);
+        route::routeFromGraph(from_pose.lanelet_id, to_pose.lanelet_id, routing_configuration);
       not route.empty() || from_pose.lanelet_id == to_pose.lanelet_id) {
     /// @note horizontal bar must intersect with the lanelet spline, so the distance was set arbitrarily to 10 meters.
     static constexpr double matching_distance = 10.0;

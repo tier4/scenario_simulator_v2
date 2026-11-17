@@ -24,6 +24,7 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -31,14 +32,11 @@ namespace traffic_simulator
 {
 namespace entity
 {
-EntityBase::EntityBase(
-  const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+EntityBase::EntityBase(const std::string & name, const CanonicalizedEntityStatus & entity_status)
 : name(name),
   verbose(true),
   status_(std::make_shared<CanonicalizedEntityStatus>(entity_status)),
-  status_before_update_(*status_),
-  hdmap_utils_ptr_(hdmap_utils_ptr)
+  status_before_update_(*status_)
 {
   job_list_.append(
     [this](double) {
@@ -164,8 +162,8 @@ auto EntityBase::requestLaneChange(const lane_change::Direction & direction) -> 
 {
   if (isInLanelet()) {
     if (
-      const auto target_lanelet_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-        getCanonicalizedStatus().getLaneletId(), direction)) {
+      const auto target_lanelet_id =
+        route::laneChangeableLaneletId(getCanonicalizedStatus().getLaneletId(), direction)) {
       requestLaneChange(target_lanelet_id.value());
     }
   }
@@ -207,8 +205,8 @@ auto EntityBase::requestLaneChange(
   }
 
   if (
-    const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-      reference_lanelet_id, target.direction, target.shift)) {
+    const auto lane_change_target_id =
+      route::laneChangeableLaneletId(reference_lanelet_id, target.direction, target.shift)) {
     requestLaneChange(
       traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);
@@ -271,23 +269,23 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
 
 void EntityBase::requestSpeedChangeWithTimeConstraint(
   const double target_speed, const speed_change::Transition transition,
-  const double acceleration_time)
+  const double acceleration_time, const bool continuous)
 {
-  if (isTargetSpeedReached(target_speed)) {
+  if (isTargetSpeedReached(target_speed) and not continuous) {
     return;
   }
   if (
     std::abs(acceleration_time) <= std::numeric_limits<double>::epsilon() &&
     transition != speed_change::Transition::STEP) {
     requestSpeedChangeWithTimeConstraint(
-      target_speed, speed_change::Transition::STEP, acceleration_time);
+      target_speed, speed_change::Transition::STEP, acceleration_time, continuous);
     return;
   }
   switch (transition) {
     case speed_change::Transition::LINEAR: {
       requestSpeedChangeWithConstantAcceleration(
         target_speed, transition, (target_speed - getCurrentTwist().linear.x) / acceleration_time,
-        false);
+        continuous);
       break;
     }
     case speed_change::Transition::AUTO: {
@@ -311,11 +309,11 @@ void EntityBase::requestSpeedChangeWithTimeConstraint(
          */
         [this]() { resetDynamicConstraints(); }, job::Type::LINEAR_ACCELERATION, true,
         job::Event::POST_UPDATE);
-      requestSpeedChange(target_speed, false);
+      requestSpeedChange(target_speed, continuous);
       break;
     }
     case speed_change::Transition::STEP: {
-      requestSpeedChange(target_speed, false);
+      requestSpeedChange(target_speed, continuous);
       setLinearVelocity(target_speed);
       break;
     }
@@ -335,7 +333,7 @@ void EntityBase::requestSpeedChange(
         target_speed, transition, constraint.value, continuous);
       break;
     case speed_change::Constraint::Type::TIME:
-      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value);
+      requestSpeedChangeWithTimeConstraint(target_speed, transition, constraint.value, continuous);
       break;
     case speed_change::Constraint::Type::NONE:
       requestSpeedChange(target_speed, continuous);
@@ -596,6 +594,15 @@ auto EntityBase::setStatus(
 {
   auto status = static_cast<EntityStatus>(getCanonicalizedStatus());
   status.pose = map_pose;
+  /*
+     The LaneletPose copied from the current status corresponds to the old map
+     pose. If it is left valid, it takes precedence over the new map pose: the
+     orientation and the z of the new map pose are overwritten with those based
+     on the old LaneletPose, and then the behavior plugin moves the entity back
+     to the old LaneletPose. Invalidate it so that the LaneletPose is
+     recalculated from the new map pose.
+  */
+  status.lanelet_pose_valid = false;
   status.action_status = action_status;
   setStatus(status);
 }

@@ -25,6 +25,13 @@
 #include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
+#include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
 
 namespace traffic_simulator
@@ -66,11 +73,9 @@ public:
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     entities_(128),
-    hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
-      configuration_.lanelet2_map_path(), getOrigin(*node))),
-    markers_raw_(hdmap_utils_ptr_->generateMarker())
+    markers_raw_(lanelet_map::visualizationMarker())
   {
-    updateHdmapMarker();
+    updateLaneletMarker();
   }
 
   ~EntityManager() = default;
@@ -98,7 +103,7 @@ public:
     const std::string & name, const double current_time, const double step_time,
     const std::shared_ptr<EuclideanDistancesMap> & distances) -> const CanonicalizedEntityStatus &;
 
-  auto updateHdmapMarker() const -> void;
+  auto updateLaneletMarker() const -> void;
 
   auto broadcastEntityTransform() -> void;
 
@@ -177,8 +182,7 @@ public:
 
     if (const auto [iter, success] = entities_.emplace(
           name, std::make_unique<EntityType>(
-                  name, makeEntityStatus(), hdmap_utils_ptr_, parameters,
-                  std::forward<decltype(xs)>(xs)...));
+                  name, makeEntityStatus(), parameters, std::forward<decltype(xs)>(xs)...));
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLights(traffic_lights_ptr_->getConventionalTrafficLights());
@@ -225,18 +229,6 @@ public:
   auto despawnEntity(const std::string & name) -> bool;
 
   // traffics, lanelet
-  auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
-
-  template <typename Node>
-  auto getOrigin(Node & node) const
-  {
-    geographic_msgs::msg::GeoPoint origin;
-    origin.latitude = common::getParameter<decltype(origin.latitude)>(
-      node.get_node_parameters_interface(), "origin_latitude");
-    origin.longitude = common::getParameter<decltype(origin.longitude)>(
-      node.get_node_parameters_interface(), "origin_longitude");
-    return origin;
-  }
 
   auto calculateEuclideanDistances() -> std::shared_ptr<EuclideanDistancesMap>;
 
@@ -260,8 +252,6 @@ private:
   /* */ bool npc_logic_started_{false};
 
   /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_{nullptr};
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
   /* */ MarkerArray markers_raw_;
 };

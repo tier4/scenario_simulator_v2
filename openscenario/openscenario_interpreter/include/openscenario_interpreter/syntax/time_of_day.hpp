@@ -23,14 +23,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- TimeOfDay 1.2 -----------------------------------------------------------
- *
- * <xsd:complexType name="TimeOfDay">
- *   <xsd:attribute name="animation" type="Boolean" use="required"/>
- *   <xsd:attribute name="dateTime" type="DateTime" use="required"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   TimeOfDay (OpenSCENARIO XML 1.3.1)
+
+   Defines the day and time.
+
+   <xsd:complexType name="TimeOfDay">
+     <xsd:attribute name="animation" type="Boolean" use="required"/>
+     <xsd:attribute name="dateTime" type="DateTime" use="required"/>
+   </xsd:complexType>
+*/
 struct TimeOfDay
 {
   const Boolean animation;

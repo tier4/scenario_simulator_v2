@@ -20,16 +20,11 @@
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_routing/RoutingGraph.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <optional>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "random_test_runner/data_types.hpp"
-
-namespace hdmap_utils
-{
-class HdMapUtils;
-}
 
 struct LaneletPart
 {
@@ -41,7 +36,7 @@ struct LaneletPart
 class LaneletUtils
 {
 public:
-  LaneletUtils(const boost::filesystem::path & filename);
+  LaneletUtils(const std::filesystem::path & filename);
 
   LaneletUtils() = delete;
   LaneletUtils(const LaneletUtils &) = delete;
@@ -68,7 +63,6 @@ public:
 private:
   lanelet::LaneletMapPtr lanelet_map_ptr_;
   lanelet::routing::RoutingGraphConstPtr vehicle_routing_graph_ptr_;
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 };
 
 #endif  // RANDOM_TEST_RUNNER__LANELET_UTILS_HPP

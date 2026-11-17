@@ -30,7 +30,6 @@
 #include <set>
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
 #include <utility>
 #include <vector>
@@ -60,7 +59,7 @@ private:
   auto appendAutoSinks(const std::set<std::uint8_t> & auto_sink_entity_types) -> void;
   const std::function<void(const std::string &)> despawn_;
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
-  std::vector<std::shared_ptr<TrafficModuleBase>> modules_;
+  std::vector<std::shared_ptr<TrafficModuleBase> > modules_;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator

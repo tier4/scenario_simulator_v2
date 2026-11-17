@@ -16,6 +16,8 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/filesystem.hpp>
+#include <memory>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 
 using ament_index_cpp::get_package_share_directory;
@@ -35,7 +37,8 @@ TEST_P(ParameterValueDistributionTest, ParseXoscFile)
 {
   auto path = getTestFilePath(GetParam());
   ASSERT_TRUE(boost::filesystem::exists(path)) << "File not found: " << path;
-  EXPECT_NO_THROW(OpenScenario script{path});
+  EXPECT_NO_THROW(
+    OpenScenario(path, std::make_shared<openscenario_interpreter::ScenarioRuntime>()));
 }
 
 // clang-format off
