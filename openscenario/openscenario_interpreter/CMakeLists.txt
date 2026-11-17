@@ -139,11 +139,16 @@ if(BUILD_TESTING)
   ament_add_gtest(test_syntax test/test_syntax.cpp)
   ament_add_gtest(test_target_traffic_signal_channel test/test_target_traffic_signal_channel.cpp)
   ament_add_gtest(test_double test/test_double.cpp)
+  ament_add_gtest(test_parameter_value_distribution test/test_parameter_value_distribution.cpp)
   ament_add_gtest(test_priority test/test_priority.cpp)
   target_link_libraries(test_syntax ${PROJECT_NAME})
   target_link_libraries(test_target_traffic_signal_channel ${PROJECT_NAME})
   target_link_libraries(test_double ${PROJECT_NAME})
+  target_link_libraries(test_parameter_value_distribution ${PROJECT_NAME})
   target_link_libraries(test_priority ${PROJECT_NAME})
+  install(
+    DIRECTORY test/parameter_value_distribution
+    DESTINATION share/${PROJECT_NAME}/test)
 endif()
 
 ament_auto_package()

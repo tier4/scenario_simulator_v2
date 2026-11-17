@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<OpenSCENARIO>
+  <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
+  <ParameterValueDistribution>
+    <ScenarioFile filepath="$(ros2 pkg prefix --share openscenario_interpreter)/test/parameter_value_distribution/sample.xosc"/>
+    <Stochastic numberOfTestRuns="20">
+      <StochasticDistribution parameterName="offset">
+        <Histogram>
+          <Bin weight="1">
+            <Range lowerLimit="-1.0" upperLimit="-0.5"/>
+          </Bin>
+          <Bin weight="2">
+            <Range lowerLimit="-0.5" upperLimit="0.5"/>
+          </Bin>
+          <Bin weight="1">
+            <Range lowerLimit="0.5" upperLimit="1.0"/>
+          </Bin>
+        </Histogram>
+      </StochasticDistribution>
+    </Stochastic>
+  </ParameterValueDistribution>
+</OpenSCENARIO>
