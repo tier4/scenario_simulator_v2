@@ -146,6 +146,9 @@ if(BUILD_TESTING)
   target_link_libraries(test_double ${PROJECT_NAME})
   target_link_libraries(test_parameter_value_distribution ${PROJECT_NAME})
   target_link_libraries(test_priority ${PROJECT_NAME})
+  install(
+    DIRECTORY test/parameter_value_distribution
+    DESTINATION share/${PROJECT_NAME}/test)
 endif()
 
 ament_auto_package()
