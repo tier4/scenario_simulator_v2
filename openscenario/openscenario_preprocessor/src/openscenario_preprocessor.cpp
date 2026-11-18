@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include <boost/range/adaptor/indexed.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
@@ -26,18 +27,19 @@ void Preprocessor::preprocessScenario(const Scenario & scenario)
   using openscenario_interpreter::OpenScenario;
   using openscenario_interpreter::ParameterValueDistribution;
   using openscenario_interpreter::ParameterValueDistributionDefinition;
+  using openscenario_interpreter::ScenarioRuntime;
 
   validate(scenario.path);
 
-  if (OpenScenario script{scenario.path};
+  if (OpenScenario script{scenario.path, std::make_shared<ScenarioRuntime>()};
       script.category.is<ParameterValueDistributionDefinition>()) {
     auto & parameter_value_distribution = script.category.as<ParameterValueDistribution>();
     auto scenario_file_path = parameter_value_distribution.scenario_file.filepath;
 
-    if (boost::filesystem::exists(scenario_file_path)) {
+    if (std::filesystem::exists(scenario_file_path)) {
       validate(scenario_file_path);
 
-      OpenScenario scenario_file{scenario_file_path};
+      OpenScenario scenario_file{scenario_file_path, std::make_shared<ScenarioRuntime>()};
 
       for (const auto & parameter_list :
            parameter_value_distribution.derive() | boost::adaptors::indexed()) {

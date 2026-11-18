@@ -15,10 +15,12 @@
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <boost/filesystem.hpp>
 #include <chrono>
 #include <cstdlib>
 #include <memory>
 #include <openscenario_interpreter/parameter_distribution.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -33,7 +35,7 @@ using openscenario_interpreter::ParameterValueDistributionDefinition;
 
 void checkParameterValueDistribution(const std::string path, const ParameterDistribution & expected)
 {
-  OpenScenario script{path};
+  OpenScenario script{path, std::make_shared<openscenario_interpreter::ScenarioRuntime>()};
   auto actual = script.category.as<ParameterValueDistribution>().derive();
   EXPECT_EQ(expected.size(), actual.size());
 
@@ -351,9 +353,39 @@ TEST(ParameterValueDistribution, UniformDistribution)
   checkParameterValueDistribution(path, expected_distribution);
 }
 
+using ament_index_cpp::get_package_share_directory;
+
+std::string getTestFilePath(const std::string & filename)
+{
+  return get_package_share_directory("openscenario_interpreter") +
+         "/test/parameter_value_distribution/" + filename;
+}
+
+class ParameterValueDistributionTest : public testing::TestWithParam<std::string>
+{
+};
+
+TEST_P(ParameterValueDistributionTest, ParseXoscFile)
+{
+  auto path = getTestFilePath(GetParam());
+  ASSERT_TRUE(boost::filesystem::exists(path)) << "File not found: " << path;
+  EXPECT_NO_THROW(
+    OpenScenario(path, std::make_shared<openscenario_interpreter::ScenarioRuntime>()));
+}
+
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(
+  Stochastic, ParameterValueDistributionTest,
+  testing::Values(
+    "Stochastic.Histogram.xosc",
+    "Stochastic.NormalDistribution.xosc",
+    "Stochastic.PoissonDistribution.xosc",
+    "Stochastic.ProbabilityDistributionSet.xosc",
+    "Stochastic.UniformDistribution.xosc"));
+// clang-format on
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
-
   return RUN_ALL_TESTS();
 }

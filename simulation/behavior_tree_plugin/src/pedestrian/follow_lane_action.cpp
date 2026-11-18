@@ -20,6 +20,8 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <vector>
 
@@ -126,7 +128,8 @@ traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints
     return waypoints;
   }
 
-  const auto center_points = hdmap_utils_->getCenterPoints(following_lanelets);
+  const auto center_points =
+    traffic_simulator::lanelet_wrapper::lanelet_map::centerPoints(following_lanelets);
   if (center_points.size() < 2) {
     waypoints.waypoints.push_back(canonicalized_entity_status_->getMapPose().position);
     return waypoints;
@@ -180,10 +183,10 @@ BT::NodeStatus FollowLaneAction::doAction()
     setOutput("obstacle", std::optional<traffic_simulator_msgs::msg::Obstacle>());
     return BT::NodeStatus::RUNNING;
   }
-  auto following_lanelets = hdmap_utils_->getFollowingLanelets(
+  const auto following_lanelets = traffic_simulator::route::followingLanelets(
     canonicalized_entity_status_->getLaneletId(), getHorizon(), true);
   if (!target_speed_) {
-    target_speed_ = hdmap_utils_->getSpeedLimit(following_lanelets);
+    target_speed_ = traffic_simulator::route::speedLimit(following_lanelets);
   }
   const auto waypoints = calculateWaypoints(following_lanelets);
   const auto obstacle_detector_result =

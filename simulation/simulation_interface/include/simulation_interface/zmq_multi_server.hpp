@@ -24,7 +24,7 @@
 #include <string>
 #include <thread>
 #include <tuple>
-#include <zmqpp/zmqpp.hpp>
+#include <zmq.hpp>
 
 namespace zeromq
 {
@@ -35,13 +35,13 @@ public:
   explicit MultiServer(
     const simulation_interface::TransportProtocol & protocol,
     const simulation_interface::HostName & hostname, const unsigned int socket_port, Ts &&... xs)
-  : context_(zmqpp::context()),
-    type_(zmqpp::socket_type::reply),
+  : context_(1),
+    type_(zmq::socket_type::rep),
     socket_(context_, type_),
     functions_(std::forward<decltype(xs)>(xs)...)
   {
     socket_.bind(simulation_interface::getEndPoint(protocol, hostname, socket_port));
-    poller_.add(socket_);
+    poll_item_ = zmq::pollitem_t{socket_.handle(), 0, ZMQ_POLLIN, 0};
     thread_ = std::thread(&MultiServer::start_poll, this);
   }
 
@@ -51,10 +51,10 @@ private:
   void poll();
   void start_poll();
   std::thread thread_;
-  const zmqpp::context context_;
-  const zmqpp::socket_type type_;
-  zmqpp::poller poller_;
-  zmqpp::socket socket_;
+  zmq::context_t context_;
+  const zmq::socket_type type_;
+  zmq::pollitem_t poll_item_;
+  zmq::socket_t socket_;
 
 #define DEFINE_FUNCTION_TYPE(TYPENAME)                                      \
   using TYPENAME = std::function<simulation_api_schema::TYPENAME##Response( \

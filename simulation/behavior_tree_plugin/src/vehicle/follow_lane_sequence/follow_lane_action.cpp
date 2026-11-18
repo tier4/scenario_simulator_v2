@@ -15,11 +15,14 @@
 #include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/follow_lane_action.hpp>
+#include <geometry/bounding_box.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -97,7 +100,8 @@ BT::NodeStatus FollowLaneAction::doAction()
     return BT::NodeStatus::FAILURE;
   }
   if (behavior_parameter_.see_around) {
-    if (getRightOfWayEntities(route_lanelets_).size() != 0) {
+    if (traffic_simulator::route::isNeedToRightOfWay(
+          route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
       return BT::NodeStatus::FAILURE;
     }
     if (trajectory == nullptr) {
@@ -125,26 +129,29 @@ BT::NodeStatus FollowLaneAction::doAction()
       }
     }
     const auto distance_to_traffic_stop_line =
-      getDistanceToTrafficLightStopLine(route_lanelets_, *trajectory);
+      traffic_lights_->getDistanceToActiveTrafficLightStopLine(route_lanelets_, *trajectory);
     if (distance_to_traffic_stop_line) {
       if (distance_to_traffic_stop_line.value() <= getHorizon()) {
         return BT::NodeStatus::FAILURE;
       }
     }
-    auto distance_to_stopline =
-      traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
-    auto distance_to_conflicting_entity =
-      getDistanceToConflictingEntity(route_lanelets_, *trajectory);
-    if (distance_to_stopline) {
+
+    if (
+      const auto distance_to_stopline =
+        traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory)) {
       if (
         distance_to_stopline.value() <=
         calculateStopDistance(behavior_parameter_.dynamic_constraints) +
-          vehicle_parameters.bounding_box.dimensions.x * bounding_box_half_factor +
+          math::geometry::getDistancesFromCenterToEdge(vehicle_parameters.bounding_box).front +
           stop_line_margin) {
         return BT::NodeStatus::FAILURE;
       }
     }
-    if (distance_to_conflicting_entity) {
+    if (
+      const auto distance_to_conflicting_entity =
+        traffic_simulator::distance::distanceToNearestConflictingPose(
+          route_lanelets_, *trajectory, *canonicalized_entity_status_,
+          getOtherEntitiesCanonicalizedEntityStatuses())) {
       if (
         distance_to_conflicting_entity.value() <
         (vehicle_parameters.bounding_box.dimensions.x + conflicting_entity_margin +
@@ -154,7 +161,7 @@ BT::NodeStatus FollowLaneAction::doAction()
     }
   }
   if (!target_speed_) {
-    target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+    target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
   }
   setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
   setOutput("waypoints", waypoints);

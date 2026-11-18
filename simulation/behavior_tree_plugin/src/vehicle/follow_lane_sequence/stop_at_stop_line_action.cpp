@@ -14,9 +14,12 @@
 
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
+#include <geometry/bounding_box.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -76,7 +79,7 @@ std::optional<double> StopAtStopLineAction::calculateTargetSpeed(double current_
    */
   double rest_distance =
     distance_to_stopline_.value() -
-    (vehicle_parameters.bounding_box.dimensions.x * bounding_box_half_factor + stop_margin);
+    (math::geometry::getDistancesFromCenterToEdge(vehicle_parameters.bounding_box).front + stop_margin);
   if (rest_distance < calculateStopDistance(behavior_parameter_.dynamic_constraints)) {
     return 0;
   }
@@ -91,9 +94,8 @@ bool StopAtStopLineAction::checkPreconditions()
     return false;
   } else if (!behavior_parameter_.see_around) {
     return false;
-  } else if (!getRightOfWayEntities(route_lanelets_).empty()) {
-    return false;
-  } else if (!canonicalized_entity_status_->isInLanelet()) {
+  } else if (traffic_simulator::route::isNeedToRightOfWay(
+               route_lanelets_, getOtherEntitiesCanonicalizedLaneletPoses())) {
     return false;
   } else {
     return true;
@@ -111,7 +113,6 @@ BT::NodeStatus StopAtStopLineAction::doAction()
   }
   distance_to_stopline_ =
     traffic_simulator::distance::distanceToStopLine(route_lanelets_, *trajectory);
-  const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets_, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stopline_) {
     return BT::NodeStatus::FAILURE;
@@ -121,7 +122,11 @@ BT::NodeStatus StopAtStopLineAction::doAction()
       return BT::NodeStatus::FAILURE;
     }
   }
-  if (distance_to_stop_target) {
+  if (
+    const auto distance_to_stop_target =
+      traffic_simulator::distance::distanceToNearestConflictingPose(
+        route_lanelets_, *trajectory, *canonicalized_entity_status_,
+        getOtherEntitiesCanonicalizedEntityStatuses())) {
     if (distance_to_stop_target.value() <= distance_to_stopline_.value()) {
       return BT::NodeStatus::FAILURE;
     }
@@ -133,7 +138,7 @@ BT::NodeStatus StopAtStopLineAction::doAction()
         distance_to_stopline_.value() <=
         vehicle_parameters.bounding_box.dimensions.x + front_stopline_margin) {
         if (!target_speed_) {
-          target_speed_ = hdmap_utils_->getSpeedLimit(route_lanelets_);
+          target_speed_ = traffic_simulator::route::speedLimit(route_lanelets_);
         }
         setCanonicalizedEntityStatus(calculateUpdatedEntityStatus(target_speed_.value()));
         setOutput("waypoints", waypoints);

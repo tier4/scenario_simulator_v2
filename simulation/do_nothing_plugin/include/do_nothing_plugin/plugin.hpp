@@ -36,7 +36,7 @@ public:
   /**
    * @brief Get the Current Action object
    */
-  auto getCurrentAction() -> const std::string & override;
+  auto getCurrentAction() const -> const std::string & override;
 
 /// @note Getters defined by this macro return default values and setters are behaved as no-operation functions.
 #define DEFINE_GETTER_SETTER(NAME, TYPE)        \
@@ -51,7 +51,7 @@ public:                                         \
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(LateralCollisionThreshold,                        std::optional<double>)
   DEFINE_GETTER_SETTER(Obstacle,                                         std::optional<traffic_simulator_msgs::msg::Obstacle>)
-  DEFINE_GETTER_SETTER(OtherEntityStatus,                                EntityStatusDict)
+  DEFINE_GETTER_SETTER(OtherEntityStatus,                                traffic_simulator::OtherEntityStatuses)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(ReferenceTrajectory,                              std::shared_ptr<math::geometry::CatmullRomSpline>)
   DEFINE_GETTER_SETTER(TargetSpeed,                                      std::optional<double>)
@@ -73,7 +73,6 @@ private:                                                               \
   DEFINE_GETTER_SETTER(BehaviorParameter,         traffic_simulator_msgs::msg::BehaviorParameter,                   behavior_parameter_)
   DEFINE_GETTER_SETTER(CanonicalizedEntityStatus, std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>,    canonicalized_entity_status_)
   DEFINE_GETTER_SETTER(CurrentTime,               double,                                                           current_time_)
-  DEFINE_GETTER_SETTER(HdMapUtils,                std::shared_ptr<hdmap_utils::HdMapUtils>,                         hdmap_utils_)
   DEFINE_GETTER_SETTER(PolylineTrajectory,        std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>, polyline_trajectory)
   DEFINE_GETTER_SETTER(Request,                   traffic_simulator::behavior::Request,                             request)
   DEFINE_GETTER_SETTER(RouteLanelets,             lanelet::Ids,                                                     route_lanelets_)

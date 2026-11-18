@@ -28,7 +28,7 @@ This PR fixes how the length of the curve is computed
 
 ## References
 
-See also [this document.](https://tier4.github.io/scenario_simulator_v2-docs/)  
+See also [this document.](https://tier4.github.io/scenario_simulator_v2/)  
 This link is an example and is not directly related to this sample.
 
 # Destructive Changes

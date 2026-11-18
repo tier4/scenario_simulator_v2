@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 #define OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 
+#include <filesystem>
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_validator/validator.hpp>
@@ -26,12 +27,12 @@ struct Scenario
 {
   Scenario() = default;
 
-  explicit Scenario(const boost::filesystem::path & path, double frame_rate)
+  explicit Scenario(const std::filesystem::path & path, double frame_rate)
   : path(path), frame_rate(frame_rate)
   {
   }
 
-  boost::filesystem::path path;
+  std::filesystem::path path;
 
   float frame_rate;
 };
@@ -39,11 +40,11 @@ struct Scenario
 class Preprocessor
 {
 public:
-  explicit Preprocessor(const boost::filesystem::path & output_directory)
+  explicit Preprocessor(const std::filesystem::path & output_directory)
   : validate(), output_directory(output_directory)
   {
-    if (not boost::filesystem::exists(output_directory)) {
-      boost::filesystem::create_directories(output_directory);
+    if (not std::filesystem::exists(output_directory)) {
+      std::filesystem::create_directories(output_directory);
     }
   }
 
@@ -56,7 +57,7 @@ protected:
 
   openscenario_validator::OpenSCENARIOValidator validate;
 
-  boost::filesystem::path output_directory;
+  std::filesystem::path output_directory;
 };
 }  // namespace openscenario_preprocessor
 

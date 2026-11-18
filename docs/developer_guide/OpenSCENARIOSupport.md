@@ -316,7 +316,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 | EntityObject                                 | 1.3 (partial)     | [detail](#entityobject)                    |
 | EntityRef                                    | 1.3               |                                            |
 | EntitySelection                              | 1.3               |                                            |
-| Environment                                  | 1.3               |                                            |
+| Environment                                  | 1.3.1             |                                            |
 | EnvironmentAction                            | 1.3               |                                            |
 | EnvironmentCatalogLocation                   | 1.3               |                                            |
 | Event                                        | 1.3               |                                            |

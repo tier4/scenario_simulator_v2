@@ -27,7 +27,7 @@ OpenScenarioCategory::OpenScenarioCategory(const pugi::xml_node & tree, Scope & 
     choice(tree, {
       { "Storyboard",                [&](auto &&) { return make<ScenarioDefinition                  >(tree, scope); } },  // DIRTY HACK!!!
       { "Catalog",                   [&](auto &&) { return make<CatalogDefinition                   >(tree, scope); } },
-      { "ParameterValueDistribution",[&](auto &&) { return make<ParameterValueDistributionDefinition>(tree, scope); } }
+      { "ParameterValueDistribution",[&](auto &&) { return make<ParameterValueDistributionDefinition>(tree, scope); } },
     }))
 // clang-format on
 {

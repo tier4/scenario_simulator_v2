@@ -1,0 +1,146 @@
+# The NPC must come to a stop before the stop line.
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader: { revMajor: 1, revMinor: 1, date: '2026-09-16T00:00:00+09:00', description: 'NPC must stop before the stop line', author: 'Shota Minami' }
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+  RoadNetwork:
+    LogicFile: { filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm" }
+    TrafficSignals:
+  Entities:
+    ScenarioObject:
+      - name: npc
+        Vehicle:
+          name: truck
+          vehicleCategory: truck
+          BoundingBox:
+            # This truck's box centre sits ahead of base_link, so its nose reaches further than half
+            # its length. Getting that distance right is what the scenario checks, so do not centre it.
+            Center: { x: 2.5, y: 0, z: 1.9 }
+            Dimensions: { width: 2.2, length: 11.0, height: 3.8 }
+          Performance: { maxSpeed: 50, maxAcceleration: 7, maxDeceleration: 7 }
+          Axles:
+            FrontAxle: { maxSteering: 1.0, wheelDiameter: 2.0, trackWidth: 2.0, positionX: 7.0, positionZ: 1.0 }
+            RearAxle:  { maxSteering: 0,   wheelDiameter: 2.0, trackWidth: 2.0, positionX: 0,   positionZ: 1.0 }
+          Properties:
+            Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: npc
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34672'
+                      s: 2
+                      offset: 0
+                      Orientation: &DEFAULT_ORIENTATION { type: relative, h: 0, p: 0, r: 0 }
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics: { dynamicsShape: step, dynamicsDimension: time, value: 0 }
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed: { value: 8 }
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '34744'
+                        s: 10
+                        offset: 0
+                        Orientation: *DEFAULT_ORIENTATION
+    Story:
+      - name: story
+        Act:
+          - name: act
+            ManeuverGroup:
+              - name: maneuver-group
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: [ entityRef: npc ]
+                Maneuver:
+                  - name: stop-at-stop-line
+                    Event:
+                      - name: success
+                        priority: parallel
+                        Action:
+                          - name: (exit-success)
+                            UserDefinedAction:
+                              CustomCommandAction: { type: exitSuccess }
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                # The NPC holds still for a single frame before pulling away again, so a
+                                # non-zero duration would never be satisfied.
+                                - name: (stopped?)
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: npc ]
+                                    EntityCondition:
+                                      StandStillCondition: { duration: 0 }
+                                - name: (front-of-bounding-box-is-before-the-stop-line?)
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: npc ]
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        relativeDistanceType: longitudinal
+                                        freespace: true
+                                        rule: greaterThan
+                                        value: 0.0
+                                        # Where stop line way 120635 crosses the centerline of 34675.
+                                        Position: &STOP_LINE
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34675'
+                                            s: 13.25
+                                            offset: 0
+                                            Orientation: *DEFAULT_ORIENTATION
+
+                      - name: failure-overran-the-stop-line
+                        priority: parallel
+                        Action:
+                          - name: (exit-failure)
+                            UserDefinedAction:
+                              CustomCommandAction: { type: exitFailure }
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: (front-of-bounding-box-passed-the-stop-line?)
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: npc ]
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        relativeDistanceType: longitudinal
+                                        freespace: true
+                                        rule: lessThan
+                                        value: 0.0
+                                        Position: *STOP_LINE
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition: { value: 0, rule: greaterThan }
+    StopTrigger:
+      ConditionGroup: []

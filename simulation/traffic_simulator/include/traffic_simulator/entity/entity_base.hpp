@@ -26,9 +26,9 @@
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/other_entity_statuses.hpp>
 #include <traffic_simulator/data_type/route_option.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
@@ -52,9 +52,7 @@ using EuclideanDistancesMap = std::unordered_map<std::pair<std::string, std::str
 class EntityBase : public std::enable_shared_from_this<EntityBase>
 {
 public:
-  explicit EntityBase(
-    const std::string & name, const CanonicalizedEntityStatus & entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
+  explicit EntityBase(const std::string & name, const CanonicalizedEntityStatus & entity_status);
 
   EntityBase(const EntityBase &) = delete;
 
@@ -280,6 +278,8 @@ public:
 
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
 
+  /*   */ void setOtherStatus(const OtherEntityStatuses & status);
+
   /*   */ void setOtherStatus(
     const std::unordered_map<std::string, CanonicalizedEntityStatus> & status);
 
@@ -363,7 +363,6 @@ protected:
 
   CanonicalizedEntityStatus status_before_update_;
 
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightsBase> traffic_lights_;
 
   double stand_still_duration_ = 0.0;
@@ -371,7 +370,7 @@ protected:
   double prev_job_duration_ = 0.0;
   double step_time_ = 0.0;
 
-  std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
+  OtherEntityStatuses other_status_;
 
   std::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;
@@ -390,8 +389,8 @@ private:
     const speed_change::Transition transition, const double acceleration, const bool continuous)
     -> void;
   virtual auto requestSpeedChangeWithTimeConstraint(
-    const double target_speed, const speed_change::Transition, const double acceleration_time)
-    -> void;
+    const double target_speed, const speed_change::Transition, const double acceleration_time,
+    const bool continuous = false) -> void;
   virtual auto requestSpeedChangeWithTimeConstraint(
     const speed_change::RelativeTargetSpeed & target_speed,
     const speed_change::Transition transition, const double time) -> void;
