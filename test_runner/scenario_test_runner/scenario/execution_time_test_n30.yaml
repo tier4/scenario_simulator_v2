@@ -1,0 +1,438 @@
+OpenSCENARIO:
+  FileHeader:
+    author: 'Kota Tominaga'
+    date: '2026-11-16T09:15:00+09:00'
+    description: 'scenario for execution time test with 30 vehicles'
+    revMajor: 1
+    revMinor: 3
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: Car1
+        CatalogReference: &SAMPLE_VEHICLE
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+      - name: Car2
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car3
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car4
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car5
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car6
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car7
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car8
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car9
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car10
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car11
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car12
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car13
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car14
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car15
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car16
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car17
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car18
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car19
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car20
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car21
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car22
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car23
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car24
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car25
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car26
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car27
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car28
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car29
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: Car30
+        CatalogReference: *SAMPLE_VEHICLE
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: Car1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition: &DEFAULT_LANE_POSITION
+                      roadId: ''
+                      laneId: 34513
+                      s: 0
+                      offset: 0
+                      Orientation: &DEFAULT_ORIENTATION
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+          - entityRef: Car2
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      s: 5
+          - entityRef: Car3
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      s: 10
+          - entityRef: Car4
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      s: 15
+          - entityRef: Car5
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      s: 20
+          - entityRef: Car6
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      s: 25
+          - entityRef: Car7
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      s: 30
+          - entityRef: Car8
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      s: 35
+          - entityRef: Car9
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      s: 40
+          - entityRef: Car10
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34468
+                      s: 4
+          - entityRef: Car11
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34468
+                      s: 12
+          - entityRef: Car12
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34468
+                      s: 20
+          - entityRef: Car13
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34468
+                      s: 28
+          - entityRef: Car14
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34468
+                      s: 36
+          - entityRef: Car15
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34468
+                      s: 44
+          - entityRef: Car16
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34468
+                      s: 52
+          - entityRef: Car17
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34507
+                      s: 4
+          - entityRef: Car18
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34507
+                      s: 12
+          - entityRef: Car19
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34507
+                      s: 20
+          - entityRef: Car20
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34507
+                      s: 28
+          - entityRef: Car21
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34507
+                      s: 36
+          - entityRef: Car22
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34507
+                      s: 44
+          - entityRef: Car23
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34507
+                      s: 52
+          - entityRef: Car24
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34579
+                      s: 4
+          - entityRef: Car25
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34579
+                      s: 12
+          - entityRef: Car26
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34579
+                      s: 20
+          - entityRef: Car27
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34579
+                      s: 28
+          - entityRef: Car28
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34579
+                      s: 36
+          - entityRef: Car29
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34579
+                      s: 44
+          - entityRef: Car30
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *DEFAULT_LANE_POSITION
+                      laneId: 34600
+                      s: 4
+    Story:
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: Car1
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: Car1
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            <<: *DEFAULT_LANE_POSITION
+                                            s: 40
+                                        tolerance: 0.5
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 60
+                                      rule: greaterThan
+                            - Condition:
+                                - name: 'evaluate time checker'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: /simulation/interpreter/execution_time/evaluate
+                                      rule: greaterThan
+                                      value: 0.001
+                                - name: 'avoid startup'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1
+                                      rule: greaterThan
+                            - Condition:
+                                - name: 'update time checker'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: /simulation/interpreter/execution_time/update
+                                      rule: greaterThan
+                                      value: 0.02
+                                - name: 'avoid startup'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1
+                                      rule: greaterThan
+                            - Condition:
+                                - name: 'output time checker'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: /simulation/interpreter/execution_time/output
+                                      rule: greaterThan
+                                      value: 0.001
+                                - name: 'avoid startup'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

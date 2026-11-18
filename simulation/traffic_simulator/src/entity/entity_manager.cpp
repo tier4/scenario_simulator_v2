@@ -77,21 +77,23 @@ auto EntityManager::update(const double current_time, const double step_time) ->
   for (const auto & [name, entity_ptr] : entities_) {
     all_status.try_emplace(name, entity_ptr->getCanonicalizedStatus());
   }
+  const OtherEntityStatuses pre_update_status(std::move(all_status));
   for (const auto & [name, entity_ptr] : entities_) {
-    entity_ptr->setOtherStatus(all_status);
+    entity_ptr->setOtherStatus(pre_update_status);
   }
-  all_status.clear();
 
   std::shared_ptr<EuclideanDistancesMap> distances = calculateEuclideanDistances();
 
+  std::unordered_map<std::string, CanonicalizedEntityStatus> updated_status;
   for (const auto & [name, entity_ptr] : entities_) {
-    all_status.try_emplace(name, updateNpcLogic(name, current_time, step_time, distances));
+    updated_status.try_emplace(name, updateNpcLogic(name, current_time, step_time, distances));
   }
+  const OtherEntityStatuses post_update_status(std::move(updated_status));
   for (const auto & [name, entity_ptr] : entities_) {
-    entity_ptr->setOtherStatus(all_status);
+    entity_ptr->setOtherStatus(post_update_status);
   }
   traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
-  for (const auto & [name, status] : all_status) {
+  for (const auto & [name, status] : post_update_status) {
     auto & entity = getEntity(name);
     traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_trajectory;
     status_with_trajectory.waypoint =
