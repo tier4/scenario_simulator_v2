@@ -34,6 +34,7 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <mutex>
 #include <scenario_simulator_exception/exception.hpp>
+#include <string>
 #include <traffic_simulator/data_type/routing_configuration.hpp>
 #include <traffic_simulator/data_type/routing_graph_type.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -146,6 +147,18 @@ private:
   std::mutex mutex_;
 };
 
+// Unlike `std::unordered_map::at`, this throws the same error as `lanelet::LaneletLayer::get`.
+template <typename Cache>
+auto at(const Cache & cache, const lanelet::Id lanelet_id) -> const typename Cache::mapped_type &
+{
+  if (const auto iterator = cache.find(lanelet_id); iterator != cache.end()) {
+    return iterator->second;
+  } else {
+    throw lanelet::NoSuchPrimitiveError(
+      "Failed to lookup element with id " + std::to_string(lanelet_id));
+  }
+}
+
 class CenterPointsCache
 {
 public:
@@ -153,7 +166,7 @@ public:
 
   auto getCenterPoints(const lanelet::Id lanelet_id) const -> decltype(auto)
   {
-    return data_.at(lanelet_id);
+    return at(data_, lanelet_id);
   }
 
   auto getCenterPointsSpline(const lanelet::Id lanelet_id) const -> decltype(auto)
@@ -164,7 +177,7 @@ public:
 private:
   auto readDataSpline(const lanelet::Id lanelet_id) const -> std::shared_ptr<Spline>
   {
-    return splines_.at(lanelet_id);
+    return at(splines_, lanelet_id);
   }
 
   auto centerPoints(const lanelet::Id lanelet_id, const lanelet::LaneletMapPtr & lanelet_map) const
@@ -198,7 +211,7 @@ class LaneletLengthCache
 public:
   explicit LaneletLengthCache(const lanelet::LaneletMapPtr & lanelet_map);
 
-  auto getLength(const lanelet::Id lanelet_id) const -> double { return data_.at(lanelet_id); }
+  auto getLength(const lanelet::Id lanelet_id) const -> double { return at(data_, lanelet_id); }
 
 private:
   std::unordered_map<lanelet::Id, double> data_;

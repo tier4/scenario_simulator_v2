@@ -43,31 +43,31 @@ LaneletLengthCache::LaneletLengthCache(const lanelet::LaneletMapPtr & lanelet_ma
 auto TopologyCache::getNextLaneletIds(
   const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &
 {
-  return next_lanelet_ids_cache_.at(static_cast<std::size_t>(type)).at(lanelet_id);
+  return at(next_lanelet_ids_cache_.at(static_cast<std::size_t>(type)), lanelet_id);
 }
 
 auto TopologyCache::getPreviousLaneletIds(
   const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &
 {
-  return previous_lanelet_ids_cache_.at(static_cast<std::size_t>(type)).at(lanelet_id);
+  return at(previous_lanelet_ids_cache_.at(static_cast<std::size_t>(type)), lanelet_id);
 }
 
 auto TopologyCache::getRightOfWayLaneletIds(const lanelet::Id lanelet_id) const
   -> const lanelet::Ids &
 {
-  return right_of_way_lanelet_ids_cache_.at(lanelet_id);
+  return at(right_of_way_lanelet_ids_cache_, lanelet_id);
 }
 
 auto TopologyCache::getConflictingCrosswalkIds(const lanelet::Id lanelet_id) const
   -> const lanelet::Ids &
 {
-  return conflicting_crosswalk_ids_cache_.at(lanelet_id);
+  return at(conflicting_crosswalk_ids_cache_, lanelet_id);
 }
 
 auto TopologyCache::getConflictingLaneIds(
   const lanelet::Id lanelet_id, const RoutingGraphType type) const -> const lanelet::Ids &
 {
-  return conflicting_lanelet_ids_cache_.at(static_cast<std::size_t>(type)).at(lanelet_id);
+  return at(conflicting_lanelet_ids_cache_.at(static_cast<std::size_t>(type)), lanelet_id);
 }
 
 TopologyCache::TopologyCache(
