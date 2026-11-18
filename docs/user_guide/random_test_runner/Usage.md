@@ -102,6 +102,7 @@ High level parameters not directly related to the test itself
 | `test_timeout`        | `60.0`                      | Timeout of each random test.                                                                                          |
 | `simulator_type`      | `"simple_sensor_simulator"` | Backend simulator. Currently supported value is `simple_sensor_simulator`. It should be set only via launch argument. |
 | `initialize_duration` | `35`                        | How long test runner will wait for Autoware to initialize.                                                            |
+| `initialize_localization` | `10`                    | Response timeout in seconds for each localization initialization request. Must be greater than zero.                 |
 
 ### Test suite parameters
 
