@@ -17,6 +17,7 @@
 
 #include <lanelet2_core/Forward.h>
 
+#include <cstdint>
 #include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <type_traits>
