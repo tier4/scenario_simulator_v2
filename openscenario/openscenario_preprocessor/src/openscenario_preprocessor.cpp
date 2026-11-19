@@ -82,7 +82,34 @@ void Preprocessor::preprocessScenario(const Scenario & scenario)
       throw std::runtime_error(what.str());
     }
   } else {
-    preprocessed_scenarios.push(scenario);  // normal scenario
+    auto parameter_declarations =
+      script.script.document_element()
+        .select_node(pugi::xpath_query{"/OpenSCENARIO/ParameterDeclarations"})
+        .node();
+
+    for (const auto & [name, value] : override_parameters) {
+      if (
+        auto parameter_node =
+          parameter_declarations.find_child_by_attribute("name", name.c_str())) {
+        parameter_node.attribute("value").set_value(value.c_str());
+      } else {
+        std::cerr << "Parameter " << std::quoted(name) << " is not declared in scenario "
+                  << std::quoted(scenario.path.string()) << ", so ignore it." << std::endl;
+      }
+    }
+
+    // move original scenario file to "raw" directory
+    auto raw_scenario_directory = scenario.path.parent_path() / "raw";
+    std::filesystem::create_directories(raw_scenario_directory);
+    std::filesystem::rename(scenario.path, raw_scenario_directory / scenario.path.filename());
+
+    if (script.script.save_file(scenario.path.c_str())) {
+      preprocessed_scenarios.push(scenario);
+    } else {
+      std::stringstream what;
+      what << "Failed to save preprocessed scenario to " << scenario.path.string();
+      throw common::Error(what.str());
+    }
   }
 }
 }  // namespace openscenario_preprocessor

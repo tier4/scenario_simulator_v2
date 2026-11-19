@@ -20,6 +20,8 @@
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_validator/validator.hpp>
 #include <queue>
+#include <string>
+#include <unordered_map>
 
 namespace openscenario_preprocessor
 {
@@ -54,6 +56,8 @@ protected:
   std::queue<Scenario> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
+
+  std::unordered_map<std::string, std::string> override_parameters;
 
   openscenario_validator::OpenSCENARIOValidator validate;
 
