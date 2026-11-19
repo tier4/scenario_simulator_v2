@@ -81,6 +81,7 @@ def default_rviz_config_file():
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
+    allow_vehicle_specific_mrm_behavior         = LaunchConfiguration("allow_vehicle_specific_mrm_behavior",         default=False)
     architecture_type                           = LaunchConfiguration("architecture_type",                           default="awf/universe/20240605")
     autoware_launch_file                        = LaunchConfiguration("autoware_launch_file",                        default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package                     = LaunchConfiguration("autoware_launch_package",                     default=default_autoware_launch_package_of(architecture_type.perform(context)))
@@ -177,6 +178,7 @@ def launch_setup(context, *args, **kwargs):
         else:
             raise FileNotFoundError(f'Executable "{godot_executable_path}" could not be resolved from PATH.')
 
+    print(f"allow_vehicle_specific_mrm_behavior         := {allow_vehicle_specific_mrm_behavior.perform(context)}")
     print(f"architecture_type                           := {architecture_type.perform(context)}")
     print(f"autoware_launch_file                        := {autoware_launch_file.perform(context)}")
     print(f"autoware_launch_package                     := {autoware_launch_package.perform(context)}")
@@ -253,6 +255,7 @@ def launch_setup(context, *args, **kwargs):
 
     def make_parameters():
         parameters = [
+            {"allow_vehicle_specific_mrm_behavior": allow_vehicle_specific_mrm_behavior},
             {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
@@ -393,6 +396,7 @@ def launch_setup(context, *args, **kwargs):
 
     return [
         # fmt: off
+        DeclareLaunchArgument("allow_vehicle_specific_mrm_behavior",         default_value=allow_vehicle_specific_mrm_behavior        ),
         DeclareLaunchArgument("architecture_type",                           default_value=architecture_type                          ),
         DeclareLaunchArgument("autoware_launch_file",                        default_value=autoware_launch_file                       ),
         DeclareLaunchArgument("autoware_launch_package",                     default_value=autoware_launch_package                    ),

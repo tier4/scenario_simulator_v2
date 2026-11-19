@@ -16,6 +16,7 @@
 #include <concealer/field_operator_application.hpp>
 #include <concealer/is_package_exists.hpp>
 #include <concealer/member_detector.hpp>
+#include <get_parameter/get_parameter.hpp>
 #include <array>
 #include <cstdio>
 #include <cstdlib>
@@ -114,7 +115,7 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
       }
     };
 
-    auto behavior_name_of = [](auto behavior) constexpr {
+    auto behavior_name_of = [](auto behavior) -> std::string {
       if constexpr (DetectStaticMember_COMFORTABLE_STOP<MrmState>::value) {
         if (behavior == MrmState::COMFORTABLE_STOP) {
           return "COMFORTABLE_STOP";
@@ -139,6 +140,18 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
         if (behavior == MrmState::PULL_OVER) {
           return "PULL_OVER";
         }
+      }
+      /*
+         Vehicle-specific MRM behaviors (e.g. x2 uses 11 for Main ECU in-lane moderate stop) are not
+         defined in autoware_adapi_v1_msgs::msg::MrmState. Only when
+         allow_vehicle_specific_mrm_behavior is true, expose the number as is instead of aborting
+         the scenario, so that scenarios can check it with UserDefinedValueCondition
+         (e.g. name: ego.currentMinimumRiskManeuverState.behavior, value: "11").
+      */
+      static const auto allow_vehicle_specific_mrm_behavior =
+        common::getParameter<bool>("allow_vehicle_specific_mrm_behavior", false);
+      if (allow_vehicle_specific_mrm_behavior) {
+        return std::to_string(behavior);
       }
       throw common::Error(
         "Unexpected autoware_adapi_v1_msgs::msg::MrmState::behavior, number: ", behavior);
