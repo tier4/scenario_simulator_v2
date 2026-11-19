@@ -607,12 +607,23 @@ def launch_setup(context, *args, **kwargs):
     )
 
 
+def set_ros_domain_id(context, *args, **kwargs):
+    # If ros_domain_id is given, run the simulator (and Autoware, which inherits this environment via
+    # execvp) in that ROS domain. e.g. the redundant Autoware setup requires Main ECU in domain 1,
+    # because Sub ECU (domain 2) and Main MRM (domain 3) are bridged to domain 1.
+    # If it is empty (default), ROS_DOMAIN_ID is inherited from the caller as before.
+    ros_domain_id = LaunchConfiguration("ros_domain_id").perform(context)
+    if ros_domain_id:
+        print(f"ros_domain_id                               := {ros_domain_id}")
+        return [SetEnvironmentVariable("ROS_DOMAIN_ID", ros_domain_id)]
+    return []
+
+
 def generate_launch_description():
     return LaunchDescription(
         [
-            # Run the simulator (and Autoware, which inherits this environment via execvp) in ROS domain 1.
-            # The redundant Autoware setup bridges Sub ECU (domain 2) and Main MRM (domain 3) to domain 1.
-            SetEnvironmentVariable("ROS_DOMAIN_ID", "1"),
+            DeclareLaunchArgument("ros_domain_id", default_value=""),
+            OpaqueFunction(function=set_ros_domain_id),
             OpaqueFunction(function=launch_setup),
         ]
     )
