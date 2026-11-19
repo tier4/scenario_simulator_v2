@@ -130,10 +130,6 @@ install(
   FILES ${CMAKE_CURRENT_SOURCE_DIR}/features
   DESTINATION lib/${PROJECT_NAME})
 
-install(
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test
-  DESTINATION share/${PROJECT_NAME})
-
 # ------------------------------------------------------------------------------
 #  test
 # ------------------------------------------------------------------------------
