@@ -15,18 +15,55 @@
 #ifndef OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
 #define OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
 
+#include <memory>
 #include <openscenario_interpreter/object.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace openscenario_interpreter
 {
+// parameter set like {a: 1.0, b: 2.0,...}
+using ParameterSet = std::unordered_map<std::string, Object>;
+using ParameterSetSharedPtr = std::shared_ptr<ParameterSet>;
+// list of ParameterList
+using ParameterDistribution = std::vector<ParameterSetSharedPtr>;
+using SingleUnnamedParameterDistribution = std::vector<Object>;
+
+// TODO(HansRobo): implement parallel derivable parameter distribution with this base struct
+struct ParallelDerivableParameterValueDistributionBase
+{
+  virtual auto derive(
+    std::size_t local_index, std::size_t local_size, std::size_t global_index,
+    std::size_t global_size) -> ParameterSet = 0;
+
+  virtual auto getNumberOfDeriveScenarios() const -> std::size_t
+  {
+    throw Error("getNumberOfDeriveScenarios() is not implemented");
+  }
+};
+
+// generator types distribution
+struct SingleParameterDistributionBase
+{
+  virtual auto derive() -> SingleUnnamedParameterDistribution = 0;
+};
+
+struct MultiParameterDistributionBase
+{
+  virtual auto derive() -> ParameterDistribution = 0;
+};
+
 struct StochasticParameterDistributionBase
 {
-  virtual auto derive() -> Object
-  {
-    throw common::scenario_simulator_exception::Error(
-      "Unimplemented derive function is called. Please implement and override "
-      "StochasticParameterDistributionBase::derive.");
-  }
+  virtual auto derive() -> Object = 0;
+};
+
+// container types of distribution data generator
+struct ParameterDistributionContainer
+{
+  virtual auto derive() -> ParameterDistribution = 0;
 };
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
