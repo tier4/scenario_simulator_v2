@@ -31,8 +31,8 @@ Stochastic::Stochastic(const pugi::xml_node & node, Scope & scope)
     scope.random_engine.seed(seed);
     return seed;
   }()),
-  stochastic_distribution(
-    readElement<StochasticDistribution>("StochasticDistribution", node, scope))
+  stochastic_distributions(
+    readElements<StochasticDistribution, 1>("StochasticDistribution", node, scope))
 {
 }
 }  // namespace syntax

@@ -44,7 +44,7 @@ struct Stochastic : public ComplexType
 
   const Double random_seed;
 
-  const StochasticDistribution stochastic_distribution;
+  std::list<StochasticDistribution> stochastic_distributions;
 
   explicit Stochastic(const pugi::xml_node &, Scope & scope);
 };
