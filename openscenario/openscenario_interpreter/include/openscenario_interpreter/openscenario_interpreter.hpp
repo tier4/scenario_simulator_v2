@@ -75,6 +75,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   bool publish_empty_context;
 
+  bool publish_visualization;
+
   bool record;
 
   String record_option;

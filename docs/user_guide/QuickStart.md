@@ -96,8 +96,16 @@ ros2 launch scenario_test_runner scenario_test_runner.launch.py \
 
 #### random_test_runner
 
+!!! warning
+    `random_test_runner` is deprecated and will be removed on or after 2027-03-01. No replacement will be provided.
+
+    `random_test_runner` does not start unless the launch argument `acknowledge_deprecation:=true` is given (`-p acknowledge_deprecation:=true` if the node is started with `ros2 run`).
+
+    If the removal affects you, please contact the code owners listed in [`.github/CODEOWNERS`](https://github.com/tier4/scenario_simulator_v2/blob/master/.github/CODEOWNERS).
+
 ```bash
 ros2 launch random_test_runner random_test.launch.py \
+    acknowledge_deprecation:=true \
     architecture_type:=awf/universe/20250130 \
     sensor_model:=sample_sensor_kit \
     vehicle_model:=sample_vehicle timeout:=120.0
