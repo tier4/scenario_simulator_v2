@@ -65,5 +65,24 @@ struct ParameterDistributionContainer
 {
   virtual auto derive() -> ParameterDistribution = 0;
 };
+
+auto mergeParameterDistribution(
+  const ParameterDistribution & distribution, const ParameterDistribution & additional_distribution)
+  -> ParameterDistribution;
+
+template <typename DistributionT>
+ParameterDistribution mergeParameterDistributionList(
+  const ParameterDistribution & base_distribution,
+  const std::list<DistributionT> & distribution_list)
+{
+  ParameterDistribution merged_distribution{base_distribution};
+  for (const auto & additional_distribution : distribution_list) {
+    merged_distribution = mergeParameterDistribution(
+      merged_distribution,
+      apply(
+        [](const auto & distribution) { return distribution.derive(); }, additional_distribution));
+  }
+  return merged_distribution;
+}
 }  // namespace openscenario_interpreter
 #endif  // OPENSCENARIO_INTERPRETER__PARAMETER_DISTRIBUTION_HPP_
