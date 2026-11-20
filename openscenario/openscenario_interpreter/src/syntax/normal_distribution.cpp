@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cmath>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/normal_distribution.hpp>
 
@@ -25,7 +26,8 @@ NormalDistribution::NormalDistribution(
   range(readElement<Range>("Range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   variance(readAttribute<Double>("variance", node, scope)),
-  distribute(static_cast<double>(expected_value.data), static_cast<double>(variance.data))
+  distribute(
+    static_cast<double>(expected_value.data), std::sqrt(static_cast<double>(variance.data)))
 {
 }
 
