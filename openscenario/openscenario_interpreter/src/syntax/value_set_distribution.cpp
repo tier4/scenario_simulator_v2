@@ -25,5 +25,14 @@ ValueSetDistribution::ValueSetDistribution(
   parameter_value_sets(readElements<ParameterValueSet, 1>("ParameterValueSet", node, scope))
 {
 }
+
+auto ValueSetDistribution::derive() -> ParameterDistribution
+{
+  ParameterDistribution parameters;
+  for (const auto & parameter_value_set : parameter_value_sets) {
+    parameters.emplace_back(parameter_value_set.evaluate());
+  }
+  return parameters;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

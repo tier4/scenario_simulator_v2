@@ -24,5 +24,11 @@ StochasticDistribution::StochasticDistribution(const pugi::xml_node & node, Scop
   parameter_name(readAttribute<String>("parameterName", node, scope))
 {
 }
+
+auto StochasticDistribution::derive() -> Object
+{
+  return apply<Object>(
+    [](auto & unnamed_distribution) { return unnamed_distribution.derive(); }, *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

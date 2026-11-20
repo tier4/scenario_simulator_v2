@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DISTRIBUTION_SET_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/syntax/distribution_set_element.hpp>
 
 namespace openscenario_interpreter
@@ -32,11 +33,13 @@ inline namespace syntax
      </xsd:sequence>
    </xsd:complexType>
 */
-struct DistributionSet : private Scope, public ComplexType
+struct DistributionSet : private Scope, public ComplexType, public SingleParameterDistributionBase
 {
   const std::list<DistributionSetElement> elements;
 
   explicit DistributionSet(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> SingleUnnamedParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

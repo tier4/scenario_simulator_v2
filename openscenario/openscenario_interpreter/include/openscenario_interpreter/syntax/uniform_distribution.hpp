@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
 #include <random>
+#include <typeinfo>
 
 namespace openscenario_interpreter
 {

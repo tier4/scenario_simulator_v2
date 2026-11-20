@@ -15,35 +15,23 @@
 #ifndef OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 #define OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 
-#include <concealer/execute.hpp>
-#include <deque>
 #include <filesystem>
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_preprocessor_msgs/srv/check_derivative_remained.hpp>
-#include <openscenario_preprocessor_msgs/srv/derive.hpp>
-#include <openscenario_preprocessor_msgs/srv/load.hpp>
-#include <openscenario_preprocessor_msgs/srv/set_parameter.hpp>
-#include <rclcpp/rclcpp.hpp>
+#include <openscenario_validator/validator.hpp>
+#include <queue>
+#include <string>
+#include <unordered_map>
 
 namespace openscenario_preprocessor
 {
-struct ScenarioSet
+struct Scenario
 {
-  ScenarioSet() = default;
+  Scenario() = default;
 
-  explicit ScenarioSet(openscenario_preprocessor_msgs::srv::Load::Request & load_request)
+  explicit Scenario(const std::filesystem::path & path, double frame_rate)
+  : path(path), frame_rate(frame_rate)
   {
-    path = load_request.path;
-    frame_rate = load_request.frame_rate;
-  }
-
-  auto getDeriveResponse() -> openscenario_preprocessor_msgs::srv::Derive::Response
-  {
-    openscenario_preprocessor_msgs::srv::Derive::Response response;
-    response.path = path.string();
-    response.frame_rate = frame_rate;
-    return response;
   }
 
   std::filesystem::path path;
@@ -51,31 +39,29 @@ struct ScenarioSet
   float frame_rate;
 };
 
-class Preprocessor : public rclcpp::Node
+class Preprocessor
 {
 public:
-  explicit Preprocessor(const rclcpp::NodeOptions &);
+  explicit Preprocessor(const std::filesystem::path & output_directory)
+  : validate(), output_directory(output_directory)
+  {
+    if (not std::filesystem::exists(output_directory)) {
+      std::filesystem::create_directories(output_directory);
+    }
+  }
 
-private:
-  void preprocessScenario(ScenarioSet &);
+protected:
+  void preprocessScenario(const Scenario &);
 
-  [[nodiscard]] bool validateXOSC(const std::filesystem::path &, bool);
-
-  rclcpp::Service<openscenario_preprocessor_msgs::srv::Load>::SharedPtr load_server;
-
-  rclcpp::Service<openscenario_preprocessor_msgs::srv::Derive>::SharedPtr derive_server;
-
-  rclcpp::Service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>::SharedPtr
-    check_server;
-
-  rclcpp::Service<openscenario_preprocessor_msgs::srv::SetParameter>::SharedPtr
-    set_parameter_server;
-
-  std::deque<ScenarioSet> preprocessed_scenarios;
+  std::queue<Scenario> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
 
   std::unordered_map<std::string, std::string> override_parameters;
+
+  openscenario_validator::OpenSCENARIOValidator validate;
+
+  std::filesystem::path output_directory;
 };
 }  // namespace openscenario_preprocessor
 

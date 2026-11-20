@@ -38,6 +38,7 @@ struct ProbabilityDistributionSet : public ComplexType,
                                     private Scope,
                                     public StochasticParameterDistributionBase
 {
+  // NOTE: use std::vector instead of std::list due to random access in `derive()`
   const std::vector<ProbabilityDistributionSetElement> elements;
 
   std::discrete_distribution<std::size_t> distribute;
