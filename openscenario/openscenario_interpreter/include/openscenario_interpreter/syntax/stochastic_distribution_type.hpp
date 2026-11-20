@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/histogram.hpp>
+#include <openscenario_interpreter/syntax/log_normal_distribution.hpp>
 #include <openscenario_interpreter/syntax/normal_distribution.hpp>
 #include <openscenario_interpreter/syntax/poisson_distribution.hpp>
 #include <openscenario_interpreter/syntax/probability_distribution_set.hpp>
@@ -54,6 +55,7 @@ DEFINE_LAZY_VISITOR(
   StochasticDistributionType,
   CASE(ProbabilityDistributionSet),  //
   CASE(NormalDistribution),          //
+  CASE(LogNormalDistribution),       //
   CASE(UniformDistribution),         //
   CASE(PoissonDistribution),         //
   CASE(Histogram),                   //
