@@ -117,6 +117,7 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto acceleration_map_path      = getRequiredParameter("acceleration_map_path"      ).get_value<std::string>();
   const auto debug_acc_scaling_factor   = getRequiredParameter("debug_acc_scaling_factor"   ).get_value<double>();
   const auto debug_steer_scaling_factor = getRequiredParameter("debug_steer_scaling_factor" ).get_value<double>();
+  const auto k_us                       = common::getParameter("k_us",                      0.0);
   const auto steer_bias                 = getRequiredParameter("steer_bias"                 ).get_value<double>();
   const auto steer_dead_band            = getRequiredParameter("steer_dead_band"            ).get_value<double>();
   const auto steer_lim                  = common::getParameter("steer_lim",                 parameters.axles.front_axle.max_steering);
@@ -148,7 +149,7 @@ auto EgoEntitySimulation::makeSimulationModel(
         autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
-        debug_acc_scaling_factor, debug_steer_scaling_factor);
+        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       if (!std::filesystem::exists(acceleration_map_path)) {
