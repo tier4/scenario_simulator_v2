@@ -258,6 +258,25 @@ TEST(ParameterValueDistribution, LogNormalDistribution)
   checkParameterValueDistribution(path, expected_distribution);
 }
 
+TEST(ParameterValueDistribution, LogNormalDistributionWithoutRange)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path =
+    get_package_share_directory("openscenario_interpreter") +
+    "/test/parameter_value_distribution/Stochastic.LogNormalDistribution.WithoutRange.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.67998150854637041));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.032166799749118187));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 8.7051499808300949));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
 TEST(ParameterValueDistribution, NormalDistribution)
 {
   using ament_index_cpp::get_package_share_directory;
@@ -277,6 +296,26 @@ TEST(ParameterValueDistribution, NormalDistribution)
   checkParameterValueDistribution(path, expected_distribution);
 }
 
+TEST(ParameterValueDistribution, NormalDistributionWithoutRange)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path =
+    get_package_share_directory("openscenario_interpreter") +
+    "/test/parameter_value_distribution/Stochastic.NormalDistribution.WithoutRange.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.086242833039257866));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.76849640901310712));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.48386605955630546));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
 TEST(ParameterValueDistribution, PoissonDistribution)
 {
   using ament_index_cpp::get_package_share_directory;
@@ -286,6 +325,23 @@ TEST(ParameterValueDistribution, PoissonDistribution)
 
   std::string path = get_package_share_directory("openscenario_interpreter") +
                      "/test/parameter_value_distribution/Stochastic.PoissonDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+TEST(ParameterValueDistribution, PoissonDistributionWithoutRange)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path =
+    get_package_share_directory("openscenario_interpreter") +
+    "/test/parameter_value_distribution/Stochastic.PoissonDistribution.WithoutRange.xosc";
 
   ParameterDistribution expected_distribution;
   expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
@@ -378,7 +434,10 @@ INSTANTIATE_TEST_SUITE_P(
   Stochastic, ParameterValueDistributionTest,
   testing::Values(
     "Stochastic.Histogram.xosc",
+    "Stochastic.LogNormalDistribution.WithoutRange.xosc",
+    "Stochastic.NormalDistribution.WithoutRange.xosc",
     "Stochastic.NormalDistribution.xosc",
+    "Stochastic.PoissonDistribution.WithoutRange.xosc",
     "Stochastic.PoissonDistribution.xosc",
     "Stochastic.ProbabilityDistributionSet.xosc",
     "Stochastic.UniformDistribution.xosc"));
