@@ -151,16 +151,7 @@ auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obst
 
 auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
 {
-  lanelet::Ids ids{};
-  for (const auto & route_data : getRoute().data) {
-    for (const auto & segment : route_data.segments) {
-      ids.push_back(segment.preferred.id);
-      for (const auto & alternative : segment.alternatives) {
-        ids.push_back(alternative.id);
-      }
-    }
-  }
-  return ids;
+  return concealer::getRouteLanelets(getRoute());
 }
 
 auto EgoEntity::getCurrentPose() const -> const geometry_msgs::msg::Pose &

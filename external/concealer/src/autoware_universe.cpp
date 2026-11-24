@@ -223,20 +223,6 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<double, double, d
     gear_command.command);
 }
 
-auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
-{
-  std::vector<std::int64_t> ids{};
-  for (const auto & route_data : getRoute().data) {
-    for (const auto & segment : route_data.segments) {
-      ids.push_back(segment.preferred.id);
-      for (const auto & alternative : segment.alternatives) {
-        ids.push_back(alternative.id);
-      }
-    }
-  }
-  return ids;
-}
-
 auto AutowareUniverse::getControlModeReport() const -> ControlModeReport
 {
   ControlModeReport message;
@@ -247,5 +233,24 @@ auto AutowareUniverse::getControlModeReport() const -> ControlModeReport
 auto AutowareUniverse::setManualMode() -> void
 {
   current_control_mode.store(ControlModeReport::MANUAL);
+}
+
+auto getRouteLanelets(const autoware_adapi_v1_msgs::msg::Route & route) -> std::vector<std::int64_t>
+{
+  /*
+     RouteSegment::preferred holds only the lane that leads to the goal. Until
+     a lane change is done, the vehicle is on a lane that appears only in
+     RouteSegment::alternatives.
+  */
+  std::vector<std::int64_t> ids{};
+  for (const auto & route_data : route.data) {
+    for (const auto & segment : route_data.segments) {
+      ids.push_back(segment.preferred.id);
+      for (const auto & alternative : segment.alternatives) {
+        ids.push_back(alternative.id);
+      }
+    }
+  }
+  return ids;
 }
 }  // namespace concealer

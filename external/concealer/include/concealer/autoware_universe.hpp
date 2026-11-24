@@ -103,12 +103,12 @@ public:
 
   auto getVehicleCommand() const -> std::tuple<double, double, double, double, int>;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
-
   auto getControlModeReport() const -> ControlModeReport;
 
   auto setManualMode() -> void;
 };
+
+auto getRouteLanelets(const autoware_adapi_v1_msgs::msg::Route &) -> std::vector<std::int64_t>;
 }  // namespace concealer
 
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_
