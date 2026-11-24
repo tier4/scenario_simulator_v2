@@ -4378,6 +4378,18 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /simulation/debug_marker
           Value: true
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: true
+          Name: Interpreter Marker
+          Namespaces:
+            {}
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /simulation/interpreter/markers
+          Value: true
         - Class: rviz_common/Group
           Displays:
             - Alpha: 0.9990000128746033

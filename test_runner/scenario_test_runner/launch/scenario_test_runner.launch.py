@@ -93,6 +93,7 @@ def launch_setup(context, *args, **kwargs):
     pedestrian_ignore_see_around                = LaunchConfiguration("pedestrian_ignore_see_around",                default="blind")
     port                                        = LaunchConfiguration("port",                                        default=5555)
     publish_empty_context                       = LaunchConfiguration("publish_empty_context",                       default=False)
+    publish_visualization                       = LaunchConfiguration("publish_visualization",                       default=False)
     record                                      = LaunchConfiguration("record",                                      default=True)
     record_option                               = LaunchConfiguration("record_option",                               default="")
     record_storage_id                           = LaunchConfiguration("record_storage_id",                           default="")
@@ -132,6 +133,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"pedestrian_ignore_see_around                := {pedestrian_ignore_see_around.perform(context)}")
     print(f"port                                        := {port.perform(context)}")
     print(f"publish_empty_context                       := {publish_empty_context.perform(context)}")
+    print(f"publish_visualization                       := {publish_visualization.perform(context)}")
     print(f"record                                      := {record.perform(context)}")
     print(f"record_option                               := {record_option.perform(context)}")
     print(f"record_storage_id                           := {record_storage_id.perform(context)}")
@@ -169,6 +171,7 @@ def launch_setup(context, *args, **kwargs):
             {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
+            {"publish_visualization": publish_visualization},
             {"record": record},
             {"record_option": record_option},
             {"record_storage_id": record_storage_id},
@@ -244,6 +247,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("parameter_file_path",                         default_value=parameter_file_path                        ),
         DeclareLaunchArgument("pedestrian_ignore_see_around",                default_value=pedestrian_ignore_see_around               ),
         DeclareLaunchArgument("publish_empty_context",                       default_value=publish_empty_context                      ),
+        DeclareLaunchArgument("publish_visualization",                       default_value=publish_visualization                      ),
         DeclareLaunchArgument("record_option",                               default_value=record_option                              ),
         DeclareLaunchArgument("rviz_config",                                 default_value=rviz_config                                ),
         DeclareLaunchArgument("scenario",                                    default_value=scenario                                   ),

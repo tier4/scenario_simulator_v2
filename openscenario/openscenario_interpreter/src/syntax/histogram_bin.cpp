@@ -20,7 +20,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 HistogramBin::HistogramBin(const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
-: range(readElement<Range>("range", node, scope)),
+: range(readElement<Range>("Range", node, scope)),
   weight(readAttribute<Double>("weight", node, scope))
 {
 }

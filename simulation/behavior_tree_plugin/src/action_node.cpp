@@ -34,7 +34,6 @@
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -94,7 +93,8 @@ auto ActionNode::getBlackBoardValues() -> void
       "failed to get input matching_distance_for_lanelet_pose_calculation in ActionNode");
   }
 
-  if (!getInput<EntityStatusDict>("other_entity_status", other_entity_status_)) {
+  if (!getInput<traffic_simulator::OtherEntityStatuses>(
+        "other_entity_status", other_entity_status_)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status_ in ActionNode");
   }
   if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets_)) {
@@ -377,8 +377,7 @@ auto intersectsTrajectory(
 
 auto detectEntityCollisions(
   const QuadrilateralData & data,
-  const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
-    other_entity_status,
+  const traffic_simulator::OtherEntityStatuses & other_entity_status,
   const std::string & entity_name) -> std::optional<std::pair<std::string, double>>
 {
   if (data.polygons.empty()) {
@@ -391,6 +390,25 @@ auto detectEntityCollisions(
   for (const auto & [name, status] : other_entity_status) {
     if (entity_name == name) {
       continue;
+    }
+    if (data.trajectory_bounds) {
+      const auto & box = status.getBoundingBox();
+      // Contain all rotated top-face corners, including the bounding-box center offset.
+      const double radius = std::hypot(
+                              std::hypot(
+                                std::abs(box.center.x) + 0.5 * std::abs(box.dimensions.x),
+                                std::abs(box.center.y) + 0.5 * std::abs(box.dimensions.y)),
+                              std::abs(box.center.z + 0.5 * box.dimensions.z)) +
+                            1e-8;
+      const auto & p = status.getMapPose().position;
+      const auto & bounds = *data.trajectory_bounds;
+      if (
+        p.x + radius < bg::get<bg::min_corner, 0>(bounds) ||
+        p.x - radius > bg::get<bg::max_corner, 0>(bounds) ||
+        p.y + radius < bg::get<bg::min_corner, 1>(bounds) ||
+        p.y - radius > bg::get<bg::max_corner, 1>(bounds)) {
+        continue;
+      }
     }
     // Generate a 2D polygon from the entity pose and bounding box.
     auto polygon = math::geometry::toPolygon2D(status.getMapPose(), status.getBoundingBox());

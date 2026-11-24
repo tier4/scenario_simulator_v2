@@ -1,3 +1,10 @@
+!!! warning
+    `random_test_runner` is deprecated and will be removed on or after 2027-03-01. No replacement will be provided.
+
+    `random_test_runner` does not start unless the launch argument `acknowledge_deprecation:=true` is given (`-p acknowledge_deprecation:=true` if the node is started with `ros2 run`).
+
+    If the removal affects you, please contact the code owners listed in [`.github/CODEOWNERS`](https://github.com/tier4/scenario_simulator_v2/blob/master/.github/CODEOWNERS).
+
 # Features
 
 - Full and partial randomization of the Ego goal position for multiple test cases.
@@ -62,6 +69,7 @@ Parameters have the following source precedence priorities:
 
 | Parameter name               | Default value                 | Description                                                                                                                                                                                                                 |
 |------------------------------|-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `acknowledge_deprecation`    |  `false`                      | Set `true` to acknowledge that `random_test_runner` is deprecated and will be removed on or after 2027-03-01. `random_test_runner` does not start unless this is `true`.                                                    |
 | `test_parameters_filename`   |  `""`                         | Yaml filename within `random_test_runner/param` directory containing test parameters. Only [Node parameters](#node-parameters) can be specified in this file.                                                               |
 | `simulator_type`             |  `"simple_sensor_simulator"`  | Backend simulator. Currently supported value is `simple_sensor_simulator`. It's also accepted by the node but should be supplied as direct launch argument.                                                              |
 | `simulator_host`              | `"localhost"`                 | Simulation host. It can be either IP address or the host name that is resolvable in the environment (you can add a host by appending `"<SIMULATOR_IP> <SIMULATOR_NAME>"` line to the `/etc/hosts` file).                     |
