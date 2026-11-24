@@ -28,9 +28,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommand("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
-  getPathWithLaneId(
-    "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1),
-    *this),
+  getRoute("/api/routing/route", rclcpp::QoS(1).transient_local(), *this),
   setAcceleration(
     simulate_localization ? "/localization/acceleration"
                           : "/simulation/debug/localization/acceleration",
@@ -228,8 +226,13 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<double, double, d
 auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ids{};
-  for (const auto & point : getPathWithLaneId().points) {
-    std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+  for (const auto & route_data : getRoute().data) {
+    for (const auto & segment : route_data.segments) {
+      ids.push_back(segment.preferred.id);
+      for (const auto & alternative : segment.alternatives) {
+        ids.push_back(alternative.id);
+      }
+    }
   }
   return ids;
 }
