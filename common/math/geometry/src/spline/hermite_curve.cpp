@@ -158,23 +158,18 @@ std::set<double> HermiteCurve::getCollisionPointsIn2D(
   };
 
   for (const auto solution : get_solutions()) {
-    constexpr double epsilon = std::numeric_limits<double>::epsilon();
-    double x = solver_.cubic(ax_, bx_, cx_, dx_, solution);
-    double tx = (x - point0.x) / (point1.x - point0.x);
-    double y = solver_.cubic(ay_, by_, cy_, dy_, solution);
-    double ty = (y - point0.y) / (point1.y - point0.y);
-    if (std::abs(tx - ty) > epsilon || std::isnan(tx) || std::isnan(ty)) {
-      /**
-       * @note If the curve and the line segment to be intersected are parallel to either of the x/y axes, one of the two parameters, 
-       * tx, ty, will be in the range [0, 1] while the other will be out of that range because of division by zero.
-       */
-      if ((0 <= tx && tx <= 1) || (0 <= ty && ty <= 1)) {
-        s_values.insert(denormalize(solution));
-      }
-    } else {
-      if ((0 <= tx && tx <= 1) && (0 <= ty && ty <= 1)) {
-        s_values.insert(denormalize(solution));
-      }
+    const double x = solver_.cubic(ax_, bx_, cx_, dx_, solution);
+    const double y = solver_.cubic(ay_, by_, cy_, dy_, solution);
+    /*
+       The solution is on the infinite line through the two points. Where it
+       lies along the line segment is measured on the axis along which the
+       segment is longer. The other axis divides by a value that is zero or
+       nearly zero when the segment is parallel or nearly parallel to an axis,
+       so its result is decided by rounding errors.
+    */
+    const double t = std::abs(ex) > std::abs(ey) ? (x - fx) / ex : (y - fy) / ey;
+    if (0 <= t && t <= 1) {
+      s_values.insert(denormalize(solution));
     }
   }
   return s_values;
