@@ -1,0 +1,100 @@
+OpenSCENARIO:
+  FileHeader:
+    author: Tatsuya Yamasaki
+    date: '2026-11-24T00:00:00+09:00'
+    description: |
+      A vehicle cruising at 13.8889 m/s starts a FollowTrajectoryAction whose
+      vertices have no arrival time, and the action must complete. With
+      libstdc++ 12 or later, the first step of the action used to fail with
+      "Contradictory acceleration limits" at both 20 Hz and 30 Hz.
+    revMajor: 1
+    revMinor: 3
+  CatalogLocations.CatalogLocation: []
+  RoadNetwork.LogicFile.filepath: $(find-pkg-share kashiwanoha_map)/map
+  Entities.ScenarioObject:
+    - name: car
+      Vehicle:
+        name: ''
+        vehicleCategory: car
+        BoundingBox:
+          Center: { x: 0, y: 0, z: 1.25 }
+          Dimensions: { length: 4, width: 1.8, height: 2.5 }
+        Performance: { maxSpeed: 50, maxAcceleration: INF, maxDeceleration: INF }
+        Axles:
+          FrontAxle: { maxSteering: 0.5236, wheelDiameter: 0.6, trackWidth: 1.8, positionX: 2, positionZ: 0.3 }
+          RearAxle: { maxSteering: 0.5236, wheelDiameter: 0.6, trackWidth: 1.8, positionX: 0, positionZ: 0.3 }
+        Properties.Property: []
+      ObjectController.Controller:
+        name: ''
+        Properties.Property:
+          # With the default value 3, the action fails at 30 Hz but not at 20 Hz.
+          - { name: maxAccelerationRate, value: 1.9 }
+          - { name: maxDecelerationRate, value: 1.9 }
+  Storyboard:
+    Init.Actions.Private:
+      - entityRef: car
+        PrivateAction:
+          - TeleportAction.Position.LanePosition: { roadId: '', laneId: '34513', s: 1 }
+          - LongitudinalAction.SpeedAction:
+              SpeedActionDynamics: { dynamicsDimension: time, dynamicsShape: step, value: 0 }
+              SpeedActionTarget.AbsoluteTargetSpeed.value: 13.8889
+    Story:
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: car
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: follow_trajectory
+                            PrivateAction.RoutingAction.FollowTrajectoryAction:
+                              initialDistanceOffset: 0
+                              TimeReference.Timing: { domainAbsoluteRelative: relative, offset: 0, scale: 1 }
+                              TrajectoryFollowingMode.followingMode: position
+                              TrajectoryRef.Trajectory:
+                                closed: false
+                                name: ''
+                                Shape.Polyline.Vertex:
+                                  - Position.LanePosition: { roadId: '', laneId: '34513', s: 40 }
+                                  - Position.LanePosition: { roadId: '', laneId: '34507', s: 5 }
+                      - name: ''
+                        priority: parallel
+                        StartTrigger.ConditionGroup:
+                          - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition.StoryboardElementStateCondition:
+                                  storyboardElementRef: follow_trajectory
+                                  storyboardElementType: action
+                                  state: completeState
+                        Action:
+                          - name: ''
+                            UserDefinedAction.CustomCommandAction.type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger.ConditionGroup:
+                          - Condition:
+                              - name: ''
+                                delay: 0
+                                conditionEdge: none
+                                ByValueCondition.SimulationTimeCondition: { value: 30, rule: greaterThan }
+                        Action:
+                          - name: ''
+                            UserDefinedAction.CustomCommandAction.type: exitFailure
+            StartTrigger.ConditionGroup:
+              - Condition:
+                  - name: ''
+                    delay: 0
+                    conditionEdge: none
+                    ByValueCondition.SimulationTimeCondition: { value: 0, rule: greaterThan }
+    StopTrigger.ConditionGroup: []
