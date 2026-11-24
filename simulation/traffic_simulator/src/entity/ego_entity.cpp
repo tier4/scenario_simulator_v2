@@ -155,6 +155,9 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
   for (const auto & route_data : getRoute().data) {
     for (const auto & segment : route_data.segments) {
       ids.push_back(segment.preferred.id);
+      for (const auto & alternative : segment.alternatives) {
+        ids.push_back(alternative.id);
+      }
     }
   }
   return ids;
