@@ -38,7 +38,7 @@ inline namespace syntax
 struct Histogram : public ComplexType, private Scope, public StochasticParameterDistributionBase
 {
   /**
-   * Note: HistogramBin must be stored in continuous range and ascending order to `bins`
+   * Note: HistogramBin must be stored in continuous range and ascending order, to `bins`
    */
   const std::list<HistogramBin> bins;
 
