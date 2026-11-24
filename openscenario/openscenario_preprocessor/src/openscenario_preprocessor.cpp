@@ -41,8 +41,14 @@ void Preprocessor::preprocessScenario(const Scenario & scenario)
 
       OpenScenario scenario_file{scenario_file_path, std::make_shared<ScenarioRuntime>()};
 
-      for (const auto & parameter_list :
-           parameter_value_distribution.derive() | boost::adaptors::indexed()) {
+      /*
+         The derived distribution is held in a variable because the range
+         adaptor only refers to it. A temporary would be destroyed before the
+         loop body runs.
+      */
+      const auto parameter_distribution = parameter_value_distribution.derive();
+
+      for (const auto & parameter_list : parameter_distribution | boost::adaptors::indexed()) {
         pugi::xml_document derived_script;
 
         derived_script.reset(scenario_file.script);  // deep copy
