@@ -29,7 +29,6 @@
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/legacy_autoware_state.hpp>
-#include <concealer/path_with_lane_id.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/service.hpp>
 #include <concealer/subscriber.hpp>

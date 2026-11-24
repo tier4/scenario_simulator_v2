@@ -15,6 +15,7 @@
 #ifndef CONCEALER__SUBSCRIBER_HPP_
 #define CONCEALER__SUBSCRIBER_HPP_
 
+#include <concealer/available.hpp>
 #include <concealer/convert.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <memory>
