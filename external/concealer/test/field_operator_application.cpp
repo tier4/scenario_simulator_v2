@@ -20,6 +20,7 @@
 #include <get_parameter/get_parameter.hpp>
 #include <memory>
 #include <scenario_simulator_exception/exception.hpp>
+#include <stdexcept>
 #include <thread>
 
 namespace
@@ -110,26 +111,23 @@ protected:
   }
 };
 
-TEST_F(LocalizationInitialization, timeout_defaults_overrides_and_validation)
+TEST_F(LocalizationInitialization, timeout_is_required_and_validated)
 {
   auto & parameters = common::getParameterNode();
   {
-    SCOPED_TRACE("omitted timeout waits for a delayed response");
+    SCOPED_TRACE("omitted timeout is rejected before requesting localization");
     ASSERT_FALSE(parameters.has_parameter("initialize_localization"));
-    ASSERT_NO_THROW(createApplication());
-    EXPECT_EQ(common::getParameter<int>("initialize_localization"), 10);
-    EXPECT_NO_THROW(requestInitialPose());
-    EXPECT_EQ(localization_requests.load(), 1U);
+    EXPECT_THROW(createApplication(), std::runtime_error);
+    EXPECT_EQ(localization_requests.load(), 0U);
     destroyApplication();
   }
   {
     SCOPED_TRACE("positive timeout waits for a delayed response");
-    ASSERT_TRUE(
-      parameters.set_parameter(rclcpp::Parameter("initialize_localization", 1)).successful);
+    ASSERT_FALSE(parameters.has_parameter("initialize_localization"));
+    parameters.declare_parameter("initialize_localization", 1);
     ASSERT_NO_THROW(createApplication());
-    EXPECT_EQ(common::getParameter<int>("initialize_localization"), 1);
     EXPECT_NO_THROW(requestInitialPose());
-    EXPECT_EQ(localization_requests.load(), 2U);
+    EXPECT_EQ(localization_requests.load(), 1U);
     destroyApplication();
   }
   {
@@ -137,7 +135,7 @@ TEST_F(LocalizationInitialization, timeout_defaults_overrides_and_validation)
     ASSERT_TRUE(
       parameters.set_parameter(rclcpp::Parameter("initialize_localization", 0)).successful);
     EXPECT_THROW(createApplication(), common::SemanticError);
-    EXPECT_EQ(localization_requests.load(), 2U);
+    EXPECT_EQ(localization_requests.load(), 1U);
     destroyApplication();
   }
   {
@@ -145,7 +143,7 @@ TEST_F(LocalizationInitialization, timeout_defaults_overrides_and_validation)
     ASSERT_TRUE(
       parameters.set_parameter(rclcpp::Parameter("initialize_localization", -1)).successful);
     EXPECT_THROW(createApplication(), common::SemanticError);
-    EXPECT_EQ(localization_requests.load(), 2U);
+    EXPECT_EQ(localization_requests.load(), 1U);
     destroyApplication();
   }
 }
