@@ -25,18 +25,6 @@
 
 namespace vehicle_simulation
 {
-auto getRequiredParameter(const std::string & name) -> rclcpp::Parameter
-{
-  const auto node = common::getParameterNode().get_node_parameters_interface();
-  if (not node->has_parameter(name)) {
-    throw std::runtime_error(
-      "Required parameter '" + name +
-      "' is not set. "
-      "Please define it in description package.");
-  }
-  return node->get_parameter(name);
-}
-
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::EntityStatus & initial_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
@@ -82,8 +70,7 @@ auto toString(const VehicleModelType datum) -> std::string
 
 auto EgoEntitySimulation::getVehicleModelType() -> VehicleModelType
 {
-  const auto vehicle_model_type =
-    getRequiredParameter("vehicle_model_type").get_value<std::string>();
+  const auto vehicle_model_type = common::getRequiredParameter<std::string>("vehicle_model_type");
 
   static const std::unordered_map<std::string, VehicleModelType> table{
     {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
@@ -112,21 +99,21 @@ auto EgoEntitySimulation::makeSimulationModel(
   -> const std::shared_ptr<SimModelInterface>
 {
   // clang-format off
-  const auto acc_time_constant          = getRequiredParameter("acc_time_constant"          ).get_value<double>();
-  const auto acc_time_delay             = getRequiredParameter("acc_time_delay"             ).get_value<double>();
-  const auto acceleration_map_path      = getRequiredParameter("acceleration_map_path"      ).get_value<std::string>();
-  const auto debug_acc_scaling_factor   = getRequiredParameter("debug_acc_scaling_factor"   ).get_value<double>();
-  const auto debug_steer_scaling_factor = getRequiredParameter("debug_steer_scaling_factor" ).get_value<double>();
-  const auto steer_bias                 = getRequiredParameter("steer_bias"                 ).get_value<double>();
-  const auto steer_dead_band            = getRequiredParameter("steer_dead_band"            ).get_value<double>();
+  const auto acc_time_constant          = common::getRequiredParameter<double     >("acc_time_constant"          );
+  const auto acc_time_delay             = common::getRequiredParameter<double     >("acc_time_delay"             );
+  const auto acceleration_map_path      = common::getRequiredParameter<std::string>("acceleration_map_path"      );
+  const auto debug_acc_scaling_factor   = common::getRequiredParameter<double     >("debug_acc_scaling_factor"   );
+  const auto debug_steer_scaling_factor = common::getRequiredParameter<double     >("debug_steer_scaling_factor" );
+  const auto steer_bias                 = common::getRequiredParameter<double     >("steer_bias"                 );
+  const auto steer_dead_band            = common::getRequiredParameter<double     >("steer_dead_band"            );
   const auto steer_lim                  = common::getParameter("steer_lim",                 parameters.axles.front_axle.max_steering);
-  const auto steer_rate_lim             = getRequiredParameter("steer_rate_lim"             ).get_value<double>();
-  const auto steer_time_constant        = getRequiredParameter("steer_time_constant"        ).get_value<double>();
-  const auto steer_time_delay           = getRequiredParameter("steer_time_delay"           ).get_value<double>();
+  const auto steer_rate_lim             = common::getRequiredParameter<double     >("steer_rate_lim"             );
+  const auto steer_time_constant        = common::getRequiredParameter<double     >("steer_time_constant"        );
+  const auto steer_time_delay           = common::getRequiredParameter<double     >("steer_time_delay"           );
   const auto vel_lim                    = common::getParameter("vel_lim",                   parameters.performance.max_speed);
   const auto vel_rate_lim               = common::getParameter("vel_rate_lim",              parameters.performance.max_acceleration);
-  const auto vel_time_constant          = getRequiredParameter("vel_time_constant"          ).get_value<double>();
-  const auto vel_time_delay             = getRequiredParameter("vel_time_delay"             ).get_value<double>();
+  const auto vel_time_constant          = common::getRequiredParameter<double     >("vel_time_constant"          );
+  const auto vel_time_delay             = common::getRequiredParameter<double     >("vel_time_delay"             );
   const auto wheel_base                 = common::getParameter("wheel_base",                parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
   // clang-format on
 
