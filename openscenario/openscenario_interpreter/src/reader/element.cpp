@@ -14,8 +14,12 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
+
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 #include <openscenario_interpreter/syntax/orientation.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <openscenario_interpreter/syntax/range.hpp>
 
@@ -23,9 +27,12 @@ namespace openscenario_interpreter
 {
 inline namespace reader
 {
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
   -> syntax::Orientation;
 template auto readElement(const std::string &, const pugi::xml_node &, Scope &) -> syntax::Position;
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+
 template auto readElement(const std::string &, const pugi::xml_node &, Scope &)
   -> syntax::Properties;
 template auto readElement(const std::string &, const pugi::xml_node &, Scope &) -> syntax::Range;

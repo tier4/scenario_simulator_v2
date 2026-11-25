@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/license.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
+#include <openscenario_interpreter/syntax/unsigned_short.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter

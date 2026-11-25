@@ -15,13 +15,13 @@
 #ifndef OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_
 #define OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_
 
-#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <filesystem>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
+#include <memory>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 
@@ -75,7 +75,8 @@ class OpenSCENARIOValidator
   static inline XMLPlatformLifecycleHandler xml_platform_lifecycle_handler;
 
 public:
-  OpenSCENARIOValidator() : parser(std::make_unique<xercesc::XercesDOMParser>())
+  explicit OpenSCENARIOValidator(const std::filesystem::path & schema_path)
+  : parser(std::make_unique<xercesc::XercesDOMParser>())
   {
     parser->setDoNamespaces(true);
     parser->setDoSchema(true);
@@ -83,10 +84,7 @@ public:
     parser->setValidationSchemaFullChecking(true);
     parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
 
-    parser->setExternalNoNamespaceSchemaLocation(
-      (ament_index_cpp::get_package_share_directory("openscenario_validator") +
-       "/schema/OpenSCENARIO-1.3.xsd")
-        .c_str());
+    parser->setExternalNoNamespaceSchemaLocation(schema_path.c_str());
   }
 
   auto validate(const std::filesystem::path & xml_file) -> void
