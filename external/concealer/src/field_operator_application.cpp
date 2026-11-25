@@ -373,8 +373,8 @@ auto FieldOperatorApplication::initialize(const geometry_msgs::msg::Pose & initi
 void FieldOperatorApplication::EgoStartService()
 {
     std::thread([logger = get_logger()]() {
-        RCLCPP_INFO(logger, "waiting 20 sec for diagnostic_graph/reset");
-        std::this_thread::sleep_for(std::chrono::seconds(20));
+        RCLCPP_INFO(logger, "waiting 10 sec for diagnostic_graph/reset");
+        std::this_thread::sleep_for(std::chrono::seconds(10));
 
         // Diag Reset Service
         const std::string diag_reset_cmd =
