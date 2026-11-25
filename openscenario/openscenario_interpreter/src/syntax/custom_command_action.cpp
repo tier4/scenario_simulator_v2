@@ -13,11 +13,13 @@
 // limitations under the License.
 
 #include <iterator>  // std::distance
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/regex/function_call_expression.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -104,17 +106,15 @@ struct ApplyFaultInjectionAction : public CustomCommand
 };
 
 template <auto Version>
-struct ApplyPseudoTrafficSignalDetectorConfidenceSetAction
-: public CustomCommand,
-  public SimulatorCore::NonStandardOperation
+struct ApplyPseudoTrafficSignalDetectorConfidenceSetAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> void override
+  auto start(const Scope & scope) -> void override
   {
     static_assert(0 < Version and Version <= 1);
     if (parameters.size() == 2) {
-      setConventionalTrafficLightConfidence(
+      scope.runtime().trafficSignals().setConventionalTrafficLightConfidence(
         std::stoi(parameters.at(0)), std::stod(parameters.at(1)));
     } else {
       throw Error(
@@ -146,12 +146,11 @@ struct ApplyRequestToCorporateCommandAction : public CustomCommand,
   }
 };
 
-struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
-                                          public SimulatorCore::NonStandardOperation
+struct ApplyV2ITrafficSignalStateAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> void override
+  auto start(const Scope & scope) -> void override
   {
     auto unquote = [](auto s) {
       std::stringstream(s) >> std::quoted(s);
@@ -160,11 +159,12 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
 
     switch (parameters.size()) {
       case 3:
-        resetV2ITrafficLightPublishRate(boost::lexical_cast<double>(parameters[2]));
+        scope.runtime().trafficSignals().resetV2ITrafficLightPublishRate(
+          boost::lexical_cast<double>(parameters[2]));
         [[fallthrough]];
 
       case 2:
-        setV2ITrafficLightsState(
+        scope.runtime().trafficSignals().setV2ITrafficLightsState(
           boost::lexical_cast<std::int64_t>(parameters[0]), unquote(parameters.at(1)));
         break;
 
@@ -177,12 +177,11 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
   }
 };
 
-struct EnableTrafficSignalV2IFeatureAction : public CustomCommand,
-                                             public SimulatorCore::NonStandardOperation
+struct EnableTrafficSignalV2IFeatureAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> void override
+  auto start(const Scope & scope) -> void override
   {
     if (parameters.empty()) {
       throw Error(
@@ -190,17 +189,17 @@ struct EnableTrafficSignalV2IFeatureAction : public CustomCommand,
         "Usage: EnableTrafficSignalV2IFeatureAction(id1, id2, ...)");
     }
     for (const auto & parameter : parameters) {
-      setTrafficSignalV2IFeature(boost::lexical_cast<std::int64_t>(parameter), true);
+      scope.runtime().trafficSignals().setTrafficSignalV2IFeature(
+        boost::lexical_cast<std::int64_t>(parameter), true);
     }
   }
 };
 
-struct DisableTrafficSignalV2IFeatureAction : public CustomCommand,
-                                              public SimulatorCore::NonStandardOperation
+struct DisableTrafficSignalV2IFeatureAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> void override
+  auto start(const Scope & scope) -> void override
   {
     if (parameters.empty()) {
       throw Error(
@@ -208,23 +207,25 @@ struct DisableTrafficSignalV2IFeatureAction : public CustomCommand,
         "Usage: DisableTrafficSignalV2IFeatureAction(id1, id2, ...)");
     }
     for (const auto & parameter : parameters) {
-      setTrafficSignalV2IFeature(boost::lexical_cast<std::int64_t>(parameter), false);
+      scope.runtime().trafficSignals().setTrafficSignalV2IFeature(
+        boost::lexical_cast<std::int64_t>(parameter), false);
     }
   }
 };
 
-struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::ActionApplication
+struct ApplyWalkStraightAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
   auto start(const Scope & scope) -> void override
   {
     for (const auto & actor : parameters) {
-      applyWalkStraightAction(actor);
+      scope.runtime().entities().applyWalkStraightAction(actor);
     }
 
     for (const auto & actor : scope.actors) {
-      actor.apply([&](const auto & object) { applyWalkStraightAction(object); });
+      actor.apply(
+        [&](const auto & object) { scope.runtime().entities().applyWalkStraightAction(object); });
     }
   };
 };

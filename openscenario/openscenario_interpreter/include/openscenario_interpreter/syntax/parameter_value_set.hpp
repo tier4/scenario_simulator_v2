@@ -37,6 +37,8 @@ struct ParameterValueSet : private Scope
   const std::list<ParameterAssignment> parameter_assignments;
 
   explicit ParameterValueSet(const pugi::xml_node &, Scope & scope);
+
+  auto evaluate() const -> std::shared_ptr<std::unordered_map<std::string, Object>>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

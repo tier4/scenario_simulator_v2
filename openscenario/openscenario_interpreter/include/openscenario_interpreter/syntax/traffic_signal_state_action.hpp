@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRAFFIC_SIGNAL_STATE_ACTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
@@ -34,8 +33,10 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalStateAction : private SimulatorCore::NonStandardOperation
+struct TrafficSignalStateAction
 {
+  ScenarioRuntime & scenario_runtime;
+
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  ID of a signal in a road network. The signal ID must be listed in the

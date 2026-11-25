@@ -15,22 +15,26 @@
 #ifndef OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 #define OPENSCENARIO_INTERPRETER__SCOPE_HPP_
 
+#include <algorithm>
 #include <boost/lexical_cast.hpp>
-#include <boost/range/algorithm.hpp>
-#include <filesystem>
-#include <functional>
+#include <iomanip>
+#include <iterator>
+#include <list>
+#include <map>
 #include <memory>
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/object.hpp>
-#include <openscenario_interpreter/syntax/catalog_locations.hpp>
 #include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
-#include <unordered_map>
+#include <random>
+#include <string>
 #include <utility>
 #include <vector>
 
 namespace openscenario_interpreter
 {
+class ScenarioRuntime;
+
 class EnvironmentFrame
 {
   friend struct Scope;
@@ -149,6 +153,8 @@ private:
 
 inline namespace syntax
 {
+struct CatalogLocations;
+
 struct Entities;
 
 struct OpenScenario;
@@ -191,12 +197,15 @@ class Scope
 
   const std::shared_ptr<ScenarioDefinition> scenario_definition;
 
+  const std::shared_ptr<ScenarioRuntime> scenario_runtime;
+
 public:
   const std::string name;
 
   std::list<Entity> actors;
 
-  double seed;  // NOTE: `seed` is used only for sharing randomSeed in Stochastic now
+  // NOTE: `random_engine` is used only for sharing random number generator in Stochastic now
+  std::default_random_engine random_engine;
 
   Scope() = delete;
 
@@ -204,7 +213,7 @@ public:
 
   Scope(Scope &&) = default;
 
-  explicit Scope(const OpenScenario * const);
+  explicit Scope(const OpenScenario * const, std::shared_ptr<ScenarioRuntime>);
 
   explicit Scope(const std::string &, const Scope &);
 
@@ -229,6 +238,8 @@ public:
   auto local() const noexcept -> const Scope &;
 
   auto local() noexcept -> Scope &;
+
+  auto runtime() const noexcept -> ScenarioRuntime &;
 
   auto insert(const Name &, const Object &) -> void;
 };

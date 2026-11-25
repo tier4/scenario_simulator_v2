@@ -32,4 +32,4 @@ inline auto concatenate = [](auto &&... xs) {
 }  // namespace scenario_simulator_exception
 }  // namespace common
 
-#endif  // OPENSCENARIO_INTERPRETER__CONCATENATE_HPP_
+#endif  // SCENARIO_SIMULATOR_EXCEPTION__CONCATENATE_HPP_

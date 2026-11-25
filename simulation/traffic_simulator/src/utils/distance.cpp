@@ -22,6 +22,7 @@
 #include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator/lanelet_wrapper/route.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -420,6 +421,151 @@ auto distanceToYieldStop(
   return std::nullopt;
 }
 
+static auto distanceToCrossingTraffic(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedEntityStatus & from_status,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>
+{
+  constexpr auto required_gap = 5.0;
+  constexpr auto distance_accuracy = 0.05;
+
+  // The other ways through the intersection from the same road. They overlap this lane, so
+  // conflictingLaneIds reports them, but they are not traffic to give way to.
+  const auto own_road_lane_ids = [](const lanelet::Id id) {
+    auto ids = lanelet::Ids();
+    for (const auto previous : lanelet_wrapper::lanelet_map::previousLaneletIds(id)) {
+      ids.push_back(previous);
+      for (const auto next : lanelet_wrapper::lanelet_map::nextLaneletIds(previous)) {
+        ids.push_back(next);
+      }
+    }
+    return ids;
+  };
+
+  // The lanes that give way to this one, and so may be ignored by it.
+  const auto released_lane_ids = [](const lanelet::Id id) {
+    const auto & lanelet = lanelet_wrapper::LaneletWrapper::map()->laneletLayer.get(id);
+    auto ids = lanelet::Ids();
+    for (const auto & right_of_way : lanelet.regulatoryElementsAs<lanelet::RightOfWay>()) {
+      if (const auto & prioritized = right_of_way->rightOfWayLanelets();
+          std::find(prioritized.begin(), prioritized.end(), lanelet) != prioritized.end()) {
+        for (const auto & yield : right_of_way->yieldLanelets()) {
+          ids.push_back(yield.id());
+        }
+      }
+    }
+    return ids;
+  };
+
+  // Whether the map says anything about which of the lanes this one crosses it may ignore.
+  const auto has_right_of_way = [](const lanelet::Id id) {
+    const auto & lanelet = lanelet_wrapper::LaneletWrapper::map()->laneletLayer.get(id);
+    for (const auto & right_of_way : lanelet.regulatoryElementsAs<lanelet::RightOfWay>()) {
+      if (const auto & prioritized = right_of_way->rightOfWayLanelets();
+          std::find(prioritized.begin(), prioritized.end(), lanelet) != prioritized.end()) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Whether a lane goes before every lane it crosses. Going straight on a green light does.
+  const auto has_priority_over_conflicts = [](const lanelet::Id id) {
+    const auto & lanelet = lanelet_wrapper::LaneletWrapper::map()->laneletLayer.get(id);
+    const auto & traffic_lights = lanelet.regulatoryElementsAs<lanelet::TrafficLight>();
+    if (lanelet.attributeOr("turn_direction", std::string()) == "straight") {
+      for (const auto & traffic_light : traffic_lights) {
+        if (traffic_light->stopLine()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  const auto edges = math::geometry::getDistancesFromCenterToEdge(from_status.getBoundingBox());
+
+  // Whether the body, stopped with its front the given distance ahead, enters the given lane.
+  // It is wider than the line these distances are measured along, so its corners enter first.
+  const auto enters = [&](const lanelet::Id id, const double distance) {
+    const auto pose = pose::toMapPose(lanelet_wrapper::pose::alongLaneletPose(
+      from_status.getLaneletPose(), following_lanelets, distance - edges.front));
+    for (const auto side : {edges.left, edges.right}) {
+      const auto corner = math::geometry::transformPoint(
+        pose, geometry_msgs::build<geometry_msgs::msg::Point>().x(edges.front).y(side).z(0.0));
+      if (lanelet_wrapper::lanelet_map::isInLanelet(id, corner)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Where the route meets each lane it has to give way to: the ones the given lane crosses,
+  // less the ones it may ignore, less the ones the body is in or the route has left behind: a
+  // distance to stop short of them is not one that can be stopped at. Empty when the map says
+  // nothing, so a lane without a RightOfWay gives way to no one.
+  const auto crossing_lane_ids = [&](const lanelet::Id lanelet_id) {
+    auto crossings = std::vector<std::pair<lanelet::Id, double>>();
+    if (has_right_of_way(lanelet_id) and not has_priority_over_conflicts(lanelet_id)) {
+      const auto released = released_lane_ids(lanelet_id);
+      const auto owning = own_road_lane_ids(lanelet_id);
+      for (const auto id : lanelet_wrapper::lanelet_map::conflictingLaneIds({lanelet_id})) {
+        if (
+          std::find(released.begin(), released.end(), id) == released.end() and
+          std::find(owning.begin(), owning.end(), id) == owning.end() and
+          not enters(id, edges.front)) {
+          if (const auto entering = distanceToCrosswalk(spline, id)) {
+            crossings.emplace_back(id, entering.value());
+          }
+        }
+      }
+    }
+    return crossings;
+  };
+
+  // Whether a vehicle is still in the way, measured to where its lane leaves the crossed one:
+  // one already past that point is no longer in the way, and so is a standing one short of it.
+  const auto is_approaching = [&](const auto & crossings, const lanelet::Id crossed_id) {
+    for (const auto & [id, entering] : crossings) {
+      if (
+        const auto crossing_s =
+          lanelet_wrapper::lanelet_map::centerPointsSpline(id)->getCollisionPointIn2D(
+            lanelet_wrapper::lanelet_map::laneletPolygon(crossed_id), true)) {
+        for (const auto & status : other_statuses) {
+          if (const auto & pose = status.getCanonicalizedLaneletPose()) {
+            if (const auto distance = lanelet_wrapper::distance::longitudinalDistance(
+                  static_cast<LaneletPose>(pose.value()),
+                  helper::constructLaneletPose(id, crossing_s.value(), 0.0));
+                distance and distance.value() <= status.getTwist().linear.x * required_gap) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  // The nearest distance the vehicle can stop at with its body out of a lane it gives way to.
+  auto min_distance = std::optional<double>();
+  for (const auto & lanelet_id : following_lanelets) {
+    if (const auto crossings = crossing_lane_ids(lanelet_id);
+        is_approaching(crossings, lanelet_id)) {
+      for (const auto & [id, entering] : crossings) {
+        // The line is in the lane at `entering`, so the gap to a distance the body is out of
+        // it at is halved until the two agree.
+        auto clear = 0.0, entered = entering;
+        while (distance_accuracy < entered - clear) {
+          const auto midpoint = (clear + entered) / 2.0;
+          (enters(id, midpoint) ? entered : clear) = midpoint;
+        }
+        min_distance = std::min(min_distance.value_or(clear), clear);
+      }
+    }
+  }
+  return min_distance;
+}
+
 auto distanceToNearestConflictingPose(
   const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
   const CanonicalizedEntityStatus & from_status,
@@ -475,6 +621,13 @@ auto distanceToNearestConflictingPose(
       }
     }
   }
+
+  if (
+    const auto distance =
+      distanceToCrossingTraffic(following_lanelets, spline, from_status, other_statuses)) {
+    try_min_distance(distance.value());
+  }
+
   return min_distance;
 }
 

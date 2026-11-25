@@ -74,6 +74,7 @@ def launch_setup(context, *args, **kwargs):
     architecture_type                           = LaunchConfiguration("architecture_type",                           default="awf/universe/20240605")
     autoware_launch_file                        = LaunchConfiguration("autoware_launch_file",                        default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package                     = LaunchConfiguration("autoware_launch_package",                     default=default_autoware_launch_package_of(architecture_type.perform(context)))
+    autoware_shutdown_timeout                   = LaunchConfiguration("autoware_shutdown_timeout",                   default=20)
     consider_acceleration_by_road_slope         = LaunchConfiguration("consider_acceleration_by_road_slope",         default=False)
     consider_pose_by_road_slope                 = LaunchConfiguration("consider_pose_by_road_slope",                 default=True)
     enable_perf                                 = LaunchConfiguration("enable_perf",                                 default=False)
@@ -92,13 +93,14 @@ def launch_setup(context, *args, **kwargs):
     pedestrian_ignore_see_around                = LaunchConfiguration("pedestrian_ignore_see_around",                default="blind")
     port                                        = LaunchConfiguration("port",                                        default=5555)
     publish_empty_context                       = LaunchConfiguration("publish_empty_context",                       default=False)
+    publish_visualization                       = LaunchConfiguration("publish_visualization",                       default=False)
     record                                      = LaunchConfiguration("record",                                      default=True)
     record_option                               = LaunchConfiguration("record_option",                               default="")
     record_storage_id                           = LaunchConfiguration("record_storage_id",                           default="")
     rviz_config                                 = LaunchConfiguration("rviz_config",                                 default=default_rviz_config_file())
     scenario                                    = LaunchConfiguration("scenario",                                    default=Path("/dev/null"))
     sensor_model                                = LaunchConfiguration("sensor_model",                                default="")
-    sigterm_timeout                             = LaunchConfiguration("sigterm_timeout",                             default=8)
+    sigterm_timeout                             = LaunchConfiguration("sigterm_timeout",                             default=30)
     simulate_localization                       = LaunchConfiguration("simulate_localization",                       default=True)
     speed_condition                             = LaunchConfiguration("speed_condition",                             default="legacy")
     status_monitor_threshold                    = LaunchConfiguration("status_monitor_threshold",                    default=10)
@@ -106,13 +108,14 @@ def launch_setup(context, *args, **kwargs):
     use_custom_centerline                       = LaunchConfiguration("use_custom_centerline",                       default=True)
     use_sim_time                                = LaunchConfiguration("use_sim_time",                                default=False)
     use_trajectory_based_front_entity_detection = LaunchConfiguration("use_trajectory_based_front_entity_detection", default=False)
-    vehicle_model                               = LaunchConfiguration("vehicle_model",                               default="")
+    vehicle_model                               = LaunchConfiguration("vehicle_model",                               default="default_vehicle")
     vehicle_id                                  = LaunchConfiguration("vehicle_id",                                  default="default")
     # fmt: on
 
     print(f"architecture_type                           := {architecture_type.perform(context)}")
     print(f"autoware_launch_file                        := {autoware_launch_file.perform(context)}")
     print(f"autoware_launch_package                     := {autoware_launch_package.perform(context)}")
+    print(f"autoware_shutdown_timeout                   := {autoware_shutdown_timeout.perform(context)}")
     print(f"consider_acceleration_by_road_slope         := {consider_acceleration_by_road_slope.perform(context)}")
     print(f"consider_pose_by_road_slope                 := {consider_pose_by_road_slope.perform(context)}")
     print(f"enable_perf                                 := {enable_perf.perform(context)}")
@@ -130,6 +133,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"pedestrian_ignore_see_around                := {pedestrian_ignore_see_around.perform(context)}")
     print(f"port                                        := {port.perform(context)}")
     print(f"publish_empty_context                       := {publish_empty_context.perform(context)}")
+    print(f"publish_visualization                       := {publish_visualization.perform(context)}")
     print(f"record                                      := {record.perform(context)}")
     print(f"record_option                               := {record_option.perform(context)}")
     print(f"record_storage_id                           := {record_storage_id.perform(context)}")
@@ -158,6 +162,7 @@ def launch_setup(context, *args, **kwargs):
             {"architecture_type": architecture_type},
             {"autoware_launch_file": autoware_launch_file},
             {"autoware_launch_package": autoware_launch_package},
+            {"autoware_shutdown_timeout": autoware_shutdown_timeout},
             {"consider_acceleration_by_road_slope": consider_acceleration_by_road_slope},
             {"consider_pose_by_road_slope": consider_pose_by_road_slope},
             {"initialize_duration": initialize_duration},
@@ -166,12 +171,12 @@ def launch_setup(context, *args, **kwargs):
             {"pedestrian_ignore_see_around": pedestrian_ignore_see_around},
             {"port": port},
             {"publish_empty_context" : publish_empty_context},
+            {"publish_visualization": publish_visualization},
             {"record": record},
             {"record_option": record_option},
             {"record_storage_id": record_storage_id},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
-            {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
             {"status_monitor_threshold": status_monitor_threshold},
@@ -184,17 +189,18 @@ def launch_setup(context, *args, **kwargs):
         ]
 
         def collect_vehicle_parameters():
-            if vehicle_model_name := vehicle_model.perform(context):
-                description = get_package_share_directory(vehicle_model_name + "_description")
-                return [
-                    description + "/config/vehicle_info.param.yaml",
-                    description + "/config/simulator_model.param.yaml",
-                ]
-            else:
-                return []
+            vehicle_model_name = vehicle_model.perform(context)
+            default_description = Path(
+                get_package_share_directory("default_vehicle_description")
+            )
+            description = Path(get_package_share_directory(vehicle_model_name + "_description"))
+            return [
+                str(default_description / "config" / "simulator_model.param.yaml"),
+                str(description / "config" / "vehicle_info.param.yaml"),
+                str(description / "config" / "simulator_model.param.yaml"),
+            ]
 
-        if (it := collect_vehicle_parameters()) != []:
-            parameters += it
+        parameters += collect_vehicle_parameters()
 
         def collect_prefixed_parameters():
             return [item[0][9:] + ':=' + item[1] for item in context.launch_configurations.items() if item[0][:9] == 'autoware.']
@@ -227,6 +233,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("architecture_type",                           default_value=architecture_type                          ),
         DeclareLaunchArgument("autoware_launch_file",                        default_value=autoware_launch_file                       ),
         DeclareLaunchArgument("autoware_launch_package",                     default_value=autoware_launch_package                    ),
+        DeclareLaunchArgument("autoware_shutdown_timeout",                   default_value=autoware_shutdown_timeout                  ),
         DeclareLaunchArgument("consider_acceleration_by_road_slope",         default_value=consider_acceleration_by_road_slope        ),
         DeclareLaunchArgument("consider_pose_by_road_slope",                 default_value=consider_pose_by_road_slope                ),
         DeclareLaunchArgument("enable_perf",                                 default_value=enable_perf                                ),
@@ -240,6 +247,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("parameter_file_path",                         default_value=parameter_file_path                        ),
         DeclareLaunchArgument("pedestrian_ignore_see_around",                default_value=pedestrian_ignore_see_around               ),
         DeclareLaunchArgument("publish_empty_context",                       default_value=publish_empty_context                      ),
+        DeclareLaunchArgument("publish_visualization",                       default_value=publish_visualization                      ),
         DeclareLaunchArgument("record_option",                               default_value=record_option                              ),
         DeclareLaunchArgument("rviz_config",                                 default_value=rviz_config                                ),
         DeclareLaunchArgument("scenario",                                    default_value=scenario                                   ),
