@@ -157,12 +157,13 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
   requestEngage("/api/external/set/engage", *this),
   requestInitialPose("/api/localization/initialize", *this, [] {
-    const auto timeout = common::getParameter<int>("initialize_localization", 10);
-    if (timeout <= 0) {
+    if (const auto timeout = common::getRequiredParameter<int>("initialize_localization");
+        0 < timeout) {
+      return std::chrono::seconds(timeout);
+    } else {
       throw common::SemanticError(
         "initialize_localization must be greater than 0 seconds; got ", timeout);
     }
-    return std::chrono::seconds(timeout);
   }()),
   // NOTE: routing takes a long time to return. But the specified duration is not decided by any technical reasons.
   requestSetRoute("/api/routing/set_route", *this, std::chrono::seconds(10)),
