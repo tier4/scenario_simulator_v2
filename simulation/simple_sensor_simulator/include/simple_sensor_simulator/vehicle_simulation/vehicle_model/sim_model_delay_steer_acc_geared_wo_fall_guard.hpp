@@ -43,12 +43,19 @@ public:
    * @param [in] steer_bias steering bias [rad]
    * @param [in] debug_acc_scaling_factor scaling factor for accel command
    * @param [in] debug_steer_scaling_factor scaling factor for steering command
+   * @param [in] k_us understeer gradient [s^2/m]; 0 keeps the ideal bicycle model
+   * @param [in] dec_delay time delay for decel command [s]
+   * @param [in] dec_time_constant time constant for 1D model of decel dynamics
+   * @param [in] debug_dec_scaling_factor scaling factor for decel command
+   * @param [in] dec_threshold pedal acceleration that separates accel and decel [m/ss]
    */
   SimModelDelaySteerAccGearedWoFallGuard(
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, double steer_dead_band, double steer_bias,
-    double debug_acc_scaling_factor, double debug_steer_scaling_factor);
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+    double dec_delay, double dec_time_constant, double debug_dec_scaling_factor,
+    double dec_threshold);
 
   /**
    * @brief default destructor
@@ -76,15 +83,28 @@ private:
   const double wheelbase_;       //!< @brief vehicle wheelbase length [m]
 
   std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
+  std::deque<double> dec_input_queue_;       //!< @brief buffer for decel command
   std::deque<double> steer_input_queue_;     //!< @brief buffer for steering command
   const double acc_delay_;                   //!< @brief time delay for accel command [s]
   const double acc_time_constant_;           //!< @brief time constant for accel dynamics
+  const double dec_delay_;                   //!< @brief time delay for decel command [s]
+  const double dec_time_constant_;           //!< @brief time constant for decel dynamics
   const double steer_delay_;                 //!< @brief time delay for steering command [s]
   const double steer_time_constant_;         //!< @brief time constant for steering dynamics
   const double steer_dead_band_;             //!< @brief dead band for steering angle [rad]
   const double steer_bias_;                  //!< @brief steering angle bias [rad]
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
+  const double debug_dec_scaling_factor_;    //!< @brief scaling factor for decel command
+  const double k_us_;                        //!< @brief understeer gradient [s^2/m]
+  const double dec_threshold_;               //!< @brief accel/decel boundary [m/ss]
+
+  /**
+   * @brief steady-state yaw rate including understeer:
+   *        ω = vx · tan(δ) / (L + k_us · vx²)
+   * Reduces to the ideal kinematic bicycle ω when k_us = 0.
+   */
+  double calc_yaw_rate(double vel, double steer) const;
 
   /**
    * @brief set queue buffer for input command

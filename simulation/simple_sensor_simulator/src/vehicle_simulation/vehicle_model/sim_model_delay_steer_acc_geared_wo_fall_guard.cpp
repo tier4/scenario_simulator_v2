@@ -23,7 +23,8 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double steer_bias,
-  double debug_acc_scaling_factor, double debug_steer_scaling_factor)
+  double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us, double dec_delay,
+  double dec_time_constant, double debug_dec_scaling_factor, double dec_threshold)
 : SimModelInterface(7 /* dim x */, 4 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
@@ -33,14 +34,25 @@ SimModelDelaySteerAccGearedWoFallGuard::SimModelDelaySteerAccGearedWoFallGuard(
   wheelbase_(wheelbase),
   acc_delay_(acc_delay),
   acc_time_constant_(std::max(acc_time_constant, MIN_TIME_CONSTANT)),
+  dec_delay_(dec_delay),
+  dec_time_constant_(std::max(dec_time_constant, MIN_TIME_CONSTANT)),
   steer_delay_(steer_delay),
   steer_time_constant_(std::max(steer_time_constant, MIN_TIME_CONSTANT)),
   steer_dead_band_(steer_dead_band),
   steer_bias_(steer_bias),
   debug_acc_scaling_factor_(std::max(debug_acc_scaling_factor, 0.0)),
-  debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0))
+  debug_steer_scaling_factor_(std::max(debug_steer_scaling_factor, 0.0)),
+  debug_dec_scaling_factor_(std::max(debug_dec_scaling_factor, 0.0)),
+  k_us_(k_us),
+  dec_threshold_(dec_threshold)
 {
   initializeInputQueue(dt);
+}
+
+double SimModelDelaySteerAccGearedWoFallGuard::calc_yaw_rate(double vel, double steer) const
+{
+  const double denom = wheelbase_ + k_us_ * vel * vel;
+  return vel * std::tan(steer) / denom;
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getX() { return state_(IDX::X); }
@@ -57,7 +69,7 @@ double SimModelDelaySteerAccGearedWoFallGuard::getAx() { return state_(IDX::ACCX
 
 double SimModelDelaySteerAccGearedWoFallGuard::getWz()
 {
-  return state_(IDX::VX) * std::tan(state_(IDX::STEER)) / wheelbase_;
+  return calc_yaw_rate(state_(IDX::VX), state_(IDX::STEER));
 }
 
 double SimModelDelaySteerAccGearedWoFallGuard::getSteer()
@@ -70,9 +82,14 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
 {
   Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
 
-  acc_input_queue_.push_back(input_(IDX_U::PEDAL_ACCX_DES));
-  delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_input_queue_.front();
+  // The pedal acceleration command is split into a drive channel and a brake channel so that each
+  // of them can carry its own dead time. The split is additive for any command u and any threshold
+  // d, because max(u, d) + min(u - d, 0) == u holds on both sides of d.
+  acc_input_queue_.push_back(std::max(input_(IDX_U::PEDAL_ACCX_DES), dec_threshold_));
+  dec_input_queue_.push_back(std::min(input_(IDX_U::PEDAL_ACCX_DES) - dec_threshold_, 0.0));
+  delayed_input(IDX_U::PEDAL_ACCX_DES) = acc_input_queue_.front() + dec_input_queue_.front();
   acc_input_queue_.pop_front();
+  dec_input_queue_.pop_front();
   steer_input_queue_.push_back(input_(IDX_U::STEER_DES));
   delayed_input(IDX_U::STEER_DES) = steer_input_queue_.front();
   steer_input_queue_.pop_front();
@@ -103,6 +120,10 @@ void SimModelDelaySteerAccGearedWoFallGuard::initializeInputQueue(const double &
   acc_input_queue_.resize(acc_input_queue_size);
   std::fill(acc_input_queue_.begin(), acc_input_queue_.end(), 0.0);
 
+  size_t dec_input_queue_size = static_cast<size_t>(round(dec_delay_ / dt));
+  dec_input_queue_.resize(dec_input_queue_size);
+  std::fill(dec_input_queue_.begin(), dec_input_queue_.end(), 0.0);
+
   size_t steer_input_queue_size = static_cast<size_t>(round(steer_delay_ / dt));
   steer_input_queue_.resize(steer_input_queue_size);
   std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), 0.0);
@@ -117,8 +138,13 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const double pedal_acc = sat(state(IDX::PEDAL_ACCX), vx_rate_lim_, -vx_rate_lim_);
   const double yaw = state(IDX::YAW);
   const double steer = state(IDX::STEER);
+  // Which actuator produces the command decides which parameters apply: below `dec_threshold_`
+  // it is the brake, so the decel gain and time constant are used. With the decel parameters left
+  // at the accel values both branches coincide.
+  const bool decelerating = input(IDX_U::PEDAL_ACCX_DES) < dec_threshold_;
   const double pedal_acc_des =
-    sat(input(IDX_U::PEDAL_ACCX_DES), vx_rate_lim_, -vx_rate_lim_) * debug_acc_scaling_factor_;
+    sat(input(IDX_U::PEDAL_ACCX_DES), vx_rate_lim_, -vx_rate_lim_) *
+    (decelerating ? debug_dec_scaling_factor_ : debug_acc_scaling_factor_);
   const double steer_des =
     sat(input(IDX_U::STEER_DES), steer_lim_, -steer_lim_) * debug_steer_scaling_factor_;
   // NOTE: `steer_des` is calculated by control from measured values. getSteer() also gets the
@@ -141,7 +167,7 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
 
   d_state(IDX::X) = vel * cos(yaw);
   d_state(IDX::Y) = vel * sin(yaw);
-  d_state(IDX::YAW) = vel * std::tan(steer) / wheelbase_;
+  d_state(IDX::YAW) = calc_yaw_rate(vel, steer);
   d_state(IDX::VX) = [&] {
     if (pedal_acc >= 0.0) {
       using autoware_vehicle_msgs::msg::GearCommand;
@@ -168,7 +194,8 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
     }
   }();
   d_state(IDX::STEER) = steer_rate;
-  d_state(IDX::PEDAL_ACCX) = -(pedal_acc - pedal_acc_des) / acc_time_constant_;
+  d_state(IDX::PEDAL_ACCX) =
+    -(pedal_acc - pedal_acc_des) / (decelerating ? dec_time_constant_ : acc_time_constant_);
 
   return d_state;
 }

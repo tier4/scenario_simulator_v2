@@ -14,4 +14,5 @@
     vel_time_constant: 0.1                 # Introduced as 0.5 in #338 (2021-06) and has been 0.1 since #351 (2021-06) for an unrecorded reason. The default of autoware_simple_planning_simulator is 0.5.
     debug_acc_scaling_factor: 1.0          # Unchanged since #1144 (2023-12). Equal to the default of autoware_simple_planning_simulator.
     debug_steer_scaling_factor: 1.0        # Unchanged since #1144 (2023-12). Equal to the default of autoware_simple_planning_simulator.
+    k_us: 0.0                              # Introduced in autoware_simple_planning_simulator#26 (2026-10). Equal to the default of autoware_simple_planning_simulator.
     acceleration_map_path: ""              # Unchanged since #1144 (2023-12). autoware_simple_planning_simulator has no default for this parameter.
