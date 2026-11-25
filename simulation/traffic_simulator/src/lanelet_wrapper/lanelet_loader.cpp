@@ -13,11 +13,12 @@
 // limitations under the License.
 
 #include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_io/io_handlers/Serialize.h>
 #include <yaml-cpp/yaml.h>
 
 #include <autoware_lanelet2_extension/projection/mgrs_projector.hpp>
 #include <autoware_lanelet2_extension/projection/transverse_mercator_projector.hpp>
-#include <autoware_lanelet2_extension/utility/query.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <get_parameter/get_parameter.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -114,6 +115,23 @@ auto LaneletLoader::load(const std::filesystem::path & lanelet_map_path) -> lane
     THROW_SIMULATION_ERROR(
       "Failed to load lanelet map: returned nullptr or lanelet layer is empty!");
   }
+}
+
+auto LaneletLoader::convertMapToBin(const lanelet::LaneletMapPtr lanelet_map_ptr)
+  -> autoware_map_msgs::msg::LaneletMapBin
+{
+  std::stringstream ss;
+  boost::archive::binary_oarchive oa(ss);
+  oa << *lanelet_map_ptr;
+  auto id_counter = lanelet::utils::getId();
+  oa << id_counter;
+  std::string tmp_str = ss.str();
+  autoware_map_msgs::msg::LaneletMapBin msg;
+  msg.data.clear();
+  msg.data.resize(tmp_str.size());
+  msg.data.assign(tmp_str.begin(), tmp_str.end());
+  msg.header.frame_id = "map";
+  return msg;
 }
 
 auto LaneletLoader::overwriteLaneletsCenterline(lanelet::LaneletMapPtr lanelet_map_ptr) -> void

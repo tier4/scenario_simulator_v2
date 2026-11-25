@@ -759,19 +759,11 @@ class TrafficLightTest : public testing::Test
 {
 protected:
   TrafficLightTest()
-  : map_manager(
-      ament_index_cpp::get_package_share_directory("traffic_simulator") +
-        "/map/standard_map/lanelet2_map.osm",
-      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-        .latitude(35.61836750154)
-        .longitude(139.78066608243)
-        .altitude(0.0))
   {
     const auto lanelet_path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
                               "/map/standard_map/lanelet2_map.osm";
     traffic_simulator::lanelet_map::activate(lanelet_path);
   }
-  hdmap_utils::HdMapUtils map_manager;
 };
 
 /**
@@ -781,7 +773,7 @@ protected:
 TEST_F(TrafficLightTest, contains_colorStatusShape)
 {
   {
-    auto traffic_light = TrafficLight(34802, map_manager);
+    auto traffic_light = TrafficLight(34802);
 
     traffic_light.bulbs.emplace(Color::red, Status::flashing, Shape::circle);
     traffic_light.bulbs.emplace(Color::green, Status::solid_on, Shape::right);
@@ -792,7 +784,7 @@ TEST_F(TrafficLightTest, contains_colorStatusShape)
   }
 
   {
-    auto traffic_light = TrafficLight(34802, map_manager);
+    auto traffic_light = TrafficLight(34802);
 
     traffic_light.bulbs.emplace("red flashing circle");
     traffic_light.bulbs.emplace("green solidOn right");
@@ -807,7 +799,7 @@ TEST_F(TrafficLightTest, contains_colorStatusShape)
  */
 TEST_F(TrafficLightTest, set_valid)
 {
-  auto traffic_light = TrafficLight(34802, map_manager);
+  auto traffic_light = TrafficLight(34802);
 
   traffic_light.set("red flashing circle, green solidOn right");
 

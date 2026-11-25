@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_
 #define OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -75,7 +75,7 @@ class OpenSCENARIOValidator
   static inline XMLPlatformLifecycleHandler xml_platform_lifecycle_handler;
 
 public:
-  explicit OpenSCENARIOValidator(boost::filesystem::path schema_path)
+  explicit OpenSCENARIOValidator(const std::filesystem::path & schema_path)
   : parser(std::make_unique<xercesc::XercesDOMParser>())
   {
     parser->setDoNamespaces(true);
@@ -83,10 +83,11 @@ public:
     parser->setErrorHandler(&error_handler);
     parser->setValidationSchemaFullChecking(true);
     parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
+
     parser->setExternalNoNamespaceSchemaLocation(schema_path.c_str());
   }
 
-  auto validate(const boost::filesystem::path & xml_file) -> void
+  auto validate(const std::filesystem::path & xml_file) -> void
   {
     parser->parse(xml_file.string().c_str());
   }

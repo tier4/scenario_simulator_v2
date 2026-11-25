@@ -16,6 +16,12 @@
 #define OPENSCENARIO_PREPROCESSOR__DERIVER_HPP_
 
 #include <boost/filesystem.hpp>
+#include <memory>
+
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
+#include <openscenario_interpreter/scenario_runtime.hpp>
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
@@ -27,7 +33,7 @@ namespace openscenario_preprocessor
 class Deriver
 {
 public:
-  explicit Deriver(boost::filesystem::path schema_path) : validate(schema_path) {}
+  explicit Deriver(boost::filesystem::path schema_path) : validate(schema_path.string()) {}
   auto operator()(boost::filesystem::path path, bool check_scenario_path = true)
     -> openscenario_interpreter::ParameterDistribution
   {
@@ -35,15 +41,27 @@ public:
     using openscenario_interpreter::ParameterValueDistribution;
     using openscenario_interpreter::ParameterValueDistributionDefinition;
 
-    validate(path);
+    validate(path.string());
 
-    if (OpenScenario script{path}; script.category.is<ParameterValueDistributionDefinition>()) {
+    /*
+       The runtime is used only by the elements of a scenario definition. It is
+       not available in the build without ROS, where only parameter value
+       distribution files can be read.
+    */
+#ifdef PARAMETER_VALUE_DISTRIBUTION_ONLY
+    const auto runtime = std::shared_ptr<openscenario_interpreter::ScenarioRuntime>();
+#else
+    const auto runtime = std::make_shared<openscenario_interpreter::ScenarioRuntime>();
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+
+    if (OpenScenario script{path.string(), runtime};
+        script.category.is<ParameterValueDistributionDefinition>()) {
       auto & parameter_value_distribution = script.category.as<ParameterValueDistribution>();
-      scenario_file_path = parameter_value_distribution.scenario_file.filepath;
+      scenario_file_path = parameter_value_distribution.scenario_file.filepath.string();
 
       if (not check_scenario_path || boost::filesystem::exists(scenario_file_path)) {
         if (check_scenario_path) {
-          validate(scenario_file_path);
+          validate(scenario_file_path.string());
         }
 
         scenario_file_doc.load_file(scenario_file_path.c_str());

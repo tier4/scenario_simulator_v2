@@ -18,6 +18,7 @@
 #include <openscenario_preprocessor_msgs/srv/check_derivative_remained.hpp>
 #include <openscenario_preprocessor_msgs/srv/derive.hpp>
 #include <openscenario_preprocessor_msgs/srv/load.hpp>
+#include <openscenario_preprocessor_msgs/srv/set_parameter.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 class PreprocessorNode : public rclcpp::Node, public openscenario_preprocessor::Preprocessor
@@ -67,6 +68,13 @@ public:
         -> void {
         auto lock = std::lock_guard(preprocessed_scenarios_mutex);
         response->derivative_remained = not preprocessed_scenarios.empty();
+      })),
+    set_parameter_server(create_service<openscenario_preprocessor_msgs::srv::SetParameter>(
+      "~/set_parameter",
+      [this](
+        const openscenario_preprocessor_msgs::srv::SetParameter::Request::SharedPtr request,
+        openscenario_preprocessor_msgs::srv::SetParameter::Response::SharedPtr) -> void {
+        override_parameters[request->name] = request->value;
       }))
   {
   }
@@ -78,6 +86,9 @@ private:
 
   rclcpp::Service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>::SharedPtr
     check_server;
+
+  rclcpp::Service<openscenario_preprocessor_msgs::srv::SetParameter>::SharedPtr
+    set_parameter_server;
 };
 
 int main(const int argc, char const * const * const argv)

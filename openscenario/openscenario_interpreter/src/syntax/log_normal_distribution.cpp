@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <cmath>
+#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/log_normal_distribution.hpp>
 

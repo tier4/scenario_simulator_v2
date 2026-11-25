@@ -116,8 +116,7 @@ auto API::updateEntitiesStatusInSim() -> bool
 auto API::updateTrafficLightsInSim() -> bool
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
-    const auto request =
-      traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
+    const auto request = traffic_lights_ptr_->generateConventionalUpdateRequest();
     return zeromq_client_.call(request).result().success();
   }
   /// @todo handle response
@@ -360,11 +359,6 @@ auto API::checkCollision(
 }
 
 // traffics, lanelet
-auto API::getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
-{
-  return entity_manager_ptr_->getHdmapUtils();
-}
-
 auto API::getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
 {
   return traffic_lights_ptr_->getV2ITrafficLights();
@@ -373,6 +367,26 @@ auto API::getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
 auto API::getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>
 {
   return traffic_lights_ptr_->getConventionalTrafficLights();
+}
+
+auto API::getV2IDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>
+{
+  return traffic_lights_ptr_->getV2IDetectedTrafficLights();
+}
+
+auto API::getConventionalDetectedTrafficLights() const -> std::shared_ptr<DetectedTrafficLights>
+{
+  return traffic_lights_ptr_->getConventionalDetectedTrafficLights();
+}
+
+auto API::setTrafficSignalV2IFeature(const lanelet::Id lanelet_id, const bool enabled) -> void
+{
+  traffic_lights_ptr_->setV2IFeature(lanelet_id, enabled);
+}
+
+auto API::isV2ITrafficLightEnabled(const lanelet::Id lanelet_id) const -> bool
+{
+  return traffic_lights_ptr_->isV2ITrafficLightEnabled(lanelet_id);
 }
 
 auto API::addTrafficSource(
@@ -388,7 +402,7 @@ auto API::addTrafficSource(
 
   traffic_controller_ptr_->addModule<traffic::TrafficSource>(
     radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
-    entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
+    [this, speed](const auto & name, auto &&... xs) {
       this->spawn(name, std::forward<decltype(xs)>(xs)...);
       getEntity(name).setLinearVelocity(speed);
     });

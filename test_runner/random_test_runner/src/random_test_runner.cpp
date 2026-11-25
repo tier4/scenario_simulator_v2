@@ -18,6 +18,7 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/optional/optional_io.hpp>
+#include <cstdlib>
 #include <memory>
 #include <random_test_runner/file_interactions/yaml_test_params_saver.hpp>
 #include <random_test_runner/lanelet_utils.hpp>
@@ -33,6 +34,18 @@
 RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 : Node("random_test_runner", option), error_reporter_(get_logger())
 {
+  if (not declare_parameter<bool>("acknowledge_deprecation", false)) {
+    RCLCPP_FATAL_STREAM(
+      get_logger(),
+      "random_test_runner is deprecated and will be removed on or after 2027-03-01. No "
+      "replacement will be provided. To keep using random_test_runner until the removal, pass "
+      "acknowledge_deprecation:=true to random_test.launch.py (or -p "
+      "acknowledge_deprecation:=true to ros2 run). If the removal affects you, please contact "
+      "the code owners listed in .github/CODEOWNERS of scenario_simulator_v2.");
+    rclcpp::shutdown();
+    std::exit(EXIT_FAILURE);
+  }
+
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
     if (not has_parameter("consider_pose_by_road_slope")) {
       declare_parameter("consider_pose_by_road_slope", false);
@@ -153,12 +166,12 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
     architectureTypeFromString(this->declare_parameter<std::string>("architecture_type", ""));
   tp.simulator_host = this->declare_parameter<std::string>("simulator_host", "localhost");
 
-  if (!tp.input_dir.empty() && !boost::filesystem::is_directory(tp.input_dir)) {
+  if (!tp.input_dir.empty() && !std::filesystem::is_directory(tp.input_dir)) {
     throw std::runtime_error(
       fmt::format("Input directory {} does not exists or is not a directory", tp.input_dir));
   }
 
-  if (tp.output_dir.empty() || !boost::filesystem::is_directory(tp.output_dir)) {
+  if (tp.output_dir.empty() || !std::filesystem::is_directory(tp.output_dir)) {
     throw std::runtime_error(fmt::format(
       "Output directory {} is empty, does not exists or is not a directory", tp.output_dir));
   }

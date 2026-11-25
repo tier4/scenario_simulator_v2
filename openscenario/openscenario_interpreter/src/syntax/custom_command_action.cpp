@@ -13,11 +13,13 @@
 // limitations under the License.
 
 #include <iterator>  // std::distance
+#include <openscenario_interpreter/entity_operations.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/content.hpp>
 #include <openscenario_interpreter/regex/function_call_expression.hpp>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
@@ -104,17 +106,15 @@ struct ApplyFaultInjectionAction : public CustomCommand
 };
 
 template <auto Version>
-struct ApplyPseudoTrafficSignalDetectorConfidenceSetAction
-: public CustomCommand,
-  public SimulatorCore::NonStandardOperation
+struct ApplyPseudoTrafficSignalDetectorConfidenceSetAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> void override
+  auto start(const Scope & scope) -> void override
   {
     static_assert(0 < Version and Version <= 1);
     if (parameters.size() == 2) {
-      setConventionalTrafficLightConfidence(
+      scope.runtime().trafficSignals().setConventionalTrafficLightConfidence(
         std::stoi(parameters.at(0)), std::stod(parameters.at(1)));
     } else {
       throw Error(
@@ -146,12 +146,11 @@ struct ApplyRequestToCorporateCommandAction : public CustomCommand,
   }
 };
 
-struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
-                                          public SimulatorCore::NonStandardOperation
+struct ApplyV2ITrafficSignalStateAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
-  auto start(const Scope &) -> void override
+  auto start(const Scope & scope) -> void override
   {
     auto unquote = [](auto s) {
       std::stringstream(s) >> std::quoted(s);
@@ -160,11 +159,12 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
 
     switch (parameters.size()) {
       case 3:
-        resetV2ITrafficLightPublishRate(boost::lexical_cast<double>(parameters[2]));
+        scope.runtime().trafficSignals().resetV2ITrafficLightPublishRate(
+          boost::lexical_cast<double>(parameters[2]));
         [[fallthrough]];
 
       case 2:
-        setV2ITrafficLightsState(
+        scope.runtime().trafficSignals().setV2ITrafficLightsState(
           boost::lexical_cast<std::int64_t>(parameters[0]), unquote(parameters.at(1)));
         break;
 
@@ -177,18 +177,55 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
   }
 };
 
-struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::ActionApplication
+struct EnableTrafficSignalV2IFeatureAction : public CustomCommand
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope & scope) -> void override
+  {
+    if (parameters.empty()) {
+      throw Error(
+        "EnableTrafficSignalV2IFeature requires at least 1 argument (traffic signal IDs). "
+        "Usage: EnableTrafficSignalV2IFeatureAction(id1, id2, ...)");
+    }
+    for (const auto & parameter : parameters) {
+      scope.runtime().trafficSignals().setTrafficSignalV2IFeature(
+        boost::lexical_cast<std::int64_t>(parameter), true);
+    }
+  }
+};
+
+struct DisableTrafficSignalV2IFeatureAction : public CustomCommand
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope & scope) -> void override
+  {
+    if (parameters.empty()) {
+      throw Error(
+        "DisableTrafficSignalV2IFeatureAction requires at least 1 argument (traffic signal IDs). "
+        "Usage: DisableTrafficSignalV2IFeatureAction(id1, id2, ...)");
+    }
+    for (const auto & parameter : parameters) {
+      scope.runtime().trafficSignals().setTrafficSignalV2IFeature(
+        boost::lexical_cast<std::int64_t>(parameter), false);
+    }
+  }
+};
+
+struct ApplyWalkStraightAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
   auto start(const Scope & scope) -> void override
   {
     for (const auto & actor : parameters) {
-      applyWalkStraightAction(actor);
+      scope.runtime().entities().applyWalkStraightAction(actor);
     }
 
     for (const auto & actor : scope.actors) {
-      actor.apply([&](const auto & object) { applyWalkStraightAction(object); });
+      actor.apply(
+        [&](const auto & object) { scope.runtime().entities().applyWalkStraightAction(object); });
     }
   };
 };
@@ -229,13 +266,17 @@ struct DummyLongRunningAction : public CustomCommand, private SimulatorCore::Con
       if (auto e = scope.ref(scope.name); e.is_also<StoryboardElement>()) {
         e.as<StoryboardElement>().addTransitionCallback(
           StoryboardElementState::runningState, [name = scope.name](auto &&) {
-            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
-                      << " transitions to runningState" << std::endl;
+            RCLCPP_INFO_STREAM(
+              rclcpp::get_logger("DummyLongRunningAction"),
+              "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
+                  << " transitions to runningState");
           });
         e.as<StoryboardElement>().addTransitionCallback(
           StoryboardElementState::completeState, [name = scope.name](auto &&) {
-            std::cout << "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
-                      << " transitions to completeState" << std::endl;
+            RCLCPP_INFO_STREAM(
+              rclcpp::get_logger("DummyLongRunningAction"),
+              "[" << std::setprecision(2) << evaluateSimulationTime() << "s] " << name
+                  << " transitions to completeState");
           });
       }
     }
@@ -263,7 +304,8 @@ struct PrintParameter : public CustomCommand
   auto start(const Scope & scope) -> void override
   {
     for (auto && parameter : parameters) {
-      std::cout << parameter << " = " << scope.ref(parameter) << std::endl;
+      RCLCPP_INFO_STREAM(
+        rclcpp::get_logger("PrintParameter"), parameter << " = " << scope.ref(parameter));
     }
   }
 };
@@ -274,11 +316,12 @@ struct TestCommand : public CustomCommand
 
   auto start(const Scope &) -> void override
   {
-    std::cout << "test" << std::endl;
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("TestCommand"), "test");
 
     for (auto iter = std::cbegin(parameters); iter != std::cend(parameters); ++iter) {
-      std::cout << "  parameters[" << std::distance(std::cbegin(parameters), iter)
-                << "] = " << *iter << std::endl;
+      RCLCPP_INFO_STREAM(
+        rclcpp::get_logger("TestCommand"),
+        "  parameters[" << std::distance(std::cbegin(parameters), iter) << "] = " << *iter);
     }
   }
 };
@@ -308,6 +351,8 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
     std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
     commands{
       // clang-format off
+      ELEMENT("DisableTrafficSignalV2IFeatureAction@v1", DisableTrafficSignalV2IFeatureAction),
+      ELEMENT("EnableTrafficSignalV2IFeatureAction@v1", EnableTrafficSignalV2IFeatureAction),
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),

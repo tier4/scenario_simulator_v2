@@ -22,6 +22,8 @@
 #include <openscenario_preprocessor/deriver.hpp>
 #include <openscenario_preprocessor/schema.hpp>
 #include <queue>
+#include <string>
+#include <unordered_map>
 
 namespace openscenario_preprocessor
 {
@@ -84,6 +86,8 @@ protected:
   std::queue<boost::filesystem::path> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
+
+  std::unordered_map<std::string, std::string> override_parameters;
 
   Deriver derive;
 

@@ -16,6 +16,7 @@
 #include <boost/lexical_cast.hpp>
 #include <cassert>
 #include <iterator>
+#include <openscenario_interpreter/scenario_runtime.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -48,9 +49,9 @@ auto EnvironmentFrame::resolvePrefix(const Prefixed<Name> & prefixed_name) const
 {
   std::list<const EnvironmentFrame *> result;
 
-  boost::range::for_each(
-    inner_frames.equal_range(prefixed_name.prefixes.front()),
-    [&](auto && name_and_frame) { result.push_back(name_and_frame.second); });
+  const auto it = inner_frames.equal_range(prefixed_name.prefixes.front());
+  std::for_each(
+    it.first, it.second, [&](auto && name_and_frame) { result.push_back(name_and_frame.second); });
 
   if (result.empty()) {
     // BUG: must be breadth first search
@@ -91,10 +92,12 @@ auto EnvironmentFrame::lookupFrame(const Prefixed<Name> & prefixed_name) const
   }
 }
 
-Scope::Scope(const OpenScenario * const open_scenario)
+Scope::Scope(
+  const OpenScenario * const open_scenario, std::shared_ptr<ScenarioRuntime> scenario_runtime)
 : open_scenario(open_scenario),
   frame(new EnvironmentFrame()),
-  scenario_definition(std::make_shared<ScenarioDefinition>())
+  scenario_definition(std::make_shared<ScenarioDefinition>()),
+  scenario_runtime(std::move(scenario_runtime))
 {
 }
 
@@ -102,6 +105,7 @@ Scope::Scope(const std::string & name, const Scope & outer)
 : open_scenario(outer.open_scenario),
   frame(std::shared_ptr<EnvironmentFrame>(new EnvironmentFrame(*outer.frame, name))),
   scenario_definition(outer.scenario_definition),
+  scenario_runtime(outer.scenario_runtime),
   name(name)
 #ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
   ,
@@ -131,6 +135,8 @@ auto Scope::global() -> ScenarioDefinition &
 auto Scope::local() const noexcept -> const Scope & { return *this; }
 
 auto Scope::local() noexcept -> Scope & { return *this; }
+
+auto Scope::runtime() const noexcept -> ScenarioRuntime & { return *scenario_runtime; }
 
 auto Scope::insert(const Name & identifier, const Object & object) -> void
 {

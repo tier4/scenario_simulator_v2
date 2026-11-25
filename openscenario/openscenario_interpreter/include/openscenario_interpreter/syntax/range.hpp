@@ -35,18 +35,18 @@ inline namespace syntax
 */
 struct Range
 {
-  const Double lower_limit = Double::infinity();
+  /*
+     The default is the range without limits. It is used when `Range` is
+     omitted, which the schema allows for `LogNormalDistribution`,
+     `NormalDistribution` and `PoissonDistribution`.
+  */
+  const Double lower_limit = -Double::infinity();
 
-  const Double upper_limit = -Double::infinity();
+  const Double upper_limit = Double::infinity();
 
   Range() = default;
 
   explicit Range(const pugi::xml_node &, Scope &);
-
-  auto evaluate(const Double::value_type value) const -> Double::value_type
-  {
-    return std::clamp(value, lower_limit.data, upper_limit.data);
-  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

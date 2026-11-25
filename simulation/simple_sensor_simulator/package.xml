@@ -2,10 +2,12 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>21.3.0</version>
+  <version>25.0.22</version>
   <description>simple_sensor_simulator package</description>
 
-  <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
+  <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
+  <maintainer email="shota.minami.2@tier4.jp">Shota Minami</maintainer>
+  <maintainer email="tatsuya.yamasaki@tier4.jp">Tatsuya Yamasaki</maintainer>
 
   <license>Apache License 2.0</license>
 
@@ -60,6 +62,7 @@
   <test_depend>ament_cmake_pep257</test_depend>
   <test_depend>ament_cmake_xmllint</test_depend>
   <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>default_vehicle_description</test_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

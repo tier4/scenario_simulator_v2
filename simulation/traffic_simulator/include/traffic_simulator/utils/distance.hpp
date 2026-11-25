@@ -36,13 +36,6 @@ auto lateralDistance(
   const double matching_distance, const RoutingConfiguration & routing_configuration)
   -> std::optional<double>;
 
-// Lateral (unit: lanes)
-auto countLaneChanges(
-  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  const traffic_simulator::RoutingConfiguration & routing_configuration,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<std::pair<int, int>>;
-
 // Longitudinal
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
@@ -138,6 +131,15 @@ auto distanceToCrosswalk(Ts &&... xs)
 auto distanceToYieldStop(
   const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>;
+
+/*
+  Here it is required to pass the CanonicalizedEntityStatus vector, instead of just
+  the CanonicalizedLaneletPose vector, since it is necessary to know the msg::BoundingBox of each Entity
+*/
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const CanonicalizedEntityStatus & from_status,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>;
 
 // spline
 auto distanceToSpline(

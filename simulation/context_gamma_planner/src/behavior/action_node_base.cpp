@@ -32,10 +32,6 @@ auto ActionNodeBase::getBlackBoardValues() -> void
     THROW_SIMULATION_ERROR("failed to get input current_time in ActionNode");
   }
 
-  if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils)) {
-    THROW_SIMULATION_ERROR("failed to get input hdmap_utils in ActionNode");
-  }
-
   if (!getInput<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>(
         "canonicalized_entity_status", entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input canonicalized_entity_status in ActionNode");
@@ -45,7 +41,8 @@ auto ActionNodeBase::getBlackBoardValues() -> void
     target_speed = std::nullopt;
   }
 
-  if (!getInput<entity_behavior::EntityStatusDict>("other_entity_status", other_entity_status)) {
+  if (!getInput<traffic_simulator::OtherEntityStatuses>(
+        "other_entity_status", other_entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status in ActionNode");
   }
   if (!getInput<std::vector<lanelet::Id>>("route_lanelets", route_lanelets)) {

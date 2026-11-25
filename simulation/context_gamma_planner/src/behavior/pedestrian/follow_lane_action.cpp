@@ -41,7 +41,7 @@ BT::NodeStatus FollowLaneAction::tick()
     max_speed = planner_.getMaxSpeed();
   }
   // update waypoints
-  planner_.setWaypoints(hdmap_utils, route_lanelets);
+  planner_.setWaypoints(route_lanelets);
   if (const auto next_goal = planner_.calculateNextGoalPoint()) {
     setOutput("next_goal", next_goal.value());
   } else {
