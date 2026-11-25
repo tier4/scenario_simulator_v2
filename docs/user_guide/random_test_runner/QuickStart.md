@@ -1,5 +1,12 @@
 # Random test runner
 
+!!! warning
+    `random_test_runner` is deprecated and will be removed on or after 2027-03-01. No replacement will be provided.
+
+    `random_test_runner` does not start unless the launch argument `acknowledge_deprecation:=true` is given (`-p acknowledge_deprecation:=true` if the node is started with `ros2 run`).
+
+    If the removal affects you, please contact the code owners listed in [`.github/CODEOWNERS`](https://github.com/tier4/scenario_simulator_v2/blob/master/.github/CODEOWNERS).
+
 Random test runner allows running randomly generated scenarios to test Autoware autonomy implementation. For more information regarding Random test runner features and limitations please see [Usage](Usage.md#features).
 
 ## How to build
@@ -46,7 +53,7 @@ Being in the main project directory run:
 
 ```shell
 source install/setup.bash
-ros2 launch random_test_runner random_test.launch.py
+ros2 launch random_test_runner random_test.launch.py acknowledge_deprecation:=true
 ```
 
 Which will run random tests with default parameters. Similarly to the image below you should see several npcs spawned in random locations around the ego vehicle, which will move on random path following the goal.
@@ -80,7 +87,7 @@ Prerequisites:
 4. Execute:
 
 ```shell
-ros2 launch random_test_runner random_test.launch.py input_dir:=<some_directory>
+ros2 launch random_test_runner random_test.launch.py acknowledge_deprecation:=true input_dir:=<some_directory>
 ```
 
 Random test runner will load `result.yaml` file and rerun test.
@@ -146,7 +153,7 @@ Random test runner will load `result.yaml` file and rerun test.
 3. Launch `random_test_runner`.
 
 ```bash
-ros2 launch random_test_runner random_test.launch.py map_name:=shinjuku_map simulator_type:=awsim \
+ros2 launch random_test_runner random_test.launch.py acknowledge_deprecation:=true map_name:=shinjuku_map simulator_type:=awsim \
 npc_count:=5 initialize_duration:=260 sensor_model:=awsim_sensor_kit  vehicle_model:=sample_vehicle  \
 autoware_launch_file:=e2e_simulator.launch.xml autoware_architecture:="awf/universe/20250130"
 ```

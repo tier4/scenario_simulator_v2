@@ -119,6 +119,7 @@ See www.asam.net/license.html for further details.
 					<xsd:enumeration value="none"/>
 					<xsd:enumeration value="rising"/>
 					<xsd:enumeration value="risingOrFalling"/>
+					<xsd:enumeration value="sticky"/>
 				</xsd:restriction>
 			</xsd:simpleType>
 			<xsd:simpleType>

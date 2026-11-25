@@ -25,5 +25,20 @@ DeterministicSingleParameterDistribution::DeterministicSingleParameterDistributi
   parameter_name(readAttribute<String>("parameterName", node, scope))
 {
 }
+
+auto DeterministicSingleParameterDistribution::derive() -> ParameterDistribution
+{
+  ParameterDistribution distribution;
+  return apply<ParameterDistribution>(
+    [&](auto & unnamed_distribution) {
+      ParameterDistribution distribution;
+      for (const auto & unnamed_parameter : unnamed_distribution.derive()) {
+        distribution.emplace_back(
+          std::make_shared<ParameterSet>(ParameterSet{{parameter_name, unnamed_parameter}}));
+      }
+      return distribution;
+    },
+    *this);
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

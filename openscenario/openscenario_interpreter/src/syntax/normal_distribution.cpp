@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cmath>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/normal_distribution.hpp>
 
@@ -25,10 +26,23 @@ NormalDistribution::NormalDistribution(
   range(readElement<Range>("Range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   variance(readAttribute<Double>("variance", node, scope)),
-  distribute(static_cast<double>(expected_value.data), static_cast<double>(variance.data))
+  distribute(
+    static_cast<double>(expected_value.data), std::sqrt(static_cast<double>(variance.data)))
 {
 }
 
-auto NormalDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
+auto NormalDistribution::derive() -> Object
+{
+  return make<Double>([&]() {
+    double value;
+    auto in_range = [this](double value) {
+      return range.lower_limit.data <= value and value <= range.upper_limit.data;
+    };
+    do {
+      value = distribute(random_engine);
+    } while (not in_range(value));
+    return value;
+  }());
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
