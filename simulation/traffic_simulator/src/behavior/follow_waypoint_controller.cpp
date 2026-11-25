@@ -41,20 +41,9 @@ auto FollowWaypointController::clampAcceleration(
       accelerationWithJerkConstraint(speed, target_speed, max_deceleration_rate),
       -max_deceleration);
   } else {
-    const auto [local_min_acceleration, local_max_acceleration] =
+    auto [local_min_acceleration, local_max_acceleration] =
       getAccelerationLimits(acceleration, speed);
-    /*
-       Rounding can leave local_min_acceleration greater than local_max_acceleration by less than
-       the tolerance of getAccelerationLimits. Calling std::clamp with such bounds is undefined
-       behavior, and its result differs between libstdc++ 11 and libstdc++ 12 or later.
-    */
-    if (candidate_acceleration < local_min_acceleration) {
-      return local_min_acceleration;
-    } else if (local_max_acceleration < candidate_acceleration) {
-      return local_max_acceleration;
-    } else {
-      return candidate_acceleration;
-    }
+    return std::clamp(candidate_acceleration, local_min_acceleration, local_max_acceleration);
   }
 }
 
