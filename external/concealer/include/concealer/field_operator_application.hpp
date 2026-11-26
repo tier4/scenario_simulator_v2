@@ -18,6 +18,7 @@
 #include <sys/wait.h>
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/msg/route.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
@@ -28,7 +29,6 @@
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/legacy_autoware_state.hpp>
-#include <concealer/path_with_lane_id.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/service.hpp>
 #include <concealer/subscriber.hpp>
@@ -91,6 +91,7 @@ struct FieldOperatorApplication : public rclcpp::Node
   using AutoModeWithModule              = tier4_rtc_msgs::srv::AutoModeWithModule;
   using SetVelocityLimit                = tier4_external_api_msgs::srv::SetVelocityLimit;
   using ChangeOperationMode             = autoware_adapi_v1_msgs::srv::ChangeOperationMode;
+  using Route                           = autoware_adapi_v1_msgs::msg::Route;
 
   Subscriber<AutowareState>                   getAutowareState;
   Subscriber<Control>                         getCommand;
@@ -103,7 +104,7 @@ struct FieldOperatorApplication : public rclcpp::Node
 #if __has_include(<autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>)
   Subscriber<OperationModeState>              getOperationModeState;
 #endif
-  Subscriber<priority::PathWithLaneId>        getPathWithLaneId;
+  Subscriber<Route>        getRoute;
 #if __has_include(<autoware_adapi_v1_msgs/msg/route_state.hpp>)
   Subscriber<RouteState>                      getRouteState;
 #endif

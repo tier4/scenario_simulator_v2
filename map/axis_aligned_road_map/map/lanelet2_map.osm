@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  A straight road with two lanes that run along the y axis of the map frame.
+  Lanelet 21 (the left lane) spans x from 10 to 14 and lanelet 22 (the right
+  lane) spans x from 14 to 18, both over y from 10 to 210, in the 100 km grid
+  square 54SVE of MGRS. Since the loader projects the latitude and longitude,
+  they are written with enough digits to keep the lanes parallel to the axis.
+-->
+<osm generator="VMB">
+  <MetaInfo format_version="1" map_version="1"/>
+  <node id="1" lat="35.238178687493154" lon="139.90106785751226">
+    <tag k="local_x" v="10"/>
+    <tag k="local_y" v="10"/>
+    <tag k="ele" v="0"/>
+  </node>
+  <node id="2" lat="35.239981771849273" lon="139.90104353252121">
+    <tag k="local_x" v="10"/>
+    <tag k="local_y" v="210"/>
+    <tag k="ele" v="0"/>
+  </node>
+  <node id="3" lat="35.238179086607801" lon="139.90111181199305">
+    <tag k="local_x" v="14"/>
+    <tag k="local_y" v="10"/>
+    <tag k="ele" v="0"/>
+  </node>
+  <node id="4" lat="35.239982170990423" lon="139.90108748797445">
+    <tag k="local_x" v="14"/>
+    <tag k="local_y" v="210"/>
+    <tag k="ele" v="0"/>
+  </node>
+  <node id="5" lat="35.238179485706496" lon="139.90115576647469">
+    <tag k="local_x" v="18"/>
+    <tag k="local_y" v="10"/>
+    <tag k="ele" v="0"/>
+  </node>
+  <node id="6" lat="35.239982570115608" lon="139.90113144342854">
+    <tag k="local_x" v="18"/>
+    <tag k="local_y" v="210"/>
+    <tag k="ele" v="0"/>
+  </node>
+  <way id="11">
+    <nd ref="1"/>
+    <nd ref="2"/>
+    <tag k="type" v="line_thin"/>
+    <tag k="subtype" v="solid"/>
+  </way>
+  <way id="12">
+    <nd ref="3"/>
+    <nd ref="4"/>
+    <tag k="type" v="line_thin"/>
+    <tag k="subtype" v="dashed"/>
+  </way>
+  <way id="13">
+    <nd ref="5"/>
+    <nd ref="6"/>
+    <tag k="type" v="line_thin"/>
+    <tag k="subtype" v="solid"/>
+  </way>
+  <relation id="21">
+    <member type="way" role="left" ref="11"/>
+    <member type="way" role="right" ref="12"/>
+    <tag k="type" v="lanelet"/>
+    <tag k="subtype" v="road"/>
+    <tag k="speed_limit" v="50"/>
+    <tag k="location" v="urban"/>
+    <tag k="one_way" v="yes"/>
+  </relation>
+  <relation id="22">
+    <member type="way" role="left" ref="12"/>
+    <member type="way" role="right" ref="13"/>
+    <tag k="type" v="lanelet"/>
+    <tag k="subtype" v="road"/>
+    <tag k="speed_limit" v="50"/>
+    <tag k="location" v="urban"/>
+    <tag k="one_way" v="yes"/>
+  </relation>
+</osm>

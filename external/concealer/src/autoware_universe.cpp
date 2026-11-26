@@ -28,9 +28,7 @@ AutowareUniverse::AutowareUniverse(bool simulate_localization) try
   getCommand("/control/command/control_cmd", rclcpp::QoS(1), *this),
   getGearCommand("/control/command/gear_cmd", rclcpp::QoS(1), *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", rclcpp::QoS(1), *this),
-  getPathWithLaneId(
-    "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", rclcpp::QoS(1),
-    *this),
+  getRoute("/api/routing/route", rclcpp::QoS(1).transient_local(), *this),
   setAcceleration(
     simulate_localization ? "/localization/acceleration"
                           : "/simulation/debug/localization/acceleration",
@@ -225,15 +223,6 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<double, double, d
     gear_command.command);
 }
 
-auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
-{
-  std::vector<std::int64_t> ids{};
-  for (const auto & point : getPathWithLaneId().points) {
-    std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
-  }
-  return ids;
-}
-
 auto AutowareUniverse::getControlModeReport() const -> ControlModeReport
 {
   ControlModeReport message;
@@ -244,5 +233,24 @@ auto AutowareUniverse::getControlModeReport() const -> ControlModeReport
 auto AutowareUniverse::setManualMode() -> void
 {
   current_control_mode.store(ControlModeReport::MANUAL);
+}
+
+auto getRouteLanelets(const autoware_adapi_v1_msgs::msg::Route & route) -> std::vector<std::int64_t>
+{
+  /*
+     RouteSegment::preferred holds only the lane that leads to the goal. Until
+     a lane change is done, the vehicle is on a lane that appears only in
+     RouteSegment::alternatives.
+  */
+  std::vector<std::int64_t> ids{};
+  for (const auto & route_data : route.data) {
+    for (const auto & segment : route_data.segments) {
+      ids.push_back(segment.preferred.id);
+      for (const auto & alternative : segment.alternatives) {
+        ids.push_back(alternative.id);
+      }
+    }
+  }
+  return ids;
 }
 }  // namespace concealer

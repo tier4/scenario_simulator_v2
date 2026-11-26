@@ -37,7 +37,7 @@ from scenario_test_runner.shutdown_once import ShutdownOnce
 def architecture_types():
     # awf/universe/20230906: autoware_perception_msgs/TrafficSignalArray for traffic lights
     # awf/universe/20240605: autoware_perception_msgs/TrafficLightGroupArray for traffic lights
-    # awf/universe/20250130: [Pilot.Auto >= 0.41.1] autoware_internal_planning_msgs/msg/PathWithLaneId for concealer
+    # awf/universe/20250130: [Pilot.Auto >= 0.41.1] the same as awf/universe/20240605 (it used to select autoware_internal_planning_msgs/msg/PathWithLaneId for concealer)
     return ["awf/universe/20230906", "awf/universe/20240605", "awf/universe/20250130"]
 
 

@@ -1,0 +1,224 @@
+OpenSCENARIO:
+  FileHeader:
+    author: Tatsuya Yamasaki
+    date: '2026-11-24T00:00:00+09:00'
+    description: |
+      Test that an entity teleported onto the adjacent lane is matched to the
+      lane it is on, not to the lane it was on.
+
+      When the lanelet pose of an entity is calculated from its map pose, the
+      candidate lanelets are tried in order and the first one that matches is
+      taken. A candidate matches if the line segment that passes through the
+      entity perpendicular to its heading, as long as the matching distance on
+      each side, intersects the centerline of the lanelet. Only if no candidate
+      matches, the lanelets around the entity are searched.
+
+      The intersection test used to locate the intersection on the segment
+      along both the x and y axes, and to accept it if either of the two was
+      within the segment whenever they disagreed. If the segment is almost
+      parallel to an axis, one of the two is a division by a nearly zero value
+      and is decided by rounding errors. As a result, on a road that runs
+      along an axis, a lanelet whose centerline is farther than the matching
+      distance was reported as matching, with an offset as large as the lane
+      width.
+
+      This was found when the candidate lanelets of Ego were changed to come
+      from /api/routing/route. Ego was driving on the right lane toward a goal
+      on the left lane, so the route listed the left lane first. Ego was
+      matched to the left lane with an offset of -4 m while it was still on
+      the right lane, and scenarios that watched the distance to the goal in
+      the lane coordinate system failed (UC-v3-H-01-00004 of RJD-1666).
+
+      This scenario reproduces the same situation without Autoware. The
+      candidate for an entity teleported by WorldPosition is the lanelet it
+      was on, so the entity "vehicle" is placed on the left lane (lanelet 21)
+      and then teleported to the center of the right lane (lanelet 22), 4 m to
+      the right. The matching distance of the vehicle is about 2.3 m, so
+      lanelet 21 must not match.
+
+      The false match needs the two conditions below, which the destination
+      of the teleport is chosen to satisfy.
+      - The heading deviates from the direction of the lane by a small amount
+        other than zero. Here it is 1e-8 rad.
+      - The entity is abeam of a control point of the centerline. The control
+        points are placed every 2 m from the start of the lanelet (y = 10).
+
+      The scenario succeeds if the longitudinal distance from the vehicle to
+      the position 20 m ahead on lanelet 22 is 20 m in the lane coordinate
+      system. The distance is NaN if the vehicle is matched to lanelet 21.
+    revMajor: 1
+    revMinor: 3
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share axis_aligned_road_map)/map
+  Entities:
+    ScenarioObject:
+      - name: vehicle
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: vehicle
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '21'
+                      s: 100
+                      offset: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      dynamicsShape: step
+                      value: 0
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+    Story:
+      - name: ''
+        Act:
+          - name: teleport
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: vehicle
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            PrivateAction:
+                              TeleportAction:
+                                Position:
+                                  WorldPosition:
+                                    x: 16
+                                    y: 110
+                                    z: 0
+                                    # pi / 2 + 1e-8
+                                    h: 1.5707963367948966
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: check
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: success
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 2
+                                      rule: greaterThan
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        rule: greaterThan
+                                        value: 19.9
+                                        Position: &POSITION
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '22'
+                                            s: 120
+                                            offset: 0
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: vehicle
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        rule: lessThan
+                                        value: 20.1
+                                        Position: *POSITION
+                      - name: failure
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 5
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

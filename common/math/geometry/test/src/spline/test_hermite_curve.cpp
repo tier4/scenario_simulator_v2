@@ -399,6 +399,26 @@ TEST(HermiteCurveTest, getCollisionPointIn2DLineNoCollision)
   EXPECT_FALSE(s);
 }
 
+/*
+   The curve runs along the y axis at x = 22. The line segment is almost
+   parallel to the x axis and ends 1.7575 short of the curve, while the line
+   through it passes the start point of the curve.
+*/
+TEST(HermiteCurveTest, getCollisionPointIn2DLineNoCollisionAlmostAxisAligned)
+{
+  const math::geometry::HermiteCurve curve(
+    makePose(22.0, 300.0), makePose(22.0, 310.0), makeVector(0.0, 10.0), makeVector(0.0, 10.0));
+
+  for (const auto dy : {2.3e-13, 2.2425e-10, 2.2425e-8}) {
+    EXPECT_FALSE(
+      curve.getCollisionPointIn2D(makePoint(23.7575, 300.0 - dy), makePoint(28.2425, 300.0 + dy)));
+    EXPECT_FALSE(
+      curve.getCollisionPointIn2D(makePoint(23.7575, 300.0 + dy), makePoint(28.2425, 300.0 - dy)));
+    EXPECT_TRUE(
+      curve.getCollisionPointIn2D(makePoint(19.7575, 300.0 - dy), makePoint(24.2425, 300.0 + dy)));
+  }
+}
+
 TEST(HermiteCurveTest, getCollisionPointIn2DCurve)
 {
   const auto curve = makeCurve1();

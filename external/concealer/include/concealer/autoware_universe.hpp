@@ -16,6 +16,7 @@
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
 #include <atomic>
+#include <autoware_adapi_v1_msgs/msg/route.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
@@ -26,7 +27,6 @@
 #include <autoware_vehicle_msgs/msg/velocity_report.hpp>
 #include <autoware_vehicle_msgs/srv/control_mode_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
-#include <concealer/path_with_lane_id.hpp>
 #include <concealer/publisher.hpp>
 #include <concealer/subscriber.hpp>
 #include <concealer/visibility.hpp>
@@ -51,15 +51,16 @@ public:
   using GearReport                  = autoware_vehicle_msgs::msg::GearReport;
   using Odometry                    = nav_msgs::msg::Odometry;
   using PoseWithCovarianceStamped   = geometry_msgs::msg::PoseWithCovarianceStamped;
+  using Route                       = autoware_adapi_v1_msgs::msg::Route;
   using SteeringReport              = autoware_vehicle_msgs::msg::SteeringReport;
   using TurnIndicatorsCommand       = autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
   using TurnIndicatorsReport        = autoware_vehicle_msgs::msg::TurnIndicatorsReport;
   using VelocityReport              = autoware_vehicle_msgs::msg::VelocityReport;
 
-  Subscriber<Control>                  getCommand;
-  Subscriber<GearCommand>              getGearCommand;
-  Subscriber<TurnIndicatorsCommand>    getTurnIndicatorsCommand;
-  Subscriber<priority::PathWithLaneId> getPathWithLaneId;
+  Subscriber<Control>               getCommand;
+  Subscriber<GearCommand>           getGearCommand;
+  Subscriber<TurnIndicatorsCommand> getTurnIndicatorsCommand;
+  Subscriber<Route>                 getRoute;
 
   Publisher<AccelWithCovarianceStamped>                    setAcceleration;
   Publisher<Odometry, NormalDistribution>                  setOdometry;
@@ -102,12 +103,12 @@ public:
 
   auto getVehicleCommand() const -> std::tuple<double, double, double, double, int>;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
-
   auto getControlModeReport() const -> ControlModeReport;
 
   auto setManualMode() -> void;
 };
+
+auto getRouteLanelets(const autoware_adapi_v1_msgs::msg::Route &) -> std::vector<std::int64_t>;
 }  // namespace concealer
 
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_
