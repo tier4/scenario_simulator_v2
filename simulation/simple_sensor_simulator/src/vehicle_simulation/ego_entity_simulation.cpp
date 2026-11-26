@@ -116,7 +116,10 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto acc_time_delay             = getRequiredParameter("acc_time_delay"             ).get_value<double>();
   const auto acceleration_map_path      = getRequiredParameter("acceleration_map_path"      ).get_value<std::string>();
   const auto debug_acc_scaling_factor   = getRequiredParameter("debug_acc_scaling_factor"   ).get_value<double>();
+  const auto debug_dec_scaling_factor   = common::getParameter("debug_dec_scaling_factor",  debug_acc_scaling_factor);
   const auto debug_steer_scaling_factor = getRequiredParameter("debug_steer_scaling_factor" ).get_value<double>();
+  const auto dec_time_constant          = common::getParameter("dec_time_constant",         acc_time_constant);
+  const auto dec_time_delay             = common::getParameter("dec_time_delay",            acc_time_delay);
   const auto k_us                       = common::getParameter("k_us",                      0.0);
   const auto steer_bias                 = getRequiredParameter("steer_bias"                 ).get_value<double>();
   const auto steer_dead_band            = getRequiredParameter("steer_dead_band"            ).get_value<double>();
@@ -149,7 +152,8 @@ auto EgoEntitySimulation::makeSimulationModel(
         autoware::simulator::simple_planning_simulator::SimModelDelaySteerAccGearedWoFallGuard>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
         acc_time_constant, steer_time_delay, steer_time_constant, steer_dead_band, steer_bias,
-        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us);
+        debug_acc_scaling_factor, debug_steer_scaling_factor, k_us, dec_time_delay,
+        dec_time_constant, debug_dec_scaling_factor);
 
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       if (!std::filesystem::exists(acceleration_map_path)) {
@@ -213,7 +217,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
       break;
 
     case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
-      v << 0, 0, 0, value, 0, 0, 0;
+      v << 0, 0, 0, value, 0, 0, 0, 0;
       break;
 
     case VehicleModelType::IDEAL_STEER_ACC:

@@ -25,6 +25,41 @@
 namespace autoware::simulator::simple_planning_simulator
 {
 
+/**
+ * @brief delay steer acceleration model with gear handling and no fall guard, with the pedal
+ *        acceleration modelled as two actuators rather than one.
+ *
+ * The drive and the brake of a real vehicle are different mechanisms, so their dead time, their
+ * first-order lag and their gain are independent of each other. The accel parameters configure
+ * the drive and the decel parameters the brake, and each channel is given its own input queue
+ * *and* its own state. The pedal acceleration the vehicle feels is the sum:
+ *
+ *     a_pedal     = a_acc + a_dec
+ *     d(a_acc)/dt = -(a_acc - sat(u_acc) * s_acc) / tau_acc
+ *     d(a_dec)/dt = -(a_dec - sat(u_dec) * s_dec) / tau_dec
+ *
+ * The command u is split at zero into u_acc = max(u, 0) and u_dec = min(u, 0), which is additive
+ * for every u. The split point is not a parameter: a non-zero threshold d would put +d on the
+ * accel channel and -d on the decel channel even for a zero command, and although that cancels in
+ * the sum it does not cancel in the targets once the two gains differ, leaving a residual
+ * d * (s_acc - s_dec) at zero command. The real boundary between accel and brake is velocity
+ * dependent in any case, since it falls out of the accel and brake maps in
+ * `autoware_raw_vehicle_cmd_converter`, so a constant is the wrong shape for it.
+ *
+ * Splitting the *state*, and not only the dead time, is the point. With one shared state the
+ * model has to recover from the combined command which time constant and which gain apply, and
+ * that is ambiguous whenever both channels are active at once -- which happens on every
+ * deceleration-to-acceleration transition as soon as the two dead times differ, since the accel
+ * command has then already arrived while the decel command has not yet expired. Here the question
+ * never arises: each channel keeps its own parameters, and `calcModel()` carries each actuator
+ * into the body frame on its own before adding them, so the sign of the sum decides nothing.
+ *
+ * With the decel parameters left at the accel values this model is the single-pedal one on level
+ * ground in a forward gear: two first-order lags that share a time constant are linear, so their
+ * sum obeys the original equation, and the split is additive, so the sum of the two targets is
+ * the original target. The two differ by design in neutral, in reverse and while held at a
+ * standstill, which is where treating the sum as a single actuator gives the wrong answer.
+ */
 class SimModelDelaySteerAccGearedWoFallGuard : public SimModelInterface
 {
 public:
@@ -44,12 +79,16 @@ public:
    * @param [in] debug_acc_scaling_factor scaling factor for accel command
    * @param [in] debug_steer_scaling_factor scaling factor for steering command
    * @param [in] k_us understeer gradient [s^2/m]; 0 keeps the ideal bicycle model
+   * @param [in] dec_delay time delay for decel command [s]
+   * @param [in] dec_time_constant time constant for 1D model of decel dynamics
+   * @param [in] debug_dec_scaling_factor scaling factor for decel command
    */
   SimModelDelaySteerAccGearedWoFallGuard(
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, double steer_dead_band, double steer_bias,
-    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us);
+    double debug_acc_scaling_factor, double debug_steer_scaling_factor, double k_us,
+    double dec_delay, double dec_time_constant, double debug_dec_scaling_factor);
 
   /**
    * @brief default destructor
@@ -66,9 +105,24 @@ private:
     VX,
     STEER,
     ACCX,
-    PEDAL_ACCX,
+    ACC_ACCX,
+    DEC_ACCX,
   };
+
+  //!< @brief indices of the vector handed to `setInput()`; unchanged, the split happens inside
   enum IDX_U { PEDAL_ACCX_DES = 0, GEAR, SLOPE_ACCX, STEER_DES };
+
+  //!< @brief indices of the vector `update()` builds for `calcModel()`. The pedal command has
+  //!< been split there and each channel has passed through its own dead time, so the two are
+  //!< carried separately instead of as one `PEDAL_ACCX_DES`.
+  enum IDX_UD {
+    UD_ACC_ACCX_DES = 0,
+    UD_DEC_ACCX_DES,
+    UD_GEAR,
+    UD_SLOPE_ACCX,
+    UD_STEER_DES,
+    UD_DIM,
+  };
 
   const double vx_lim_;          //!< @brief velocity limit [m/s]
   const double vx_rate_lim_;     //!< @brief acceleration limit [m/ss]
@@ -77,14 +131,18 @@ private:
   const double wheelbase_;       //!< @brief vehicle wheelbase length [m]
 
   std::deque<double> acc_input_queue_;       //!< @brief buffer for accel command
+  std::deque<double> dec_input_queue_;       //!< @brief buffer for decel command
   std::deque<double> steer_input_queue_;     //!< @brief buffer for steering command
   const double acc_delay_;                   //!< @brief time delay for accel command [s]
   const double acc_time_constant_;           //!< @brief time constant for accel dynamics
+  const double dec_delay_;                   //!< @brief time delay for decel command [s]
+  const double dec_time_constant_;           //!< @brief time constant for decel dynamics
   const double steer_delay_;                 //!< @brief time delay for steering command [s]
   const double steer_time_constant_;         //!< @brief time constant for steering dynamics
   const double steer_dead_band_;             //!< @brief dead band for steering angle [rad]
   const double steer_bias_;                  //!< @brief steering angle bias [rad]
   const double debug_acc_scaling_factor_;    //!< @brief scaling factor for accel command
+  const double debug_dec_scaling_factor_;    //!< @brief scaling factor for decel command
   const double debug_steer_scaling_factor_;  //!< @brief scaling factor for steering command
   const double k_us_;                        //!< @brief understeer gradient [s^2/m]
 
@@ -94,6 +152,29 @@ private:
    * Reduces to the ideal kinematic bicycle ω when k_us = 0.
    */
   double calc_yaw_rate(double vel, double steer) const;
+
+  /**
+   * @brief the accel channel carried into the body frame, i.e. gated by the gear: nothing in
+   *        neutral, reversed in reverse. It models the drive, which goes through the drivetrain.
+   */
+  double calc_acc_in_body(const Eigen::VectorXd & state, const Eigen::VectorXd & input) const;
+
+  /**
+   * @brief the decel channel, which is at most zero and is never gated by the gear. It models the
+   *        brake, which does not go through the drivetrain.
+   */
+  double calc_dec_acc(const Eigen::VectorXd & state) const;
+
+  /**
+   * @brief whether the brake can hold the vehicle against the drive and the slope at a standstill
+   *
+   * Both the stop condition in `update()` and the zero-velocity case in `calcModel()` ask this,
+   * so that the vehicle is held and released on one and the same criterion. Deciding it from the
+   * sum of the two channels instead would let a drive that is gated away by the gear still count
+   * towards the balance, and a brake that takes the velocity through zero would then fail to park
+   * it there and chatter around zero instead.
+   */
+  bool can_hold_at_standstill(const Eigen::VectorXd & state, const Eigen::VectorXd & input) const;
 
   /**
    * @brief set queue buffer for input command
