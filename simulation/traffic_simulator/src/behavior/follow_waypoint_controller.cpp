@@ -162,10 +162,10 @@ auto FollowWaypointController::getAccelerationLimits(
   const auto max_acceleration_target_speed =
     accelerationWithJerkConstraint(speed, target_speed, max_acceleration_rate);
 
-  const auto local_min_acceleration = std::max(
+  auto local_min_acceleration = std::max(
     std::max(min_acceleration_zero_speed, -max_deceleration),
     acceleration - max_deceleration_rate * step_time);
-  const auto local_max_acceleration = std::min(
+  auto local_max_acceleration = std::min(
     std::min(max_acceleration_target_speed, max_acceleration),
     acceleration + max_acceleration_rate * step_time);
 
@@ -187,6 +187,19 @@ auto FollowWaypointController::getAccelerationLimits(
       ") => difference: ", (local_max_acceleration - local_min_acceleration),
       " for acceleration: ", acceleration, " and speed: ", speed, ". Target speed: ", target_speed,
       ". ", *this);
+  } else if (local_max_acceleration < local_min_acceleration) {
+    /*
+       The limits are inverted within the tolerance, that is, they are equal in theory: one of them
+       comes from accelerationWithJerkConstraint and the other from the jerk limit, and the state
+       is following the curve of accelerationWithJerkConstraint. Both are set to the former. If the
+       latter were applied, the state would leave the curve and the deviation would be multiplied
+       at every step until it exceeds the tolerance.
+    */
+    if (local_min_acceleration == min_acceleration_zero_speed) {
+      local_max_acceleration = local_min_acceleration;
+    } else {
+      local_min_acceleration = local_max_acceleration;
+    }
   }
 
   const double min_speed = speed + local_min_acceleration * step_time;
