@@ -202,6 +202,9 @@ void EgoEntitySimulation::requestSpeedChange(double value)
 {
   Eigen::VectorXd v(vehicle_model_ptr_->getDimX());
 
+  // NOTE: every branch must list exactly `getDimX()` values. Eigen only checks the count with
+  // `eigen_assert`, which is compiled out under NDEBUG, so a branch that is one short leaves the
+  // trailing state uninitialized in a release build instead of failing.
   switch (vehicle_model_type_) {
     case VehicleModelType::DELAY_STEER_ACC:
     case VehicleModelType::DELAY_STEER_ACC_GEARED:
@@ -268,7 +271,12 @@ auto EgoEntitySimulation::overwrite(
       return convertQuaternionToEulerAngle(relative_orientation).z;
     }();
 
-    switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
+    // NOTE: `Eigen::VectorXd(n)` leaves the coefficients uninitialized, and the branches below
+    // do not assign every index of every model: `DELAY_STEER_ACC_GEARED_WO_FALL_GUARD` carries
+    // `PEDAL_ACCX` at index 6, which nothing here writes. Start from zero so that a state this
+    // function does not know about is reset rather than left as garbage.
+    switch (Eigen::VectorXd state = Eigen::VectorXd::Zero(vehicle_model_ptr_->getDimX());
+            vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_ACC_GEARED_WO_FALL_GUARD:
