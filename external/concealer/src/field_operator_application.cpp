@@ -156,7 +156,15 @@ FieldOperatorApplication::FieldOperatorApplication(const pid_t pid)
   requestClearRoute("/api/routing/clear_route", *this),
   requestCooperateCommands("/api/external/set/rtc_commands", *this),
   requestEngage("/api/external/set/engage", *this),
-  requestInitialPose("/api/localization/initialize", *this, std::chrono::seconds(common::getParameter<int>("initialize_localization"))),
+  requestInitialPose("/api/localization/initialize", *this, [] {
+    if (const auto timeout = common::getRequiredParameter<int>("initialize_localization");
+        0 < timeout) {
+      return std::chrono::seconds(timeout);
+    } else {
+      throw common::SemanticError(
+        "initialize_localization must be greater than 0 seconds; got ", timeout);
+    }
+  }()),
   // NOTE: routing takes a long time to return. But the specified duration is not decided by any technical reasons.
   requestSetRoute("/api/routing/set_route", *this, std::chrono::seconds(10)),
   requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),

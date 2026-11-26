@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include <rclcpp/rclcpp.hpp>
+#include <stdexcept>
 
 namespace common
 {
@@ -55,6 +56,17 @@ template <typename T>
 auto getParameter(const std::string & name, T value = {})
 {
   return getParameter(getParameterNode().get_node_parameters_interface(), name, value);
+}
+
+template <typename T>
+auto getRequiredParameter(const std::string & name) -> T
+{
+  if (const auto node = getParameterNode().get_node_parameters_interface();
+      node->has_parameter(name)) {
+    return node->get_parameter(name).get_value<T>();
+  } else {
+    throw std::runtime_error("Required parameter '" + name + "' is not set.");
+  }
 }
 }  // namespace common
 
