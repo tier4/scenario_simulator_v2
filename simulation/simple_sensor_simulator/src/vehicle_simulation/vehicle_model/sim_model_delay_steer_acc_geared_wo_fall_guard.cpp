@@ -94,9 +94,13 @@ void SimModelDelaySteerAccGearedWoFallGuard::update(const double & dt)
   // take velocity limit explicitly
   state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
 
+  // NOTE: the test uses `prev_state`, the state the Euler step was evaluated at, so that the
+  // velocity update and the decision about whether the vehicle may stop are made from the same
+  // pedal acceleration rather than from values half a step apart. Using the post-step state mixes
+  // a velocity from before the step with a pedal acceleration from after it.
   if (
     prev_state(IDX::VX) * state_(IDX::VX) <= 0.0 &&
-    -state_(IDX::PEDAL_ACCX) >= std::abs(delayed_input(IDX_U::SLOPE_ACCX))) {
+    -prev_state(IDX::PEDAL_ACCX) >= std::abs(delayed_input(IDX_U::SLOPE_ACCX))) {
     // stop condition is satisfied
     state_(IDX::VX) = 0.0;
   }
@@ -124,8 +128,12 @@ Eigen::VectorXd SimModelDelaySteerAccGearedWoFallGuard::calcModel(
   const double pedal_acc = sat(state(IDX::PEDAL_ACCX), vx_rate_lim_, -vx_rate_lim_);
   const double yaw = state(IDX::YAW);
   const double steer = state(IDX::STEER);
+  // NOTE: the clip is applied *after* the gain, not before. Clipping first and scaling after lets
+  // a gain above one place the target outside the acceleration limit; since the derivative below
+  // uses the clipped state, the raw state then integrates past the limit without bound and the
+  // output stays pinned at the limit long after the command is released.
   const double pedal_acc_des =
-    sat(input(IDX_U::PEDAL_ACCX_DES), vx_rate_lim_, -vx_rate_lim_) * debug_acc_scaling_factor_;
+    sat(input(IDX_U::PEDAL_ACCX_DES) * debug_acc_scaling_factor_, vx_rate_lim_, -vx_rate_lim_);
   const double steer_des =
     sat(input(IDX_U::STEER_DES), steer_lim_, -steer_lim_) * debug_steer_scaling_factor_;
   // NOTE: `steer_des` is calculated by control from measured values. getSteer() also gets the
