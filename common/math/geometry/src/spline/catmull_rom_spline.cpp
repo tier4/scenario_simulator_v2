@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
+#include <array>
+#include <cmath>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <iostream>
 #include <limits>
@@ -210,93 +213,81 @@ CatmullRomSpline::CatmullRomSpline(
     /// @note In this case, spline is interpreted as curve.
     default:
       [this](const auto & control_points) -> void {
-        std::size_t n = control_points.size() - 1;
+        /**
+         * @note Centripetal Catmull-Rom (alpha = 0.5): the knot interval of a segment is the
+         * square root of its chord length. The uniform variant (every interval 1) gives each
+         * segment a tangent of half the chord of its neighbours regardless of its own length, so
+         * a short segment between long ones overshoots its end point and turns back, reversing
+         * the heading even when every control point lies on one line. With centripetal knots the
+         * tangent at either end of a segment is less than twice its chord, so for collinear
+         * monotonic points the segment stays monotonic (Fritsch-Carlson). For equal chord lengths
+         * the curves are the same as the uniform ones.
+         */
+        const std::size_t n = control_points.size() - 1;
+        const auto interval = [&control_points](const std::size_t i) {
+          const auto & p0 = control_points[i];
+          const auto & p1 = control_points[i + 1];
+          /// @note std::unique removed equal neighbours; the guard covers an underflowing distance.
+          return std::max(
+            std::sqrt(std::hypot(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z)),
+            std::numeric_limits<double>::min());
+        };
+        std::vector<double> intervals(n);
         for (std::size_t i = 0; i < n; i++) {
+          intervals[i] = interval(i);
+        }
+        /// @note Derivative with respect to the knot parameter at the inner control point i.
+        const auto velocity = [&control_points, &intervals](const std::size_t i) {
+          const auto & p0 = control_points[i - 1];
+          const auto & p1 = control_points[i];
+          const auto & p2 = control_points[i + 1];
+          const double d0 = intervals[i - 1];
+          const double d1 = intervals[i];
+          const auto component = [d0, d1](const double v0, const double v1, const double v2) {
+            return (v1 - v0) / d0 - (v2 - v0) / (d0 + d1) + (v2 - v1) / d1;
+          };
+          return std::array<double, 3>{
+            component(p0.x, p1.x, p2.x), component(p0.y, p1.y, p2.y), component(p0.z, p1.z, p2.z)};
+        };
+        for (std::size_t i = 0; i < n; i++) {
+          const auto & p0 = control_points[i];
+          const auto & p1 = control_points[i + 1];
+          const std::array<double, 3> start{p0.x, p0.y, p0.z};
+          const std::array<double, 3> chord{p1.x - p0.x, p1.y - p0.y, p1.z - p0.z};
+          /// @note a t^3 + b t^2 + c t + d for each axis, t in [0, 1] over this segment.
+          std::array<double, 3> a{}, b{}, c{}, d{};
           if (i == 0) {
-            double ax = 0;
-            double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;
-            double cx = -3 * control_points[0].x + 4 * control_points[1].x - control_points[2].x;
-            double dx = 2 * control_points[0].x;
-            double ay = 0;
-            double by = control_points[0].y - 2 * control_points[1].y + control_points[2].y;
-            double cy = -3 * control_points[0].y + 4 * control_points[1].y - control_points[2].y;
-            double dy = 2 * control_points[0].y;
-            double az = 0;
-            double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
-            double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
-            double dz = 2 * control_points[0].z;
-            ax = ax * 0.5;
-            bx = bx * 0.5;
-            cx = cx * 0.5;
-            dx = dx * 0.5;
-            ay = ay * 0.5;
-            by = by * 0.5;
-            cy = cy * 0.5;
-            dy = dy * 0.5;
-            az = az * 0.5;
-            bz = bz * 0.5;
-            cz = cz * 0.5;
-            dz = dz * 0.5;
-            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
+            /// @note A quadratic ending with the tangent of the next segment's start.
+            const auto v = velocity(1);
+            for (std::size_t k = 0; k < 3; k++) {
+              const double m1 = v[k] * intervals[0];
+              b[k] = m1 - chord[k];
+              c[k] = 2 * chord[k] - m1;
+              d[k] = start[k];
+            }
           } else if (i == (n - 1)) {
-            double ax = 0;
-            double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
-            double cx = -1 * control_points[i - 1].x + control_points[i + 1].x;
-            double dx = 2 * control_points[i].x;
-            double ay = 0;
-            double by = control_points[i - 1].y - 2 * control_points[i].y + control_points[i + 1].y;
-            double cy = -1 * control_points[i - 1].y + control_points[i + 1].y;
-            double dy = 2 * control_points[i].y;
-            double az = 0;
-            double bz = control_points[i - 1].z - 2 * control_points[i].z + control_points[i + 1].z;
-            double cz = -1 * control_points[i - 1].z + control_points[i + 1].z;
-            double dz = 2 * control_points[i].z;
-            ax = ax * 0.5;
-            bx = bx * 0.5;
-            cx = cx * 0.5;
-            dx = dx * 0.5;
-            ay = ay * 0.5;
-            by = by * 0.5;
-            cy = cy * 0.5;
-            dy = dy * 0.5;
-            az = az * 0.5;
-            bz = bz * 0.5;
-            cz = cz * 0.5;
-            dz = dz * 0.5;
-            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
+            /// @note A quadratic starting with the tangent of the previous segment's end.
+            const auto v = velocity(i);
+            for (std::size_t k = 0; k < 3; k++) {
+              const double m0 = v[k] * intervals[i];
+              b[k] = chord[k] - m0;
+              c[k] = m0;
+              d[k] = start[k];
+            }
           } else {
-            double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
-                        3 * control_points[i + 1].x + control_points[i + 2].x;
-            double bx = 2 * control_points[i - 1].x - 5 * control_points[i].x +
-                        4 * control_points[i + 1].x - control_points[i + 2].x;
-            double cx = -control_points[i - 1].x + control_points[i + 1].x;
-            double dx = 2 * control_points[i].x;
-            double ay = -1 * control_points[i - 1].y + 3 * control_points[i].y -
-                        3 * control_points[i + 1].y + control_points[i + 2].y;
-            double by = 2 * control_points[i - 1].y - 5 * control_points[i].y +
-                        4 * control_points[i + 1].y - control_points[i + 2].y;
-            double cy = -control_points[i - 1].y + control_points[i + 1].y;
-            double dy = 2 * control_points[i].y;
-            double az = -1 * control_points[i - 1].z + 3 * control_points[i].z -
-                        3 * control_points[i + 1].z + control_points[i + 2].z;
-            double bz = 2 * control_points[i - 1].z - 5 * control_points[i].z +
-                        4 * control_points[i + 1].z - control_points[i + 2].z;
-            double cz = -control_points[i - 1].z + control_points[i + 1].z;
-            double dz = 2 * control_points[i].z;
-            ax = ax * 0.5;
-            bx = bx * 0.5;
-            cx = cx * 0.5;
-            dx = dx * 0.5;
-            ay = ay * 0.5;
-            by = by * 0.5;
-            cy = cy * 0.5;
-            dy = dy * 0.5;
-            az = az * 0.5;
-            bz = bz * 0.5;
-            cz = cz * 0.5;
-            dz = dz * 0.5;
-            curves_.emplace_back(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz);
+            const auto v0 = velocity(i);
+            const auto v1 = velocity(i + 1);
+            for (std::size_t k = 0; k < 3; k++) {
+              const double m0 = v0[k] * intervals[i];
+              const double m1 = v1[k] * intervals[i];
+              a[k] = -2 * chord[k] + m0 + m1;
+              b[k] = 3 * chord[k] - 2 * m0 - m1;
+              c[k] = m0;
+              d[k] = start[k];
+            }
           }
+          curves_.emplace_back(
+            a[0], b[0], c[0], d[0], a[1], b[1], c[1], d[1], a[2], b[2], c[2], d[2]);
         }
         for (const auto & curve : curves_) {
           length_list_.emplace_back(curve.getLength());

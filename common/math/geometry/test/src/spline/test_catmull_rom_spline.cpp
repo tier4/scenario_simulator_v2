@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <cmath>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -314,7 +315,9 @@ TEST(CatmullRomSpline, getMaximum2DCurvatureCurve)
     makePoint(3.0, 0.0)};
   const math::geometry::CatmullRomSpline spline(points);
   constexpr double eps = 0.1;
-  EXPECT_NEAR(spline.getMaximum2DCurvature(), -6.0, eps);
+  /// @note The chords are sqrt(0.5), sqrt(0.5), sqrt(2) and sqrt(2) long, so the centripetal
+  /// parameterisation differs from the uniform one here (which gave about -6.07).
+  EXPECT_NEAR(spline.getMaximum2DCurvature(), 4.0 - 8.0 * std::sqrt(2.0), eps);
 }
 
 TEST(CatmullRomSpline, getPolygon)
@@ -521,6 +524,9 @@ TEST(CatmullRomSpline, getSValue2)
     makePoint(89122.2, 43364.1, 3.13364), makePoint(89122.5, 43363.8, 3.13364),
     makePoint(89122.8, 43363.4, 3.13364), makePoint(89123.1, 43363.0, 3.13364),
     makePoint(89123.4, 43362.6, 3.13364)};
+  /// @note The first chord is shorter than the others, so the expected values are those of the
+  /// centripetal parameterisation (the uniform one gave 0.92433178422155371 and
+  /// 0.42440442127906564).
   auto spline = math::geometry::CatmullRomSpline(points);
 
   geometry_msgs::msg::Pose pose0;
@@ -533,7 +539,7 @@ TEST(CatmullRomSpline, getSValue2)
   pose0.orientation.w = 0.891092;
   const auto result0 = spline.getSValue(pose0);
   EXPECT_TRUE(result0);
-  EXPECT_DOUBLE_EQ(result0.value(), 0.92433178422155371);
+  EXPECT_DOUBLE_EQ(result0.value(), 0.92454242766546391);
 
   geometry_msgs::msg::Pose pose1;
   pose1.position.x = 89122.5;
@@ -545,7 +551,7 @@ TEST(CatmullRomSpline, getSValue2)
   pose1.orientation.w = 0.894575;
   const auto result1 = spline.getSValue(pose1);
   EXPECT_TRUE(result1);
-  EXPECT_DOUBLE_EQ(result1.value(), 0.42440442127906564);
+  EXPECT_DOUBLE_EQ(result1.value(), 0.42449578439964369);
 }
 
 TEST(CatmullRomSpline, getSValueEdge)
@@ -641,6 +647,52 @@ TEST(CatmullRomSpline, initializationNotEnoughControlPoints)
 {
   const std::vector<geometry_msgs::msg::Point> points;
   EXPECT_THROW(math::geometry::CatmullRomSpline{points}, common::SemanticError);
+}
+
+/**
+ * @note Collinear control points with short segments between long ones. A uniform Catmull-Rom
+ * overshoots the short segments (0.600 -> 0.615 reaches x = 0.6265, 0.645 -> 0.660 goes back to
+ * 0.6335), reversing the tangent there.
+ */
+math::geometry::CatmullRomSpline makeUnevenlySpacedLine()
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0),   makePoint(0.3, 0.0),  makePoint(0.6, 0.0),
+    makePoint(0.615, 0.0), makePoint(0.63, 0.0), makePoint(0.645, 0.0),
+    makePoint(0.66, 0.0),  makePoint(0.96, 0.0), makePoint(1.26, 0.0)};
+  return math::geometry::CatmullRomSpline(points);
+}
+
+/**
+ * @note Test the tangent and the position along collinear, unevenly spaced control points:
+ * the spline must not turn back anywhere.
+ */
+TEST(CatmullRomSpline, unevenlySpacedLineHeadsForward)
+{
+  const auto spline = makeUnevenlySpacedLine();
+  const double length = spline.getLength();
+  constexpr std::size_t samples = 20000;
+  double previous_x = spline.getPoint(0.0).x;
+  for (std::size_t i = 0; i <= samples; i++) {
+    const double s = length * static_cast<double>(i) / static_cast<double>(samples);
+    const auto tangent = spline.getTangentVector(s);
+    EXPECT_GT(tangent.x, 0.0) << "at s = " << s;
+    EXPECT_NEAR(tangent.y, 0.0, EPS) << "at s = " << s;
+    const auto point = spline.getPoint(s);
+    EXPECT_GE(point.x, previous_x - EPS) << "at s = " << s;
+    EXPECT_NEAR(point.y, 0.0, EPS) << "at s = " << s;
+    previous_x = point.x;
+  }
+}
+
+/**
+ * @note Test that the length of collinear, unevenly spaced control points is the polyline's.
+ */
+TEST(CatmullRomSpline, unevenlySpacedLineLength)
+{
+  const auto spline = makeUnevenlySpacedLine();
+  EXPECT_NEAR(spline.getLength(), 1.26, 1e-3);
+  EXPECT_POINT_NEAR(spline.getPoint(spline.getLength()), makePoint(1.26, 0.0), 1e-3);
 }
 
 int main(int argc, char ** argv)
