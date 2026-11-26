@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 #include <simulation_interface/geometry_msgs.pb.h>
 
+#include <cstdint>
 #include <traffic_simulator_msgs/msg/traffic_light_bulb_v1.hpp>
 
 #include "expect_equal_macros.hpp"

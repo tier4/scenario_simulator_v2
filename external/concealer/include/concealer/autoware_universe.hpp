@@ -30,6 +30,7 @@
 #include <concealer/publisher.hpp>
 #include <concealer/subscriber.hpp>
 #include <concealer/visibility.hpp>
+#include <cstdint>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>

@@ -17,6 +17,7 @@
 #include <lanelet2_io/Io.h>
 
 #include <autoware_map_msgs/msg/lanelet_map_bin.hpp>
+#include <cstdint>
 #include <filesystem>
 
 namespace traffic_simulator
