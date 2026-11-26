@@ -1,0 +1,16 @@
+<OpenSCENARIO>
+  <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
+  <ParameterValueDistribution>
+    <ScenarioFile filepath="$(ros2 pkg prefix --share openscenario_interpreter)/test/parameter_value_distribution/sample.xosc"/>
+    <Deterministic>
+      <DeterministicMultiParameterDistribution>
+        <ValueSetDistribution>
+          <ParameterValueSet>
+            <ParameterAssignment parameterRef="LANE_ID" value="34564"/>
+            <ParameterAssignment parameterRef="offset" value="1.0"/>
+          </ParameterValueSet>
+        </ValueSetDistribution>
+      </DeterministicMultiParameterDistribution>
+    </Deterministic>
+  </ParameterValueDistribution>
+</OpenSCENARIO>
