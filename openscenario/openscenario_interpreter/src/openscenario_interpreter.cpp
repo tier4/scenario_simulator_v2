@@ -150,6 +150,9 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       common::status_monitor.updateThreshold(
         std::chrono::seconds(common::getParameter<std::int64_t>("status_monitor_threshold", 10)));
 
+      simulator_core_shutdown_threshold = std::chrono::seconds(
+        common::getParameter<std::int64_t>("simulator_core_shutdown_threshold", 30));
+
       // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
       traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(

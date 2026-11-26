@@ -50,7 +50,9 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
                     private SimulatorCore::NonStandardOperation
 {
   /// @note Needs to be longer than the SIGINT + SIGTERM signals timeout duration.
-  static inline constexpr std::chrono::seconds simulator_core_shutdown_threshold{30};
+  /// Can be overridden by the parameter `simulator_core_shutdown_threshold` [s] (e.g. for a
+  /// large Autoware launch that takes longer to shut down).
+  std::chrono::seconds simulator_core_shutdown_threshold{30};
 
   using Context = openscenario_interpreter_msgs::msg::Context;
 

@@ -115,6 +115,7 @@ def launch_setup(context, *args, **kwargs):
     rviz_config                                 = LaunchConfiguration("rviz_config",                                 default=default_rviz_config_file())
     scenario                                    = LaunchConfiguration("scenario",                                    default=Path("/dev/null"))
     sensor_model                                = LaunchConfiguration("sensor_model",                                default="")
+    simulator_core_shutdown_threshold           = LaunchConfiguration("simulator_core_shutdown_threshold",           default=30)
     sigterm_timeout                             = LaunchConfiguration("sigterm_timeout",                             default=8)
     simulate_localization                       = LaunchConfiguration("simulate_localization",                       default=True)
     speed_condition                             = LaunchConfiguration("speed_condition",                             default="legacy")
@@ -211,6 +212,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"rviz_config                                 := {rviz_config.perform(context)}")
     print(f"scenario                                    := {scenario.perform(context)}")
     print(f"sensor_model                                := {sensor_model.perform(context)}")
+    print(f"simulator_core_shutdown_threshold           := {simulator_core_shutdown_threshold.perform(context)}")
     print(f"sigterm_timeout                             := {sigterm_timeout.perform(context)}")
     print(f"simulate_localization                       := {simulate_localization.perform(context)}")
     print(f"speed_condition                             := {speed_condition.perform(context)}")
@@ -275,6 +277,7 @@ def launch_setup(context, *args, **kwargs):
             {"post_process_timeout": post_process_timeout},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
+            {"simulator_core_shutdown_threshold": simulator_core_shutdown_threshold},
             {"sigterm_timeout": sigterm_timeout},
             {"simulate_localization": simulate_localization},
             {"speed_condition": speed_condition},
@@ -423,6 +426,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("rviz_config",                                 default_value=rviz_config                                ),
         DeclareLaunchArgument("scenario",                                    default_value=scenario                                   ),
         DeclareLaunchArgument("sensor_model",                                default_value=sensor_model                               ),
+        DeclareLaunchArgument("simulator_core_shutdown_threshold",           default_value=simulator_core_shutdown_threshold          ),
         DeclareLaunchArgument("sigterm_timeout",                             default_value=sigterm_timeout                            ),
         DeclareLaunchArgument("simulate_localization",                       default_value=simulate_localization                      ),
         DeclareLaunchArgument("speed_condition",                             default_value=speed_condition                            ),
