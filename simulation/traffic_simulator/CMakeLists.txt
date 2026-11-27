@@ -27,7 +27,6 @@ find_package(ament_cmake_auto REQUIRED)
 find_package(traffic_simulator_msgs REQUIRED)
 find_package(Boost COMPONENTS filesystem)
 find_package(lanelet2_matching REQUIRED)
-find_package(tinyxml2_vendor REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(yaml-cpp REQUIRED)
 include(FindProtobuf REQUIRED)
@@ -97,7 +96,6 @@ ament_export_libraries(visualization_component)
 rclcpp_components_register_nodes(visualization_component "traffic_simulator::VisualizationComponent")
 
 target_link_libraries(traffic_simulator
-  tinyxml2
   pugixml
   pthread
   sodium
