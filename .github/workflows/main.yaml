@@ -63,11 +63,6 @@ jobs:
       - run: rm -rf /var/lib/apt/lists/*
       - run: rm -rf /tmp/*
       - run: rm -rf /root/.ros/rosdep
-      - id: build_wrapper
-        uses: SonarSource/sonarqube-scan-action/install-build-wrapper@22918119ff8e1ca75a623e15c8296b6ea4fbe28f # v8.2.1
-        if: matrix.sonar != 'no-sonar' && github.event.pull_request.head.repo.fork == false
-        env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
       - run: |
           . "/opt/ros/$ROS_DISTRO/setup.sh"
           CXX_FLAGS="$CXX_FLAGS -fprofile-arcs"
@@ -76,7 +71,7 @@ jobs:
           CXX_FLAGS="$CXX_FLAGS -Wno-error=pessimizing-move" # Added with the Jazzy build test in #1704
           CXX_FLAGS="$CXX_FLAGS -Wno-error=redundant-move"   # Added with the Jazzy build test in #1704
           CXX_FLAGS="$CXX_FLAGS -Wno-unused-local-typedefs"  # Added with the Jazzy build test in #1704
-          ${BUILD_WRAPPER:+"$BUILD_WRAPPER" --out-dir src/scenario_simulator_v2/bw-output} colcon build \
+          colcon build \
             --event-handlers console_cohesion+ \
             --symlink-install \
             --cmake-args \
@@ -86,7 +81,6 @@ jobs:
               -D CMAKE_CXX_FLAGS="$CXX_FLAGS" \
             --packages-up-to $PACKAGES
         env:
-          BUILD_WRAPPER: ${{ steps.build_wrapper.outputs.build-wrapper-binary }}
           PACKAGES: ${{ steps.list_packages.outputs.package_list }}
       - run: . install/setup.sh && colcon test --event-handlers console_cohesion+ --packages-select $PACKAGES
         if: matrix.test != 'no-test'
@@ -100,13 +94,3 @@ jobs:
         continue-on-error: ${{ matrix.rosdistro == 'jazzy' }} # Jazzy is not supported yet
       - run: gcovr -r src/scenario_simulator_v2 build --sonarqube coverage.xml
         if: matrix.sonar != 'no-sonar'
-      - uses: SonarSource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f # v8.2.1
-        if: matrix.sonar != 'no-sonar' && github.event.pull_request.head.repo.fork == false && github.actor != 'dependabot[bot]'
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        with:
-          args: --define project.settings=src/scenario_simulator_v2/.github/sonar-project.properties --define sonar.cfamily.compile-commands=src/scenario_simulator_v2/bw-output/compile_commands.json
-          projectBaseDir: src/scenario_simulator_v2/
