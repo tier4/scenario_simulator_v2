@@ -17,7 +17,6 @@ endif()
 
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
-find_package(Boost REQUIRED thread)
 find_package(cppzmq QUIET)
 find_package(rclcpp REQUIRED)
 include(FetchContent)
