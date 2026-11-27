@@ -14,6 +14,8 @@
 
 #include <lanelet2_core/primitives/Primitive.h>
 
+#include <algorithm>
+#include <cmath>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
@@ -177,9 +179,22 @@ auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
       const auto & points = centerPoints(lanelet_id);
       center_points.insert(center_points.end(), points.begin(), points.end());
     }
-    /// @note We intentionally do not sort here, because only consecutive duplicates are supposed to be removed
+    /**
+     * @note We intentionally do not sort here, because only consecutive duplicates are supposed
+     * to be removed. A lanelet's last point and the next one's first are the same position, but
+     * each lanelet's centre points are resampled from its own bounds, so the two can differ by
+     * rounding (about 1e-14 m). Compared exactly, both are kept, and a Catmull-Rom spline through
+     * the joined points loops over that segment of almost no length. So a point closer than
+     * 1e-6 m to the last one kept counts as a duplicate.
+     */
+    constexpr double duplicate_tolerance = 1e-6;
     center_points.erase(
-      std::unique(center_points.begin(), center_points.end()), center_points.end());
+      std::unique(
+        center_points.begin(), center_points.end(),
+        [](const Point & a, const Point & b) {
+          return std::hypot(a.x - b.x, a.y - b.y, a.z - b.z) < duplicate_tolerance;
+        }),
+      center_points.end());
     return center_points;
   }
 }

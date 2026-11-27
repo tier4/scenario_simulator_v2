@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cmath>
+#include <limits>
+#include <string>
+#include <utility>
+
 #include "test_lanelet_wrapper.hpp"
 
 int main(int argc, char ** argv)
@@ -599,5 +604,64 @@ TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getStopLinePolygon_stopLin
 TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, getStopLinePolygon_invalidLaneletId)
 {
   EXPECT_THROW(lanelet_map::stopLinePolygon(1000039), std::runtime_error);
+}
+
+/**
+ * @note centerPoints(lanelet_ids) joins the lanelets' centre points. A lanelet's last point and
+ * the next lanelet's first are the same position, but SSv2's resampling of their bounds can
+ * round them differently (about 1e-14 m apart), and an exact-equality dedupe then keeps both,
+ * so the joined points hold a segment of almost no length, over which a Catmull-Rom spline
+ * through them loops. Every join of the map must leave no two consecutive points closer than
+ * 1e-6 m.
+ */
+static auto nearestConsecutiveDistanceOverJoins() -> std::pair<double, std::string>
+{
+  double nearest = std::numeric_limits<double>::infinity();
+  std::string where;
+  for (const auto & id : lanelet_map::laneletIds()) {
+    for (const auto & next : lanelet_map::nextLaneletIds(id)) {
+      const auto points = lanelet_map::centerPoints(lanelet::Ids{id, next});
+      for (std::size_t i = 1; i < points.size(); ++i) {
+        const double d = std::hypot(
+          points[i].x - points[i - 1].x, points[i].y - points[i - 1].y,
+          points[i].z - points[i - 1].z);
+        if (d < nearest) {
+          nearest = d;
+          where = std::to_string(id) + " -> " + std::to_string(next);
+        }
+      }
+    }
+  }
+  return {nearest, where};
+}
+
+TEST_F(LaneletWrapperTest_StandardMap, centerPoints_joinLeavesNoNearDuplicate)
+{
+  const auto [nearest, where] = nearestConsecutiveDistanceOverJoins();
+  EXPECT_GT(nearest, 1e-6) << "at " << where;
+}
+
+TEST_F(LaneletWrapperTest_FourTrackHighwayMap, centerPoints_joinLeavesNoNearDuplicate)
+{
+  const auto [nearest, where] = nearestConsecutiveDistanceOverJoins();
+  EXPECT_GT(nearest, 1e-6) << "at " << where;
+}
+
+TEST_F(LaneletWrapperTest_CrossroadsWithStoplinesMap, centerPoints_joinLeavesNoNearDuplicate)
+{
+  const auto [nearest, where] = nearestConsecutiveDistanceOverJoins();
+  EXPECT_GT(nearest, 1e-6) << "at " << where;
+}
+
+TEST_F(LaneletWrapperTest_KashiwanohaMap, centerPoints_joinLeavesNoNearDuplicate)
+{
+  const auto [nearest, where] = nearestConsecutiveDistanceOverJoins();
+  EXPECT_GT(nearest, 1e-6) << "at " << where;
+}
+
+TEST_F(LaneletWrapperTest_IntersectionMap, centerPoints_joinLeavesNoNearDuplicate)
+{
+  const auto [nearest, where] = nearestConsecutiveDistanceOverJoins();
+  EXPECT_GT(nearest, 1e-6) << "at " << where;
 }
 }  // namespace traffic_simulator::lanelet_wrapper::tests
